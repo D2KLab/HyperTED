@@ -3,6 +3,7 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Media Fragment Player Demo</title>
+
 </head>
 <body>
 <video id="video" controls autoplay>
@@ -11,15 +12,24 @@
 <pre id="parsed"></pre>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
 <script src="js/mediafragments.js"></script>
+<script src="http://popcornjs.org/code/dist/popcorn-complete.js"></script>
+
 <script type="text/javascript">
-    $(document).ready(function(){
-        var $video = $('#video');
-        var uri = $video.children('source').attr('src');
+    $(document).ready(function () {
+        var video = Popcorn('#video');
+        var uri = $(video.media).children('source').attr('src');
+        var pop = Popcorn.smart(video, uri);
+        pop.play();
         var parsedJSON = MediaFragments.parseMediaFragmentsUri(uri);
         console.log(parsedJSON);
         $('#parsed').text(parsedJSON);
+
+
+
+
     });
 </script>
+
 
 </body>
 </html>
