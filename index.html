@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Media Fragment Player Demo</title>
+</head>
+<body>
+<video id="video" controls autoplay>
+    <source src="http://media.w3.org/2010/05/sintel/trailer.mp4#t=21,32" type="video/mp4">
+</video>
+<pre id="parsed"></pre>
+<script src="http://code.jquery.com/jquery-2.1.0.js"></script>
+<script src="js/mediafragments.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        var $video = $('#video');
+        var uri = $video.children('source').attr('src');
+        var parsedJSON = MediaFragments.parseMediaFragmentsUri(uri);
+        console.log(parsedJSON);
+        $('#parsed').text(parsedJSON);
+    });
+</script>
+
+</body>
+</html>
