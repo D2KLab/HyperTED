@@ -3,28 +3,45 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Media Fragment Player Demo</title>
+    <link rel="stylesheet" type="text/css" href="Media-Fragment-Player-master/build/mediaelementplayer.min.css"/>
+    <link rel="stylesheet" type="text/css" href="Media-Fragment-Player-master/build/smfplayer.css"/>
 
 </head>
 <body>
-<video id="video" controls autoplay>
-    <source src="http://media.w3.org/2010/05/sintel/trailer.mp4#t=21,32" type="video/mp4">
-</video>
+<div id="video">
+    <div id="mfDiv"  style="border:3px solid #FF0000;"></div>
+</div>
+<div id="foo"></div>
+
 <pre id="parsed"></pre>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
+<script type="text/javascript" src="Media-Fragment-Player-master/build/mediaelement-and-player.min.js"></script>
+<script type="text/javascript" src="Media-Fragment-Player-master/build/smfplayer.min.js"></script>
 <script src="js/mediafragments.js"></script>
+
 <script src="http://popcornjs.org/code/dist/popcorn-complete.js"></script>
 
 <script type="text/javascript">
+    var uri = 'http://www.youtube.com/watch?v=hKdAdgR4LyI#t=5,9';
     $(document).ready(function () {
-        var video = Popcorn('#video');
-        var uri = $(video.media).children('source').attr('src');
-        var pop = Popcorn.smart(video, uri);
-        pop.play();
-        var parsedJSON = MediaFragments.parseMediaFragmentsUri(uri);
+        var mfuri = uri; //Media Fragment URI
+
+        //initialise smfplayer
+        var $player = $("#video").smfplayer({
+                    mfURI: mfuri
+                }
+                /*options*/
+                //$player.getTemporalMF().attr("id", "#smfplayer-overlay");
+
+        );
+
+        var redFrame = $("#mfDiv");
+        redFrame.height("6px");
+        redFrame.width("114px");
+
+        var parsedJSON = MediaFragments.parseMediaFragmentsUri(mfuri);
         console.log(parsedJSON);
         $('#parsed').text(parsedJSON);
-
-
 
 
     });
