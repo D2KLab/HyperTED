@@ -1,10 +1,7 @@
 /**
  * Created by Marella Sabatino on 04/04/2014.
  */
-var uri = 'http://www.youtube.com/watch?v=r88O2xHJXo0#t=15,25';
-var uriDM = 'http://www.dailymotion.com/video/xjwusq?start=120';
-var uriVmeo = 'http://vimeo.com/812027#t=214';
-var urihtml5 = 'http://media.w3.org/2010/05/sintel/trailer.mp4#t=15,19';
+var uri = videoURI;
 
 $(document).ready(function () {
 
@@ -26,11 +23,12 @@ $(document).ready(function () {
 
     setTimeout(function () {
 
+
         var $player_width = $(".mejs-time-total").width();
         var $player_height = $(".mejs-time-total").height();
         var $highligthedMF = $("#mfDiv");
         $highligthedMF.height(2 * $player_height);
-
+        $highligthedMF.width($player_width);
 
         setTimeout(function () {
             var $totDuration = $player.getDuration();
@@ -43,7 +41,9 @@ $(document).ready(function () {
 
             console.log($totDuration);
             console.log($timeUnit);
+            //var $MEstart = MediaFragments.time
 
+        }, 1000);
 
         }, 800);
     }, 150);
