@@ -14,7 +14,10 @@ $(document).ready(function () {
 
 
     var parsedJSON = MediaFragments.parseMediaFragmentsUri(mfuri);
-    //console.log(parsedJSON);
+    var MEstart = (parsedJSON.hash.t[0].start || parsedJSON.query.t[0].start) * 1000; //media frame starting point in milliseconds
+    var MEend = (parsedJSON.hash.t[0].end || parsedJSON.query.t[0].end) * 1000; //media frame ending point in milliseconds
+
+
     $('#parsed').text(parsedJSON);
 
 
@@ -31,20 +34,19 @@ $(document).ready(function () {
             var $totDuration = $player.getDuration();
             var $timeUnit = $player_width / $totDuration;
 
+            $highligthedMF.width((MEend - MEstart) * $timeUnit); //width of Media Frame Highlighting
+
+            $highligthedMF.offset({ left: ($(".mejs-button").width() + $(".mejs-time").width() + MEstart * $timeUnit) });
+            console.log($highligthedMF.position());
+
             console.log($totDuration);
             console.log($timeUnit);
             //var $MEstart = MediaFragments.time
 
         }, 1000);
 
-
-
-
-        //console.log($highligthedMF.getMeplayer());
-        //console.log(mfuri.getDuration());
-
-
-    }, 250);
+        }, 800);
+    }, 150);
 
 
 });

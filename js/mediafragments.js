@@ -86,7 +86,8 @@ var MediaFragments = (function(window) {
           } else {
             return false;
           }
-          if (hours > 23) {
+
+            if (hours > 23) {
             logWarning('Please ensure that hours <= 23.');                      
             return false;              
           }          
