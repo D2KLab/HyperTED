@@ -217,7 +217,7 @@
 			}; //in miliseconds
 			this.getDuration=function(){ //in milliseconds
 				var player = $(this).data('smfplayer').smfplayer;
-				if(player !== undefined)
+                if(player !== undefined)
 					return player.duration*1000;
 				else
 				{

@@ -1575,11 +1575,11 @@ mejs.YouTubeApi = {
 				break;
 			case 5:
 				// cued?
-				break;						
-			
-		}			
-		
-	}
+				break;
+		}
+
+
+    }
 }
 // IFRAME
 function onYouTubePlayerAPIReady() {

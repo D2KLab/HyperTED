@@ -1,0 +1,17 @@
+#container{
+    position: relative;
+}
+
+#mfDiv {
+    position: absolute;
+    bottom: -474px;
+    height: 6px;
+    background-color: rgb(255, 0, 0);
+    z-index: 5;
+    opacity: 0.5;
+}
+
+#video {
+    position: absolute;
+    z-index: 2;
+}

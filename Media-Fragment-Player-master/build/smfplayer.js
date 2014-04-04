@@ -882,8 +882,9 @@ smfplayer.utils={
 			}; //in miliseconds
 			this.getDuration=function(){ //in milliseconds
 				var player = $(this).data('smfplayer').smfplayer;
-				if(player !== undefined)
-					return player.duration*1000;
+
+                if(player !== undefined)
+					return player.media.duration*1000;
 				else
 				{
 					console.error("smfplayer hasn't been initalised");
