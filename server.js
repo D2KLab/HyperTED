@@ -3,21 +3,32 @@ var sys = require("sys"),
     path = require("path"),
     url = require("url"),
     filesys = require("fs"),
-    nerd = require('./nerd');
+    nerd = require('./nerd'),
+    handlebars = require("handlebars");
+
+var template = filesys.readFileSync("./index.html", "utf8");
 
 my_http.createServer(function (request, response) {
-    var my_path = url.parse(request.url).pathname;
+    var url_parts = url.parse(request.url, true);
+    var my_path = url_parts.pathname;
 
     if (my_path === '/nerd') {
         nerd.start(function (err, data) {
-            if (err){
+            if (err) {
                 sendResponse(500, "text/plain", data);
-            }else{
+            } else {
                 sendResponse(200, "text/plain", JSON.stringify(data));
             }
         });
-    } else {
+    } else if (my_path == '/video') {
+        var source = {
+            videoURI : url_parts.query.uri
+        }
+        var pageBuilder = handlebars.compile(template);
+        var pageText = pageBuilder(source);
 
+        sendResponse(200, "text/html", pageText);
+    } else {
         var full_path = path.join(process.cwd(), my_path);
         filesys.exists(full_path, function (exists) {
             if (!exists) {
@@ -52,3 +63,10 @@ my_http.createServer(function (request, response) {
     }
 }).listen(8080);
 sys.puts("Server Running on 8080");
+
+
+if (typeof String.prototype.startsWith != 'function') {
+    String.prototype.startsWith = function (str) {
+        return this.slice(0, str.length) == str;
+    };
+}

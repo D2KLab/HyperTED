@@ -1,7 +1,7 @@
 /**
  * Created by Marella Sabatino on 04/04/2014.
  */
-var uri = 'http://www.youtube.com/watch?v=LxHK5OSUXr0#t=5,9';
+var uri = videoURI;
 
 $(document).ready(function () {
 
