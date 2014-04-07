@@ -7,7 +7,7 @@
    * Ignore styling, which may occur after the end time or in-text
    * While not part of the "official" spec, majority of players support HTML and SSA styling tags
    * SSA-style tags are stripped, HTML style tags are left for the browser to handle:
-   *    HTML: <font>, <b>, <i>, <u>, <s>
+   *    HTML: <fonts>, <b>, <i>, <u>, <s>
    *    SSA:  \N or \n, {\cmdArg1}, {\cmd(arg1, arg2, ...)}
 
    * Data parameter is given by Popcorn, will need a text.
@@ -18,7 +18,7 @@
    * Example:
     1
     00:00:25,712 --> 00:00:30.399
-    This text is <font color="red">RED</font> and has not been {\pos(142,120)} positioned.
+    This text is <fonts color="red">RED</fonts> and has not been {\pos(142,120)} positioned.
     This takes \Nup three \nentire lines.
     This contains nested <b>bold, <i>italic, <u>underline</u> and <s>strike-through</s></u></i></b> HTML tags
     Unclosed but <b>supported tags are left in
@@ -79,7 +79,7 @@
       // Escape HTML entities
       sub.text = sub.text.replace( /</g, "&lt;" ).replace( />/g, "&gt;" );
 
-      // Unescape great than and less than when it makes a valid html tag of a supported style (font, b, u, s, i)
+      // Unescape great than and less than when it makes a valid html tag of a supported style (fonts, b, u, s, i)
       // Modified version of regex from Phil Haack's blog: http://haacked.com/archive/2004/10/25/usingregularexpressionstomatchhtml.aspx
       // Later modified by kev: http://kevin.deldycke.com/2007/03/ultimate-regular-expression-for-html-tag-parsing-with-php/
       sub.text = sub.text.replace( /&lt;(\/?(font|b|u|i|s))((\s+(\w|\w[\w\-]*\w)(\s*=\s*(?:\".*?\"|'.*?'|[^'\">\s]+))?)+\s*|\s*)(\/?)&gt;/gi, "<$1$3$7>" );

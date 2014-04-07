@@ -10,20 +10,80 @@
 </head>
 
 <body>
-<div id="container">
-    <div id="mfDiv"></div>
-    <div id="video"></div>
+<nav class="navbar" role="navigation">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="welcome.html">Media Fragment Enricher</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <form class="navbar-form navbar-right" method="get" action="./video" role="searchs">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input name="uri" type="url" placeholder="Insert a Media Fragment URL" class="form-control ">
+             <span class="input-group-btn">
+                    <button class="btn btn-primary" type="submit">Go!</button>
+             </span>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container-fluid -->
+</nav>
+
+<div class="container">
+    <div class="main-content">
+        <section id="player-sect">
+            <div id="video-title"></div>
+            <div id="player-container" class="clearfix">
+                <div id="mfDiv"></div>
+                <div id="video"></div>
+            </div>
+
+            <pre id="parsed"></pre>
+        </section>
+        <section id="playlist-sect">
+            <ul class="video-list">
+                <li class="video-link">
+                    <h4><a>Video 1</a></h4>
+                    <ul class="frag-list">
+                        <li class="frag-link"><a>Frag 1</a></li>
+                        <li class="frag-link"><a>Frag 2</a></li>
+                    </ul>
+                </li>
+                <li class="video-link">
+                    <h4><a>Video 2</a></h4>
+                    <ul class="frag-list">
+                        <li class="frag-link"><a>Frag 3</a></li>
+                        <li class="frag-link"><a>Frag 4</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+        </section>
+    </div>
 </div>
-
-<pre id="parsed"></pre>
-
 <script>
-    var videoURI = "{{videoURI}}";
+    var videoURI = "https://www.youtube.com/watch?v=pQZOzJpaqA8#t=0,5";
+    //    var videoURI = "{{videoURI}}";
+
 </script>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
-<script type="text/javascript" src="Media-Fragment-Player-master/build/mediaelement-and-player.min.js"></script>
-<script type="text/javascript" src="Media-Fragment-Player-master/build/smfplayer.js"></script>
-<script src="js/mediafragments.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="Media-Fragment-Player-master/build/mediaelement-and-player.min.js"></script>
+<script src="Media-Fragment-Player-master/build/smfplayer.js"></script>
 <script src="js/MFPlayerDemo.js"></script>
 
 <script src="http://popcornjs.org/code/dist/popcorn-complete.js"></script>

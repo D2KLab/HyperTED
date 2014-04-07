@@ -1,0 +1,17 @@
+@mixin font-face($style-name, $file, $weight: normal, $style: normal) {
+  $filepath: "fonts/" + $style-name + "/" + $file;
+  @font-face {
+    font-family: "#{$style-name}";
+    src: url($filepath + ".eot");
+    src: url($filepath + ".eot?#iefix") format('embedded-opentype'), url($filepath + ".woff") format('woff'), url($filepath + ".ttf") format('truetype'), url($filepath + ".svg#" + $style-name + "") format('svg');
+    font: {
+      weight: $weight;
+      style: $style;
+    }
+  }
+}
+
+@include font-face(CaviarDreams, CaviarDreams-webfont);
+@include font-face(CaviarDreams, Caviar_Dreams_Bold-webfont, bold);
+@include font-face(CaviarDreams, CaviarDreams_Italic-webfont, normal, italic);
+@include font-face(CaviarDreams, CaviarDreams_BoldItalic-webfont, bold, italic);

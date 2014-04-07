@@ -2454,7 +2454,7 @@ var JSLINT = (function () {
         display: ['block', 'compact', 'inline', 'inline-block', 'inline-table', 'list-item', 'marker', 'none', 'run-in', 'table', 'table-caption', 'table-cell', 'table-column', 'table-column-group', 'table-footer-group', 'table-header-group', 'table-row', 'table-row-group'],
         'empty-cells': ['show', 'hide'],
         'float': ['left', 'none', 'right'],
-        font: ['caption', 'icon', 'menu', 'message-box', 'small-caption', 'status-bar', true, 'font-size', 'font-style', 'font-weight', 'font-family'],
+        font: ['caption', 'icon', 'menu', 'message-box', 'small-caption', 'status-bar', true, 'fonts-size', 'fonts-style', 'fonts-weight', 'fonts-family'],
         'font-family': cssCommaList,
         'font-size': ['xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large', 'larger', 'smaller', cssLength],
         'font-size-adjust': ['none', cssNumber],

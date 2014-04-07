@@ -1,0 +1,101 @@
+@import "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css";
+//@import "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css";
+@import "font";
+@import "mixins";
+
+/* colors */
+$light_gray: #f4f4f4;
+$medium_gray: #aaaaaa;
+$dark_gray: #5d5d5d;
+
+.clearfix {
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand {
+  font: {
+    family: CaviarDreams, Helvetica, sans-serif;
+  }
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+body {
+  background: $light_gray;
+}
+
+.navbar {
+  background: #fff;
+  @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
+  @include border-radius(0);
+}
+
+.main-content {
+  @include flexBox;
+  flex-direction: row;
+  justify-content: space-around;
+
+  section {
+    &:first-child {
+      flex: 2.0;
+    }
+    &:last-child {
+      flex: 1.0;
+    }
+  }
+}
+
+#player-container {
+  position: relative;
+}
+
+#mfDiv {
+  position: absolute;
+  bottom: -474px;
+  height: 6px;
+  background-color: rgb(255, 0, 0);
+  z-index: 5;
+  opacity: 0.5;
+}
+
+#video {
+  position: relative;
+  z-index: 2;
+}
+
+ul.video-list {
+  list-style: none;
+  background: #fff;
+  padding: 0 10px;
+  @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
+  li.video-link {
+    padding: 10px;
+    border-top: 1px solid $medium_gray;
+    &:first-child {
+      border-top: none;
+    }
+    ul.frag-list {
+      li.frag-link {
+        a:before {
+          content: "\e072";
+          font-family: 'Glyphicons Halflings';
+          font-size: 0.6em;
+          padding: 0 3px;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+      }
+    }
+  }
+}
+

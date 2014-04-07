@@ -1,0 +1,109 @@
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  -ms-border-radius: $radius;
+  -o-border-radius: $radius;
+  border-radius: $radius;
+}
+
+@mixin transition($prop, $time) {
+  -webkit-transition: $prop $time ease-out;
+  -moz-transition: $prop $time ease-out;
+  -o-transition: $prop $time ease-out;
+  transition: $prop $time ease-out;
+}
+
+@mixin linear-transition($prop, $time) {
+  -webkit-transition: $prop $time linear;
+  -moz-transition: $prop $time linear;
+  -o-transition: $prop $time linear;
+  transition: $prop $time linear;
+}
+
+@mixin box-shadow($hshad, $vshad, $blur, $spread, $color) {
+  -moz-box-shadow: $hshad $vshad $blur $spread $color;
+  -webkit-box-shadow: $hshad $vshad $blur $spread $color;
+  box-shadow: $hshad $vshad $blur $spread $color;
+}
+
+@mixin inner-shadow($hshad, $vshad, $blur, $spread, $color) {
+  -moz-box-shadow: $hshad $vshad $blur $spread $color inset;
+  -webkit-box-shadow: $hshad $vshad $blur $spread $color inset;
+  box-shadow: $hshad $vshad $blur $spread $color inset;
+}
+
+@mixin vert-gradient-bg($topColor, $bottomColor) {
+  background: $topColor;
+  background: -moz-linear-gradient(top, $topColor 0%, $bottomColor 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, $topColor), color-stop(100%, $bottomColor));
+  background: -webkit-linear-gradient(top, $topColor 0%, $bottomColor 100%);
+  background: -o-linear-gradient(top, $topColor 0%, $bottomColor 100%);
+  background: -ms-linear-gradient(top, $topColor 0%, $bottomColor 100%);
+  background: linear-gradient(to bottom, $topColor 0%, $bottomColor 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$topColor', endColorstr='$bottomColor', GradientType=0);
+}
+
+@mixin rotate($degree) {
+  transform: rotate(#{$degree}deg);
+
+  /* Safari */
+  -webkit-transform: rotate(#{$degree}deg);
+
+  /* Firefox */
+  -moz-transform: rotate(#{$degree}deg);
+
+  /* IE */
+  -ms-transform: rotate(#{$degree}deg);
+
+  /* Opera */
+  -o-transform: rotate(#{$degree}deg);
+
+  /* Internet Explorer */
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=#{round($degree / 90)});
+}
+
+@mixin transform-origin($y, $x) {
+  transform-origin: $y $x;
+  -webkit-transform-origin: $y $x;
+  -moz-transform-origin: $y $x;
+  -ms-transform-origin: $y $x;
+  -o-transform-origin: $y $x;
+}
+
+@mixin rotate3D($Xdegree, $Ydegree) {
+  transform: rotateX(#{$Xdegree}deg) rotateY(#{$Ydegree}deg);
+  -moz-transform: rotateX(#{$Xdegree}deg) rotateY(#{$Ydegree}deg); /* Firefox */
+  -webkit-transform: rotateX(#{$Xdegree}deg) rotateY(#{$Ydegree}deg); /* Safari and Chrome */
+  -o-transform: rotateX(#{$Xdegree}deg) rotateY(#{$Ydegree}deg); /* Opera */
+}
+
+@mixin scale($ratio) {
+  transform: scale($ratio);
+  -ms-transform: scale($ratio); /* IE 9 */
+  -moz-transform: scale($ratio); /* Firefox */
+  -webkit-transform: scale($ratio); /* Safari and Chrome */
+  -o-transform: scale($ratio); /* Opera */
+}
+
+@mixin unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+@mixin border-box-sizing {
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box; /* Firefox, other Gecko */
+  box-sizing: border-box; /* Opera/IE 8+ */
+}
+
+@mixin flexBox {
+  display: -webkit-box; /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box; /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox; /* TWEENER - IE 10 */
+  display: -webkit-flex; /* NEW - Chrome */
+  display: flex; /* NEW, Spec - Opera 12.1, Firefox 20+ */
+}

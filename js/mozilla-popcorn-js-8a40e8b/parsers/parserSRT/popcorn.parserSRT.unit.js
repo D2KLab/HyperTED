@@ -28,7 +28,7 @@ asyncTest( "Popcorn 0.3 SRT Parser Plugin", function () {
           id: 4,
           start: 31,
           end: 31.999,
-          text: 'This text is <font color="red">RED</font> and has not been positioned.'
+          text: 'This text is <fonts color="red">RED</fonts> and has not been positioned.'
         },
         {
           id: 5,

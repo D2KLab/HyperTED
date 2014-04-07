@@ -17,7 +17,7 @@
   * Border_color - border color of the activity feed. Names (i.e: "white") and html color codes are valid
   * Colorscheme - changes the color of almost all plugins. Options: light(default) / dark
   * Event_app_id - an app_id is required for the live-stream plugin
-  * Font - the font of the text contained in the plugin. Options: arial / segoe ui / tahoma / trebuchet ms / verdana / lucida grande
+  * Font - the fonts of the text contained in the plugin. Options: arial / segoe ui / tahoma / trebuchet ms / verdana / lucida grande
   * Header - displays the title of like-box or activity feed. Options: true / false(default)
   * Href - url to apply to the plugin. Default is current page
   * Layout - changes the format of the 'like' count (written in english or a number in a callout).
@@ -240,7 +240,7 @@
       // create an array of Facebook widget attributes
       var fbAttrs = (
         "width height layout show_faces stream header colorscheme" +
-        " maxrows border_color recommendations font always_post_to_friends xid" +
+        " maxrows border_color recommendations fonts always_post_to_friends xid" +
         " num_posts"
       ).split(" ");
 

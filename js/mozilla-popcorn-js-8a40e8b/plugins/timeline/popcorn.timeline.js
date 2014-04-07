@@ -72,8 +72,8 @@
     //  Default to empty if not used
     //options.innerHTML = options.innerHTML || "";
 
-    contentDiv.innerHTML = "<p><span id='big' style='font-size:24px; line-height: 130%;' >" + options.title + "</span><br />" +
-    "<span id='mid' style='font-size: 16px;'>" + options.text + "</span><br />" + options.innerHTML;
+    contentDiv.innerHTML = "<p><span id='big' style='fonts-size:24px; line-height: 130%;' >" + options.title + "</span><br />" +
+    "<span id='mid' style='fonts-size: 16px;'>" + options.text + "</span><br />" + options.innerHTML;
 
     return {
 

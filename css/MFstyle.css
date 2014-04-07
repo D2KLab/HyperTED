@@ -1,17 +1,109 @@
-#container{
-    position: relative;
-}
+@import "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css";
+@font-face {
+  font-family: "CaviarDreams";
+  src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot");
+  src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams-webfont.svg#CaviarDreams") format("svg");
+  font-weight: normal;
+  font-style: normal; }
+
+@font-face {
+  font-family: "CaviarDreams";
+  src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
+  src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
+  font-weight: bold;
+  font-style: normal; }
+
+@font-face {
+  font-family: "CaviarDreams";
+  src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot");
+  src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.svg#CaviarDreams") format("svg");
+  font-weight: normal;
+  font-style: italic; }
+
+@font-face {
+  font-family: "CaviarDreams";
+  src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot");
+  src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.svg#CaviarDreams") format("svg");
+  font-weight: bold;
+  font-style: italic; }
+
+/* colors */
+.clearfix:before, .clearfix:after {
+  content: "";
+  display: table; }
+.clearfix:after {
+  clear: both; }
+
+h1, h2, h3, h4, h5, h6, .navbar-brand {
+  font-family: CaviarDreams, Helvetica, sans-serif; }
+
+ul {
+  padding: 0;
+  list-style: none; }
+
+body {
+  background: #f4f4f4; }
+
+.navbar {
+  background: #fff;
+  -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
+  -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
+  box-shadow: 0 1px 8px -2px #5d5d5d;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -ms-border-radius: 0;
+  -o-border-radius: 0;
+  border-radius: 0; }
+
+.main-content {
+  display: -webkit-box;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;
+  /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;
+  /* TWEENER - IE 10 */
+  display: -webkit-flex;
+  /* NEW - Chrome */
+  display: flex;
+  /* NEW, Spec - Opera 12.1, Firefox 20+ */
+  flex-direction: row;
+  justify-content: space-around; }
+  .main-content section:first-child {
+    flex: 2.0; }
+  .main-content section:last-child {
+    flex: 1.0; }
+
+#player-container {
+  position: relative; }
 
 #mfDiv {
-    position: absolute;
-    bottom: -474px;
-    height: 6px;
-    background-color: rgb(255, 0, 0);
-    z-index: 5;
-    opacity: 0.5;
-}
+  position: absolute;
+  bottom: -474px;
+  height: 6px;
+  background-color: red;
+  z-index: 5;
+  opacity: 0.5; }
 
 #video {
-    position: absolute;
-    z-index: 2;
-}
+  position: relative;
+  z-index: 2; }
+
+ul.video-list {
+  list-style: none;
+  background: #fff;
+  padding: 0 10px;
+  -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
+  -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
+  box-shadow: 0 1px 8px -2px #5d5d5d; }
+  ul.video-list li.video-link {
+    padding: 10px;
+    border-top: 1px solid #aaaaaa; }
+    ul.video-list li.video-link:first-child {
+      border-top: none; }
+    ul.video-list li.video-link ul.frag-list li.frag-link a:before {
+      content: "\e072";
+      font-family: 'Glyphicons Halflings';
+      font-size: 0.6em;
+      padding: 0 3px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale; }

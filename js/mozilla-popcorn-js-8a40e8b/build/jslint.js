@@ -187,9 +187,9 @@ SOFTWARE.
     dodgerblue, dt, edition, else, em, embed, empty, "empty-cells",
     encodeURI, encodeURIComponent, entityify, eqeqeq, errors, escape, eval,
     event, evidence, evil, ex, exception, exec, exps, fieldset, filesystem,
-    firebrick, first, float, floor, floralwhite, focus, focusWidget, font,
-    "font-face", "font-family", "font-size", "font-size-adjust",
-    "font-stretch", "font-style", "font-variant", "font-weight",
+    firebrick, first, float, floor, floralwhite, focus, focusWidget, fonts,
+    "fonts-face", "fonts-family", "fonts-size", "fonts-size-adjust",
+    "fonts-stretch", "fonts-style", "fonts-variant", "fonts-weight",
     forestgreen, forin, form, fragment, frame, frames, frameset, from,
     fromCharCode, fuchsia, fud, funct, function, functions, g, gainsboro,
     gc, getComputedStyle, ghostwhite, global, globals, gold, goldenrod,
@@ -3032,8 +3032,8 @@ loop:   for (;;) {
         'float': ['left', 'none', 'right'],
         font: [
             'caption', 'icon', 'menu', 'message-box', 'small-caption',
-            'status-bar', true, 'font-size', 'font-style', 'font-weight',
-            'font-family'
+            'status-bar', true, 'fonts-size', 'fonts-style', 'fonts-weight',
+            'fonts-family'
         ],
         'font-family': cssCommaList,
         'font-size': [
