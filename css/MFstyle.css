@@ -88,6 +88,9 @@ body {
   position: relative;
   z-index: 2; }
 
+.mejs-time-loaded {
+  background-color: lime; }
+
 ul.video-list {
   list-style: none;
   background: #fff;
