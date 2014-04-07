@@ -12,16 +12,19 @@ $(document).ready(function () {
     });
 
     var parsedJSON = $player.getMFJson();
-    var MEstart = (parsedJSON.hash.t[0].start * 1000) || ((parsedJSON.query.t[0].start) * 1000) || (mfuri.start * 1000); //media frame starting point in milliseconds
-    var MEend = (parsedJSON.hash.t[0].end * 1000) || (parsedJSON.query.t[0].end * 1000) || (mfuri.end * 1000); //media frame ending point in milliseconds
-
+    var MEt = parsedJSON.hash.t || parsedJSON.query.t;
+    if (typeof Met != 'undefined') {
+        var MEstart = MEt[0].start * 1000; //media frame starting point in milliseconds
+        var MEend = MEt[0].end * 1000; //media frame ending point in milliseconds
+    }
 
     $('#parsed').text(parsedJSON);
 
 
     var video_tag = $("div#mep_0").find("video");
-    if (video_tag.readyState == 4){
-        console.log(video_tag);
+    window.video_tag = video_tag[0];
+    video_tag[0].oncanplay = function() {
+        console.log('********');
         highlight();
     }
 
@@ -35,7 +38,7 @@ $(document).ready(function () {
         console.log($player_height);
         console.log($player_width);
 
-        video_tag.onloadeddata = puppa();
+        video_tag.onloadedmetadata = puppa();
 
         function puppa() {
             console.log("emmostoqquà!");

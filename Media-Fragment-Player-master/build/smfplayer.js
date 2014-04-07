@@ -665,7 +665,7 @@ smfplayer.utils={
 })(jQuery);
 (function($){
 	
-	var VERBOSE=false;	
+	var VERBOSE=true;
 	//more options can be found at http://mediaelementjs.com/#api
 	var defaults = {
 			width:640, //the width in pixel of the video on the webpage, no matter if it's audio or video
