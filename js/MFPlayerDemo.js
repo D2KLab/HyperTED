@@ -1,6 +1,3 @@
-/**
- * Created by Mariella Sabatino on 04/04/2014.
- */
 var uri = videoURI;
 
 $(document).ready(function () {
@@ -37,9 +34,9 @@ $(document).ready(function () {
 //        highlight();
 //    }
 
-    setInterval(function () {
-        console.log(video_tag.get(0).readyState);
-    },1000);
+//    setInterval(function () {
+//        console.log(video_tag.get(0).readyState);
+//    },1000);
 
 
     function highlight() {

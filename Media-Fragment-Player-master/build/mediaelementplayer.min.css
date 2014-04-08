@@ -159,7 +159,7 @@
     height: 16px;
     width: 16px;
     border: 0;
-    background: transparent url(controls.png) no-repeat;
+    background: transparent url(../src/mediaelementjs/css/controls.png) no-repeat;
 }
 
 .mejs-controls .mejs-button button:focus {
