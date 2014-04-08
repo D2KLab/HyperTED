@@ -68,18 +68,16 @@ body {
   position: absolute;
   bottom: 10px;
   height: 6px;
-  background-color: rgb(255, 0, 0);
+  background-color: rgb(255, 255, 0);
   z-index: 5;
   opacity: 0.5;
+  pointer-events: none;
+  @include border-radius(2px);
 }
 
 #video {
   position: relative;
   z-index: 2;
-}
-
-.mejs-controls .mejs-time-rail .mejs-time-loaded {
-  background-color: rgb(0, 255, 0);
 }
 
 ul.video-list {

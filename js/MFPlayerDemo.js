@@ -11,6 +11,8 @@ $(document).ready(function () {
     });
 
 
+    $( "#mfDiv" ).appendTo( $(".mejs-controls") );
+
     function highlight() {
         if (hightlighted) return;
         var $player_width = $(".mejs-time-total").width(); //total width of timeline
@@ -29,13 +31,15 @@ $(document).ready(function () {
             var MEstart = MEt[0].start * 1000; //media frame starting point in milliseconds
             var MEend = MEt[0].end * 1000; //media frame ending point in milliseconds
 
-            $highligthedMF.offset({ left: ($(".mejs-button").outerWidth() + $(".mejs-currenttime-container").outerWidth() + (MEstart * $timeUnit) + 15) });
-            console.log($(".mejs-button").outerWidth() + $(".mejs-currenttime-container").outerWidth() + (MEstart * $timeUnit) + 15);
+            $highligthedMF.css({ left: ($(".mejs-playpause-button").outerWidth() + $(".mejs-currenttime-container").outerWidth() + (MEstart * $timeUnit)) + 5 });
             $highligthedMF.width((MEend - MEstart) * $timeUnit); //width of Media Frame Highlighting
         }
 
         hightlighted = true;
+
     }
+
+
 
     if (smfplayer.utils.isYouTubeURL(uri)) {
         var video_id = uri.match(/v=(.{11})/)[1];

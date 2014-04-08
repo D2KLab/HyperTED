@@ -10,35 +10,45 @@ $red: #ff0000;
 /*font*/
 $caviar: CaviarDreams, Helvetica, sans-serif;
 
-.mejs-container div.mejs-controls {
-  //player control and progress bar container
-  background: {
-    image: none;
-    /* Fallback for web browsers that don't support RGBa */
-    color: $light_gray;
-    /* RGBa with 0.6 opacity */
-    color: rgba(244, 244, 244, 0.7);
-    /* For IE 5.5 - 7*/
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#99f4f4f4, endColorstr=#99f4f4f4);
-    /* For IE 8*/
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99f4f4f4, endColorstr=#99f4f4f4)";
+.mejs-container {
 
+  .mejs-video {
+    @include box-shadow(0, 1px, 8px, -2px, $darker_gray);
   }
-  //@include box-shadow(0, 1px, 8px, -2px, $darker_gray);
-}
 
-.mejs-container .mejs-controls .mejs-time span{
-  //player time
-  color: $darker_gray;
- @include font-face(CaviarDreams, Caviar_Dreams_Bold-webfont, bold);
-}
+  /*player control and progress bar container*/
+  div.mejs-controls {
+    background: {
+      image: none;
+      /* Fallback for web browsers that don't support RGBa */
+      color: $light_gray;
+      /* RGBa with 0.7 opacity */
+      color: rgba(244, 244, 244, 0.7);
+      /* For IE 5.5 - 7*/
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#99f4f4f4, endColorstr=#99f4f4f4);
+      /* For IE 8*/
+      -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99f4f4f4, endColorstr=#99f4f4f4)";
+    }
 
-.mejs-controls .mejs-time-rail span.mejs-time-current {
-  //current time
-  @include vert-gradient-bg(rgb(128, 8, 12), rgb(200, 55, 76));
-}
+    /*current and total time*/
+    .mejs-time span {
+      color: $darker_gray;
+      @include font-face(CaviarDreams, Caviar_Dreams_Bold-webfont, bold);
+    }
 
-.mejs-controls .mejs-time-rail span.mejs-time-loaded {
-  //loaded time
-  @include vert-gradient-bg($darker_gray, $gray);
+    /*progress bars*/
+    .mejs-time-rail {
+
+      /*current time progress bar*/
+      span.mejs-time-current {
+        @include vert-gradient-bg(rgb(128, 8, 12), rgb(200, 55, 76));
+      }
+
+      /*loaded time progress bar*/
+      span.mejs-time-loaded {
+        @include vert-gradient-bg($darker_gray, $gray);
+      }
+
+    }
+  }
 }

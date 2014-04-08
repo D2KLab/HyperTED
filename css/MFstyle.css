@@ -1,60 +1,103 @@
 @import "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css";
+@import "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css";
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: normal; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: normal; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: italic; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: italic; }
-
-.mejs-container .mejs-controls .mejs-time span {
-  color: #444444; }
 @font-face {
-  .mejs-container .mejs-controls .mejs-time span {
+  font-family: "CaviarDreams";
+  src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot");
+  src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams-webfont.svg#CaviarDreams") format("svg");
+  font-weight: normal;
+  font-style: normal; }
+@font-face {
+  font-family: "CaviarDreams";
+  src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
+  src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
+  font-weight: bold;
+  font-style: normal; }
+@font-face {
+  font-family: "CaviarDreams";
+  src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot");
+  src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.svg#CaviarDreams") format("svg");
+  font-weight: normal;
+  font-style: italic; }
+@font-face {
+  font-family: "CaviarDreams";
+  src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot");
+  src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.svg#CaviarDreams") format("svg");
+  font-weight: bold;
+  font-style: italic; }
+/* colors */
+/*font*/
+.mejs-container {
+  /*player control and progress bar container*/ }
+  .mejs-container .mejs-video {
+    -moz-box-shadow: 0 1px 8px -2px #444444;
+    -webkit-box-shadow: 0 1px 8px -2px #444444;
+    box-shadow: 0 1px 8px -2px #444444; }
+  .mejs-container div.mejs-controls {
+    background-image: none;
+    /* Fallback for web browsers that don't support RGBa */
+    background-color: #f4f4f4;
+    /* RGBa with 0.7 opacity */
+    background-color: rgba(244, 244, 244, 0.7);
+    /* For IE 5.5 - 7*/
+    background-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#99f4f4f4, endColorstr=#99f4f4f4);
+    /* For IE 8*/
+    background--ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99f4f4f4, endColorstr=#99f4f4f4)";
+    /*current and total time*/
+    /*progress bars*/ }
+    .mejs-container div.mejs-controls .mejs-time span {
+      color: #444444; }
+@font-face {
+  .mejs-container div.mejs-controls .mejs-time span {
     font-family: "CaviarDreams";
     src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
     src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
     font-weight: bold;
     font-style: normal; } }
-.mejs-controls .mejs-time-rail span.mejs-time-current {
-  background: #80080c;
-  background: -moz-linear-gradient(top, #80080c 0%, #c8374c 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #80080c), color-stop(100%, #c8374c));
-  background: -webkit-linear-gradient(top, #80080c 0%, #c8374c 100%);
-  background: -o-linear-gradient(top, #80080c 0%, #c8374c 100%);
-  background: -ms-linear-gradient(top, #80080c 0%, #c8374c 100%);
-  background: linear-gradient(to bottom, #80080c 0%, #c8374c 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$topColor', endColorstr='$bottomColor', GradientType=0); }
-
-.mejs-controls .mejs-time-rail span.mejs-time-loaded {
-  background: #444444;
-  background: -moz-linear-gradient(top, #444444 0%, #929292 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #444444), color-stop(100%, #929292));
-  background: -webkit-linear-gradient(top, #444444 0%, #929292 100%);
-  background: -o-linear-gradient(top, #444444 0%, #929292 100%);
-  background: -ms-linear-gradient(top, #444444 0%, #929292 100%);
-  background: linear-gradient(to bottom, #444444 0%, #929292 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$topColor', endColorstr='$bottomColor', GradientType=0); }
+    .mejs-container div.mejs-controls .mejs-time-rail {
+      /*current time progress bar*/
+      /*loaded time progress bar*/ }
+      .mejs-container div.mejs-controls .mejs-time-rail span.mejs-time-current {
+        background: #80080c;
+        background: -moz-linear-gradient(top, #80080c 0%, #c8374c 100%);
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #80080c), color-stop(100%, #c8374c));
+        background: -webkit-linear-gradient(top, #80080c 0%, #c8374c 100%);
+        background: -o-linear-gradient(top, #80080c 0%, #c8374c 100%);
+        background: -ms-linear-gradient(top, #80080c 0%, #c8374c 100%);
+        background: linear-gradient(to bottom, #80080c 0%, #c8374c 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$topColor', endColorstr='$bottomColor', GradientType=0); }
+      .mejs-container div.mejs-controls .mejs-time-rail span.mejs-time-loaded {
+        background: #444444;
+        background: -moz-linear-gradient(top, #444444 0%, #929292 100%);
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #444444), color-stop(100%, #929292));
+        background: -webkit-linear-gradient(top, #444444 0%, #929292 100%);
+        background: -o-linear-gradient(top, #444444 0%, #929292 100%);
+        background: -ms-linear-gradient(top, #444444 0%, #929292 100%);
+        background: linear-gradient(to bottom, #444444 0%, #929292 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$topColor', endColorstr='$bottomColor', GradientType=0); }
 
 /* colors */
 .clearfix:before, .clearfix:after {
@@ -111,16 +154,19 @@ body {
   position: absolute;
   bottom: 10px;
   height: 6px;
-  background-color: red;
+  background-color: yellow;
   z-index: 5;
-  opacity: 0.5; }
+  opacity: 0.5;
+  pointer-events: none;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+  border-radius: 2px; }
 
 #video {
   position: relative;
   z-index: 2; }
-
-.mejs-controls .mejs-time-rail .mejs-time-loaded {
-  background-color: lime; }
 
 ul.video-list {
   list-style: none;
