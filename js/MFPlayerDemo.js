@@ -48,8 +48,15 @@ $(document).ready(function () {
 
             retriveInfo(video_url, function (data) {
                 var video_title = data.entry.title.$t;
+                var video_thumb = data.entry.media$group.media$thumbnail[0].url;
+                $('h4 a', $li).text(video_title).attr('alt', video_title).attr('href', video_url);
+                var $thumb = $('<a>').attr('href', video_url).attr('alt', video_title).append($('<img>').attr('src', video_thumb).addClass('thumb'));
+                $('.content', $li).prepend($thumb);
 
-                $('h4 a', $li).text(video_title);
+                $('.loader', $li).hide();
+                $('.content', $li).show(function () {
+                    $(this).addClass('visible');
+                });
             });
         }
     });
