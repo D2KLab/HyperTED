@@ -1380,7 +1380,6 @@ if (typeof jQuery != 'undefined') {
 
 				// add class to current time
 				controls.find('.mejs-currenttime').parent().addClass('mejs-currenttime-container');
-				
 				$('<div class="mejs-time mejs-duration-container">'+
 					'<span class="mejs-duration">' + 
 						(t.options.duration > 0 ? 
@@ -1412,7 +1411,7 @@ if (typeof jQuery != 'undefined') {
 			
 			if (t.media.duration && t.durationD) {
 				t.durationD.html(mejs.Utility.secondsToTimeCode(t.media.duration, t.options.alwaysShowHours, t.options.showTimecodeFrameCount, t.options.framesPerSecond || 25));
-			}		
+			}
 		}
 	});
 
