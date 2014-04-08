@@ -27,6 +27,35 @@
   font-weight: bold;
   font-style: italic; }
 
+.mejs-container .mejs-controls .mejs-time span {
+  color: #444444; }
+@font-face {
+  .mejs-container .mejs-controls .mejs-time span {
+    font-family: "CaviarDreams";
+    src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
+    src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
+    font-weight: bold;
+    font-style: normal; } }
+.mejs-controls .mejs-time-rail span.mejs-time-current {
+  background: #80080c;
+  background: -moz-linear-gradient(top, #80080c 0%, #c8374c 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #80080c), color-stop(100%, #c8374c));
+  background: -webkit-linear-gradient(top, #80080c 0%, #c8374c 100%);
+  background: -o-linear-gradient(top, #80080c 0%, #c8374c 100%);
+  background: -ms-linear-gradient(top, #80080c 0%, #c8374c 100%);
+  background: linear-gradient(to bottom, #80080c 0%, #c8374c 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$topColor', endColorstr='$bottomColor', GradientType=0); }
+
+.mejs-controls .mejs-time-rail span.mejs-time-loaded {
+  background: #444444;
+  background: -moz-linear-gradient(top, #444444 0%, #929292 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #444444), color-stop(100%, #929292));
+  background: -webkit-linear-gradient(top, #444444 0%, #929292 100%);
+  background: -o-linear-gradient(top, #444444 0%, #929292 100%);
+  background: -ms-linear-gradient(top, #444444 0%, #929292 100%);
+  background: linear-gradient(to bottom, #444444 0%, #929292 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$topColor', endColorstr='$bottomColor', GradientType=0); }
+
 /* colors */
 .clearfix:before, .clearfix:after {
   content: "";
