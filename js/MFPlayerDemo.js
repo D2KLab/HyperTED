@@ -5,63 +5,39 @@ var uri = videoURI;
 
 $(document).ready(function () {
     var mfuri = uri; //Media Fragment URI
+    var hightlighted = false;
 
     //initialise smfplayer
     var $player = $("#video").smfplayer({
-        mfURI: mfuri
+        mfURI: mfuri,
+        ontimeready: highlight
     });
-
-    var parsedJSON = $player.getMFJson();
-    var MEt = parsedJSON.hash.t || parsedJSON.query.t;
-    if (typeof Met != 'undefined') {
-        var MEstart = MEt[0].start * 1000; //media frame starting point in milliseconds
-        var MEend = MEt[0].end * 1000; //media frame ending point in milliseconds
-    }
-
-    $('#parsed').text(parsedJSON);
-
-
-    var video_tag = $("div#mep_0").find("video");
-    window.video_tag = video_tag[0];
-    video_tag[0].oncanplay = function() {
-        console.log('********');
-        highlight();
-    }
 
 
     function highlight() {
-        console.log("stoqquà!");
+        if (hightlighted) return;
         var $player_width = $(".mejs-time-total").width(); //total width of timeline
         var $player_height = $(".mejs-time-total").height();
         var $highligthedMF = $("#mfDiv");
         $highligthedMF.height($player_height);
-        console.log($player_height);
-        console.log($player_width);
 
-        video_tag.onloadedmetadata = puppa();
+        var $totDuration = $player.getDuration();
+        var $timeUnit = $player_width / $totDuration;
 
-        function puppa() {
-            console.log("emmostoqquà!");
-            var $totDuration = $player.getDuration();
-            var $timeUnit = $player_width / $totDuration;
+        var parsedJSON = $player.getMFJson();
+        $('#parsed').text(parsedJSON);
 
+        var MEt = parsedJSON.hash.t || parsedJSON.query.t;
+        if (typeof MEt != 'undefined') {
+            var MEstart = MEt[0].start * 1000; //media frame starting point in milliseconds
+            var MEend = MEt[0].end * 1000; //media frame ending point in milliseconds
 
             $highligthedMF.offset({ left: ($(".mejs-button").outerWidth() + $(".mejs-currenttime-container").outerWidth() + (MEstart * $timeUnit) + 15) });
-
+            console.log($(".mejs-button").outerWidth() + $(".mejs-currenttime-container").outerWidth() + (MEstart * $timeUnit) + 15);
             $highligthedMF.width((MEend - MEstart) * $timeUnit); //width of Media Frame Highlighting
-
-            setTimeout(function () {
-                console.log(MEend * $timeUnit);
-                console.log(MEstart * $timeUnit);
-
-                console.log($totDuration);
-                console.log($timeUnit);
-
-            }, 3000);
-
-
         }
 
+        hightlighted = true;
     }
 
     if (smfplayer.utils.isYouTubeURL(uri)) {

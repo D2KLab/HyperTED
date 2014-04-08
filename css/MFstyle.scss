@@ -38,6 +38,10 @@ body {
   background: #fff;
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
   @include border-radius(0);
+
+  .form-group {
+    max-width: 300px;
+  }
 }
 
 .main-content {
@@ -61,7 +65,7 @@ body {
 
 #mfDiv {
   position: absolute;
-  bottom: -474px;
+  bottom: 10px;
   height: 6px;
   background-color: rgb(255, 0, 0);
   z-index: 5;
@@ -73,7 +77,7 @@ body {
   z-index: 2;
 }
 
-.mejs-time-loaded {
+.mejs-controls .mejs-time-rail .mejs-time-loaded {
   background-color: rgb(0, 255, 0);
 }
 

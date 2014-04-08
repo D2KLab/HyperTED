@@ -54,6 +54,8 @@ body {
   -ms-border-radius: 0;
   -o-border-radius: 0;
   border-radius: 0; }
+  .navbar .form-group {
+    max-width: 300px; }
 
 .main-content {
   display: -webkit-box;
@@ -78,7 +80,7 @@ body {
 
 #mfDiv {
   position: absolute;
-  bottom: -474px;
+  bottom: 10px;
   height: 6px;
   background-color: red;
   z-index: 5;
@@ -88,7 +90,7 @@ body {
   position: relative;
   z-index: 2; }
 
-.mejs-time-loaded {
+.mejs-controls .mejs-time-rail .mejs-time-loaded {
   background-color: lime; }
 
 ul.video-list {

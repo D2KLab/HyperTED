@@ -3146,7 +3146,7 @@ if (typeof jQuery != 'undefined') {
 			
 			if (t.media.duration && t.durationD) {
 				t.durationD.html(mejs.Utility.secondsToTimeCode(t.media.duration, t.options.alwaysShowHours, t.options.showTimecodeFrameCount, t.options.framesPerSecond || 25));
-			}		
+			}
 		}
 	});
 
