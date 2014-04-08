@@ -998,6 +998,7 @@ smfplayer.utils={
 
 					        }
 				        }
+                        var ontimereadytriggered = false;
 
 				        mediaElement.addEventListener('timeupdate', function(e) {
 
@@ -1062,7 +1063,10 @@ smfplayer.utils={
 					        }
 
                             if (typeof settings.ontimeready == 'function') {
-                                settings.ontimeready();
+                                if (!ontimereadytriggered) {
+                                    settings.ontimeready();
+                                    ontimereadytriggered = true;
+                                }
                             }
 
 

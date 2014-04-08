@@ -2,7 +2,6 @@ var uri = videoURI;
 
 $(document).ready(function () {
     var mfuri = uri; //Media Fragment URI
-    var hightlighted = false;
 
     //initialise smfplayer
     var $player = $("#video").smfplayer({
@@ -14,7 +13,6 @@ $(document).ready(function () {
     $( "#mfDiv" ).appendTo( $(".mejs-controls") );
 
     function highlight() {
-        if (hightlighted) return;
         var $player_width = $(".mejs-time-total").width(); //total width of timeline
         var $player_height = $(".mejs-time-total").height();
         var $highligthedMF = $("#mfDiv");
@@ -36,25 +34,41 @@ $(document).ready(function () {
         }
 
         hightlighted = true;
-
     }
 
+    retriveInfo(uri, function (data) {
+        var video_title = data.entry.title.$t;
+
+        $('#video-title').text(video_title)
+    });
 
 
-    if (smfplayer.utils.isYouTubeURL(uri)) {
-        var video_id = uri.match(/v=(.{11})/)[1];
+    $('.video-list .video-link').each(function () {
+        var $li = $(this);
+        var video_url = $li.data('url');
+        if (typeof video_url != 'undefined' && video_url != "") {
 
-        function youtubeFeedCallback(data) {
-            var video_title = data.entry.title.$t;
+            retriveInfo(video_url, function (data) {
+                var video_title = data.entry.title.$t;
+                var video_thumb = data.entry.media$group.media$thumbnail[0].url;
+                $('h4 a', $li).text(video_title).attr('alt', video_title).attr('href', video_url);
+                var $thumb = $('<a>').attr('href', video_url).attr('alt', video_title).append($('<img>').attr('src', video_thumb).addClass('thumb'));
+                $('.content', $li).prepend($thumb);
 
-            var $video_title = $('<h1>');
-            $video_title.text(video_title)
-            $('#video-title').append($video_title);
+                $('.loader', $li).hide();
+                $('.content', $li).show(function () {
+                    $(this).addClass('visible');
+                });
+            });
         }
+    });
 
-        window.youtubeFeedCallback = youtubeFeedCallback;
+    function retriveInfo(uri, callback) {
+        if (smfplayer.utils.isYouTubeURL(uri)) {
+            var video_id = uri.match(/v=(.{11})/)[1];
 
-        $.getScript('http://gdata.youtube.com/feeds/api/videos/' + video_id + '?v=2&alt=json-in-script&callback=youtubeFeedCallback');
+            $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + video_id + '?v=2&alt=json-in-script&callback=?', callback);
+        }
+        //TODO other video platforms
     }
-    //TODO other video platforms
 });

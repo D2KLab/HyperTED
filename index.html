@@ -14,13 +14,15 @@
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse"
-                    data-target="#bs-example-navbar-collapse-1">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
+            <div class="navbar-default">
+                <button type="button" class="navbar-toggle" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
             <a class="navbar-brand" href="welcome.html">Media Fragment Enricher</a>
         </div>
 
@@ -43,41 +45,49 @@
     <!-- /.container-fluid -->
 </nav>
 
-<div class="container">
-    <div class="main-content">
-        <section id="player-sect">
-            <div id="video-title"></div>
-            <div id="player-container" class="clearfix">
-                <div id="mfDiv"></div>
-                <div id="video"></div>
-            </div>
+<div class="main-content">
+    <section id="player-sect">
+        <h1 id="video-title" class="title"></h1>
 
-            <pre id="parsed"></pre>
-        </section>
-        <section id="playlist-sect">
-            <ul class="video-list">
-                <li class="video-link" data-url="https://www.youtube.com/watch?v=hed1nP9X7pI">
+        <div id="player-container" class="clearfix">
+            <div id="mfDiv"></div>
+            <div id="video"></div>
+        </div>
+
+        <pre id="parsed"></pre>
+    </section>
+    <section id="playlist-sect">
+        <h1 class="title">see also</h1>
+        <ul class="video-list">
+            <li class="video-link" data-url="https://www.youtube.com/watch?v=hed1nP9X7pI">
+                <img class="loader" src="img/ajax-loader.gif">
+
+                <div class="content">
                     <h4><a>Video 1</a></h4>
                     <ul class="frag-list">
                         <li class="frag-link"><a>Frag 1</a></li>
                         <li class="frag-link"><a>Frag 2</a></li>
                     </ul>
-                </li>
-                <li class="video-link">
+                </div>
+            </li>
+            <li class="video-link" data-url="https://www.youtube.com/watch?v=30onwXme1ws">
+                <img class="loader" src="img/ajax-loader.gif">
+
+                <div class="content">
                     <h4><a>Video 2</a></h4>
                     <ul class="frag-list">
                         <li class="frag-link"><a>Frag 3</a></li>
                         <li class="frag-link"><a>Frag 4</a></li>
                     </ul>
-                </li>
-            </ul>
+                </div>
+            </li>
+        </ul>
 
-        </section>
-    </div>
+    </section>
 </div>
 <script>
-//    var videoURI = "https://www.youtube.com/watch?v=pQZOzJpaqA8#t=10,15";
-        var videoURI = "{{videoURI}}";
+    var videoURI = "https://www.youtube.com/watch?v=pQZOzJpaqA8#t=10,15";
+    //        var videoURI = "{{videoURI}}";
 
 </script>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>

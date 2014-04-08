@@ -48,16 +48,32 @@ body {
 .main-content {
   @include flexBox;
   flex-direction: row;
-  justify-content: space-around;
-
+  justify-content: space-between;
+  max-width: 1200px;
+  min-width: 1000px;
+  margin: auto;
   section {
-    &:first-child {
+    margin: 10px;
+    &#player-sect {
       flex: 2.0;
+      max-width: 640px;
+      .title {
+        text-align: right;
+      }
     }
-    &:last-child {
+    &#playlist-sect {
       flex: 1.0;
+      max-width: 400px;
     }
   }
+}
+
+.title {
+  color: $medium_gray;
+  padding-bottom: 0;
+  margin: 20px 10px -6px;
+  z-index: 5;
+  position: relative;
 }
 
 #player-container {
@@ -88,9 +104,37 @@ ul.video-list {
   li.video-link {
     padding: 10px;
     border-top: 1px solid $medium_gray;
+    min-height: 100px;
     &:first-child {
       border-top: none;
     }
+
+    h4 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .loader {
+      height: 16px;
+      width: 16px;
+      margin: 30px auto;
+      display: block;
+    }
+    .thumb {
+      height: 70px;
+      width: 93px;
+      float: left;
+      margin-right: 12px;
+    }
+    .content {
+      display: none;
+      opacity: 0;
+      @include transition(opacity, 200ms);
+      &.visible{
+        opacity: 1;
+      }
+    }
+
     ul.frag-list {
       li.frag-link {
         a:before {
