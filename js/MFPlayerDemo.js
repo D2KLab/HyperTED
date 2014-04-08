@@ -22,11 +22,24 @@ $(document).ready(function () {
 
 
     var video_tag = $("div#mep_0").find("video");
+
+
+
     window.video_tag = video_tag[0];
-    video_tag[0].oncanplay = function() {
-        console.log('********');
+
+    if (video_tag.get(0).readyState === 4) {
+        console.log('yayyyyy');
         highlight();
+
     }
+//    video_tag[0].oncanplay = function () {
+//        console.log('********');
+//        highlight();
+//    }
+
+    setInterval(function () {
+        console.log(video_tag.get(0).readyState);
+    },1000);
 
 
     function highlight() {
@@ -38,9 +51,9 @@ $(document).ready(function () {
         console.log($player_height);
         console.log($player_width);
 
-        video_tag.onloadedmetadata = puppa();
+        video_tag.onloadedmetadata = highlight_pos();
 
-        function puppa() {
+        function highlight_pos() {
             console.log("emmostoqquà!");
             var $totDuration = $player.getDuration();
             var $timeUnit = $player_width / $totDuration;
@@ -80,4 +93,6 @@ $(document).ready(function () {
         $.getScript('http://gdata.youtube.com/feeds/api/videos/' + video_id + '?v=2&alt=json-in-script&callback=youtubeFeedCallback');
     }
     //TODO other video platforms
+
+
 });
