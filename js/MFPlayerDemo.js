@@ -2,7 +2,7 @@ var uri = videoURI;
 
 $(document).ready(function () {
     var mfuri = uri; //Media Fragment URI
-
+    console.log(mfuri);
     //initialise smfplayer
     var $player = $("#video").smfplayer({
         mfURI: mfuri,
@@ -69,8 +69,18 @@ $(document).ready(function () {
                     $(this).addClass('visible');
                 });
             });
+
+            $('.frag-link a', $li).click(function () {
+                var frag_param = $(this).data('frag') || "";
+                var complete_url = video_url + frag_param;
+
+                var $form = $('#video-search');
+                $('input[name=uri').val(complete_url);
+                $form.submit();
+            });
         }
     });
+
 
     function statDiv(key, value, glyph) {
         if (value == undefined || value == null) return null;
