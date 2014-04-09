@@ -13,13 +13,13 @@ $(document).ready(function () {
     $("#mfDiv").appendTo($(".mejs-controls"));
 
     function highlight() {
-        var $player_width = $(".mejs-time-total").width(); //total width of timeline
-        var $player_height = $(".mejs-time-total").height();
+        var player_width = $(".mejs-time-total").width(); //total width of timeline
+        var player_height = $(".mejs-time-total").height();
         var $highligthedMF = $("#mfDiv");
-        $highligthedMF.height($player_height);
+        $highligthedMF.height(player_height);
 
-        var $totDuration = $player.getDuration();
-        var $timeUnit = $player_width / $totDuration;
+        var totDuration = $player.getDuration();
+        var timeUnit = player_width / totDuration;
 
         var parsedJSON = $player.getMFJson();
         console.log(parsedJSON);
@@ -28,8 +28,11 @@ $(document).ready(function () {
             var MEstart = MEt[0].start * 1000; //media frame starting point in milliseconds
             var MEend = MEt[0].end * 1000; //media frame ending point in milliseconds
 
-            $highligthedMF.css({ left: ($(".mejs-playpause-button").outerWidth() + $(".mejs-currenttime-container").outerWidth() + (MEstart * $timeUnit)) + 5 });
-            $highligthedMF.width((MEend - MEstart) * $timeUnit); //width of Media Frame Highlighting
+            MEend = (MEend > 0) ? MEend : totDuration;
+
+            $highligthedMF.css({ left: ($(".mejs-playpause-button").outerWidth() + $(".mejs-currenttime-container").outerWidth() + (MEstart * timeUnit)) + 5 });
+            $highligthedMF.width((MEend - MEstart) * timeUnit); //width of Media Frame Highlighting
+            $highligthedMF.show();
         }
 
     }
@@ -95,7 +98,6 @@ $(document).ready(function () {
         }
         $stat.append($('<span>').addClass('value').text(value));
 
-
         return $stat;
     }
 
@@ -117,9 +119,23 @@ $(document).ready(function () {
 
                 callback(video_info);
             });
+        } else if (smfplayer.utils.isDailyMotionURL(uri)) {
+            var video_id = uri.match(/video\/([^_||^#]+)/)[1];
+            $.getJSON('https://api.dailymotion.com/video/' + video_id + '?fields=title,thumbnail_60_url,description,views_total,bookmarks_total,comments_total,ratings_total,rating,created_time,genre&callback=?', function (data) {
+                video_info.title = data.title;
+                video_info.thumb = data.thumbnail_60_url;
+                video_info.descr = data.description;
+                video_info.views = data.views_total;
+                video_info.favourites = data.bookmarks_total;
+                video_info.comments = data.comments_total;
+                video_info.likes = data.ratings_total;
+                video_info.avgRate = data.rating;
+                video_info.published = data.created_time;
+                video_info.category = data.genre;
+
+                callback(video_info);
+            });
         }
         //TODO other video platforms
     }
-
-
 });
