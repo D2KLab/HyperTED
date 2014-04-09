@@ -1,4 +1,4 @@
-var uri = videoURI;
+var uri = videoURI.replace(new RegExp('&amp;', 'g'), '&');
 
 $(document).ready(function () {
     var mfuri = uri; //Media Fragment URI
@@ -75,7 +75,7 @@ $(document).ready(function () {
                 var complete_url = video_url + frag_param;
 
                 var $form = $('#video-search');
-                $('input[name=uri').val(complete_url);
+                $('input[name=uri]').val(complete_url);
                 $form.submit();
             });
         }

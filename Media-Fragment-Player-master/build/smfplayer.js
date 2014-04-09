@@ -768,7 +768,15 @@ smfplayer.utils={
 		           	//var cssStr = "top:"+x+";left:"+y+";width:"+w+";height:"+h+";";
 		           	spatial_div = $("<div/>");
 		           	spatial_div.css(data.settings.spatialStyle);
+                    console.log(data.settings);
 		           	spatial_div.addClass('smfplayer-overlay').appendTo(this);
+
+                    var $topdiv = $('<div>').addClass('smfplayer-overlay dark'),
+                        $leftdiv = $('<div>').addClass('smfplayer-overlay dark'),
+                        $rightdiv = $('<div>').addClass('smfplayer-overlay dark'),
+                        $bottomdiv = $('<div>').addClass('smfplayer-overlay dark');
+
+                    $topdiv.css('top: 0; left: 0; ');
 
 		           	data.settings.xywhoverlay =  spatial_div;
 			    }
