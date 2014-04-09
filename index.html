@@ -50,7 +50,6 @@
         <h1 id="video-title" class="title"></h1>
 
         <div id="player-container" class="clearfix">
-            <div id="mfDiv"></div>
             <div id="video"></div>
         </div>
         <div id="video-info">
@@ -63,7 +62,8 @@
                 <img class="loader" src="img/ajax-loader.gif">
 
                 <div class="content">
-                    <h4><a>Video 1</a></h4>
+                    <a class="thumb-cont" href="./video?uri=https://www.youtube.com/watch?v=hed1nP9X7pI"></a>
+                    <h4><a href="./video?uri=https://www.youtube.com/watch?v=hed1nP9X7pI">Video 1</a></h4>
                     <ul class="frag-list">
                         <li class="frag-link"><a>Frag 1</a></li>
                         <li class="frag-link"><a>Frag 2</a></li>
@@ -74,7 +74,8 @@
                 <img class="loader" src="img/ajax-loader.gif">
 
                 <div class="content">
-                    <h4><a>Video 2</a></h4>
+                    <a class="thumb-cont" href="./video?uri=https://www.youtube.com/watch?v=30onwXme1ws"></a>
+                    <h4><a href="./video?uri=https://www.youtube.com/watch?v=30onwXme1ws">Video 2</a></h4>
                     <ul class="frag-list">
                         <li class="frag-link"><a>Frag 3</a></li>
                         <li class="frag-link"><a>Frag 4</a></li>
@@ -86,8 +87,8 @@
     </section>
 </div>
 <script>
-    var videoURI = "https://www.youtube.com/watch?v=pQZOzJpaqA8#t=10,15";
-    //        var videoURI = "{{videoURI}}";
+    //    var videoURI = "https://www.youtube.com/watch?v=pQZOzJpaqA8#t=10,15";
+    var videoURI = "{{videoURI}}";
 
 </script>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
