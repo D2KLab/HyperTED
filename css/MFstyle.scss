@@ -32,8 +32,25 @@ ul {
   list-style: none;
 }
 
-body {
+html, body {
   background: $light_gray;
+  height: 100%;
+}
+
+.home_header {
+  background: white;
+  @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
+  margin: 0 0 30px;
+  height: 50%;
+  h1 {
+    text-align: center;
+    font-size: 4.5em;
+    color: #3276b1;
+    margin: -0.5em auto 0;
+    position: relative;
+    top: 50%;
+    padding: 0 40px;
+  }
 }
 
 .navbar {
@@ -160,18 +177,18 @@ ul.video-list {
   background: #fff;
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
   padding: 20px;
-  .stats-cont{
+  .stats-cont {
     display: flex;
     flex-direction: row;
-    .left-col{
+    .left-col {
       flex: 2.0;
     }
-    .right-col{
+    .right-col {
       flex: 1.0;
     }
     .stat {
       margin-bottom: 5px;
-      &.little{
+      &.little {
         display: inline-block;
         min-width: 50%;
       }

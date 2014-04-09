@@ -2,7 +2,7 @@ var uri = videoURI;
 
 $(document).ready(function () {
     var mfuri = uri; //Media Fragment URI
-
+    console.log(mfuri);
     //initialise smfplayer
     var $player = $("#video").smfplayer({
         mfURI: mfuri,
@@ -22,7 +22,7 @@ $(document).ready(function () {
         var timeUnit = player_width / totDuration;
 
         var parsedJSON = $player.getMFJson();
-
+        console.log(parsedJSON);
         var MEt = parsedJSON.hash.t || parsedJSON.query.t;
         if (typeof MEt != 'undefined') {
             var MEstart = MEt[0].start * 1000; //media frame starting point in milliseconds
@@ -63,17 +63,27 @@ $(document).ready(function () {
         if (typeof video_url != 'undefined' && video_url != "") {
 
             retriveInfo(video_url, function (video_info) {
-                $('h4 a', $li).text(video_info.title).attr('alt', video_info.title).attr('href', video_url);
-                var $thumb = $('<a>').attr('href', video_url).attr('alt', video_info.title).append($('<img>').attr('src', video_info.thumb).addClass('thumb'));
-                $('.content', $li).prepend($thumb);
+                $('h4 a', $li).text(video_info.title).attr('alt', video_info.title);
+                var $thumb = $('<img>').attr('src', video_info.thumb).addClass('thumb');
+                $('.thumb-cont', $li).attr('title', video_info.title).append($thumb);
 
                 $('.loader', $li).hide();
                 $('.content', $li).show(function () {
                     $(this).addClass('visible');
                 });
             });
+
+            $('.frag-link a', $li).click(function () {
+                var frag_param = $(this).data('frag') || "";
+                var complete_url = video_url + frag_param;
+
+                var $form = $('#video-search');
+                $('input[name=uri').val(complete_url);
+                $form.submit();
+            });
         }
     });
+
 
     function statDiv(key, value, glyph) {
         if (value == undefined || value == null) return null;

@@ -54,6 +54,7 @@ my_http.createServer(function (request, response) {
         } else {
             response.writeHeader(code, {"Content-Type": content_type});
         }
+
         if (format) {
             response.write(content, format);
         } else {
