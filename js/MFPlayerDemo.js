@@ -10,7 +10,7 @@ $(document).ready(function () {
     });
 
 
-    $( "#mfDiv" ).appendTo( $(".mejs-controls") );
+    $("#mfDiv").appendTo($(".mejs-controls"));
 
     function highlight() {
         var $player_width = $(".mejs-time-total").width(); //total width of timeline
@@ -22,7 +22,6 @@ $(document).ready(function () {
         var $timeUnit = $player_width / $totDuration;
 
         var parsedJSON = $player.getMFJson();
-        $('#parsed').text(parsedJSON);
 
         var MEt = parsedJSON.hash.t || parsedJSON.query.t;
         if (typeof MEt != 'undefined') {
@@ -36,10 +35,23 @@ $(document).ready(function () {
         hightlighted = true;
     }
 
-    retriveInfo(uri, function (data) {
-        var video_title = data.entry.title.$t;
+    retriveInfo(uri, function (video_info) {
+        $('#video-title').text(video_info.title);
 
-        $('#video-title').text(video_title)
+        var $videoInfo = $('#video-info');
+
+        var $rightCol=$('<div>').addClass('right-col');
+        var $leftCol=$('<div>').addClass('left-col');
+        $leftCol.append(statDiv('Published', video_info.published));
+        $leftCol.append(statDiv('Category', video_info.category));
+        $rightCol.append(statDiv('Views', video_info.views, 'eye-open'));
+        $rightCol.append(statDiv('Likes', video_info.likes, 'thumbs-up'));
+        $rightCol.append(statDiv('Favourites', video_info.favourites, 'star'));
+        $rightCol.append(statDiv('AVG Rating', video_info.avgRate, 'signal'));
+
+        $videoInfo.append($('<div>').addClass('stats-cont').append($leftCol).append($rightCol));
+
+        $videoInfo.append($('<p>').html(video_info.descr).addClass('descr'));
     });
 
 
@@ -48,11 +60,9 @@ $(document).ready(function () {
         var video_url = $li.data('url');
         if (typeof video_url != 'undefined' && video_url != "") {
 
-            retriveInfo(video_url, function (data) {
-                var video_title = data.entry.title.$t;
-                var video_thumb = data.entry.media$group.media$thumbnail[0].url;
-                $('h4 a', $li).text(video_title).attr('alt', video_title).attr('href', video_url);
-                var $thumb = $('<a>').attr('href', video_url).attr('alt', video_title).append($('<img>').attr('src', video_thumb).addClass('thumb'));
+            retriveInfo(video_url, function (video_info) {
+                $('h4 a', $li).text(video_info.title).attr('alt', video_info.title).attr('href', video_url);
+                var $thumb = $('<a>').attr('href', video_url).attr('alt', video_info.title).append($('<img>').attr('src', video_info.thumb).addClass('thumb'));
                 $('.content', $li).prepend($thumb);
 
                 $('.loader', $li).hide();
@@ -63,12 +73,44 @@ $(document).ready(function () {
         }
     });
 
+    function statDiv(key, value, glyph) {
+        if (value == undefined || value == null) return null;
+
+        var $stat = $('<div>').addClass('stat');
+
+        if (glyph) {
+            $stat.append($('<span>').addClass('key glyphicon glyphicon-'+glyph).attr('title',key));
+            $stat.addClass('little');
+        } else {
+            $stat.append($('<label>').addClass('key').text(key));
+        }
+        $stat.append($('<span>').addClass('value').text(value));
+
+
+        return $stat;
+    }
+
     function retriveInfo(uri, callback) {
+        var video_info = {};
         if (smfplayer.utils.isYouTubeURL(uri)) {
             var video_id = uri.match(/v=(.{11})/)[1];
+            $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + video_id + '?v=2&alt=json-in-script&callback=?', function (data) {
+                video_info.title = data.entry.title.$t
+                video_info.thumb = data.entry.media$group.media$thumbnail[0].url;
+                video_info.descr = data.entry.media$group.media$description.$t;
+                video_info.views = data.entry.yt$statistics.viewCount;
+                video_info.favourites = data.entry.yt$statistics.favoriteCount;
+                video_info.comments = data.entry.gd$comments.gd$feedLink.countHint;
+                video_info.likes = data.entry.yt$rating.numLikes;
+                video_info.avgRate = data.entry.gd$rating.average;
+                video_info.published = data.entry.published.$t;
+                video_info.category = data.entry.category[1].term;
 
-            $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + video_id + '?v=2&alt=json-in-script&callback=?', callback);
+                callback(video_info);
+            });
         }
         //TODO other video platforms
     }
+
+
 });
