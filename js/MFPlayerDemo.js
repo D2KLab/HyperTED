@@ -10,12 +10,12 @@ $(document).ready(function () {
     });
 
 
-    $("#mfDiv").appendTo($(".mejs-controls"));
 
     function highlight() {
         var player_width = $(".mejs-time-total").width(); //total width of timeline
         var player_height = $(".mejs-time-total").height();
-        var $highligthedMF = $("#mfDiv");
+        var $highligthedMF = $("<div>").attr('id','mfDiv');
+
         $highligthedMF.height(player_height);
 
         var totDuration = $player.getDuration();
@@ -25,14 +25,14 @@ $(document).ready(function () {
         console.log(parsedJSON);
         var MEt = parsedJSON.hash.t || parsedJSON.query.t;
         if (typeof MEt != 'undefined') {
-            var MEstart = MEt[0].start * 1000; //media frame starting point in milliseconds
-            var MEend = MEt[0].end * 1000; //media frame ending point in milliseconds
+            var MEstart = MEt[0].startNormalized * 1000; //media frame starting point in milliseconds
+            var MEend = MEt[0].endNormalized * 1000; //media frame ending point in milliseconds
 
             MEend = (MEend > 0) ? MEend : totDuration;
 
-            $highligthedMF.css({ left: ($(".mejs-playpause-button").outerWidth() + $(".mejs-currenttime-container").outerWidth() + (MEstart * timeUnit)) + 5 });
-            $highligthedMF.width((MEend - MEstart) * timeUnit); //width of Media Frame Highlighting
-            $highligthedMF.show();
+            $highligthedMF.css("left", $(".mejs-playpause-button").outerWidth() + $(".mejs-currenttime-container").outerWidth() + (MEstart * timeUnit) + 5);
+            $highligthedMF.width(Math.ceil((MEend - MEstart) * timeUnit)); //width of Media Frame Highlighting
+            $highligthedMF.appendTo($(".mejs-controls")).show();
         }
 
     }

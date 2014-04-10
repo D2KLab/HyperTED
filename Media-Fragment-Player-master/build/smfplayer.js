@@ -761,14 +761,13 @@ smfplayer.utils={
 				if( $.isEmptyObject(xywh) || data.settings.spatialEnabled !== true)
 					return;
 
-				var spatial_div;
+				var spatial_div, dark_divs;
 				if(data.settings.xywhoverlay === undefined) //the overlay hasn't been created
 				{
 		           	this.addClass('smfplayer-container');
 		           	//var cssStr = "top:"+x+";left:"+y+";width:"+w+";height:"+h+";";
 		           	spatial_div = $("<div/>");
 		           	spatial_div.css(data.settings.spatialStyle);
-                    console.log(data.settings);
 		           	spatial_div.addClass('smfplayer-overlay').appendTo(this);
 
                     var $topdiv = $('<div>').addClass('smfplayer-overlay dark'),
@@ -776,13 +775,52 @@ smfplayer.utils={
                         $rightdiv = $('<div>').addClass('smfplayer-overlay dark'),
                         $bottomdiv = $('<div>').addClass('smfplayer-overlay dark');
 
-                    $topdiv.css('top: 0; left: 0; ');
+                    $topdiv.css({
+                        top: 0,
+                        left: 0,
+                        height:xywh.y,
+                        width: "100%"
+                    });
 
-		           	data.settings.xywhoverlay =  spatial_div;
+                    $leftdiv.css({
+                        top:xywh.y+'px',
+                        left:0,
+                        height: xywh.h,
+                        width: xywh.x
+                    });
+
+                    $rightdiv.css({
+                        top:xywh.y+"px",
+                        right:0,
+                        height: xywh.h,
+                        width: (options.width || defaults.width) - (parseInt(xywh.x) + parseInt(xywh.w))
+                    });
+
+                    $bottomdiv.css({
+                        bottom:0,
+                        left:0,
+                        height: (options.height || defaults.height) - (parseInt(xywh.y) + parseInt(xywh.h)),
+                        width: "100%"
+                    });
+                    dark_divs = $('<div>').addClass('dark-divs').append($topdiv, $leftdiv, $rightdiv, $bottomdiv);
+                    dark_divs.height(options.height || defaults.height).width(options.width || defaults.width).appendTo(this);
+
+                    var superThis = this;
+                    dark_divs.add(spatial_div).click(function(){
+                        var player = superThis.getMeplayer();
+                        if(player.media.paused){
+                            player.play();
+                        }else{
+                            player.pause();
+                        }
+                    });
+                    data.settings.xywhoverlaydark =  dark_divs;
+                    data.settings.xywhoverlay =  spatial_div;
 			    }
 			    else
 			    {
 				    spatial_div = data.settings.xywhoverlay;
+                    dark_divs  = data.settings.xywhoverlaydark;
 			    }
 
 			    //console.log(xywh);
@@ -807,6 +845,7 @@ smfplayer.utils={
 
 	           	spatial_div.css({'width':w,'height':h,'top':y+'px','left':x+'px'});
 	           	spatial_div.show();
+                dark_divs.show();
 			};
 
 			this.hidexywh = function()
@@ -823,7 +862,8 @@ smfplayer.utils={
 
 				if(data.settings.xywhoverlay !== undefined)
 				{
-					data.settings.xywhoverlay.hide();
+                    data.settings.xywhoverlay.hide();
+                    data.settings.xywhoverlaydark.fadeOut();
 				}
 			};
 

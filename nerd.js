@@ -7,13 +7,7 @@ var ext = 'dbspotlight';
 var doc_type = "text"; //timedtext|text
 var t = "";
 var gran = "oed";
-var to = 2;
-var nerd_results;
-var callback = function (something) {
-    console.log('*****');
-    console.log(something);
-    nerd_results = something;
-}
+var to = 2; //timeout
 
 function start(callback) {
     filesys.readFile("./text.txt", "binary", function (err, file) {
@@ -24,8 +18,6 @@ function start(callback) {
             nerd.annotate(api_instance, apiID, ext, doc_type, t, gran, to, function (err, data) {
                 callback(err, data);
             });
-
-
         }
     });
 }
