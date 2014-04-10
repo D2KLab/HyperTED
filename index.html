@@ -50,7 +50,7 @@
         <h1 id="video-title" class="title"></h1>
 
         <div id="player-container" class="clearfix">
-            <div id="mfDiv"></div>
+            <!--<div id="mfDiv"></div>-->
             <div id="video"></div>
         </div>
         <div id="video-info">
@@ -67,11 +67,23 @@
                     <h4><a href="./video?uri=https://www.youtube.com/watch?v=hed1nP9X7pI">Video 1</a></h4>
                     <ul class="frag-list">
                         <li class="frag-link"><a href='#' data-frag="#t=0:07:43,0:07:53">Standing ovation</a></li>
-                        <li class="frag-link"><a href='#' data-frag="#t=0:32:41,0:32:59">Obama talks about something</a></li>
+                        <li class="frag-link"><a href='#' data-frag="#t=0:32:41,0:32:45">Obama talks about something</a></li>
                     </ul>
                 </div>
             </li>
             <li class="video-link" data-url="https://www.youtube.com/watch?v=30onwXme1ws">
+                <img class="loader" src="img/ajax-loader.gif">
+
+                <div class="content">
+                    <a class="thumb-cont" href="./video?uri=https://www.youtube.com/watch?v=30onwXme1ws"></a>
+                    <h4><a href="./video?uri=https://www.youtube.com/watch?v=30onwXme1ws">Video 2</a></h4>
+                    <ul class="frag-list">
+                        <li class="frag-link"><a href='#' data-frag="#t=0:04:31,0:04:50">Matthew McConaughey explains</a></li>
+                        <li class="frag-link"><a href='#' data-frag="#t=0:08:40,">Fragment to the end</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="video-link" data-url="http://www.dailymotion.com/video/36300382">
                 <img class="loader" src="img/ajax-loader.gif">
 
                 <div class="content">
@@ -93,7 +105,6 @@
 
 </script>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
 <script src="http://malsup.github.com/jquery.form.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 <script src="Media-Fragment-Player-master/build/mediaelement-and-player.js"></script>

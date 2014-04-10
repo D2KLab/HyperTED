@@ -29,6 +29,7 @@ $caviar: CaviarDreams, Helvetica, sans-serif;
       /* For IE 8*/
       -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99f4f4f4, endColorstr=#99f4f4f4)";
     }
+    z-index:100;
 
     /*current and total time*/
     .mejs-time span {
@@ -50,5 +51,25 @@ $caviar: CaviarDreams, Helvetica, sans-serif;
       }
 
     }
+  }
+}
+
+.smfplayer-overlay {
+  border: none;
+
+  &.dark {
+    display: block;
+    background: rgba(0, 0, 0, .8);
+    @include box-shadow(0, 0, 0, 0, #fff);
+    @include transition(opacity,100ms);
+  }
+}
+
+.dark-divs{
+  position: absolute;
+  top:0;
+  bottom:0;
+  &:hover .dark{
+    opacity: 0.5;
   }
 }

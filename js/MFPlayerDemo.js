@@ -1,4 +1,4 @@
-var uri = videoURI;
+var uri = videoURI.replace(new RegExp('&amp;', 'g'), '&');
 
 $(document).ready(function () {
     var mfuri = uri; //Media Fragment URI
@@ -14,14 +14,15 @@ $(document).ready(function () {
     function highlight() {
         var player_width = $(".mejs-time-total").width(); //total width of timeline
         var player_height = $(".mejs-time-total").height();
-        var $highligthedMF = $("#mfDiv");
+        var $highligthedMF = $("<div>").attr('id','mfDiv');
+
         $highligthedMF.height(player_height);
 
         var totDuration = $player.getDuration();
         var timeUnit = player_width / totDuration;
 
         var parsedJSON = $player.getMFJson();
-
+        console.log(parsedJSON);
         var MEt = parsedJSON.hash.t || parsedJSON.query.t;
         if (typeof MEt != 'undefined') {
             var MEstart = MEt[0].startNormalized * 1000; //media frame starting point in milliseconds
@@ -29,9 +30,9 @@ $(document).ready(function () {
 
             MEend = (MEend > 0) ? MEend : totDuration;
 
-            $highligthedMF.css({ left: ($(".mejs-playpause-button").outerWidth() + $(".mejs-currenttime-container").outerWidth() + (MEstart * timeUnit)) + 5 });
-            $highligthedMF.width((MEend - MEstart) * timeUnit); //width of Media Frame Highlighting
-            $highligthedMF.show();
+            $highligthedMF.css("left", $(".mejs-playpause-button").outerWidth() + $(".mejs-currenttime-container").outerWidth() + (MEstart * timeUnit) + 5);
+            $highligthedMF.width(Math.ceil((MEend - MEstart) * timeUnit)); //width of Media Frame Highlighting
+            $highligthedMF.appendTo($(".mejs-controls")).show();
         }
 
     }
@@ -75,8 +76,6 @@ $(document).ready(function () {
     });
 
 
-
-
     $('.video-list .video-link').each(function () {
         var $li = $(this);
         var video_url = $li.data('url');
@@ -98,7 +97,7 @@ $(document).ready(function () {
                 var complete_url = video_url + frag_param;
 
                 var $form = $('#video-search');
-                $('input[name=uri').val(complete_url);
+                $('input[name=uri]').val(complete_url);
                 $form.submit();
             });
         }
