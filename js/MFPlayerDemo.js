@@ -14,7 +14,7 @@ $(document).ready(function () {
     function highlight() {
         var player_width = $(".mejs-time-total").width(); //total width of timeline
         var player_height = $(".mejs-time-total").height();
-        var $highligthedMF = $("<div>").attr('id','mfDiv');
+        var $highligthedMF = $("<div>").attr('id', 'mfDiv');
 
         $highligthedMF.height(player_height);
 
@@ -63,11 +63,27 @@ $(document).ready(function () {
         $buttonCont.submit(function (e) {
             e.preventDefault();
             $(this).ajaxSubmit({
+                dataType: 'json',
                 success: function (responseText, statusText, xhr, $form) {
-                    console.log('success');
-                    console.log(responseText);
+
+                    //sorting JSON for Start character desc
+                    responseText.sort(function SortByStartChar(x, y) {
+                        return ((x.startChar == y.startChar) ? 0 : ((x.startChar < y.startChar) ? 1 : -1 ));
+                    });
+
+                    var new_descr = video_info.descr;
+                    $.each(responseText, function (key, value) {
+                        var entity = value;
+
+                        var s1 = new_descr.substring(0, entity.startChar);
+                        var s2 = new_descr.substring(entity.startChar, entity.endChar);
+                        var s3 = new_descr.substring(entity.endChar);
+
+                        new_descr = s1 + '<span>' + s2 + '</span>' + s3;
+                    });
+                    console.log(new_descr);
                 },
-                error: function(){
+                error: function () {
                     console.log('Something went wrong');
                 }
             });

@@ -10,6 +10,7 @@ var sys = require("sys"),
 var template = filesys.readFileSync("./index.html", "utf8");
 
 my_http.createServer(function (request, response) {
+
     var url_parts = url.parse(request.url, true);
     var my_path = url_parts.pathname;
 
@@ -24,8 +25,6 @@ my_http.createServer(function (request, response) {
         }
     });
 
-
-
     } else if (my_path === '/nerd') {
         nerd.start(function (err, data) {
             if (err) {
@@ -34,6 +33,7 @@ my_http.createServer(function (request, response) {
                 sendResponse(200, "text/plain", JSON.stringify(data));
             }
         });
+
     } else if (my_path == '/video') {
         var source = {
             videoURI: url_parts.query.uri
