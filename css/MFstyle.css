@@ -307,3 +307,5 @@ ul.video-list {
     border-top: 1px solid #aaaaaa;
     margin-top: 10px;
     padding-top: 10px; }
+  #video-info .button-cont {
+    text-align: right; }
