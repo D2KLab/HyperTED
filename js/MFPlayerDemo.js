@@ -2,7 +2,6 @@ var uri = videoURI;
 
 $(document).ready(function () {
     var mfuri = uri; //Media Fragment URI
-    console.log(mfuri);
     //initialise smfplayer
     var $player = $("#video").smfplayer({
         mfURI: mfuri,
@@ -22,11 +21,11 @@ $(document).ready(function () {
         var timeUnit = player_width / totDuration;
 
         var parsedJSON = $player.getMFJson();
-        console.log(parsedJSON);
+
         var MEt = parsedJSON.hash.t || parsedJSON.query.t;
         if (typeof MEt != 'undefined') {
-            var MEstart = MEt[0].start * 1000; //media frame starting point in milliseconds
-            var MEend = MEt[0].end * 1000; //media frame ending point in milliseconds
+            var MEstart = MEt[0].startNormalized * 1000; //media frame starting point in milliseconds
+            var MEend = MEt[0].endNormalized * 1000; //media frame ending point in milliseconds
 
             MEend = (MEend > 0) ? MEend : totDuration;
 
@@ -53,8 +52,20 @@ $(document).ready(function () {
 
         $videoInfo.append($('<div>').addClass('stats-cont').append($leftCol).append($rightCol));
 
-        $videoInfo.append($('<p>').html(video_info.descr).addClass('descr'));
+        var $videoDesc = ($('<p>').html(video_info.descr).addClass('descr'));
+        var $buttonNerd = ($('<button type="submit">').html('Nerdify').addClass('btn btn-danger btn-lg'));
+        var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr));
+        var $buttonCont = $('<form>').attr('method', 'GET').attr('action', './nerdify').addClass('button-cont').append($hiddenInput).append($buttonNerd);
+        $videoInfo.append($('<div>').addClass('desc-cont').append($videoDesc).append($buttonCont));
+
+
+        $buttonCont.submit(function(options) {
+            $(this).ajaxSubmit();
+        });
+
     });
+
+
 
 
     $('.video-list .video-link').each(function () {

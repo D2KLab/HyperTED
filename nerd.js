@@ -7,13 +7,7 @@ var ext = 'dbspotlight';
 var doc_type = "text"; //timedtext|text
 var t = "";
 var gran = "oed";
-var to = 2;
-var nerd_results;
-var callback = function (something) {
-    console.log('*****');
-    console.log(something);
-    nerd_results = something;
-}
+var to = 2; //timeOut
 
 function start(callback) {
     filesys.readFile("./text.txt", "binary", function (err, file) {

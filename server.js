@@ -4,6 +4,7 @@ var sys = require("sys"),
     url = require("url"),
     filesys = require("fs"),
     nerd = require('./nerd'),
+    nerdify = require('./nerdify'),
     handlebars = require("handlebars");
 
 var template = filesys.readFileSync("./index.html", "utf8");
@@ -12,7 +13,20 @@ my_http.createServer(function (request, response) {
     var url_parts = url.parse(request.url, true);
     var my_path = url_parts.pathname;
 
-    if (my_path === '/nerd') {
+    if (my_path === '/nerdify') {
+        text = url_parts.query.text;
+        nerdify.start(text, function (err, data) {
+        if (err) {
+            console.log(data);
+            sendResponse(500, "text/plain", data+'');
+        } else {
+            sendResponse(200, "text/plain", JSON.stringify(data));
+        }
+    });
+
+
+
+    } else if (my_path === '/nerd') {
         nerd.start(function (err, data) {
             if (err) {
                 sendResponse(500, "text/plain", data);
@@ -22,7 +36,7 @@ my_http.createServer(function (request, response) {
         });
     } else if (my_path == '/video') {
         var source = {
-            videoURI : url_parts.query.uri
+            videoURI: url_parts.query.uri
         }
         var pageBuilder = handlebars.compile(template);
         var pageText = pageBuilder(source);
