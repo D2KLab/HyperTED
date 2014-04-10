@@ -59,8 +59,17 @@ $(document).ready(function () {
         $videoInfo.append($('<div>').addClass('desc-cont').append($videoDesc).append($buttonCont));
 
 
-        $buttonCont.submit(function(options) {
-            $(this).ajaxSubmit();
+        $buttonCont.submit(function (e) {
+            e.preventDefault();
+            $(this).ajaxSubmit({
+                success: function (responseText, statusText, xhr, $form) {
+                    console.log('success');
+                    console.log(responseText);
+                },
+                error: function(){
+                    console.log('Something went wrong');
+                }
+            });
         });
 
     });
