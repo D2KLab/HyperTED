@@ -3,8 +3,8 @@ var sys = require("sys"),
     path = require("path"),
     url = require("url"),
     filesys = require("fs"),
-    nerd = require('./nerd'),
     nerdify = require('./nerdify'),
+    xmlSrt = require('./xml_to_srt'),
     handlebars = require("handlebars");
 
 var template = filesys.readFileSync("./index.html", "utf8");
@@ -24,7 +24,9 @@ my_http.createServer(function (request, response) {
                 sendResponse(200, "text/plain", JSON.stringify(data));
             }
         });
-
+    } else if (my_path === '/srt') {
+        console.log('srt translation');
+        sendResponse(200, "text/plain",xmlSrt.retriveXml());
     } else if (my_path == '/video') {
         var source = {
             videoURI: url_parts.query.uri
