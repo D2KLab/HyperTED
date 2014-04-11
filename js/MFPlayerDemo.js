@@ -60,12 +60,11 @@ $(document).ready(function () {
         var $descCont = ($('<div>').addClass('desc-cont').append($videoDesc).append($buttonCont));
         $videoInfo.append($descCont);
 
-        var $nerdified = ($('<span>').addClass('nerdified'));
-
-
         $buttonCont.submit(function (e) {
             e.preventDefault();
-            $(this).ajaxSubmit({
+            var $form = $(this);
+            $('button[type="submit"]', $form).prop('disabled', true).addLoader('left');
+            $form.ajaxSubmit({
                 dataType: 'json',
                 success: function (responseText) {
                     console.log(responseText);
@@ -82,7 +81,7 @@ $(document).ready(function () {
                         var s2 = new_descr.substring(entity.startChar, entity.endChar);
                         var s3 = new_descr.substring(entity.endChar);
 
-                        new_descr = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() +'"><a href="' + entity.uri +'">' + s2 + '</a></span>' + s3;
+                        new_descr = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '"><a href="' + entity.uri + '">' + s2 + '</a></span>' + s3;
 
                     });
                     $descCont.empty().append(new_descr);
@@ -176,5 +175,24 @@ $(document).ready(function () {
             });
         }
         //TODO other video platforms
+    }
+
+});
+
+var $loaderImg;
+jQuery.fn.extend({
+    addLoader: function (direction) {
+        if (!$loaderImg) {
+            $loaderImg = $("<img>").attr('src', 'img/ajax-loader.gif');
+        }
+
+        $tempImg = $loaderImg;
+        $loaderImg = $loaderImg.clone();
+        if (direction == 'left') {
+            $(this).before($loaderImg);
+        } else {
+            $(this).after($loaderImg);
+        }
+        return true;
     }
 });
