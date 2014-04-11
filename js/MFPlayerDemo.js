@@ -22,7 +22,7 @@ $(document).ready(function () {
         var timeUnit = player_width / totDuration;
 
         var parsedJSON = $player.getMFJson();
-        console.log(parsedJSON);
+
         var MEt = parsedJSON.hash.t || parsedJSON.query.t;
         if (typeof MEt != 'undefined') {
             var MEstart = MEt[0].startNormalized * 1000; //media frame starting point in milliseconds
@@ -60,8 +60,6 @@ $(document).ready(function () {
         var $descCont = ($('<div>').addClass('desc-cont').append($videoDesc).append($buttonCont));
         $videoInfo.append($descCont);
 
-        var $nerdified = ($('<span>').addClass('nerdified'));
-
 
         $buttonCont.submit(function (e) {
             e.preventDefault();
@@ -85,8 +83,7 @@ $(document).ready(function () {
                         new_descr = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() +'"><a href="' + entity.uri +'">' + s2 + '</a></span>' + s3;
 
                     });
-                    $descCont.empty().append(new_descr);
-                    console.log(new_descr);
+                    $descCont.html(new_descr);
                 },
                 error: function () {
                     console.log('Something went wrong');
