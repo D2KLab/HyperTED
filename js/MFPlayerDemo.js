@@ -57,18 +57,21 @@ $(document).ready(function () {
         var $buttonNerd = ($('<button type="submit">').html('Nerdify').addClass('btn btn-danger btn-lg'));
         var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr));
         var $buttonCont = $('<form>').attr('method', 'GET').attr('action', './nerdify').addClass('button-cont').append($hiddenInput).append($buttonNerd);
-        $videoInfo.append($('<div>').addClass('desc-cont').append($videoDesc).append($buttonCont));
+        var $descCont = ($('<div>').addClass('desc-cont').append($videoDesc).append($buttonCont));
+        $videoInfo.append($descCont);
+
+        var $nerdified = ($('<span>').addClass('nerdified'));
 
 
         $buttonCont.submit(function (e) {
             e.preventDefault();
             $(this).ajaxSubmit({
                 dataType: 'json',
-                success: function (responseText, statusText, xhr, $form) {
-
+                success: function (responseText) {
+                    console.log(responseText);
                     //sorting JSON for Start character desc
                     responseText.sort(function SortByStartChar(x, y) {
-                        return ((x.startChar == y.startChar) ? 0 : ((x.startChar < y.startChar) ? 1 : -1 ));
+                        return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
                     });
 
                     var new_descr = video_info.descr;
@@ -79,8 +82,10 @@ $(document).ready(function () {
                         var s2 = new_descr.substring(entity.startChar, entity.endChar);
                         var s3 = new_descr.substring(entity.endChar);
 
-                        new_descr = s1 + '<span>' + s2 + '</span>' + s3;
+                        new_descr = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() +'"><a href="' + entity.uri +'">' + s2 + '</a></span>' + s3;
+
                     });
+                    $descCont.empty().append(new_descr);
                     console.log(new_descr);
                 },
                 error: function () {
@@ -88,7 +93,6 @@ $(document).ready(function () {
                 }
             });
         });
-
     });
 
 
@@ -141,7 +145,7 @@ $(document).ready(function () {
         if (smfplayer.utils.isYouTubeURL(uri)) {
             var video_id = uri.match(/v=(.{11})/)[1];
             $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + video_id + '?v=2&alt=json-in-script&callback=?', function (data) {
-                video_info.title = data.entry.title.$t
+                video_info.title = data.entry.title.$t;
                 video_info.thumb = data.entry.media$group.media$thumbnail[0].url;
                 video_info.descr = data.entry.media$group.media$description.$t;
                 video_info.views = data.entry.yt$statistics.viewCount;
