@@ -2,7 +2,6 @@ var uri = videoURI.replace(new RegExp('&amp;', 'g'), '&');
 
 $(document).ready(function () {
     var mfuri = uri; //Media Fragment URI
-    console.log(mfuri);
     //initialise smfplayer
     var $player = $("#video").smfplayer({
         mfURI: mfuri,
@@ -10,11 +9,12 @@ $(document).ready(function () {
     });
 
 
+    $("#mfDiv").appendTo($(".mejs-controls"));
 
     function highlight() {
         var player_width = $(".mejs-time-total").width(); //total width of timeline
         var player_height = $(".mejs-time-total").height();
-        var $highligthedMF = $("<div>").attr('id','mfDiv');
+        var $highligthedMF = $("<div>").attr('id', 'mfDiv');
 
         $highligthedMF.height(player_height);
 
@@ -53,7 +53,46 @@ $(document).ready(function () {
 
         $videoInfo.append($('<div>').addClass('stats-cont').append($leftCol).append($rightCol));
 
-        $videoInfo.append($('<p>').html(video_info.descr).addClass('descr'));
+        var $videoDesc = ($('<p>').html(video_info.descr).addClass('descr'));
+        var $buttonNerd = ($('<button type="submit">').html('Nerdify').addClass('btn btn-danger btn-lg'));
+        var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr));
+        var $buttonCont = $('<form>').attr('method', 'GET').attr('action', './nerdify').addClass('button-cont').append($hiddenInput).append($buttonNerd);
+        var $descCont = ($('<div>').addClass('desc-cont').append($videoDesc).append($buttonCont));
+        $videoInfo.append($descCont);
+
+        var $nerdified = ($('<span>').addClass('nerdified'));
+
+
+        $buttonCont.submit(function (e) {
+            e.preventDefault();
+            $(this).ajaxSubmit({
+                dataType: 'json',
+                success: function (responseText) {
+                    console.log(responseText);
+                    //sorting JSON for Start character desc
+                    responseText.sort(function SortByStartChar(x, y) {
+                        return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
+                    });
+
+                    var new_descr = video_info.descr;
+                    $.each(responseText, function (key, value) {
+                        var entity = value;
+
+                        var s1 = new_descr.substring(0, entity.startChar);
+                        var s2 = new_descr.substring(entity.startChar, entity.endChar);
+                        var s3 = new_descr.substring(entity.endChar);
+
+                        new_descr = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() +'"><a href="' + entity.uri +'">' + s2 + '</a></span>' + s3;
+
+                    });
+                    $descCont.empty().append(new_descr);
+                    console.log(new_descr);
+                },
+                error: function () {
+                    console.log('Something went wrong');
+                }
+            });
+        });
     });
 
 
@@ -106,7 +145,7 @@ $(document).ready(function () {
         if (smfplayer.utils.isYouTubeURL(uri)) {
             var video_id = uri.match(/v=(.{11})/)[1];
             $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + video_id + '?v=2&alt=json-in-script&callback=?', function (data) {
-                video_info.title = data.entry.title.$t
+                video_info.title = data.entry.title.$t;
                 video_info.thumb = data.entry.media$group.media$thumbnail[0].url;
                 video_info.descr = data.entry.media$group.media$description.$t;
                 video_info.views = data.entry.yt$statistics.viewCount;

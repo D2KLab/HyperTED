@@ -10,7 +10,7 @@ var to = 2; //timeOut
 
 function start(text, callback) {
     if (text != null && text != '') {
-        nerd.annotate(api_instance, apiID, ext, doc_type, t, gran, to, function (err, data) {
+        nerd.annotate(api_instance, apiID, ext, doc_type, text, gran, to, function (err, data) {
             callback(err, data);
         });
     }else(callback(true, 'Empty Text'))
