@@ -123,34 +123,34 @@ $(document).ready(function () {
         });
     }, true);
 
-    retrieveSubtitles(uri, function (video_info) {
-        var $descCont = $('.desc-cont');
-
-        var $buttonNerdSub = $('<button type="submit">').html('Nerdify Sub').addClass('btn btn-danger btn-lg');
-        var $hiddenInputSub = $('<input name="text">').val(video_info.sub_text);
-        var $subStamp = $('<div>').addClass('subs-cont');
-        var $buttonContSub = $('<form>').attr('method', 'GET').attr('action', './nerdify').addClass('button-cont-sub').append($hiddenInputSub).append($buttonNerdSub);
-        $descCont.append($buttonContSub).append($subStamp);
-
-        $buttonContSub.submit(function (e) {
-            e.preventDefault();
-            var $form = $(this);
-            $('button[type="submit"]', $form).prop('disabled', true).addLoader('left');
-
-
-            $form.ajaxSubmit({
-
-                success: function () {
-                    console.log("SUCCESS");
-                    ($subStamp).load(video_info.sub_url);
-                },
-                error: function () {
-                    console.log('Something went wrong');
-                }
-            });
-        });
-
-    });
+//    retrieveSubtitles(uri, function (video_info) {
+//        var $descCont = $('.desc-cont');
+//
+//        var $buttonNerdSub = $('<button type="submit">').html('Nerdify Sub').addClass('btn btn-danger btn-lg');
+//        var $hiddenInputSub = $('<input name="text">').val(video_info.sub_text);
+//        var $subStamp = $('<div>').addClass('subs-cont');
+//        var $buttonContSub = $('<form>').attr('method', 'GET').attr('action', './nerdify').addClass('button-cont-sub').append($hiddenInputSub).append($buttonNerdSub);
+//        $descCont.append($buttonContSub).append($subStamp);
+//
+//        $buttonContSub.submit(function (e) {
+//            e.preventDefault();
+//            var $form = $(this);
+//            $('button[type="submit"]', $form).prop('disabled', true).addLoader('left');
+//
+//
+//            $form.ajaxSubmit({
+//
+//                success: function () {
+//                    console.log("SUCCESS");
+//                    ($subStamp).load(video_info.sub_url);
+//                },
+//                error: function () {
+//                    console.log('Something went wrong');
+//                }
+//            });
+//        });
+//
+//    });
 
     $('.video-list .video-link').each(function () {
         var $li = $(this);
@@ -195,7 +195,7 @@ $(document).ready(function () {
         return $stat;
     }
 
-    function retriveInfo(uri, callback, full) {
+    function retrieveInfo(uri, callback, full) {
         var video_info = {};
         if (smfplayer.utils.isYouTubeURL(uri)) {
             var video_id = uri.match(/v=(.{11})/)[1];
@@ -220,7 +220,7 @@ $(document).ready(function () {
                     video_info.published = data.entry.published.$t;
                     video_info.category = data.entry.category[1].term;
                 }),
-                retriveSub('./srt?video_id=' + video_id, function (data) {
+                retriveSub('./srt?video_id=' + video_id + '&vendor=youtube', function (data) {
                     video_info.sub = data;
                 })
             ).then(function () {
@@ -228,46 +228,40 @@ $(document).ready(function () {
                 }, function () {
                     callback(video_info);
                 });
+
         } else if (smfplayer.utils.isDailyMotionURL(uri)) {
             var video_id = uri.match(/video\/([^_||^#]+)/)[1];
-            $.getJSON('https://api.dailymotion.com/video/' + video_id + '?fields=title,thumbnail_60_url,description,views_total,bookmarks_total,comments_total,ratings_total,rating,created_time,genre&callback=?', function (data) {
-                video_info.title = data.title;
-                video_info.thumb = data.thumbnail_60_url;
-                video_info.descr = data.description;
-                video_info.views = data.views_total;
-                video_info.favourites = data.bookmarks_total;
-                video_info.comments = data.comments_total;
-                video_info.likes = data.ratings_total;
-                video_info.avgRate = data.rating;
-                video_info.published = data.created_time;
-                video_info.category = data.genre;
 
-                callback(video_info);
-            });
+            var retrieveSub = function () {
+                return;
+            }
+            if (full) {
+                retrieveSub = $.get;
+            }
 
+            $.when(
+                $.getJSON('https://api.dailymotion.com/video/' + video_id + '?fields=title,thumbnail_60_url,description,views_total,bookmarks_total,comments_total,ratings_total,rating,created_time,genre&callback=?', function (data) {
+                    video_info.title = data.title;
+                    video_info.thumb = data.thumbnail_60_url;
+                    video_info.descr = data.description;
+                    video_info.views = data.views_total;
+                    video_info.favourites = data.bookmarks_total;
+                    video_info.comments = data.comments_total;
+                    video_info.likes = data.ratings_total;
+                    video_info.avgRate = data.rating;
+                    video_info.published = data.created_time;
+                    video_info.category = data.genre;
+                }),
+                retrieveSub('./srt?video_id=' + video_id + '&vendor=dailymotion', function (data) {
+                    video_info.sub = data;
+                })
+            ).then(function () {
+                    callback(video_info);
+                }, function () {
+                    callback(video_info);
+                });
         }
         //TODO other video platforms
-    }
-
-    function retrieveSubtitles(uri, callback) {
-        var video_info = {};
-        if (smfplayer.utils.isDailyMotionURL(uri)) {
-            var video_id = uri.match(/video\/([^_||^#]+)/)[1];
-            $.getJSON('https://api.dailymotion.com/video/' + video_id + '/subtitles?fields=id,language%2Curl&callback=?', function (data) {
-                video_info.sub_id = data.list[0].id;
-                video_info.sub_language = data.list[0].language;
-                video_info.sub_url = (data.list[0].url);
-                console.log(video_info.sub_url);
-
-                video_info.sub_text = $('.subs-cont').load(video_info.sub_url);
-                    console.log("************retrieve sub");
-                    console.log(video_info.sub_text);
-                    console.log("*******primo*********");
-
-
-                callback(video_info);
-            });
-        }
     }
 
 });

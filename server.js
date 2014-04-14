@@ -5,6 +5,7 @@ var sys = require("sys"),
     filesys = require("fs"),
     nerdify = require('./nerdify'),
     xmlSrt = require('./youTubeSubSrt'),
+    dmSrt = require('./dailyMotionSubSrt'),
     handlebars = require("handlebars");
 
 var template = filesys.readFileSync("./index.html", "utf8");
@@ -25,17 +26,30 @@ my_http.createServer(function (request, response) {
             }
         });
     } else if (my_path === '/srt') {
-        console.log('srt translation');
-        var video_id = url_parts.query.video_id;
+        // console.log('srt translation');
 
-        xmlSrt.getYouTubeSub(video_id, function (err, data) {
-            if (err) {
-                console.log(data);
-                sendResponse(500, "text/plain", data + '');
-            } else {
-                sendResponse(200, "text/plain", data);
-            }
-        })
+        var video_id = url_parts.query.video_id;
+        var vendor = url_parts.query.vendor;
+
+        if (vendor == 'youtube') {
+            xmlSrt.getYouTubeSub(video_id, function (err, data) {
+                if (err) {
+                    console.log(data);
+                    sendResponse(500, "text/plain", data + '');
+                } else {
+                    sendResponse(200, "text/plain", data);
+                }
+            })
+        } else if (vendor == 'dailymotion') {
+            dmSrt.getDailymotionSub( video_id, function (err, data) {
+                if (err) {
+                    console.log(data);
+                    sendResponse(500, "text/plain", data + '');
+                } else {
+                    sendResponse(200, "text/plain", data);
+                }
+            });
+        }
     } else if (my_path == '/video') {
         var source = {
             videoURI: url_parts.query.uri
