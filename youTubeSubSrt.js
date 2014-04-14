@@ -1,18 +1,27 @@
 var http = require('http'),
     xml2js = require('xml2js');
-
-function retriveXml(callback) {
-    http.get("http://www.youtube.com/api/timedtext?lang=en&v=CKCvf8E7V1g", function (res) {
+function getYouTubeSub(video_id, callback) {
+    if(video_id == null || video_id == ''){
+        console.error("Empty video id");
+        callback(true, "Empty video id");
+        return;
+    }
+    console.log("http://www.youtube.com/api/timedtext?lang=en&v="+video_id);
+    http.get("http://www.youtube.com/api/timedtext?lang=en&v="+video_id, function (res) {
         console.log("Got res: " + res.statusCode);
         if (res.statusCode != 200) {
             callback(true, res.statusCode);
+            return;
         }
-        ;
         var data = '';
         res.on("data", function (chunk) {
             data += chunk;
         });
         res.on('end', function () {
+            if( data == ''){
+                callback(true, 'No sub available');
+                return;
+            }
             ytXml2srt(data, function (err, result) {
                 callback(err, result);
             });
@@ -24,9 +33,10 @@ function retriveXml(callback) {
 
 function ytXml2srt(data, callback) {
     xml2js.parseString(data, function (err, json) {
+        console.log(json);
         if (err) {
             callback(err, json);
-        } else {
+        }else {
             var srt = '', n = 0;
             var captionsList = json.transcript.text;
             captionsList.forEach(function (cap) {
@@ -47,7 +57,6 @@ function ytXml2srt(data, callback) {
 }
 
 function sec2timecode(origin) {
-    console.log(origin);
     var hh, mm, ss, ms;
 
     hh = Math.floor(origin / 60 / 60);
@@ -76,4 +85,4 @@ function padZero(input, digit) {
     return output;
 }
 
-exports.retriveXml = retriveXml;
+exports.getYouTubeSub = getYouTubeSub;

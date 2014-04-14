@@ -4,7 +4,7 @@ var sys = require("sys"),
     url = require("url"),
     filesys = require("fs"),
     nerdify = require('./nerdify'),
-    xmlSrt = require('./xml_to_srt'),
+    xmlSrt = require('./youTubeSubSrt'),
     handlebars = require("handlebars");
 
 var template = filesys.readFileSync("./index.html", "utf8");
@@ -26,7 +26,9 @@ my_http.createServer(function (request, response) {
         });
     } else if (my_path === '/srt') {
         console.log('srt translation');
-        xmlSrt.retriveXml(function (err, data) {
+        var video_id = url_parts.query.video_id;
+
+        xmlSrt.getYouTubeSub(video_id, function (err, data) {
             if (err) {
                 console.log(data);
                 sendResponse(500, "text/plain", data + '');
