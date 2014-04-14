@@ -53,13 +53,42 @@ $(document).ready(function () {
 
         $videoInfo.append($('<div>').addClass('stats-cont').append($leftCol).append($rightCol));
 
-        var $videoDesc = $('<p>').html(video_info.descr).addClass('descr');
-        var $buttonNerd = $('<button type="submit">').html('Nerdify').addClass('btn btn-danger btn-lg');
-        var $hiddenInput = $('<input type="hidden" name="text">').val(video_info.descr);
+        var $tabCont;
+        if (video_info.descr && video_info.sub) {
+            var $tabNav = $('<ul>').addClass('nav nav-tabs').appendTo($videoInfo);
+            $tabNav.append($('<li>').addClass('active').append($('<a href="#descr-cont">').attr('data-toggle', 'tab').text('Description')));
+            $tabNav.append($('<li>').append($('<a href="#sub-cont">').attr('data-toggle', 'tab').text('Subtitles')));
 
-        var $buttonCont = $('<form>').attr('method', 'GET').attr('action', './nerdify').addClass('button-cont').append($hiddenInput).append($buttonNerd);
-        var $descCont = $('<div>').addClass('desc-cont').append($videoDesc).append($buttonCont);
-        $videoInfo.append($descCont);
+            $tabCont = $('<div>').addClass('tab-content').appendTo($videoInfo);
+        }
+        if (video_info.descr) {
+
+            var $descCont = $('<div>').addClass('desc-cont').attr('id', 'descr-cont');
+
+            var $videoDesc = ($('<p>').html(video_info.descr).addClass('descr'));
+            var $buttonNerd = ($('<button type="submit">').html('Nerdify').addClass('btn btn-danger btn-lg'));
+            var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr));
+            var $buttonCont = $('<form>').attr('method', 'GET').attr('action', './nerdify').addClass('button-cont').append($hiddenInput).append($buttonNerd);
+            $descCont.append($videoDesc).append($buttonCont);
+
+            if ($tabCont) {
+                $descCont.addClass('tab-pane').appendTo($tabCont);
+            } else {
+                $videoInfo.append($descCont);
+            }
+        }
+        if (video_info.sub) {
+            var $subCont = $('<div>').attr('id', 'sub-cont').html(video_info.sub);
+            if ($tabCont) {
+                $subCont.addClass('tab-pane').appendTo($tabCont);
+            } else {
+                $videoInfo.append($descCont);
+            }
+        }
+
+        if ($tabCont) {
+            $tabCont.children('.tab-pane').first().addClass('active');
+        }
 
         $buttonCont.submit(function (e) {
             e.preventDefault();
@@ -92,7 +121,7 @@ $(document).ready(function () {
                 }
             });
         });
-    });
+    }, true);
 
     retrieveSubtitles(uri, function (video_info) {
         var $descCont = $('.desc-cont');
@@ -150,7 +179,6 @@ $(document).ready(function () {
         }
     });
 
-
     function statDiv(key, value, glyph) {
         if (value == undefined || value == null) return null;
 
@@ -167,24 +195,39 @@ $(document).ready(function () {
         return $stat;
     }
 
-    function retrieveInfo(uri, callback) {
+    function retriveInfo(uri, callback, full) {
         var video_info = {};
         if (smfplayer.utils.isYouTubeURL(uri)) {
             var video_id = uri.match(/v=(.{11})/)[1];
-            $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + video_id + '?v=2&alt=json-in-script&callback=?', function (data) {
-                video_info.title = data.entry.title.$t;
-                video_info.thumb = data.entry.media$group.media$thumbnail[0].url;
-                video_info.descr = data.entry.media$group.media$description.$t;
-                video_info.views = data.entry.yt$statistics.viewCount;
-                video_info.favourites = data.entry.yt$statistics.favoriteCount;
-                video_info.comments = data.entry.gd$comments.gd$feedLink.countHint;
-                video_info.likes = data.entry.yt$rating.numLikes;
-                video_info.avgRate = data.entry.gd$rating.average;
-                video_info.published = data.entry.published.$t;
-                video_info.category = data.entry.category[1].term;
 
-                callback(video_info);
-            });
+            var retriveSub = function () {
+                return;
+            }
+            if (full) {
+                retriveSub = $.get;
+            }
+
+            $.when(
+                $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + video_id + '?v=2&alt=json-in-script&callback=?', function (data) {
+                    video_info.title = data.entry.title.$t;
+                    video_info.thumb = data.entry.media$group.media$thumbnail[0].url;
+                    video_info.descr = data.entry.media$group.media$description.$t;
+                    video_info.views = data.entry.yt$statistics.viewCount;
+                    video_info.favourites = data.entry.yt$statistics.favoriteCount;
+                    video_info.comments = data.entry.gd$comments.gd$feedLink.countHint;
+                    video_info.likes = data.entry.yt$rating.numLikes;
+                    video_info.avgRate = data.entry.gd$rating.average;
+                    video_info.published = data.entry.published.$t;
+                    video_info.category = data.entry.category[1].term;
+                }),
+                retriveSub('./srt?video_id=' + video_id, function (data) {
+                    video_info.sub = data;
+                })
+            ).then(function () {
+                    callback(video_info);
+                }, function () {
+                    callback(video_info);
+                });
         } else if (smfplayer.utils.isDailyMotionURL(uri)) {
             var video_id = uri.match(/video\/([^_||^#]+)/)[1];
             $.getJSON('https://api.dailymotion.com/video/' + video_id + '?fields=title,thumbnail_60_url,description,views_total,bookmarks_total,comments_total,ratings_total,rating,created_time,genre&callback=?', function (data) {

@@ -4,6 +4,7 @@ var sys = require("sys"),
     url = require("url"),
     filesys = require("fs"),
     nerdify = require('./nerdify'),
+    xmlSrt = require('./youTubeSubSrt'),
     handlebars = require("handlebars");
 
 var template = filesys.readFileSync("./index.html", "utf8");
@@ -14,7 +15,7 @@ my_http.createServer(function (request, response) {
     var my_path = url_parts.pathname;
 
     if (my_path === '/nerdify') {
-        text = url_parts.query.text;
+        var text = url_parts.query.text;
         nerdify.start(text, function (err, data) {
             if (err) {
                 console.log(data);
@@ -23,7 +24,18 @@ my_http.createServer(function (request, response) {
                 sendResponse(200, "text/plain", JSON.stringify(data));
             }
         });
+    } else if (my_path === '/srt') {
+        console.log('srt translation');
+        var video_id = url_parts.query.video_id;
 
+        xmlSrt.getYouTubeSub(video_id, function (err, data) {
+            if (err) {
+                console.log(data);
+                sendResponse(500, "text/plain", data + '');
+            } else {
+                sendResponse(200, "text/plain", data);
+            }
+        })
     } else if (my_path == '/video') {
         var source = {
             videoURI: url_parts.query.uri
