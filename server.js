@@ -17,7 +17,8 @@ my_http.createServer(function (request, response) {
 
     if (my_path === '/nerdify') {
         var text = url_parts.query.text;
-        nerdify.start(text, function (err, data) {
+        var type = url_parts.query.type;
+        nerdify.start(text, type, function (err, data) {
             if (err) {
                 console.log(data);
                 sendResponse(500, "text/plain", data + '');
