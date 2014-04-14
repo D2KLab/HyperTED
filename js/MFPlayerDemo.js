@@ -38,90 +38,117 @@ $(document).ready(function () {
     }
 
     retriveInfo(uri, function (video_info) {
-        $('#video-title').text(video_info.title);
+            $('#video-title').text(video_info.title);
 
-        var $videoInfo = $('#video-info');
+            var $videoInfo = $('#video-info');
 
-        var $rightCol = $('<div>').addClass('right-col');
-        var $leftCol = $('<div>').addClass('left-col');
-        $leftCol.append(statDiv('Published', video_info.published));
-        $leftCol.append(statDiv('Category', video_info.category));
-        $rightCol.append(statDiv('Views', video_info.views, 'eye-open'));
-        $rightCol.append(statDiv('Likes', video_info.likes, 'thumbs-up'));
-        $rightCol.append(statDiv('Favourites', video_info.favourites, 'star'));
-        $rightCol.append(statDiv('AVG Rating', video_info.avgRate, 'signal'));
+            var $rightCol = $('<div>').addClass('right-col');
+            var $leftCol = $('<div>').addClass('left-col');
+            $leftCol.append(statDiv('Published', video_info.published));
+            $leftCol.append(statDiv('Category', video_info.category));
+            $rightCol.append(statDiv('Views', video_info.views, 'eye-open'));
+            $rightCol.append(statDiv('Likes', video_info.likes, 'thumbs-up'));
+            $rightCol.append(statDiv('Favourites', video_info.favourites, 'star'));
+            $rightCol.append(statDiv('AVG Rating', video_info.avgRate, 'signal'));
 
-        $videoInfo.append($('<div>').addClass('stats-cont').append($leftCol).append($rightCol));
+            $videoInfo.append($('<div>').addClass('stats-cont').append($leftCol).append($rightCol));
 
-        var $tabCont;
-        if (video_info.descr && video_info.sub) {
-            var $tabNav = $('<ul>').addClass('nav nav-tabs').appendTo($videoInfo);
-            $tabNav.append($('<li>').addClass('active').append($('<a href="#descr-cont">').attr('data-toggle', 'tab').text('Description')));
-            $tabNav.append($('<li>').append($('<a href="#sub-cont">').attr('data-toggle', 'tab').text('Subtitles')));
+            var $tabCont;
+            if (video_info.descr && video_info.sub) {
+                var $tabNav = $('<ul>').addClass('nav nav-tabs').appendTo($videoInfo);
+                $tabNav.append($('<li>').addClass('active').append($('<a href="#descr-cont">').attr('data-toggle', 'tab').text('Description')));
+                $tabNav.append($('<li>').append($('<a href="#sub-cont">').attr('data-toggle', 'tab').text('Subtitles')));
 
-            $tabCont = $('<div>').addClass('tab-content').appendTo($videoInfo);
-        }
-        if (video_info.descr) {
-
-            var $descCont = $('<div>').addClass('desc-cont').attr('id', 'descr-cont');
-
-            var $videoDesc = ($('<p>').html(video_info.descr).addClass('descr'));
-            var $buttonNerd = ($('<button type="submit">').html('Nerdify').addClass('btn btn-danger btn-lg'));
-            var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr));
-            var $buttonCont = $('<form>').attr('method', 'GET').attr('action', './nerdify').addClass('button-cont').append($hiddenInput).append($buttonNerd);
-            $descCont.append($videoDesc).append($buttonCont);
-
-            if ($tabCont) {
-                $descCont.addClass('tab-pane').appendTo($tabCont);
-            } else {
-                $videoInfo.append($descCont);
+                $tabCont = $('<div>').addClass('tab-content').appendTo($videoInfo);
             }
-        }
-        if (video_info.sub) {
-            var $subCont = $('<div>').attr('id', 'sub-cont').html(video_info.sub);
-            if ($tabCont) {
-                $subCont.addClass('tab-pane').appendTo($tabCont);
-            } else {
-                $videoInfo.append($descCont);
-            }
-        }
+            if (video_info.descr) {
 
-        if ($tabCont) {
-            $tabCont.children('.tab-pane').first().addClass('active');
-        }
+                var $descCont = $('<div>').addClass('desc-cont').attr('id', 'descr-cont');
 
-        $buttonCont.submit(function (e) {
-            e.preventDefault();
-            var $form = $(this);
-            $('button[type="submit"]', $form).prop('disabled', true).addLoader('left');
-            $form.ajaxSubmit({
-                dataType: 'json',
-                success: function (responseText) {
-                    console.log(responseText);
-                    //sorting JSON for Start character desc
-                    responseText.sort(function SortByStartChar(x, y) {
-                        return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
-                    });
+                var $videoDesc = ($('<p>').html(video_info.descr).addClass('descr'));
+                var $buttonNerd = ($('<button type="submit">').html('Nerdify').addClass('btn btn-danger btn-lg'));
+                var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr));
+                var $buttonCont = $('<form>').attr('method', 'GET').attr('action', './nerdify').addClass('button-cont').append($hiddenInput).append($buttonNerd);
+                $descCont.append($videoDesc).append($buttonCont);
 
-                    var new_descr = video_info.descr;
-                    $.each(responseText, function (key, value) {
-                        var entity = value;
-
-                        var s1 = new_descr.substring(0, entity.startChar);
-                        var s2 = new_descr.substring(entity.startChar, entity.endChar);
-                        var s3 = new_descr.substring(entity.endChar);
-
-                        new_descr = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '"><a href="' + entity.uri + '">' + s2 + '</a></span>' + s3;
-
-                    });
-                    $descCont.html(new_descr);
-                },
-                error: function () {
-                    console.log('Something went wrong');
+                if ($tabCont) {
+                    $descCont.addClass('tab-pane').appendTo($tabCont);
+                } else {
+                    $videoInfo.append($descCont);
                 }
+            }
+            if (video_info.sub) {
+                var strList = video_info.sub.split('\n\n');
+                var formattedSub = '';
+
+                for (var sub in strList) {
+                    formattedSub += '<div>';
+                    var timeLine = true;
+                    var idLine = true;
+
+                    var lines = strList[sub].split('\n');
+                    lineLoop: for (var line in lines) {
+                        if (idLine) {
+                            //nothing for now
+                            idLine = false;
+                            continue lineLoop;
+                        }
+                        if (timeLine) {
+                            //nothing for now
+                            timeLine = false;
+                            continue lineLoop;
+                        }
+                        formattedSub += '<p>' + lines[line] + '<p>';
+                    }
+                }
+
+                var $subCont = $('<div>').attr('id', 'sub-cont').html(formattedSub);
+                if ($tabCont) {
+                    $subCont.addClass('tab-pane').appendTo($tabCont);
+                } else {
+                    $videoInfo.append($descCont);
+                }
+            }
+
+            if ($tabCont) {
+                $tabCont.children('.tab-pane').first().addClass('active');
+            }
+
+            $buttonCont.submit(function (e) {
+                e.preventDefault();
+                var $form = $(this);
+                $('button[type="submit"]', $form).prop('disabled', true).addLoader('left');
+                $form.ajaxSubmit({
+                    dataType: 'json',
+                    success: function (responseText) {
+                        console.log(responseText);
+                        //sorting JSON for Start character desc
+                        responseText.sort(function SortByStartChar(x, y) {
+                            return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
+                        });
+
+                        var new_descr = video_info.descr;
+                        $.each(responseText, function (key, value) {
+                            var entity = value;
+
+                            var s1 = new_descr.substring(0, entity.startChar);
+                            var s2 = new_descr.substring(entity.startChar, entity.endChar);
+                            var s3 = new_descr.substring(entity.endChar);
+
+                            new_descr = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '"><a href="' + entity.uri + '">' + s2 + '</a></span>' + s3;
+
+                        });
+                        $descCont.html(new_descr);
+                    },
+                    error: function () {
+                        console.log('Something went wrong');
+                    }
+                });
             });
-        });
-    }, true);
+        },
+        true
+    )
+    ;
 
 
     $('.video-list .video-link').each(function () {
@@ -220,7 +247,8 @@ $(document).ready(function () {
         //TODO other video platforms
     }
 
-});
+})
+;
 
 
 var $loaderImg;
