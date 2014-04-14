@@ -3,7 +3,6 @@ var sys = require("sys"),
     path = require("path"),
     url = require("url"),
     filesys = require("fs"),
-    nerd = require('./nerd'),
     nerdify = require('./nerdify'),
     handlebars = require("handlebars");
 
