@@ -67,7 +67,7 @@ $(document).ready(function () {
 
             var $videoDesc = ($('<p>').html(video_info.descr).addClass('descr'));
             var $buttonNerd = ($('<button type="submit">').html('Nerdify').addClass('btn btn-danger btn-lg'));
-            var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr));
+            var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr.replace(new RegExp('<br />','g'), '\n')));
             var $hiddenInput2 = ($('<input type="hidden" name="type">').val("text"));
             var $hiddenInput3 = ($('<input type="hidden" name="videoid">').val(video_info.video_id));
             var $hiddenInput4 = ($('<input type="hidden" name="vendor">').val(video_info.vendor));
@@ -200,7 +200,7 @@ $(document).ready(function () {
                         //TODO reformatted subs
                     },
                     error: function () {
-                        console.log('Something went wrong');
+                        console.error('Something went wrong');
                     }
                 });
             });
@@ -218,7 +218,6 @@ $(document).ready(function () {
             $form.ajaxSubmit({
                 dataType: 'json',
                 success: function (responseText) {
-                    console.log(responseText);
                     //sorting JSON for Start character desc
                     responseText.sort(function SortByStartChar(x, y) {
                         return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
@@ -239,7 +238,7 @@ $(document).ready(function () {
                     $form.remove();
                 },
                 error: function () {
-                    console.log('Something went wrong');
+                    console.error('Something went wrong');
                 }
             });
         });

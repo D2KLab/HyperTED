@@ -32,7 +32,8 @@ my_http.createServer(function (request, response) {
 
         nerdify.start(text, type, function (err, data) {
             if (err) {
-                sendResponse(500, "text/plain", err + '');
+                console.log(err);
+                sendResponse(500, "text/plain", err.message);
             } else {
                 nerdCache.set(cacheKey, data);
                 sendResponse(200, "application/json", JSON.stringify(data));
