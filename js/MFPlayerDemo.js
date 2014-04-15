@@ -67,7 +67,7 @@ $(document).ready(function () {
 
             var $videoDesc = ($('<p>').html(video_info.descr).addClass('descr'));
             var $buttonNerd = ($('<button type="submit">').html('Nerdify').addClass('btn btn-danger btn-lg'));
-            var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr));
+            var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr.replace(new RegExp('<br />', 'g'), '\n')));
             var $hiddenInput2 = ($('<input type="hidden" name="type">').val("text"));
             var $buttonCont = $('<form>').attr('method', 'GET').attr('action', './nerdify').addClass('button-cont').append($hiddenInput2).append($hiddenInput).append($buttonNerd);
             $descCont.append($videoDesc).append($buttonCont);
@@ -100,7 +100,8 @@ $(document).ready(function () {
                         continue lineLoop;
                     }
                     formattedSub += '<p>' + lines[line] + '</p>';
-                }formattedSub += '</div>';
+                }
+                formattedSub += '</div>';
             }
 
             var $buttonNerdSub = $('<button type="submit">').html('Nerdify Sub').addClass('btn btn-danger btn-lg');
@@ -144,7 +145,7 @@ $(document).ready(function () {
                                     timeLine = false;
                                     continue lineLoop;
                                 }
-                                formattedSub += lines[line]+' ' ;
+                                formattedSub += lines[line] + ' ';
                             }
                         }
 
@@ -155,6 +156,7 @@ $(document).ready(function () {
 
 
                         var new_subs = formattedSub;
+                        var startTime = [];
                         $.each(responseText, function (key, value) {
                             var entity = value;
 
@@ -162,10 +164,30 @@ $(document).ready(function () {
                             var s2 = new_subs.substring(entity.startChar, entity.endChar);
                             var s3 = new_subs.substring(entity.endChar);
 
-                            new_subs = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '"><a href="' + entity.uri + '">' + s2 + '</a></span>' + s3;
+                            new_subs = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '">' + '<a href="' + entity.uri + '" target="_blank" id="'+key+'">' + s2 + '</a></span>' + s3;
+
+
+                                startTime[key] = entity.startNPT;
+
+
 
                         });
                         $subCont.html(new_subs);
+
+                        var $cliccabile = $("span.entity");
+                        $cliccabile.click(function () {
+                            console.log($cliccabile.children("a").attr("id"));
+                        });
+
+
+                        function playentity(entity) {
+                            var urimf = uri + "#t=" + entity.startNPT + "," + entity.endNPT;
+
+//                            $player.playmf(urimf);
+                            console.log("********");
+                            console.log(urimf);
+                        }
+
                         //TODO reformatted subs
                     },
                     error: function () {
