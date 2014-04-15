@@ -164,6 +164,7 @@ $(document).ready(function () {
 
                         var new_subs = formattedSub;
                         var oldstart;
+                        var startTime = [];
                         $.each(responseText, function (key, value) {
                             var entity = value;
                             if (entity.endChar >= oldstart) {
@@ -175,11 +176,34 @@ $(document).ready(function () {
                             var s2 = new_subs.substring(entity.startChar, entity.endChar);
                             var s3 = new_subs.substring(entity.endChar);
 
+                            new_subs = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '">' + '<a href="' + entity.uri + '" target="_blank" id="'+key+'">' + s2 + '</a></span>' + s3;
+
+
+                                startTime[key] = entity.startNPT;
+
+
+
                             new_subs = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '"><a href="' + entity.uri + '">' + s2 + '</a></span>' + s3;
                             oldstart = entity.startChar;
                         });
                         $('.sub-text', $subCont).html(new_subs);
                         $form.remove();
+                        $subCont.html(new_subs);
+
+                        var $cliccabile = $("span.entity");
+                        $cliccabile.click(function () {
+                            console.log($cliccabile.children("a").attr("id"));
+                        });
+
+
+                        function playentity(entity) {
+                            var urimf = uri + "#t=" + entity.startNPT + "," + entity.endNPT;
+
+//                            $player.playmf(urimf);
+                            console.log("********");
+                            console.log(urimf);
+                        }
+
                         //TODO reformatted subs
                     },
                     error: function () {
