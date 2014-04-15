@@ -12,7 +12,6 @@ function start(text, doc_type, callback) {
         nerd.annotate(api_instance, apiID, ext, doc_type, text, gran, to, function (err, data) {
             callback(err, data);
         });
-
     } else {
         callback(true, 'Empty Text');
     }
