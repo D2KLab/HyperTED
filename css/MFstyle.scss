@@ -205,10 +205,7 @@ ul.video-list {
   div{
     line-height: 200%;
     .descr {
-      border-top: 1px solid $medium_gray;
       margin-top: 10px;
-      padding-top: 10px;
-
     }
     .entity {
       @include border-radius(5px);
