@@ -163,21 +163,16 @@ $(document).ready(function () {
 
 
                         var new_subs = formattedSub;
-                        var oldstart;
                         $.each(responseText, function (key, value) {
                             var entity = value;
-                            if (entity.endChar >= oldstart) {
-                                // FIXME nested entities
-                                // do not care for now
-                                return;
-                            }
+
                             var s1 = new_subs.substring(0, entity.startChar);
                             var s2 = new_subs.substring(entity.startChar, entity.endChar);
                             var s3 = new_subs.substring(entity.endChar);
 
                             new_subs = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '">' + '<a href="' + entity.uri + '" target="_blank" data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
 
-                            oldstart = entity.startChar;
+
                         });
                         $('.sub-text', $subCont).html(new_subs);
                         $form.remove();
@@ -204,12 +199,12 @@ $(document).ready(function () {
                                 startEntityS = startEntity.toFixed();
                             } else if (startEntity >= 60 && startEntity < 3600) {
                                 startEntityH = 0;
-                                startEntityM = Math.floor(startEntity / 60);
-                                startEntityS = Math.floor(startEntity % 60);
+                                startEntityM = Math.floor(startEntity / 60).toFixed();
+                                startEntityS = Math.floor(startEntity % 60).toFixed();
                             } else {
-                                startEntityH = Math.floor(startEntity / 3600);
-                                startEntityM = Math.floor((startEntity % 3600) / 60);
-                                startEntityS = Math.floor(startEntityM % 60);
+                                startEntityH = Math.floor(startEntity / 3600).toFixed();
+                                startEntityM = Math.floor((startEntity % 3600) / 60).toFixed();
+                                startEntityS = Math.floor(startEntityM % 60).toFixed();
                             }
 
                             if (endEntity < 60) {
@@ -218,12 +213,12 @@ $(document).ready(function () {
                                 endEntityS = endEntity.toFixed();
                             } else if (endEntity >= 60 && endEntity < 3600) {
                                 endEntityH = 0;
-                                endEntityM = Math.floor(endEntity / 60);
-                                endEntityS = Math.floor(endEntity % 60);
+                                endEntityM = Math.floor(endEntity / 60).toFixed();
+                                endEntityS = Math.floor(endEntity % 60).toFixed();
                             } else {
-                                endEntityH = Math.floor(endEntity / 3600);
-                                endEntityM = Math.floor((endEntity % 3600) / 60);
-                                endEntityS = Math.floor(endEntityM % 60);
+                                endEntityH = Math.floor(endEntity / 3600).toFixed();
+                                endEntityM = Math.floor((endEntity % 3600) / 60).toFixed();
+                                endEntityS = Math.floor(endEntityM % 60).toFixed();
                             }
 
                             mfuri2 = uri + "#t=" + startEntityH + ":" + ("0" + startEntityM).slice(-2) + ":" + ("0" + startEntityS).slice(-2) + "," + endEntityH + ":" + ("0" + endEntityM).slice(-2) + ":" + ("0" + endEntityS).slice(-2);
@@ -276,21 +271,15 @@ $(document).ready(function () {
                     });
 
                     var new_descr = video_info.descr;
-                    var oldstart;
                     $.each(responseText, function (key, value) {
                         var entity = value;
-                        if (entity.endChar >= oldstart) {
-                            // FIXME nested entities
-                            // do not care for now
-                            return;
-                        }
 
                         var s1 = new_descr.substring(0, entity.startChar);
                         var s2 = new_descr.substring(entity.startChar, entity.endChar);
                         var s3 = new_descr.substring(entity.endChar);
 
                         new_descr = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '"><a href="' + entity.uri + '">' + s2 + '</a></span>' + s3;
-                        oldstart = entity.startChar;
+
                     });
                     $('.descr', $descCont).html(new_descr);
                     $form.remove();
@@ -363,7 +352,7 @@ $(document).ready(function () {
                 $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + video_info.video_id + '?v=2&alt=json-in-script&callback=?', function (data) {
                     video_info.title = data.entry.title.$t;
                     video_info.thumb = data.entry.media$group.media$thumbnail[0].url;
-                    video_info.descr = data.entry.media$group.media$description.$t.replace(new RegExp('<br />', 'g'), '\n');
+                    video_info.descr = data.entry.media$group.media$description.$t;
                     video_info.views = data.entry.yt$statistics.viewCount;
                     video_info.favourites = data.entry.yt$statistics.favoriteCount;
                     video_info.comments = data.entry.gd$comments.gd$feedLink.countHint;
@@ -395,7 +384,7 @@ $(document).ready(function () {
                 $.getJSON('https://api.dailymotion.com/video/' + video_info.video_id + '?fields=title,thumbnail_60_url,description,views_total,bookmarks_total,comments_total,ratings_total,rating,created_time,genre&callback=?', function (data) {
                     video_info.title = data.title;
                     video_info.thumb = data.thumbnail_60_url;
-                    video_info.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
+                    video_info.descr = data.description;
                     video_info.views = data.views_total;
                     video_info.favourites = data.bookmarks_total;
                     video_info.comments = data.comments_total;
