@@ -208,6 +208,7 @@ ul.video-list {
       margin-top: 10px;
     }
     .entity {
+      cursor: pointer;
       @include border-radius(5px);
       @include border-box-sizing;
       padding: 4px;
