@@ -204,12 +204,12 @@ $(document).ready(function () {
                                 startEntityS = startEntity.toFixed();
                             } else if (startEntity >= 60 && startEntity < 3600) {
                                 startEntityH = 0;
-                                startEntityM = Math.floor(startEntity / 60).toFixed();
-                                startEntityS = Math.floor(startEntity % 60).toFixed();
+                                startEntityM = Math.floor(startEntity / 60);
+                                startEntityS = Math.floor(startEntity % 60);
                             } else {
-                                startEntityH = Math.floor(startEntity / 3600).toFixed();
-                                startEntityM = Math.floor((startEntity % 3600) / 60).toFixed();
-                                startEntityS = Math.floor(startEntityM % 60).toFixed();
+                                startEntityH = Math.floor(startEntity / 3600);
+                                startEntityM = Math.floor((startEntity % 3600) / 60);
+                                startEntityS = Math.floor(startEntityM % 60);
                             }
 
                             if (endEntity < 60) {
@@ -218,12 +218,12 @@ $(document).ready(function () {
                                 endEntityS = endEntity.toFixed();
                             } else if (endEntity >= 60 && endEntity < 3600) {
                                 endEntityH = 0;
-                                endEntityM = Math.floor(endEntity / 60).toFixed();
-                                endEntityS = Math.floor(endEntity % 60).toFixed();
+                                endEntityM = Math.floor(endEntity / 60);
+                                endEntityS = Math.floor(endEntity % 60);
                             } else {
-                                endEntityH = Math.floor(endEntity / 3600).toFixed();
-                                endEntityM = Math.floor((endEntity % 3600) / 60).toFixed();
-                                endEntityS = Math.floor(endEntityM % 60).toFixed();
+                                endEntityH = Math.floor(endEntity / 3600);
+                                endEntityM = Math.floor((endEntity % 3600) / 60);
+                                endEntityS = Math.floor(endEntityM % 60);
                             }
 
                             mfuri2 = uri + "#t=" + startEntityH + ":" + ("0" + startEntityM).slice(-2) + ":" + ("0" + startEntityS).slice(-2) + "," + endEntityH + ":" + ("0" + endEntityM).slice(-2) + ":" + ("0" + endEntityS).slice(-2);
