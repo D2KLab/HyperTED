@@ -67,7 +67,7 @@ $(document).ready(function () {
 
             var $videoDesc = ($('<p>').html(video_info.descr).addClass('descr'));
             var $buttonNerd = ($('<button type="submit">').html('Nerdify').addClass('btn btn-danger btn-lg'));
-            var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr.replace(new RegExp('<br />','g'), '\n')));
+            var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr.replace(new RegExp('<br />', 'g'), '\n')));
             var $hiddenInput2 = ($('<input type="hidden" name="type">').val("text"));
             var $hiddenInput3 = ($('<input type="hidden" name="videoid">').val(video_info.video_id));
             var $hiddenInput4 = ($('<input type="hidden" name="vendor">').val(video_info.vendor));
@@ -163,7 +163,6 @@ $(document).ready(function () {
 
 
                         var new_subs = formattedSub;
-                        var startTime = [];
                         $.each(responseText, function (key, value) {
                             var entity = value;
 
@@ -171,11 +170,7 @@ $(document).ready(function () {
                             var s2 = new_subs.substring(entity.startChar, entity.endChar);
                             var s3 = new_subs.substring(entity.endChar);
 
-                            new_subs = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '">' + '<a href="' + entity.uri + '" target="_blank" id="'+key+'">' + s2 + '</a></span>' + s3;
-
-
-                                startTime[key] = entity.startNPT;
-
+                            new_subs = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '">' + '<a href="' + entity.uri + '" target="_blank" data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
 
 
                         });
@@ -183,19 +178,71 @@ $(document).ready(function () {
                         $form.remove();
                         $subCont.html(new_subs);
 
-                        var $cliccabile = $("span.entity");
-                        $cliccabile.click(function () {
-                            console.log($cliccabile.children("a").attr("id"));
+
+                        $("span.entity").click(function () {
+                            $player.smfplayer('destroy');
+
+
+                            var mfuri2 = '';
+                            var startEntity = $(this).children('a').data('start-time');
+                            var endEntity = $(this).children('a').data('end-time');
+                            var startEntityH;
+                            var startEntityM;
+                            var startEntityS;
+                            var endEntityH;
+                            var endEntityM;
+                            var endEntityS;
+
+                            if (startEntity < 60) {
+                                startEntityH = 0;
+                                startEntityM = 0;
+                                startEntityS = startEntity.toFixed();
+                            } else if (startEntity >= 60 && startEntity < 3600) {
+                                startEntityH = 0;
+                                startEntityM = Math.floor(startEntity / 60).toFixed();
+                                startEntityS = Math.floor(startEntity % 60).toFixed();
+                            } else {
+                                startEntityH = Math.floor(startEntity / 3600).toFixed();
+                                startEntityM = Math.floor((startEntity % 3600) / 60).toFixed();
+                                startEntityS = Math.floor(startEntityM % 60).toFixed();
+                            }
+
+                            if (endEntity < 60) {
+                                endEntityH = 0;
+                                endEntityM = 0;
+                                endEntityS = endEntity.toFixed();
+                            } else if (endEntity >= 60 && endEntity < 3600) {
+                                endEntityH = 0;
+                                endEntityM = Math.floor(endEntity / 60).toFixed();
+                                endEntityS = Math.floor(endEntity % 60).toFixed();
+                            } else {
+                                endEntityH = Math.floor(endEntity / 3600).toFixed();
+                                endEntityM = Math.floor((endEntity % 3600) / 60).toFixed();
+                                endEntityS = Math.floor(endEntityM % 60).toFixed();
+                            }
+
+                            mfuri2 = uri + "#t=" + startEntityH + ":" + ("0" + startEntityM).slice(-2) + ":" + ("0" + startEntityS).slice(-2) + "," + endEntityH + ":" + ("0" + endEntityM).slice(-2) + ":" + ("0" + endEntityS).slice(-2);
+
+                            console.log("********H");
+                            console.log(startEntityH);
+                            console.log("********M");
+                            console.log(startEntityM);
+                            console.log("********S");
+                            console.log(startEntityS);
+                            console.log("********Sec");
+                            console.log(startEntity);
+
+                            //initialise smfplayer
+                            $player.smfplayer({
+                                mfURI: mfuri2,
+                                ontimeready: highlight
+                            });
+                            $player.playmf();
+
+                            console.log("********");
+                            console.log(mfuri2);
                         });
 
-
-                        function playentity(entity) {
-                            var urimf = uri + "#t=" + entity.startNPT + "," + entity.endNPT;
-
-//                            $player.playmf(urimf);
-                            console.log("********");
-                            console.log(urimf);
-                        }
 
                         //TODO reformatted subs
                     },
@@ -234,7 +281,7 @@ $(document).ready(function () {
                         new_descr = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '"><a href="' + entity.uri + '">' + s2 + '</a></span>' + s3;
 
                     });
-                    $('.descr',$descCont).html(new_descr);
+                    $('.descr', $descCont).html(new_descr);
                     $form.remove();
                 },
                 error: function () {
