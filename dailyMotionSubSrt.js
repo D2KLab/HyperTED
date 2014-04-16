@@ -40,10 +40,7 @@ function getDailymotionSub(video_id, callback) {
 
                     var data = '';
                     res.on("data", function (chunk) {
-
                         data += chunk;
-                        quote(data);
-
                     });
                     res.on('end', function () {
                         if (data == '') {
@@ -56,41 +53,8 @@ function getDailymotionSub(video_id, callback) {
             } else {
                 //TODO
             }
-
         });
-
-//from UTF-8 to ASCII encoding
-        var escapable = /[\\\"\x00-\x1f\x7f-\uffff]/g,
-            meta = {    // table of character substitutions
-                '\b': '\\b',
-                '\t': '\\t',
-                '\n': '\\n',
-                '\f': '\\f',
-                '\r': '\\r',
-                '"': '\\"',
-                '\\': '\\\\'
-            };
-
-        function quote(string) {
-
-// If the string contains no control characters, no quote characters, and no
-// backslash characters, then we can safely slap some quotes around it.
-// Otherwise we must also replace the offending characters with safe escape
-// sequences.
-
-            escapable.lastIndex = 0;
-            return escapable.test(string) ?
-                '"' + string.replace(escapable, function (a) {
-                var c = meta[a];
-                return typeof c === 'string' ? c :
-                    '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-            }) + '"' :
-                '"' + string + '"';
-        }
-
     });
-
-
 }
 
 

@@ -308,6 +308,7 @@ ul.video-list {
     #video-info div .descr {
       margin-top: 10px; }
     #video-info div .entity {
+      cursor: pointer;
       -webkit-border-radius: 5px;
       -moz-border-radius: 5px;
       -ms-border-radius: 5px;
