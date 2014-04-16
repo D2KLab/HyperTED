@@ -163,16 +163,21 @@ $(document).ready(function () {
 
 
                         var new_subs = formattedSub;
+                        var oldstart;
                         $.each(responseText, function (key, value) {
                             var entity = value;
-
+                            if (entity.endChar >= oldstart) {
+                                // FIXME nested entities
+                                // do not care for now
+                                return;
+                            }
                             var s1 = new_subs.substring(0, entity.startChar);
                             var s2 = new_subs.substring(entity.startChar, entity.endChar);
                             var s3 = new_subs.substring(entity.endChar);
 
                             new_subs = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '">' + '<a href="' + entity.uri + '" target="_blank" data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
 
-
+                            oldstart = entity.startChar;
                         });
                         $('.sub-text', $subCont).html(new_subs);
                         $form.remove();
@@ -271,15 +276,21 @@ $(document).ready(function () {
                     });
 
                     var new_descr = video_info.descr;
+                    var oldstart;
                     $.each(responseText, function (key, value) {
                         var entity = value;
+                        if (entity.endChar >= oldstart) {
+                            // FIXME nested entities
+                            // do not care for now
+                            return;
+                        }
 
                         var s1 = new_descr.substring(0, entity.startChar);
                         var s2 = new_descr.substring(entity.startChar, entity.endChar);
                         var s3 = new_descr.substring(entity.endChar);
 
                         new_descr = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '"><a href="' + entity.uri + '">' + s2 + '</a></span>' + s3;
-
+                        oldstart = entity.startChar;
                     });
                     $('.descr', $descCont).html(new_descr);
                     $form.remove();
@@ -352,7 +363,7 @@ $(document).ready(function () {
                 $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + video_info.video_id + '?v=2&alt=json-in-script&callback=?', function (data) {
                     video_info.title = data.entry.title.$t;
                     video_info.thumb = data.entry.media$group.media$thumbnail[0].url;
-                    video_info.descr = data.entry.media$group.media$description.$t;
+                    video_info.descr = data.entry.media$group.media$description.$t.replace(new RegExp('<br />', 'g'), '\n');
                     video_info.views = data.entry.yt$statistics.viewCount;
                     video_info.favourites = data.entry.yt$statistics.favoriteCount;
                     video_info.comments = data.entry.gd$comments.gd$feedLink.countHint;
@@ -384,7 +395,7 @@ $(document).ready(function () {
                 $.getJSON('https://api.dailymotion.com/video/' + video_info.video_id + '?fields=title,thumbnail_60_url,description,views_total,bookmarks_total,comments_total,ratings_total,rating,created_time,genre&callback=?', function (data) {
                     video_info.title = data.title;
                     video_info.thumb = data.thumbnail_60_url;
-                    video_info.descr = data.description;
+                    video_info.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
                     video_info.views = data.views_total;
                     video_info.favourites = data.bookmarks_total;
                     video_info.comments = data.comments_total;
