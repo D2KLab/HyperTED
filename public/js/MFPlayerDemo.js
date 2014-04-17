@@ -174,8 +174,10 @@ $(document).ready(function () {
                         var new_subs = formattedSub;
                         var onlyEntity = [responseText.length];
                         var oldstart;
+
                         $.each(responseText, function (key, value) {
                             var entity = value;
+                            var n = 0;
                             if (entity.endChar >= oldstart) {
                                 // FIXME nested entities
                                 // do not care for now
@@ -187,9 +189,10 @@ $(document).ready(function () {
                             var href = entity.uri ? 'href="' + entity.uri + '"' : '';
                             var nerdType = entity.nerdType.split('#')[1].toLowerCase();
 
-                            new_subs = s1 + '<span class="entity ' + nerdType + '">' + '<a ' + href + ' target="_blank" data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
-                            onlyEntity[key] = '<span class="entity ' + nerdType + '">#' + s2 + '</span>';
-                            onlyEntity.sort();
+                            new_subs = s1 + '<span class="entity ' + nerdType + '"><a href="#" +  data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
+                            onlyEntity[key] = '<span class="entity ' + nerdType + '"><a ' + href + ' target="_blank"> #' + s2 + '</a></span>';
+
+
                             oldstart = entity.startChar;
                         });
 
@@ -199,14 +202,34 @@ $(document).ready(function () {
 
                         $('#entity-sect').show();
                         var $entityList = $('<ul>').addClass('displayEntity');
-
-
+                        onlyEntity.sort();
+                        responseText.sort(function SortByNerdType(x, y) {
+                            return ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1 ));
+                        });
 
                         for (var i in responseText) {
-//                            var $type = $('<li>').html(onlyEntity[i].split('#'));
-//                            console.log(onlyEntity[i]);
+                            var nerdTypeCount = 1;
+                            if (i > 0)
+                                if (responseText[i].nerdType.split('#')[1] == responseText[i - 1].nerdType.split('#')[1]) {
+
+                                    console.log(responseText[i].nerdType.split('#')[1]);
+                                    console.log(i);
+                                    console.log(nerdTypeCount);
+                                    console.log(responseText[i - 1].nerdType.split('#')[1]);
+                                    console.log("****************");
+                                    nerdTypeCount++;
+                                } else {
+                                    console.log(responseText[i].nerdType.split('#')[1]);
+                                    console.log(i);
+                                    console.log(nerdTypeCount);
+                                    console.log(responseText[i - 1].nerdType.split('#')[1]);
+                                    console.log("****************");
+                                    var $typeEntity = $('<h3>').addClass('title').html(nerdTypeCount + " " + responseText[i].nerdType.split('#')[1]);
+                                    nerdTypeCount = 1;
+                                }
                             var $singularEntity = $('<li>').html(onlyEntity[i]);
-                            $entityList.append($singularEntity);
+                            $entityList.append($typeEntity).append($singularEntity);
+
                         }
                         $('.entity-content').html("In this video there are " + responseText.length + " entities").append($entityList);
 
