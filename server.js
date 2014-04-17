@@ -54,6 +54,7 @@ app.get('/video', function (req, res) {
     var source = {
         videoURI: req.query.uri
     };
+    console.log(source.videoURI);
     var pageBuilder = handlebars.compile(template);
     var pageText = pageBuilder(source);
 
