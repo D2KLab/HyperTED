@@ -206,7 +206,7 @@ $(document).ready(function () {
 //                            var $type = $('<li>').html(onlyEntity[i].split('#'));
 //                            console.log(onlyEntity[i]);
                             var $singularEntity = $('<li>').html(onlyEntity[i]);
-                            $entityList.append($type).append($singularEntity);
+                            $entityList.append($singularEntity);
                         }
                         $('.entity-content').html("In this video there are " + responseText.length + " entities").append($entityList);
 
