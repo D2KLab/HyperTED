@@ -421,19 +421,17 @@ $(document).ready(function () {
         //TODO other video platforms
     }
 
-})
-;
+});
 
 
-var $loaderImg;
 jQuery.fn.extend({
     addLoader: function (direction) {
-        if (!$loaderImg) {
-            $loaderImg = $("<img>").attr('src', 'img/ajax-loader.gif');
+        if (!jQuery.loaderImg) {
+            jQuery.loaderImg = $("<img>").attr('src', 'img/ajax-loader.gif');
         }
 
-        $tempImg = $loaderImg;
-        $loaderImg = $loaderImg.clone();
+        $loaderImg = jQuery.loaderImg;
+        jQuery.loaderImg = $loaderImg.clone();
         if (direction == 'left') {
             $(this).before($loaderImg);
         } else {

@@ -1,17 +1,24 @@
 var express = require('express'),
     sys = require("sys"),
-    http = require("http"),
     path = require("path"),
     url = require("url"),
     fs = require("fs"), //file system
     nerdify = require('./nerdify'),
-    video_util = require('./video'),
-    handlebars = require("handlebars"),
+    video = require('./video'),
+    exphbs = require("express3-handlebars"),
     Cache = require("node-cache"),
     nerdCache = new Cache();
 
-var app = express();
-var template = fs.readFileSync("./index.html", "utf8");
+var app = express(), hbs=exphbs.create({});
+app.set('view options', {layout: false});
+app.set('views', path.join(__dirname, 'views'));
+app.engine('html', hbs.engine);
+app.set('view engine', 'html');
+
+//app.register('.html', require('handlebars'));
+
+//var template = fs.readFileSync("./index.html", "utf8");
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/nerdify', function (req, res) {
@@ -42,7 +49,7 @@ app.get('/srt', function (req, res) {
     var video_id = req.query.video_id;
     var vendor = req.query.vendor;
 
-    video_util.getSub(vendor, video_id, function (err, data) {
+    video.getSub(vendor, video_id, function (err, data) {
         if (err) {
             res.send(500, data + '');
         } else {
@@ -56,35 +63,24 @@ app.get('/video', function (req, res) {
 
     var t = req.query.t;
     if (t) {
-        videoURI += concSign + 't='+t;
+        videoURI += concSign + 't=' + t;
         concSign = '&';
     }
     var xywh = req.query.xywh;
-    if(xywh){
-        videoURI += concSign + 'xywh=' +xywh;
+    if (xywh) {
+        videoURI += concSign + 'xywh=' + xywh;
 //        concSign = '&';
     }
 
     var source = {
         videoURI: videoURI
     };
-    var pageBuilder = handlebars.compile(template);
-    var pageText = pageBuilder(source);
-
-    res.send(pageText);
+//    var pageBuilder = handlebars.compile(template);
+//    var pageText = pageBuilder(source);
+//
+//    res.send(pageText);
+    res.render('index.html', source);
 });
 
-
-///* serves all the static files */
-//app.get(/^(.+)$/, function (req, res) {
-//    res.sendfile(__dirname + req.params[0]);
-//});
 app.listen(8080);
 sys.puts("Server Running on 8080");
-
-
-if (typeof String.prototype.startsWith != 'function') {
-    String.prototype.startsWith = function (str) {
-        return this.slice(0, str.length) == str;
-    };
-}
