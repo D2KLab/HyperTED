@@ -3,6 +3,26 @@ var http = require('http'),
 
 var LOG_TAG = '[VIDEO.JS]: ';
 
+exports.getSub = function (vendor, video_id, callback) {
+    if (video_id == null || video_id == '') {
+        console.error(LOG_TAG + "Empty video id");
+        callback(true, "Empty video id");
+        return;
+    }
+
+    switch (vendor) {
+        case 'youtube':
+            getYouTubeSub(video_id, callback);
+            break;
+        case 'dailymotion':
+            getDailymotionSub(video_id, callback);
+            break;
+        default :
+            console.log(LOG_TAG + 'Vendor not recognized or not supported.');
+            callback(true, 'Vendor not recognized or not supported.');
+    }
+};
+
 function getYouTubeSub(video_id, callback) {
     http.get("http://www.youtube.com/api/timedtext?lang=en&format=srt&v=" + video_id, function (res) {
         if (res.statusCode != 200) {
@@ -68,28 +88,6 @@ function getDailymotionSub(video_id, callback) {
         });
     });
 }
-
-function getSub(vendor, video_id, callback) {
-    if (video_id == null || video_id == '') {
-        console.error(LOG_TAG + "Empty video id");
-        callback(true, "Empty video id");
-        return;
-    }
-
-    switch (vendor) {
-        case 'youtube':
-            getYouTubeSub(video_id, callback);
-            break;
-        case 'dailymotion':
-            getDailymotionSub(video_id, callback);
-            break;
-        default :
-            console.log(LOG_TAG + 'Vendor not recognized or not supported.');
-            callback(true, 'Vendor not recognized or not supported.');
-    }
-}
-exports.getSub = getSub;
-
 
 function empty(data) {
     if (typeof(data) == 'number' || typeof(data) == 'boolean') {

@@ -12,6 +12,7 @@ var express = require('express'),
 
 var app = express();
 var template = fs.readFileSync("./index.html", "utf8");
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/nerdify', function (req, res) {
     var text = req.query.text;
@@ -59,10 +60,11 @@ app.get('/video', function (req, res) {
     res.send(pageText);
 });
 
-/* serves all the static files */
-app.get(/^(.+)$/, function (req, res) {
-    res.sendfile(__dirname + req.params[0]);
-});
+
+///* serves all the static files */
+//app.get(/^(.+)$/, function (req, res) {
+//    res.sendfile(__dirname + req.params[0]);
+//});
 app.listen(8080);
 sys.puts("Server Running on 8080");
 
