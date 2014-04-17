@@ -1,15 +1,10 @@
 var http = require('http'),
     https = require('https');
 
+var LOG_TAG = '[VIDEO.JS]: ';
+
 function getYouTubeSub(video_id, callback) {
-    if (video_id == null || video_id == '') {
-        console.error("Empty video id");
-        callback(true, "Empty video id");
-        return;
-    }
-    console.log("http://www.youtube.com/api/timedtext?lang=en&v=" + video_id);
     http.get("http://www.youtube.com/api/timedtext?lang=en&format=srt&v=" + video_id, function (res) {
-        console.log("Got res: " + res.statusCode);
         if (res.statusCode != 200) {
             callback(true, res.statusCode);
             return;
@@ -27,27 +22,17 @@ function getYouTubeSub(video_id, callback) {
 
         });
     });
-
 }
 
 function getDailymotionSub(video_id, callback) {
-    if (video_id == null || video_id == '') {
-        console.error("Empty video id");
-        callback(true, "Empty video id");
-        return;
-    }
     https.get('https://api.dailymotion.com/video/' + video_id + '/subtitles?fields=id,language%2Curl', function (res) {
-        console.log("Got res: " + res.statusCode);
         if (res.statusCode != 200) {
             callback(true, res.statusCode);
             return;
         }
-
-
         var data = '';
         res.on("data", function (chunk) {
             data += chunk;
-
         });
         res.on('end', function () {
             if (data == '') {
@@ -56,8 +41,6 @@ function getDailymotionSub(video_id, callback) {
             }
             data = JSON.parse(data);
             if (data.total > 0) {
-//                video_info.sub_id = data.list[0].id;
-//                video_info.sub_language = data.list[0].language;
                 var url = (data.list[0].url);
                 http.get(url, function (res) {
 
@@ -87,6 +70,12 @@ function getDailymotionSub(video_id, callback) {
 }
 
 function getSub(vendor, video_id, callback) {
+    if (video_id == null || video_id == '') {
+        console.error(LOG_TAG + "Empty video id");
+        callback(true, "Empty video id");
+        return;
+    }
+
     switch (vendor) {
         case 'youtube':
             getYouTubeSub(video_id, callback);
@@ -95,8 +84,28 @@ function getSub(vendor, video_id, callback) {
             getDailymotionSub(video_id, callback);
             break;
         default :
-            console.log('[VIDEO.JS]: Vendor not recognized or not supported.');
+            console.log(LOG_TAG + 'Vendor not recognized or not supported.');
             callback(true, 'Vendor not recognized or not supported.');
     }
 }
 exports.getSub = getSub;
+
+
+function empty(data) {
+    if (typeof(data) == 'number' || typeof(data) == 'boolean') {
+        return false;
+    }
+    if (typeof(data) == 'undefined' || data === null) {
+        return true;
+    }
+    if (typeof(data.length) != 'undefined') {
+        return data.length == 0;
+    }
+    var count = 0;
+    for (var i in data) {
+        if (data.hasOwnProperty(i)) {
+            count++;
+        }
+    }
+    return count == 0;
+}

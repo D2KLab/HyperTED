@@ -1,4 +1,5 @@
-var sys = require("sys"),
+var express = require('express'),
+    sys = require("sys"),
     http = require("http"),
     path = require("path"),
     url = require("url"),
@@ -9,90 +10,60 @@ var sys = require("sys"),
     Cache = require("node-cache"),
     nerdCache = new Cache();
 
+var app = express();
 var template = fs.readFileSync("./index.html", "utf8");
 
-http.createServer(function (request, response) {
+app.get('/nerdify', function (req, res) {
+    var text = req.query.text;
+    var type = req.query.type;
+    var video_id = req.query.videoid;
+    var vendor = req.query.vendor;
+    var cacheKey = vendor + video_id + type;
 
-    var url_parts = url.parse(request.url, true);
-    var my_path = url_parts.pathname;
-
-    if (my_path === '/nerdify') {
-        var text = url_parts.query.text;
-        var type = url_parts.query.type;
-        var video_id = url_parts.query.videoid;
-        var vendor = url_parts.query.vendor;
-        var cacheKey = vendor + video_id + type;
-
-        var cachedData = nerdCache.get(cacheKey);
-        if (cachedData[cacheKey]) {
-            sendResponse(200, "application/json", JSON.stringify(cachedData[cacheKey]));
-            return;
-        }
-
-        nerdify.start(text, type, function (err, data) {
-            if (err) {
-                console.log(err);
-                sendResponse(500, "text/plain", err.message);
-            } else {
-                nerdCache.set(cacheKey, data);
-                sendResponse(200, "application/json", JSON.stringify(data));
-            }
-        });
-    } else if (my_path === '/srt') {
-        var video_id = url_parts.query.video_id;
-        var vendor = url_parts.query.vendor;
-
-        video_util.getSub(vendor, video_id, function (err, data) {
-            if (err) {
-                sendResponse(500, "text/plain", data + '');
-            } else {
-                sendResponse(200, "text/plain", data);
-            }
-        })
-    } else if (my_path == '/video') {
-
-        var source = {
-            videoURI: url_parts.query.uri
-        };
-        var pageBuilder = handlebars.compile(template);
-        var pageText = pageBuilder(source);
-
-        sendResponse(200, "text/html", pageText);
-    } else {
-        var full_path = path.join(process.cwd(), my_path);
-        fs.exists(full_path, function (exists) {
-            if (!exists) {
-                sendResponse(404, "text/plain", "404 Not Found\n");
-            }
-            else {
-                fs.readFile(full_path, "binary", function (err, file) {
-                    if (err) {
-                        sendResponse(500, "text/plain", err + "\n");
-                    }
-                    else {
-                        sendResponse(200, "auto", file, "binary");
-                    }
-
-                });
-            }
-        });
+    var cachedData = nerdCache.get(cacheKey);
+    var json = cachedData[cacheKey];
+    if (json) {
+        res.json(json);
+        return;
     }
 
-    function sendResponse(code, content_type, content, format) {
-        if (content_type === "auto") {
-            response.writeHeader(code);
+    nerdify.start(text, type, function (err, data) {
+        if (err) {
+            console.log(err);
+            res.send(500, err.message);
         } else {
-            response.writeHeader(code, {"Content-Type": content_type});
+            nerdCache.set(cacheKey, data);
+            res.json(data);
         }
+    });
+});
+app.get('/srt', function (req, res) {
+    var video_id = req.query.video_id;
+    var vendor = req.query.vendor;
 
-        if (format) {
-            response.write(content, format);
+    video_util.getSub(vendor, video_id, function (err, data) {
+        if (err) {
+            res.send(500, data + '');
         } else {
-            response.write(content);
+            res.send(200, data);
         }
-        response.end();
-    }
-}).listen(8080);
+    })
+});
+app.get('/video', function (req, res) {
+    var source = {
+        videoURI: req.query.uri
+    };
+    var pageBuilder = handlebars.compile(template);
+    var pageText = pageBuilder(source);
+
+    res.send(pageText);
+});
+
+/* serves all the static files */
+app.get(/^(.+)$/, function (req, res) {
+    res.sendfile(__dirname + req.params[0]);
+});
+app.listen(8080);
 sys.puts("Server Running on 8080");
 
 
