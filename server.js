@@ -1,18 +1,17 @@
 var sys = require("sys"),
-    my_http = require("http"),
+    http = require("http"),
     path = require("path"),
     url = require("url"),
-    filesys = require("fs"),
+    fs = require("fs"), //file system
     nerdify = require('./nerdify'),
-    xmlSrt = require('./youTubeSubSrt'),
-    dmSrt = require('./dailyMotionSubSrt'),
+    video_util = require('./video'),
     handlebars = require("handlebars"),
     Cache = require("node-cache"),
     nerdCache = new Cache();
 
-var template = filesys.readFileSync("./index.html", "utf8");
+var template = fs.readFileSync("./index.html", "utf8");
 
-my_http.createServer(function (request, response) {
+http.createServer(function (request, response) {
 
     var url_parts = url.parse(request.url, true);
     var my_path = url_parts.pathname;
@@ -25,7 +24,7 @@ my_http.createServer(function (request, response) {
         var cacheKey = vendor + video_id + type;
 
         var cachedData = nerdCache.get(cacheKey);
-        if(cachedData[cacheKey]){
+        if (cachedData[cacheKey]) {
             sendResponse(200, "application/json", JSON.stringify(cachedData[cacheKey]));
             return;
         }
@@ -40,45 +39,33 @@ my_http.createServer(function (request, response) {
             }
         });
     } else if (my_path === '/srt') {
-        // console.log('srt translation');
-
         var video_id = url_parts.query.video_id;
         var vendor = url_parts.query.vendor;
 
-        if (vendor == 'youtube') {
-            xmlSrt.getYouTubeSub(video_id, function (err, data) {
-                if (err) {
-                    sendResponse(500, "text/plain", data + '');
-                } else {
-                    sendResponse(200, "text/plain", data);
-                }
-            })
-        } else if (vendor == 'dailymotion') {
-            dmSrt.getDailymotionSub(video_id, function (err, data) {
-                if (err) {
-                    console.log(data);
-                    sendResponse(500, "text/plain", data + '');
-                } else {
-                    sendResponse(200, "text/plain", data);
-                }
-            });
-        }
+        video_util.getSub(vendor, video_id, function (err, data) {
+            if (err) {
+                sendResponse(500, "text/plain", data + '');
+            } else {
+                sendResponse(200, "text/plain", data);
+            }
+        })
     } else if (my_path == '/video') {
+
         var source = {
             videoURI: url_parts.query.uri
-        }
+        };
         var pageBuilder = handlebars.compile(template);
         var pageText = pageBuilder(source);
 
         sendResponse(200, "text/html", pageText);
     } else {
         var full_path = path.join(process.cwd(), my_path);
-        filesys.exists(full_path, function (exists) {
+        fs.exists(full_path, function (exists) {
             if (!exists) {
                 sendResponse(404, "text/plain", "404 Not Found\n");
             }
             else {
-                filesys.readFile(full_path, "binary", function (err, file) {
+                fs.readFile(full_path, "binary", function (err, file) {
                     if (err) {
                         sendResponse(500, "text/plain", err + "\n");
                     }
