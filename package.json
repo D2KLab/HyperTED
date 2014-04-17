@@ -1,0 +1,9 @@
+{
+  "name": "MediaFragmentPlayerDemo",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "^4.0.0",
+    "handlebars": "^2.0.0-alpha.2",
+    "node-cache": "^1.0.0"
+  }
+}
