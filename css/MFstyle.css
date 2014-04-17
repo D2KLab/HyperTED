@@ -6,56 +6,48 @@
   src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: normal; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: normal; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: italic; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: italic; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: normal; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: normal; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: italic; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: italic; }
-
 /* colors */
 /*font*/
 .mejs-container {
@@ -78,14 +70,14 @@
     /*current and total time*/
     /*progress bars*/ }
     .mejs-container div.mejs-controls .mejs-time span {
-      color: #444444;
-      @font-face {
-        font-family: "CaviarDreams";
-        src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
-        src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
-        font-weight: bold;
-        font-style: normal; }
- }
+      color: #444444; }
+@font-face {
+  .mejs-container div.mejs-controls .mejs-time span {
+    font-family: "CaviarDreams";
+    src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
+    src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
+    font-weight: bold;
+    font-style: normal; } }
     .mejs-container div.mejs-controls .mejs-time-rail {
       /*current time progress bar*/
       /*loaded time progress bar*/ }
@@ -205,6 +197,15 @@ html, body {
     .main-content section#playlist-sect {
       flex: 1.0;
       max-width: 400px; }
+      .main-content section#playlist-sect #entity-sect {
+        display: none; }
+        .main-content section#playlist-sect #entity-sect .entity-content {
+          line-height: 200%;
+          background: #fff;
+          padding: 0 10px;
+          -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
+          -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
+          box-shadow: 0 1px 8px -2px #5d5d5d; }
 
 .title {
   color: #aaaaaa;
@@ -307,49 +308,50 @@ ul.video-list {
     line-height: 200%; }
     #video-info div .descr {
       margin-top: 10px; }
-    #video-info div .entity {
-      cursor: pointer;
-      -webkit-border-radius: 5px;
-      -moz-border-radius: 5px;
-      -ms-border-radius: 5px;
-      -o-border-radius: 5px;
-      border-radius: 5px;
-      -webkit-box-sizing: border-box;
-      /* Safari/Chrome, other WebKit */
-      -moz-box-sizing: border-box;
-      /* Firefox, other Gecko */
-      box-sizing: border-box;
-      /* Opera/IE 8+ */
-      padding: 4px;
-      background-color: #000000; }
-      #video-info div .entity a {
-        color: #ffffff; }
-      #video-info div .entity.thing {
-        background-color: #3fff21; }
-        #video-info div .entity.thing a {
-          color: #000000; }
-      #video-info div .entity.amount {
-        background-color: #09fffc; }
-        #video-info div .entity.amount a {
-          color: #000000; }
-      #video-info div .entity.animal {
-        background-color: #1004ff; }
-      #video-info div .entity.event {
-        background-color: #b200ff; }
-      #video-info div .entity.function {
-        background-color: #ff00aa; }
-      #video-info div .entity.location {
-        background-color: #ff0040; }
-      #video-info div .entity.organization {
-        background-color: #ff7408; }
-      #video-info div .entity.person {
-        background-color: #fff600; }
-        #video-info div .entity.person a {
-          color: #000000; }
-      #video-info div .entity.product {
-        background-color: #8e5300; }
-      #video-info div .entity.time {
-        background-color: #771ebe; }
+
+.entity {
+  cursor: pointer;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-box-sizing: border-box;
+  /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;
+  /* Firefox, other Gecko */
+  box-sizing: border-box;
+  /* Opera/IE 8+ */
+  padding: 4px;
+  background-color: #000000; }
+  .entity a {
+    color: #ffffff; }
+  .entity.thing {
+    background-color: #3fff21; }
+    .entity.thing a {
+      color: #000000; }
+  .entity.amount {
+    background-color: #09fffc; }
+    .entity.amount a {
+      color: #000000; }
+  .entity.animal {
+    background-color: #1004ff; }
+  .entity.event {
+    background-color: #b200ff; }
+  .entity.function {
+    background-color: #ff00aa; }
+  .entity.location {
+    background-color: #ff0040; }
+  .entity.organization {
+    background-color: #ff7408; }
+  .entity.person {
+    background-color: #fff600; }
+    .entity.person a {
+      color: #000000; }
+  .entity.product {
+    background-color: #8e5300; }
+  .entity.time {
+    background-color: #771ebe; }
 
 .button-cont {
   text-align: right; }

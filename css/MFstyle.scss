@@ -86,7 +86,17 @@ html, body {
     &#playlist-sect {
       flex: 1.0;
       max-width: 400px;
+      #entity-sect {
+        display: none;
+        .entity-content {
+          line-height: 200%;
+          background: #fff;
+          padding: 0 10px;
+          @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
+        }
+      }
     }
+
   }
 }
 
@@ -202,85 +212,87 @@ ul.video-list {
       }
     }
   }
-  div{
+  div {
     line-height: 200%;
     .descr {
       margin-top: 10px;
     }
-    .entity {
-      cursor: pointer;
-      @include border-radius(5px);
-      @include border-box-sizing;
-      padding: 4px;
 
-      background: {
-        color: #000000;
-      }
-      a {
-        color: #ffffff;
-      }
+  }
+}
 
-      &.thing {
-        a {
-          color: #000000;
-        }
-        background: {
-          color: #3fff21;
-        }
-      }
-      &.amount {
-        a {
-          color: #000000;
-        }
-        background: {
-          color: #09fffc;
-        }
-      }
-      &.animal {
-        background: {
-          color: #1004ff;
-        }
-      }
-      &.event {
-        background: {
-          color: #b200ff;
-        }
-      }
-      &.function {
-        background: {
-          color: #ff00aa;
-        }
-      }
-      &.location {
-        background: {
-          color: #ff0040;
-        }
-      }
-      &.organization {
-        background: {
-          color: #ff7408;
-        }
+.entity {
+  cursor: pointer;
+  @include border-radius(5px);
+  @include border-box-sizing;
+  padding: 4px;
 
-      }
-      &.person {
-        a {
-          color: #000000;
-        }
-        background: {
-          color: #fff600;
-        }
-      }
-      &.product {
+  background: {
+    color: #000000;
+  }
+  a {
+    color: #ffffff;
+  }
 
-        background: {
-          color: #8e5300;
-        }
-      }
-      &.time {
-        background: {
-          color: #771ebe;
-        }
-      }
+  &.thing {
+    a {
+      color: #000000;
+    }
+    background: {
+      color: #3fff21;
+    }
+  }
+  &.amount {
+    a {
+      color: #000000;
+    }
+    background: {
+      color: #09fffc;
+    }
+  }
+  &.animal {
+    background: {
+      color: #1004ff;
+    }
+  }
+  &.event {
+    background: {
+      color: #b200ff;
+    }
+  }
+  &.function {
+    background: {
+      color: #ff00aa;
+    }
+  }
+  &.location {
+    background: {
+      color: #ff0040;
+    }
+  }
+  &.organization {
+    background: {
+      color: #ff7408;
+    }
+
+  }
+  &.person {
+    a {
+      color: #000000;
+    }
+    background: {
+      color: #fff600;
+    }
+  }
+  &.product {
+
+    background: {
+      color: #8e5300;
+    }
+  }
+  &.time {
+    background: {
+      color: #771ebe;
     }
   }
 }

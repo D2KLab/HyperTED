@@ -16,7 +16,7 @@ $(document).ready(function () {
         var player_height = $(".mejs-time-total").height();
 
         var $highligthedMF = $('#mfDiv');
-        if($highligthedMF.length == 0){
+        if ($highligthedMF.length == 0) {
             $highligthedMF = $("<div>").attr('id', 'mfDiv');
             $highligthedMF.height(player_height);
         }
@@ -171,8 +171,8 @@ $(document).ready(function () {
                             return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
                         });
 
-
                         var new_subs = formattedSub;
+                        var onlyEntity = [responseText.length];
                         var oldstart;
                         $.each(responseText, function (key, value) {
                             var entity = value;
@@ -185,14 +185,30 @@ $(document).ready(function () {
                             var s2 = new_subs.substring(entity.startChar, entity.endChar);
                             var s3 = new_subs.substring(entity.endChar);
                             var href = entity.uri ? 'href="' + entity.uri + '"' : '';
+                            var nerdType = entity.nerdType.split('#')[1].toLowerCase();
 
-                            new_subs = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '">' + '<a ' + href + ' target="_blank" data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
-
+                            new_subs = s1 + '<span class="entity ' + nerdType + '">' + '<a ' + href + ' target="_blank" data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
+                            onlyEntity[key] = '<span class="entity ' + nerdType + '">#' + s2 + '</span>';
+                            onlyEntity.sort();
                             oldstart = entity.startChar;
                         });
+
                         $('.sub-text', $subCont).html(new_subs);
                         $form.remove();
                         $subCont.html(new_subs);
+
+                        $('#entity-sect').show();
+                        var $entityList = $('<ul>').addClass('displayEntity');
+
+
+
+                        for (var i in responseText) {
+//                            var $type = $('<li>').html(onlyEntity[i].split('#'));
+//                            console.log(onlyEntity[i]);
+                            var $singularEntity = $('<li>').html(onlyEntity[i]);
+                            $entityList.append($type).append($singularEntity);
+                        }
+                        $('.entity-content').html("In this video there are " + responseText.length + " entities").append($entityList);
 
 
                         $("span.entity").click(function () {
