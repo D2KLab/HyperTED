@@ -51,10 +51,23 @@ app.get('/srt', function (req, res) {
     })
 });
 app.get('/video', function (req, res) {
+    var videoURI = req.query.uri;
+    var concSign = url.parse(videoURI).hash ? '&' : '#';
+
+    var t = req.query.t;
+    if (t) {
+        videoURI += concSign + 't='+t;
+        concSign = '&';
+    }
+    var xywh = req.query.xywh;
+    if(xywh){
+        videoURI += concSign + 'xywh=' +xywh;
+//        concSign = '&';
+    }
+
     var source = {
-        videoURI: req.query.uri
+        videoURI: videoURI
     };
-    console.log(source.videoURI);
     var pageBuilder = handlebars.compile(template);
     var pageText = pageBuilder(source);
 
