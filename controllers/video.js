@@ -1,27 +1,67 @@
 var http = require('http'),
-    https = require('https');
+    https = require('https'),
+    url = require("url");
 
 var LOG_TAG = '[VIDEO.JS]: ';
 
-exports.getSub = function (vendor, video_id, callback) {
+//exports.getSub = function (vendor, video_id, callback) {
+exports.getSub = function (req, res) {
+    var video_id = req.query.video_id;
+    var vendor = req.query.vendor;
     if (video_id == null || video_id == '') {
         console.error(LOG_TAG + "Empty video id");
-        callback(true, "Empty video id");
+        res.send(400, "Empty video id");
         return;
     }
 
+    var subFunction;
+
     switch (vendor) {
         case 'youtube':
-            getYouTubeSub(video_id, callback);
+            subFunction = getYouTubeSub;
             break;
         case 'dailymotion':
-            getDailymotionSub(video_id, callback);
+            subFunction = getDailymotionSub;
             break;
         default :
             console.log(LOG_TAG + 'Vendor not recognized or not supported.');
-            callback(true, 'Vendor not recognized or not supported.');
+            res.send(400, "Vendor not recognized or not supported.");
+            return;
     }
+
+    subFunction(video_id, function (err, msg) {
+        if (err) {
+            res.send(404, msg);
+        } else {
+            res.send(200, msg);
+        }
+    });
 };
+
+exports.view = function (req, res) {
+    var videoURI = req.query.uri;
+    if(!videoURI){
+        res.redirect('/');
+        return;
+    }
+    var concSign = url.parse(videoURI).hash ? '&' : '#';
+
+    var t = req.query.t;
+    if (t) {
+        videoURI += concSign + 't=' + t;
+        concSign = '&';
+    }
+    var xywh = req.query.xywh;
+    if (xywh) {
+        videoURI += concSign + 'xywh=' + xywh;
+//        concSign = '&';
+    }
+
+    var source = {
+        videoURI: videoURI
+    };
+    res.render('index.html', source);
+}
 
 function getYouTubeSub(video_id, callback) {
     http.get("http://www.youtube.com/api/timedtext?lang=en&format=srt&v=" + video_id, function (res) {
@@ -107,3 +147,5 @@ function empty(data) {
     }
     return count == 0;
 }
+
+
