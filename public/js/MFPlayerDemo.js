@@ -141,7 +141,7 @@ $(document).ready(function () {
                 $('button[type="submit"]', $form).prop('disabled', true).addLoader('left');
                 $form.ajaxSubmit({
                     dataType: 'json',
-                    success: function (responseText) {
+                    success: function (entityList) {
 
                         var strList = video_info.sub.split('\n\n');
                         var formattedSub = '';
@@ -167,17 +167,15 @@ $(document).ready(function () {
                         }
 
                         //sorting JSON for Start character desc
-                        responseText.sort(function SortByStartChar(x, y) {
+                        entityList.sort(function SortByStartChar(x, y) {
                             return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
                         });
 
                         var new_subs = formattedSub;
-                        var onlyEntity = [responseText.length];
                         var oldstart;
 
-                        $.each(responseText, function (key, value) {
+                        $.each(entityList, function (key, value) {
                             var entity = value;
-                            var n = 0;
                             if (entity.endChar >= oldstart) {
                                 // FIXME nested entities
                                 // do not care for now
@@ -186,11 +184,11 @@ $(document).ready(function () {
                             var s1 = new_subs.substring(0, entity.startChar);
                             var s2 = new_subs.substring(entity.startChar, entity.endChar);
                             var s3 = new_subs.substring(entity.endChar);
-                            var href = entity.uri ? 'href="' + entity.uri + '"' : '';
+                            var href = entity.uri ? 'href="' + entity.uri + '" target="_blank"' : '';
                             var nerdType = entity.nerdType.split('#')[1].toLowerCase();
 
                             new_subs = s1 + '<span class="entity ' + nerdType + '"><a href="#" +  data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
-                            onlyEntity[key] = '<span class="entity ' + nerdType + '"><a ' + href + ' target="_blank"> #' + s2 + '</a></span>';
+                            entity.html = '<span class="entity ' + nerdType + '"><a ' + href + '> #' + s2 + '</a></span>';
 
 
                             oldstart = entity.startChar;
@@ -201,37 +199,44 @@ $(document).ready(function () {
                         $subCont.html(new_subs);
 
                         $('#entity-sect').show();
-                        var $entityList = $('<ul>').addClass('displayEntity');
-                        onlyEntity.sort();
-                        responseText.sort(function SortByNerdType(x, y) {
+
+                        entityList.sort(function SortByNerdType(x, y) {
                             return ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1 ));
                         });
 
-                        for (var i in responseText) {
-                            var nerdTypeCount = 1;
-                            if (i > 0)
-                                if (responseText[i].nerdType.split('#')[1] == responseText[i - 1].nerdType.split('#')[1]) {
 
-                                    console.log(responseText[i].nerdType.split('#')[1]);
-                                    console.log(i);
-                                    console.log(nerdTypeCount);
-                                    console.log(responseText[i - 1].nerdType.split('#')[1]);
-                                    console.log("****************");
-                                    nerdTypeCount++;
-                                } else {
-                                    console.log(responseText[i].nerdType.split('#')[1]);
-                                    console.log(i);
-                                    console.log(nerdTypeCount);
-                                    console.log(responseText[i - 1].nerdType.split('#')[1]);
-                                    console.log("****************");
-                                    var $typeEntity = $('<h3>').addClass('title').html(nerdTypeCount + " " + responseText[i].nerdType.split('#')[1]);
-                                    nerdTypeCount = 1;
-                                }
-                            var $singularEntity = $('<li>').html(onlyEntity[i]);
-                            $entityList.append($typeEntity).append($singularEntity);
+                        var $entityCont = $('.entity-content').html("<p>In this video there are " + entityList.length + " entities</p>");
 
+                        var typeEntities = [];
+                        for (var key in entityList) {
+
+                            var actualEntity = entityList[key];
+                            if (key == 0 || actualEntity.nerdType == entityList[key - 1].nerdType) {
+                                typeEntities.push(actualEntity);
+                            } else {
+                                printEntityGroup(typeEntities);
+                                typeEntities = [];
+                                typeEntities.push(actualEntity);
+
+                            }
                         }
-                        $('.entity-content').html("In this video there are " + responseText.length + " entities").append($entityList);
+                        printEntityGroup(typeEntities);
+
+                        function printEntityGroup(array) {
+
+                            var $typeEntity = $('<h3>').addClass('title').html(array.length + " " + array[0].nerdType.split('#')[1]);
+                            var $entityList = $('<ul>').addClass('displayEntity');
+
+                            for (var n in array) {
+                                var $entity = $('<li>').html(array[n].html);
+                                $entityList.append($entity);
+                            }
+                            $entityCont.append($typeEntity).append($entityList);
+                            console.log($entityList);
+                        }
+
+
+
 
 
                         $("span.entity").click(function () {
