@@ -6,7 +6,6 @@
     <link rel="stylesheet" type="text/css" href="Media-Fragment-Player-master/build/mediaelementplayer.min.css"/>
     <link rel="stylesheet" type="text/css" href="Media-Fragment-Player-master/build/smfplayer.css"/>
     <link rel="stylesheet" type="text/css" href="css/MFstyle.css"/>
-
 </head>
 
 <body>
@@ -50,7 +49,6 @@
         <h1 id="video-title" class="title"></h1>
 
         <div id="player-container" class="clearfix">
-            <!--<div id="mfDiv"></div>-->
             <div id="video"></div>
         </div>
         <div id="video-info">
@@ -121,7 +119,7 @@
 
 </div>
 <script>
-    var videoURI = "{{videoURI}}";
+    var videoURI = "<%=videoURI%>";
 
 </script>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>

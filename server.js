@@ -1,16 +1,12 @@
 var express = require('express'),
-    sys = require("sys"),
     path = require("path"),
-    url = require("url"),
     nerdify = require('./controllers/nerdify'),
-    video = require('./controllers/video'),
-    exphbs = require("express3-handlebars");
+    video = require('./controllers/video');
 
-var app = express(), hbs = exphbs.create({});
+var app = express();
 app.set('view options', {layout: false});
 app.set('views', path.join(__dirname, 'views'));
-app.engine('html', hbs.engine);
-app.set('view engine', 'html');
+app.set('view engine', 'ejs');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -18,8 +14,8 @@ app.get('/nerdify', nerdify.start);
 app.get('/srt', video.getSub);
 app.get('/video', video.view);
 app.get('/', function (req, res) {
-    res.render('welcome.html')
+    res.render('welcome.ejs')
 });
 
 app.listen(8080);
-sys.puts("Server Running on 8080");
+console.log("Server Running on 8080");

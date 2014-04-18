@@ -60,7 +60,29 @@ exports.view = function (req, res) {
     var source = {
         videoURI: videoURI
     };
-    res.render('index.html', source);
+    res.render('video.ejs', source);
+}
+
+
+function getMetadata(video_id, vendor) {
+    http.get("http://www.youtube.com/api/timedtext?lang=en&format=srt&v=" + video_id, function (res) {
+        if (res.statusCode != 200) {
+            callback(true, res.statusCode);
+            return;
+        }
+        var data = '';
+        res.on("data", function (chunk) {
+            data += chunk;
+        });
+        res.on('end', function () {
+            if (data == '') {
+                callback(true, 'No sub available');
+                return;
+            } else
+                callback(false, data);
+
+        });
+    });
 }
 
 function getYouTubeSub(video_id, callback) {
@@ -83,7 +105,6 @@ function getYouTubeSub(video_id, callback) {
         });
     });
 }
-
 function getDailymotionSub(video_id, callback) {
     https.get('https://api.dailymotion.com/video/' + video_id + '/subtitles?fields=id,language%2Curl', function (res) {
         if (res.statusCode != 200) {
