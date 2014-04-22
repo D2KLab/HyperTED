@@ -174,16 +174,19 @@ $(document).ready(function () {
 
                         $.each(entityList, function (key, value) {
                             var entity = value;
-                            if (entity.endChar >= oldstart) {
-                                // FIXME nested entities
-                                // do not care for now
-                                return;
-                            }
+
                             var s1 = new_subs.substring(0, entity.startChar);
                             var s2 = new_subs.substring(entity.startChar, entity.endChar);
                             var s3 = new_subs.substring(entity.endChar);
                             var href = entity.uri ? 'href="' + entity.uri + '" target="_blank"' : '';
                             var nerdType = entity.nerdType.split('#')[1].toLowerCase();
+
+                            if (entity.endChar >= oldstart) {
+                                entity.html = '<span class="entity ' + nerdType + '"><a ' + href + '> #' + entity.label + '</a></span>';
+                                return;
+                            }
+
+
 
                             new_subs = s1 + '<span class="entity ' + nerdType + '"><a href="#" +  data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
                             entity.html = '<span class="entity ' + nerdType + '"><a ' + href + '> #' + s2 + '</a></span>';
