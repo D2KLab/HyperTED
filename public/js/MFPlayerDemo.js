@@ -47,270 +47,184 @@ $(document).ready(function () {
         }
     }
 
-    retrieveInfo(uri, function (video_info) {
-        $('#video-title').text(video_info.title);
+    $('.see-all').click(function () {
+        var $this = $(this);
+        var $target = $('#' + $this.attr('for'));
+        $target.toggleClass('full')
+        var text = $target.hasClass('full') ? 'see less' : 'see more';
+        $this.text(text)
+    });
 
-        var $videoInfo = $('#video-info');
+    var $subCont = $('#sub-cont');
+    $('.button-cont', $subCont).submit(function (e) {
+        e.preventDefault();
+        var $form = $(this);
+        $('button[type="submit"]', $form).prop('disabled', true).addLoader('left');
+        $form.ajaxSubmit({
+            dataType: 'json',
+            success: function (entityList) {
 
+                var strList = $('input[name="text"]',$form).val().split('\n\n');
+                var formattedSub = '';
 
-        var $tabCont;
-        if (video_info.descr && video_info.sub) {
-            var $tabNav = $('<ul>').addClass('nav nav-tabs').appendTo($videoInfo);
-            $tabNav.append($('<li>').addClass('active').append($('<a href="#descr-cont">').attr('data-toggle', 'tab').text('Description')));
-            $tabNav.append($('<li>').append($('<a href="#sub-cont">').attr('data-toggle', 'tab').text('Subtitles')));
+                for (var sub in strList) {
+                    var timeLine = true;
+                    var idLine = true;
 
-            $tabCont = $('<div>').addClass('tab-content').appendTo($videoInfo);
-        }
-//        if (video_info.descr) {
-//
-//            var $descCont = $('<div>').addClass('desc-cont').attr('id', 'descr-cont');
-//
-//            var $videoDesc = ($('<p>').html(video_info.descr).addClass('descr'));
-//            var $buttonNerd = ($('<button type="submit">').html('Nerdify').addClass('btn btn-danger btn-lg'));
-//            var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr.replace(new RegExp('<br />', 'g'), '\n')));
-//            var $hiddenInput2 = ($('<input type="hidden" name="type">').val("text"));
-//            var $hiddenInput3 = ($('<input type="hidden" name="videoid">').val(video_info.video_id));
-//            var $hiddenInput4 = ($('<input type="hidden" name="vendor">').val(video_info.vendor));
-//            var $buttonCont = $('<form>').attr('method', 'GET').attr('action', './nerdify').addClass('button-cont');
-//            $buttonCont.append($hiddenInput2).append($hiddenInput).append($hiddenInput3).append($hiddenInput4).append($buttonNerd);
-//            $descCont.append($videoDesc).append($buttonCont);
-//
-//            if ($tabCont) {
-//                $descCont.addClass('tab-pane').appendTo($tabCont);
-//            } else {
-//                $videoInfo.append($descCont);
-//            }
-//        }
-
-        $('.see-all').click(function () {
-            var $this = $(this);
-            var $target = $('#' + $this.attr('for'));
-            $target.toggleClass('full')
-            var text = $target.hasClass('full') ? 'see less' : 'see more';
-            $this.text(text)
-        });
-        if (video_info.sub) {
-            var strList = video_info.sub.split('\n\n');
-            var formattedSub = '';
-
-            for (var sub in strList) {
-                formattedSub += '<div>';
-                var timeLine = true;
-                var idLine = true;
-
-                var lines = strList[sub].split('\n');
-                lineLoop: for (var line in lines) {
-                    if (idLine) {
-                        //nothing for now
-                        idLine = false;
-                        continue lineLoop;
+                    var lines = strList[sub].split('\n');
+                    lineLoop: for (var line in lines) {
+                        if (idLine) {
+                            //nothing for now
+                            idLine = false;
+                            continue lineLoop;
+                        }
+                        if (timeLine) {
+                            //nothing for now
+                            timeLine = false;
+                            continue lineLoop;
+                        }
+                        formattedSub += lines[line] + ' ';
                     }
-                    if (timeLine) {
-                        //nothing for now
-                        timeLine = false;
-                        continue lineLoop;
-                    }
-                    formattedSub += '<p>' + lines[line] + '</p>';
                 }
-                formattedSub += '</div>';
-            }
 
-            var $buttonNerdSub = $('<button type="submit">').html('Nerdify Sub').addClass('btn btn-danger btn-lg');
-            var $hiddenInputSub = $('<input type="hidden" name="text">').val(video_info.sub);
-            var $hiddenInputSub2 = $('<input type="hidden" name="type">').val('timedtext');
-            var $hiddenInputSub3 = ($('<input type="hidden" name="videoid">').val(video_info.video_id));
-            var $hiddenInputSub4 = ($('<input type="hidden" name="vendor">').val(video_info.vendor));
-
-            var $buttonContSub = $('<form>').attr('method', 'GET').attr('action', './nerdify').addClass('button-cont');
-            $buttonContSub.append($hiddenInputSub2).append($hiddenInputSub).append($hiddenInputSub3).append($hiddenInputSub4).append($buttonNerdSub);
-            var $subText = $('<div>').addClass('sub-text').html(formattedSub);
-//            var $subText = $('<div>').addClass('sub-text').html(formattedSub);
-            var $subCont = $('<div>').attr('id', 'sub-cont').append($buttonContSub).append($subText);
-            if ($tabCont) {
-                $subCont.addClass('tab-pane').appendTo($tabCont);
-            } else {
-                $videoInfo.append($descCont);
-            }
-
-
-            $buttonContSub.submit(function (e) {
-                e.preventDefault();
-                var $form = $(this);
-                $('button[type="submit"]', $form).prop('disabled', true).addLoader('left');
-                $form.ajaxSubmit({
-                    dataType: 'json',
-                    success: function (entityList) {
-
-                        var strList = video_info.sub.split('\n\n');
-                        var formattedSub = '';
-
-                        for (var sub in strList) {
-                            var timeLine = true;
-                            var idLine = true;
-
-                            var lines = strList[sub].split('\n');
-                            lineLoop: for (var line in lines) {
-                                if (idLine) {
-                                    //nothing for now
-                                    idLine = false;
-                                    continue lineLoop;
-                                }
-                                if (timeLine) {
-                                    //nothing for now
-                                    timeLine = false;
-                                    continue lineLoop;
-                                }
-                                formattedSub += lines[line] + ' ';
-                            }
-                        }
-
-                        //sorting JSON for Start character desc
-                        entityList.sort(function SortByStartChar(x, y) {
-                            return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
-                        });
-
-                        var new_subs = formattedSub;
-                        var oldstart;
-
-                        $.each(entityList, function (key, value) {
-                            var entity = value;
-
-                            var s1 = new_subs.substring(0, entity.startChar);
-                            var s2 = new_subs.substring(entity.startChar, entity.endChar);
-                            var s3 = new_subs.substring(entity.endChar);
-                            var href = entity.uri ? 'href="' + entity.uri + '" target="_blank"' : '';
-                            var nerdType = entity.nerdType.split('#')[1].toLowerCase();
-
-                            if (entity.endChar >= oldstart) {
-                                entity.html = '<span class="entity ' + nerdType + '"><a ' + href + '> #' + entity.label + '</a></span>';
-                                return;
-                            }
-
-
-
-                            new_subs = s1 + '<span class="entity ' + nerdType + '"><a href="#" +  data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
-                            entity.html = '<span class="entity ' + nerdType + '"><a ' + href + '> #' + s2 + '</a></span>';
-
-
-                            oldstart = entity.startChar;
-                        });
-
-                        $('.sub-text', $subCont).html(new_subs);
-                        $form.remove();
-                        $subCont.html(new_subs);
-
-                        $('#entity-sect').show();
-
-                        entityList.sort(function SortByNerdType(x, y) {
-                            return ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1 ));
-                        });
-
-
-                        var $entityCont = $('.entity-content').html("<p>In this video there are " + entityList.length + " entities</p>");
-
-                        var typeEntities = [];
-                        for (var key in entityList) {
-
-                            var actualEntity = entityList[key];
-                            if (key == 0 || actualEntity.nerdType == entityList[key - 1].nerdType) {
-                                typeEntities.push(actualEntity);
-                            } else {
-                                printEntityGroup(typeEntities);
-                                typeEntities = [];
-                                typeEntities.push(actualEntity);
-
-                            }
-                        }
-                        printEntityGroup(typeEntities);
-
-                        function printEntityGroup(array) {
-
-                            var $typeEntity = $('<h3>').addClass('title').html(array.length + " " + array[0].nerdType.split('#')[1]);
-                            var $entityList = $('<ul>').addClass('displayEntity');
-
-                            for (var n in array) {
-                                var $entity = $('<li>').html(array[n].html);
-                                $entityList.append($entity);
-                            }
-                            $entityCont.append($typeEntity).append($entityList);
-                            console.log($entityList);
-                        }
-
-
-                        $("span.entity").click(function () {
-                            var startEntity = $(this).children('a').data('start-time') * 1000;
-                            var endEntity = $(this).children('a').data('end-time') * 1000;
-
-                            $player.setPosition(startEntity);
-                            $player.play();
-                            highlight(startEntity, endEntity);
-                            var waitFragEndListener = function (event) {
-                                console.log($player.getPosition());
-                                if (endEntity != null && $player.getPosition() >= endEntity) {
-                                    $player.pause();
-                                    $player.getMeplayer().media.removeEventListener(waitFragEndListener);
-                                    endEntity = null;
-                                }
-                            };
-
-                            $player.getMeplayer().media.addEventListener('timeupdate', waitFragEndListener, false);
-                        });
-
-
-                        //TODO reformatted subs
-                    },
-                    error: function () {
-                        console.error('Something went wrong');
-                    }
+                //sorting JSON for Start character desc
+                entityList.sort(function SortByStartChar(x, y) {
+                    return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
                 });
-            });
-        }
+
+                var new_subs = formattedSub;
+                var oldstart;
+
+                $.each(entityList, function (key, value) {
+                    var entity = value;
+
+                    var s1 = new_subs.substring(0, entity.startChar);
+                    var s2 = new_subs.substring(entity.startChar, entity.endChar);
+                    var s3 = new_subs.substring(entity.endChar);
+                    var href = entity.uri ? 'href="' + entity.uri + '" target="_blank"' : '';
+                    var nerdType = entity.nerdType.split('#')[1].toLowerCase();
+
+                    if (entity.endChar >= oldstart) {
+                        entity.html = '<span class="entity ' + nerdType + '"><a ' + href + '> #' + entity.label + '</a></span>';
+                        return;
+                    }
 
 
-        if ($tabCont) {
-            $tabCont.children('.tab-pane').first().addClass('active');
-        }
 
-        $('.desc-cont .button-cont').submit(function (e) {
-            e.preventDefault();
-            var $form = $(this);
-            $('button[type="submit"]', $form).prop('disabled', true).addLoader('left');
-            $form.ajaxSubmit({
-                dataType: 'json',
-                success: function (responseText) {
-                    //sorting JSON for Start character desc
-                    responseText.sort(function SortByStartChar(x, y) {
-                        return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
-                    });
+                    new_subs = s1 + '<span class="entity ' + nerdType + '"><a href="#" +  data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
+                    entity.html = '<span class="entity ' + nerdType + '"><a ' + href + '> #' + s2 + '</a></span>';
 
-                    var new_descr = video_info.descr;
-                    var oldstart;
-                    $.each(responseText, function (key, value) {
-                        var entity = value;
-                        if (entity.endChar >= oldstart) {
-                            // FIXME nested entities
-                            // do not care for now
-                            return;
-                        }
 
-                        var s1 = new_descr.substring(0, entity.startChar);
-                        var s2 = new_descr.substring(entity.startChar, entity.endChar);
-                        var s3 = new_descr.substring(entity.endChar);
+                    oldstart = entity.startChar;
+                });
 
-                        new_descr = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '"><a href="' + entity.uri + '">' + s2 + '</a></span>' + s3;
-                        oldstart = entity.startChar;
-                    });
-                    $('.descr-cont .descr').html(new_descr);
-                    $form.remove();
-                },
-                error: function () {
-                    console.error('Something went wrong');
+                $('.sub-text', $subCont).html(new_subs);
+                $form.remove();
+                $subCont.html(new_subs);
+
+                $('#entity-sect').show();
+
+                entityList.sort(function SortByNerdType(x, y) {
+                    return ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1 ));
+                });
+
+
+                var $entityCont = $('.entity-content').html("<p>In this video there are " + entityList.length + " entities</p>");
+
+                var typeEntities = [];
+                for (var key in entityList) {
+
+                    var actualEntity = entityList[key];
+                    if (key == 0 || actualEntity.nerdType == entityList[key - 1].nerdType) {
+                        typeEntities.push(actualEntity);
+                    } else {
+                        printEntityGroup(typeEntities);
+                        typeEntities = [];
+                        typeEntities.push(actualEntity);
+
+                    }
                 }
-            });
+                printEntityGroup(typeEntities);
+
+                function printEntityGroup(array) {
+
+                    var $typeEntity = $('<h3>').addClass('title').html(array.length + " " + array[0].nerdType.split('#')[1]);
+                    var $entityList = $('<ul>').addClass('displayEntity');
+
+                    for (var n in array) {
+                        var $entity = $('<li>').html(array[n].html);
+                        $entityList.append($entity);
+                    }
+                    $entityCont.append($typeEntity).append($entityList);
+                    console.log($entityList);
+                }
+
+
+                $("span.entity").click(function () {
+                    var startEntity = $(this).children('a').data('start-time') * 1000;
+                    var endEntity = $(this).children('a').data('end-time') * 1000;
+
+                    $player.setPosition(startEntity);
+                    $player.play();
+                    highlight(startEntity, endEntity);
+                    var waitFragEndListener = function (event) {
+                        console.log($player.getPosition());
+                        if (endEntity != null && $player.getPosition() >= endEntity) {
+                            $player.pause();
+                            $player.getMeplayer().media.removeEventListener(waitFragEndListener);
+                            endEntity = null;
+                        }
+                    };
+
+                    $player.getMeplayer().media.addEventListener('timeupdate', waitFragEndListener, false);
+                });
+
+
+                //TODO reformatted subs
+            },
+            error: function () {
+                console.error('Something went wrong');
+            }
         });
+    });
 
-    }, true);
+    $('#desc-cont .button-cont').submit(function (e) {
+        e.preventDefault();
+        var $form = $(this);
+        $('button[type="submit"]', $form).prop('disabled', true).addLoader('left');
+        $form.ajaxSubmit({
+            dataType: 'json',
+            success: function (responseText) {
+                //sorting JSON for Start character desc
+                responseText.sort(function SortByStartChar(x, y) {
+                    return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
+                });
 
+                var new_descr = video_info.descr;
+                var oldstart;
+                $.each(responseText, function (key, value) {
+                    var entity = value;
+                    if (entity.endChar >= oldstart) {
+                        // FIXME nested entities
+                        // do not care for now
+                        return;
+                    }
+
+                    var s1 = new_descr.substring(0, entity.startChar);
+                    var s2 = new_descr.substring(entity.startChar, entity.endChar);
+                    var s3 = new_descr.substring(entity.endChar);
+
+                    new_descr = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '"><a href="' + entity.uri + '">' + s2 + '</a></span>' + s3;
+                    oldstart = entity.startChar;
+                });
+                $('.descr-cont .descr').html(new_descr);
+                $form.remove();
+            },
+            error: function () {
+                console.error('Something went wrong');
+            }
+        });
+    });
 
     $('.video-list .video-link').each(function () {
         var $li = $(this);
@@ -338,22 +252,6 @@ $(document).ready(function () {
             });
         }
     });
-
-    function statDiv(key, value, glyph) {
-        if (value == undefined || value == null) return null;
-
-        var $stat = $('<div>').addClass('stat');
-
-        if (glyph) {
-            $stat.append($('<span>').addClass('key glyphicon glyphicon-' + glyph).attr('title', key));
-            $stat.addClass('little');
-        } else {
-            $stat.append($('<label>').addClass('key').text(key));
-        }
-        $stat.append($('<span>').addClass('value').text(value));
-
-        return $stat;
-    }
 
     function retrieveInfo(uri, callback, full) {
         var video_info = {};

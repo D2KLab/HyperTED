@@ -1,0 +1,25 @@
+<%
+if (videoInfo.sub) {
+    var strList = videoInfo.sub.split('\n\n');
+
+        for (var index in strList) {
+    var sub = {
+        text: ''
+    };
+
+    var lines = strList[index].split('\n');
+    for (var line in lines) {
+        if (!sub.id) {
+            sub.id = lines[line];
+        } else if (!sub.time) {
+            sub.time = lines[line];
+        } else {
+            sub.text += '\n' + lines[line];
+        }
+    }
+%>
+<p data-id="<%= sub.id %>" data-time="<%= sub.time %>"><%= sub.text %></p>
+<%
+}
+}
+%>

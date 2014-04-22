@@ -220,6 +220,7 @@ ul.video-list {
       padding-bottom: 10px;
       border-bottom: 1px solid $light_gray;
       box-sizing: content-box;
+      white-space: pre-wrap;
       @include transition(max-height, 1000ms);
       @include box-shadow(0, 7px, 9px, -5px, $medium_gray);
       &.full {
@@ -245,7 +246,7 @@ ul.video-list {
       margin: 0 9px;
       opacity: 0.7;
       @include transition(opacity, 200ms);
-      &:hover{
+      &:hover {
         opacity: 1;
       }
     }
@@ -334,4 +335,6 @@ ul.video-list {
   clear: both;
 }
 
-
+.sub-text {
+  white-space: pre-wrap;
+}

@@ -321,6 +321,7 @@ ul.video-list {
       padding-bottom: 10px;
       border-bottom: 1px solid #f4f4f4;
       box-sizing: content-box;
+      white-space: pre-wrap;
       -webkit-transition: max-height 1000ms ease-out;
       -moz-transition: max-height 1000ms ease-out;
       -o-transition: max-height 1000ms ease-out;
@@ -406,3 +407,6 @@ ul.video-list {
 .button-cont {
   text-align: right;
   clear: both; }
+
+.sub-text {
+  white-space: pre-wrap; }
