@@ -51,8 +51,63 @@
         <div id="player-container" class="clearfix">
             <div id="video"></div>
         </div>
+        <% if (videoInfo) { %>
         <div id="video-info">
+            <div class="stats-cont">
+                <div class="left-col">
+                    <%
+                        var leftVals = {
+                            'Published': videoInfo.published,
+                            'Category': videoInfo.category
+                        };
+
+                            for(key in leftVals) {
+                        var value = leftVals [key];
+                        if (value == undefined || value == null) continue;
+                    %>
+                    <div class="stat">
+                        <label class="key"><%= key %></label>
+                        <span class="value"><%= value %></span>
+                    </div>
+                    <% } %>
+                </div>
+                <div class="right-col">
+                    <%
+                        var rightVals = {
+                            'Views': {obj: videoInfo.views, gliph: 'eye-open'},
+                            'Likes': {obj: videoInfo.likes, gliph: 'thumbs-up'},
+                            'Favourites': {obj: videoInfo.favourites, gliph: 'star'},
+                            'AVG Rating': {obj: videoInfo.avgRate, gliph: 'signal'}
+                        };
+
+                            for(key in rightVals) {
+                        var value = rightVals [key].obj;
+                        if (value == undefined || value == null) continue;
+                    %>
+                    <div class="stat little">
+                        <span class="key glyphicon glyphicon-<%= rightVals [key].gliph %>"
+                              title="<%= key %>"></span>
+                        <span class="value"><%= value %></span>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+            <% if(videoInfo.descr) { %>
+            <div class="desc-cont" id="descr-cont">
+                <div class="descr" id="descr"><p><%= videoInfo.descr %></p></div>
+                <button type="button" class="see-all" for="descr">see more</button>
+
+                <form method="get" action="./nerdify" class="button-cont">
+                    <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
+                    <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
+                    <input type="hidden" name="type" value="text"/>
+                    <input type="hidden" name="text" value="<%= videoInfo.descr.toString() %>" />
+                    <button type="submit" class="btn btn-danger btn-lg">Nerdify</button>
+                </form>
+            </div>
+            <% } %>
         </div>
+        <% } %>
     </section>
     <section id="playlist-sect">
         <h1 class="title">see also</h1>
@@ -66,7 +121,7 @@
                     <ul class="frag-list">
                         <li class="frag-link"><a href='#' data-frag="#t=0:07:43,0:07:53">Standing ovation</a></li>
                         <li class="frag-link"><a href='#' data-frag="#t=0:32:41,0:32:45&xywh=pixel:160,95,319,305">Obama
-                            talks about something</a></li>
+                                talks about something</a></li>
                     </ul>
                 </div>
             </li>
@@ -78,7 +133,7 @@
                     <h4><a href="./video?uri=https://www.youtube.com/watch?v=30onwXme1ws">Video 2</a></h4>
                     <ul class="frag-list">
                         <li class="frag-link"><a href='#' data-frag="#t=0:04:31,0:04:50">Matthew McConaughey
-                            explains</a></li>
+                                explains</a></li>
                         <li class="frag-link"><a href='#' data-frag="#t=0:08:40,">Fragment to the end</a></li>
                     </ul>
                 </div>
@@ -91,7 +146,7 @@
                     <h4><a href="./video?uri=http://www.dailymotion.com/video/28764736">Video 3</a></h4>
                     <ul class="frag-list">
                         <li class="frag-link"><a href='#' data-frag="#t=0:05:20,0:05:32">Frédéric Yonnet plays his
-                            harmonica</a></li>
+                                harmonica</a></li>
                         <li class="frag-link"><a href='#' data-frag="#t=0:30:40,">Fragment to the end</a></li>
                     </ul>
                 </div>
@@ -110,6 +165,7 @@
 
         <section id="entity-sect">
             <h1 class="title">entities</h1>
+
             <div class="entity-content">
             </div>
         </section>

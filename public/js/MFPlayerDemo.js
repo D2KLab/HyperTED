@@ -52,16 +52,6 @@ $(document).ready(function () {
 
         var $videoInfo = $('#video-info');
 
-        var $rightCol = $('<div>').addClass('right-col');
-        var $leftCol = $('<div>').addClass('left-col');
-        $leftCol.append(statDiv('Published', video_info.published));
-        $leftCol.append(statDiv('Category', video_info.category));
-        $rightCol.append(statDiv('Views', video_info.views, 'eye-open'));
-        $rightCol.append(statDiv('Likes', video_info.likes, 'thumbs-up'));
-        $rightCol.append(statDiv('Favourites', video_info.favourites, 'star'));
-        $rightCol.append(statDiv('AVG Rating', video_info.avgRate, 'signal'));
-
-        $videoInfo.append($('<div>').addClass('stats-cont').append($leftCol).append($rightCol));
 
         var $tabCont;
         if (video_info.descr && video_info.sub) {
@@ -71,26 +61,34 @@ $(document).ready(function () {
 
             $tabCont = $('<div>').addClass('tab-content').appendTo($videoInfo);
         }
-        if (video_info.descr) {
+//        if (video_info.descr) {
+//
+//            var $descCont = $('<div>').addClass('desc-cont').attr('id', 'descr-cont');
+//
+//            var $videoDesc = ($('<p>').html(video_info.descr).addClass('descr'));
+//            var $buttonNerd = ($('<button type="submit">').html('Nerdify').addClass('btn btn-danger btn-lg'));
+//            var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr.replace(new RegExp('<br />', 'g'), '\n')));
+//            var $hiddenInput2 = ($('<input type="hidden" name="type">').val("text"));
+//            var $hiddenInput3 = ($('<input type="hidden" name="videoid">').val(video_info.video_id));
+//            var $hiddenInput4 = ($('<input type="hidden" name="vendor">').val(video_info.vendor));
+//            var $buttonCont = $('<form>').attr('method', 'GET').attr('action', './nerdify').addClass('button-cont');
+//            $buttonCont.append($hiddenInput2).append($hiddenInput).append($hiddenInput3).append($hiddenInput4).append($buttonNerd);
+//            $descCont.append($videoDesc).append($buttonCont);
+//
+//            if ($tabCont) {
+//                $descCont.addClass('tab-pane').appendTo($tabCont);
+//            } else {
+//                $videoInfo.append($descCont);
+//            }
+//        }
 
-            var $descCont = $('<div>').addClass('desc-cont').attr('id', 'descr-cont');
-
-            var $videoDesc = ($('<p>').html(video_info.descr).addClass('descr'));
-            var $buttonNerd = ($('<button type="submit">').html('Nerdify').addClass('btn btn-danger btn-lg'));
-            var $hiddenInput = ($('<input type="hidden" name="text">').val(video_info.descr.replace(new RegExp('<br />', 'g'), '\n')));
-            var $hiddenInput2 = ($('<input type="hidden" name="type">').val("text"));
-            var $hiddenInput3 = ($('<input type="hidden" name="videoid">').val(video_info.video_id));
-            var $hiddenInput4 = ($('<input type="hidden" name="vendor">').val(video_info.vendor));
-            var $buttonCont = $('<form>').attr('method', 'GET').attr('action', './nerdify').addClass('button-cont');
-            $buttonCont.append($hiddenInput2).append($hiddenInput).append($hiddenInput3).append($hiddenInput4).append($buttonNerd);
-            $descCont.append($videoDesc).append($buttonCont);
-
-            if ($tabCont) {
-                $descCont.addClass('tab-pane').appendTo($tabCont);
-            } else {
-                $videoInfo.append($descCont);
-            }
-        }
+        $('.see-all').click(function () {
+            var $this = $(this);
+            var $target = $('#' + $this.attr('for'));
+            $target.toggleClass('full')
+            var text = $target.hasClass('full') ? 'see less' : 'see more';
+            $this.text(text)
+        });
         if (video_info.sub) {
             var strList = video_info.sub.split('\n\n');
             var formattedSub = '';
@@ -236,9 +234,6 @@ $(document).ready(function () {
                         }
 
 
-
-
-
                         $("span.entity").click(function () {
                             var startEntity = $(this).children('a').data('start-time') * 1000;
                             var endEntity = $(this).children('a').data('end-time') * 1000;
@@ -273,7 +268,7 @@ $(document).ready(function () {
             $tabCont.children('.tab-pane').first().addClass('active');
         }
 
-        $buttonCont.submit(function (e) {
+        $('.desc-cont .button-cont').submit(function (e) {
             e.preventDefault();
             var $form = $(this);
             $('button[type="submit"]', $form).prop('disabled', true).addLoader('left');
@@ -302,7 +297,7 @@ $(document).ready(function () {
                         new_descr = s1 + '<span class="entity ' + entity.nerdType.split('#')[1].toLowerCase() + '"><a href="' + entity.uri + '">' + s2 + '</a></span>' + s3;
                         oldstart = entity.startChar;
                     });
-                    $('.descr', $descCont).html(new_descr);
+                    $('.descr-cont .descr').html(new_descr);
                     $form.remove();
                 },
                 error: function () {

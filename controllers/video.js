@@ -59,23 +59,24 @@ exports.view = function (req, res) {
 //        concSign = '&';
     }
 
-    var info = null
+    var info = null;
     var vendor = detectVendor(videoURI);
     if (vendor) {
         var id = detectId(videoURI, vendor);
         if (id) {
-            info = getMetadata(id, vendor);
+            info = getMetadata(id, vendor, function (err, response) {
+                info = response || info;
+                var source = {
+                    videoURI: videoURI,
+                    videoInfo: info
+                };
+                res.render('video.ejs', source);
+            });
         }
     }
+};
 
-    var source = {
-        videoURI: videoURI,
-        videoInfo: info
-    };
-    res.render('video.ejs', source);
-}
-
-function getMetadata(video_id, vendor) {
+function getMetadata(video_id, vendor, callback) {
     var video_info = {
         video_id: video_id,
         vendor: vendor.name
@@ -84,7 +85,7 @@ function getMetadata(video_id, vendor) {
     switch (vendor.name) {
         case 'youtube':
             async.parallel([
-                function (callback) {
+                function (async_callback) {
                     var json_url = 'http://gdata.youtube.com/feeds/api/videos/' + video_info.video_id + '?v=2&alt=json-in-script';
                     console.log('retrieving metadata from ' + json_url);
                     http.getJSON(json_url, function (err, data) {
@@ -99,30 +100,27 @@ function getMetadata(video_id, vendor) {
                             video_info.avgRate = data.entry.gd$rating.average;
                             video_info.published = data.entry.published.$t;
                             video_info.category = data.entry.category[1].term;
-                            console.log('1');
-                            callback(false);
+                            async_callback(false);
                         } else {
                             //TODO
-                            callback(true);
+                            async_callback(true);
                         }
                     });
                 },
-                function (callback) {
+                function (async_callback) {
                     getYouTubeSub(video_info.video_id, function (err, data) {
                         if (err) {
                             console.log(err);
                             video_info.sub = false;
-                            callback(true);
+                            async_callback(true);
                         } else {
-                            console.log('2');
                             video_info.sub = data;
-                            callback(false);
+                            async_callback(false);
                         }
                     });
                 }
             ], function (err) {
-                console.log('Both ended with err: ' + err);
-                return video_info;
+                callback(err, video_info);
             });
             break;
         case 'dailymotion':
@@ -157,12 +155,11 @@ function getMetadata(video_id, vendor) {
                     });
                 }
             ], function (err) {
-                console.log('Both ended with err: ' + err);
-                return video_info;
+                callback(err, video_info);
             });
             break;
         default :
-            return 'Vendor undefined or not recognized'
+            callback(true, 'Vendor undefined or not recognized');
     }
 
 }
