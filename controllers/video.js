@@ -119,6 +119,38 @@ exports.view = function (req, res) {
     }
 };
 
+exports.nerdify = function (req, res) {
+    var id = req.query.videoid;
+    var vendor = req.query.vendor;
+    var cacheKey = vendor + '-' + id;
+    var info = getFromCache(cacheKey);
+
+    if (!info.entities) {
+        console.log(LOG_TAG + 'nerdifying ' + cacheKey);
+        getEntities(info, function (err, data) {
+            if (err) {
+                console.log(LOG_TAG + data);
+                // TODO
+            } else {
+                info.entities = data;
+            }
+            var source = {
+                videoInfo: info,
+                enriched: true
+            };
+            res.render('nerdify_resp.ejs', source);
+            videoCache.set(cacheKey, info);
+        });
+    } else {
+        var source = {
+            videoInfo: info,
+            enriched: true
+        };
+        res.render('nerdify_resp.ejs', source);
+
+    }
+};
+
 function getEntities(video_info, callback) {
     var doc_type, text;
     if (video_info.sub) {
@@ -134,7 +166,7 @@ function getEntities(video_info, callback) {
 function getMetadata(video_id, vendor, callback) {
     var video_info = {
         video_id: video_id,
-        vendor: vendor.name
+        vendor: vendor.code
     };
 
     switch (vendor.name) {

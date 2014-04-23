@@ -97,8 +97,8 @@
                 <div class="descr" id="descr"><p><%= videoInfo.descr %></p></div>
                 <button type="button" class="see-all" for="descr">see more</button>
 
-                <% if(!videoInfo.sub){ %>
-                <form method="get" action="./nerdify" class="button-cont">
+                <% if(!enriched && !videoInfo.sub){ %>
+                <form method="get" action="./nerdify" class="nerdify button-cont">
                     <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
                     <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
                     <input type="hidden" name="type" value="text"/>
@@ -110,14 +110,16 @@
             <% } %>
             <% if(videoInfo.sub) { %>
             <div id="sub-cont">
-                <% include sub_partial.ejs %>
-                <form method="get" action="./nerdify" class="button-cont">
+                <% include partials/sub_partial.ejs %>
+                <% if(!enriched) { %>
+                <form method="get" action="./nerdify" class="nerdify button-cont">
                     <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
                     <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
                     <input type="hidden" name="type" value="timedtext"/>
                     <input type="hidden" name="text" value="<%= videoInfo.sub %>"/>
                     <button type="submit" class="btn btn-danger btn-lg">Nerdify Sub</button>
                 </form>
+                <% } %>
             </div>
             <% } %>
         </div>
@@ -177,7 +179,7 @@
             </li>
         </ul>
         <% if (enriched && videoInfo.entities) { %>
-        <% include entitiesList_partial.ejs %>
+        <% include partials/entitiesList_partial.ejs %>
         <% } %>
     </section>
 
