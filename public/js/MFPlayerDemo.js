@@ -160,24 +160,6 @@ $(document).ready(function () {
                 }
 
 
-                $("span.entity").click(function () {
-                    var startEntity = $(this).children('a').data('start-time') * 1000;
-                    var endEntity = $(this).children('a').data('end-time') * 1000;
-
-                    $player.setPosition(startEntity);
-                    $player.play();
-                    highlight(startEntity, endEntity);
-                    var waitFragEndListener = function (event) {
-                        console.log($player.getPosition());
-                        if (endEntity != null && $player.getPosition() >= endEntity) {
-                            $player.pause();
-                            $player.getMeplayer().media.removeEventListener(waitFragEndListener);
-                            endEntity = null;
-                        }
-                    };
-
-                    $player.getMeplayer().media.addEventListener('timeupdate', waitFragEndListener, false);
-                });
 
 
                 //TODO reformatted subs
@@ -187,6 +169,26 @@ $(document).ready(function () {
             }
         });
     });
+
+    $(document).on('click', 'span.entity', function () {
+        var startEntity = $(this).children('a').data('start-time') * 1000;
+        var endEntity = $(this).children('a').data('end-time') * 1000;
+
+        $player.setPosition(startEntity);
+        $player.play();
+        highlight(startEntity, endEntity);
+        var waitFragEndListener = function (event) {
+            console.log($player.getPosition());
+            if (endEntity != null && $player.getPosition() >= endEntity) {
+                $player.pause();
+                $player.getMeplayer().media.removeEventListener(waitFragEndListener);
+                endEntity = null;
+            }
+        };
+
+        $player.getMeplayer().media.addEventListener('timeupdate', waitFragEndListener, false);
+    });
+
 
     $('#desc-cont .button-cont').submit(function (e) {
         e.preventDefault();

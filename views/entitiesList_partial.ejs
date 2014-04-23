@@ -1,0 +1,36 @@
+<%
+var entityList = videoInfo.entities;
+entityList.sort(function SortByNerdType(x, y) {
+    return ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1 ));
+});
+
+var typeList = entityList.reduce(function (memo, ent) {
+    if (!memo[ent.nerdType]) {
+        memo[ent.nerdType] = [];
+    }
+    memo[ent.nerdType].push(ent);
+    return memo;
+}, {});
+%>
+
+<section id="entity-sect">
+    <h1 class="title">entities</h1>
+
+    <div class="entity-content">
+        <p>In this video there are <%= entityList.length %> entities</p>
+        <%
+        for (type in typeList) {
+            var typeName = type.split('#')[1];
+            var entTypeList = typeList[type];
+        %>
+        <h3 class="title"><%= entTypeList.length %> <%= typeName %></h3>
+        <ul class="displayEntity">
+            <% entTypeList.forEach(function (ent) {
+                var href = ent.uri ? 'href="' + ent.uri + '" target="_blank"' : '';
+            %>
+            <li><span class="entity <%= typeName.toLowerCase() %>"><a <%= href %>>#<%= ent.label %></a></span></li>
+            <% }) %>
+        </ul>
+        <% } %>
+    </div>
+</section>

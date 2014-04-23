@@ -110,7 +110,7 @@
             <% } %>
             <% if(videoInfo.sub) { %>
             <div id="sub-cont">
-                <% include sub_partial.ejs%>
+                <% include sub_partial.ejs %>
                 <form method="get" action="./nerdify" class="button-cont">
                     <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
                     <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
@@ -176,14 +176,9 @@
                 </div>
             </li>
         </ul>
-
-        <section id="entity-sect">
-            <h1 class="title">entities</h1>
-
-            <div class="entity-content">
-            </div>
-        </section>
-
+        <% if (enriched && videoInfo.entities) { %>
+        <% include entitiesList_partial.ejs %>
+        <% } %>
     </section>
 
 

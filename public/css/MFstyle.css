@@ -205,15 +205,13 @@ html, body {
     .main-content section#playlist-sect {
       flex: 1.0;
       max-width: 400px; }
-      .main-content section#playlist-sect #entity-sect {
-        display: none; }
-        .main-content section#playlist-sect #entity-sect .entity-content {
-          line-height: 200%;
-          background: #fff;
-          padding: 0 10px;
-          -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
-          -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
-          box-shadow: 0 1px 8px -2px #5d5d5d; }
+      .main-content section#playlist-sect #entity-sect .entity-content {
+        line-height: 200%;
+        background: #fff;
+        padding: 0 10px;
+        -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
+        -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
+        box-shadow: 0 1px 8px -2px #5d5d5d; }
 
 .title {
   color: #aaaaaa;
