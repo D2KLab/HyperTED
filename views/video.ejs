@@ -101,8 +101,6 @@
                 <form method="get" action="./nerdify" class="nerdify button-cont">
                     <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
                     <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
-                    <input type="hidden" name="type" value="text"/>
-                    <input type="hidden" name="text" value="<%= videoInfo.descr %>"/>
                     <button type="submit" class="btn btn-danger btn-lg">Nerdify</button>
                 </form>
                 <% } %>
@@ -115,8 +113,6 @@
                 <form method="get" action="./nerdify" class="nerdify button-cont">
                     <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
                     <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
-                    <input type="hidden" name="type" value="timedtext"/>
-                    <input type="hidden" name="text" value="<%= videoInfo.sub %>"/>
                     <button type="submit" class="btn btn-danger btn-lg">Nerdify Sub</button>
                 </form>
                 <% } %>

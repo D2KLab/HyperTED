@@ -50,7 +50,7 @@ $(document).ready(function () {
     $('.see-all').click(function () {
         var $this = $(this);
         var $target = $('#' + $this.attr('for'));
-        $target.toggleClass('full')
+        $target.toggleClass('full');
         var text = $target.hasClass('full') ? 'see less' : 'see more';
         $this.text(text)
     });
@@ -59,26 +59,53 @@ $(document).ready(function () {
     $('form.nerdify').submit(function (e) {
         e.preventDefault();
         var $form = $(this);
-        $('button[type="submit"]', $form).prop('disabled', true).addLoader('left');
+        var $submitButton =  $('button[type="submit"]', $form);
+        $submitButton.prop('disabled', true).addLoader('left');
         $form.ajaxSubmit({
             success: function (data) {
-                console.log(data);
                 var $data = $(data);
                 var $subText = $data.find('.sub-text');
-                if($subText.exists()){
-                    $subCont.empty().html($subText);
-                }else{
+                if ($subText.exists()) {
+                    var $actualSubText = $('.sub-text', $subCont);
+                    $actualSubText.replaceWith($subText);
+                } else {
                     var $descr = $data.find('.descr');
                     var $actualDescr = $('#descr');
-                    if($actualDescr.hasClass('full')){
+                    if ($actualDescr.hasClass('full')) {
                         $descr.addClass('full');
                     }
                     $actualDescr.replaceWith($descr);
                 }
-                var $entSect = $data.find('#entity-sect');
+                var $entSect = $data.find('#entity-sect').hide();
                 $('#playlist-sect').append($entSect);
+                $entSect.fadeIn();
 
-                $('form.nerdify').remove();
+                $('form.nerdify').fadeOut();
+                $submitButton.prop('disabled', false).removeLoader();
+
+                var joinSymbol = location.search ? '&' : '?';
+                var new_url = location.href + joinSymbol + 'enriched=true';
+                history.pushState(null, null, new_url);
+
+                $(window).off('popstate.nerdify').on('popstate.nerdify', function () {
+                    if (getParameterByName('enriched')) {
+                        $entSect.fadeIn();
+                        $('form.nerdify').fadeOut();
+                        if($subText.exists()){
+                            $actualSubText.replaceWith($subText);
+                        }else{
+                            $actualDescr.replaceWith($descr);
+                        }
+                    } else {
+                        $entSect.fadeOut();
+                        $('form.nerdify').fadeIn();
+                        if($subText.exists()){
+                            $subText.replaceWith($actualSubText);
+                        }else{
+                            $descr.replaceWith($actualDescr);
+                        }
+                    }
+                });
             },
             error: function () {
                 console.error('Something went wrong');
@@ -248,16 +275,27 @@ jQuery.fn.extend({
             jQuery.loaderImg = $("<img>").attr('src', 'img/ajax-loader.gif');
         }
 
-        $loaderImg = jQuery.loaderImg;
+        var $loaderImg = jQuery.loaderImg;
         jQuery.loaderImg = $loaderImg.clone();
         if (direction == 'left') {
             $(this).before($loaderImg);
         } else {
             $(this).after($loaderImg);
         }
+        $(this).data('loader', $loaderImg);
         return true;
     },
-    exists: function(){
-       return $(this).length > 0;
+    removeLoader: function(){
+        var loader = $(this).data('loader');
+        $(loader).remove();
+    },
+    exists: function () {
+        return $(this).length > 0;
     }
 });
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
