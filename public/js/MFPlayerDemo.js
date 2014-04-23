@@ -83,7 +83,6 @@ $(document).ready(function () {
         $player.play();
         highlight(startEntity, endEntity);
         var waitFragEndListener = function (event) {
-            console.log($player.getPosition());
             if (endEntity != null && $player.getPosition() >= endEntity) {
                 $player.pause();
                 $player.getMeplayer().media.removeEventListener(waitFragEndListener);
