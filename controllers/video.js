@@ -1,9 +1,12 @@
 var http = require('http'),
     https = require('https'),
     url = require("url"),
-    async = require('async');
+    async = require('async'),
+    Cache = require("node-cache"),
+    nerd = require('./nerdify');
 
 var LOG_TAG = '[VIDEO.JS]: ';
+var videoCache;
 
 
 //exports.getSub = function (vendor, video_id, callback) {
@@ -42,6 +45,7 @@ exports.getSub = function (req, res) {
 
 exports.view = function (req, res) {
     var videoURI = req.query.uri;
+    var enriched = req.query.enriched;
     if (!videoURI) {
         res.redirect('/');
         return;
@@ -59,23 +63,75 @@ exports.view = function (req, res) {
 //        concSign = '&';
     }
 
-    var info = null
+    function sendResp(infoObj) {
+        var source = {
+            videoURI: videoURI,
+            videoInfo: infoObj,
+            enriched: enriched
+        };
+        res.render('video.ejs', source);
+    }
+
     var vendor = detectVendor(videoURI);
     if (vendor) {
         var id = detectId(videoURI, vendor);
         if (id) {
-            info = getMetadata(id, vendor);
+            var cacheKey = vendor.code + '-' + id;
+            var info = getFromCache(cacheKey);
+            if (info) {
+                if (!enriched || info.entities) {
+                    sendResp(info);
+                } else {
+                    getEntities(info, function (err, data) {
+                        if (err) {
+                            console.log(LOG_TAG + data);
+                            // TODO
+                        } else {
+                            info.entities = data;
+                        }
+
+                        sendResp(info);
+                        videoCache.set(cacheKey, info);
+                    });
+                }
+            } else {
+                info = getMetadata(id, vendor, function (err, response) {
+                    info = response || info;
+                    if (enriched) {
+                        getEntities(info, function (err, data) {
+                            if (err) {
+                                console.log(LOG_TAG + data);
+                                // TODO
+                            } else {
+                                info.entities = data;
+                            }
+                            sendResp(info);
+                            videoCache.set(cacheKey, info);
+                        });
+                    } else {
+                        sendResp(info);
+                        videoCache.set(cacheKey, info);
+                    }
+                });
+            }
+
         }
     }
+};
 
-    var source = {
-        videoURI: videoURI,
-        videoInfo: info
-    };
-    res.render('video.ejs', source);
+function getEntities(video_info, callback) {
+    var doc_type, text;
+    if (video_info.sub) {
+        doc_type = 'timedtext';
+        text = video_info.sub;
+    } else {
+        doc_type = 'text';
+        text = video_info.descr;
+    }
+    nerd.getEntities(doc_type, text, callback);
 }
 
-function getMetadata(video_id, vendor) {
+function getMetadata(video_id, vendor, callback) {
     var video_info = {
         video_id: video_id,
         vendor: vendor.name
@@ -84,7 +140,7 @@ function getMetadata(video_id, vendor) {
     switch (vendor.name) {
         case 'youtube':
             async.parallel([
-                function (callback) {
+                function (async_callback) {
                     var json_url = 'http://gdata.youtube.com/feeds/api/videos/' + video_info.video_id + '?v=2&alt=json-in-script';
                     console.log('retrieving metadata from ' + json_url);
                     http.getJSON(json_url, function (err, data) {
@@ -99,30 +155,27 @@ function getMetadata(video_id, vendor) {
                             video_info.avgRate = data.entry.gd$rating.average;
                             video_info.published = data.entry.published.$t;
                             video_info.category = data.entry.category[1].term;
-                            console.log('1');
-                            callback(false);
+                            async_callback(false);
                         } else {
                             //TODO
-                            callback(true);
+                            async_callback(true);
                         }
                     });
                 },
-                function (callback) {
+                function (async_callback) {
                     getYouTubeSub(video_info.video_id, function (err, data) {
                         if (err) {
                             console.log(err);
                             video_info.sub = false;
-                            callback(true);
+                            async_callback(true);
                         } else {
-                            console.log('2');
                             video_info.sub = data;
-                            callback(false);
+                            async_callback(false);
                         }
                     });
                 }
             ], function (err) {
-                console.log('Both ended with err: ' + err);
-                return video_info;
+                callback(err, video_info);
             });
             break;
         case 'dailymotion':
@@ -157,12 +210,11 @@ function getMetadata(video_id, vendor) {
                     });
                 }
             ], function (err) {
-                console.log('Both ended with err: ' + err);
-                return video_info;
+                callback(err, video_info);
             });
             break;
         default :
-            return 'Vendor undefined or not recognized'
+            callback(true, 'Vendor undefined or not recognized');
     }
 
 }
@@ -206,16 +258,19 @@ function empty(data) {
 
 var vendors = [
     {
+        code: 1,
         name: 'youtube',
         url_pattern: /^https?:\/\/(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/,
         id_pattern: /v=(.{11})/
     },
     {
+        code: 2,
         name: 'dailymotion',
         url_pattern: /^.+dailymotion.com\/(video|hub)\/([^_]+)[^#]*(#video=([^_&]+))?/,
         id_pattern: /video\/([^_||^#]+)/
     },
     {
+        code: 3,
         name: 'vimeo',
         url_pattern: /^.+vimeo.com\/(\d+)?/
     }
@@ -280,3 +335,14 @@ if (typeof String.prototype.startsWith != 'function') {
         return this.indexOf(str) == 0;
     };
 }
+
+function getFromCache(key) {
+    if (!videoCache) {
+        videoCache = new Cache();
+        return false;
+    } else {
+        var cachedData = videoCache.get(key);
+        return cachedData[key];
+    }
+}
+

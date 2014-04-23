@@ -23,21 +23,27 @@ exports.start = function (req, res) {
         return;
     }
 
+    getEntities(doc_type, text, function (err, data) {
+        if (err) {
+            console.log(err);
+            res.send(500, err.message);
+        } else {
+            console.log('sending entities from nerd');
+            nerdCache.set(cacheKey, data);
+            res.json(data);
+        }
+    });
+};
+function getEntities(doc_type, text, callback) {
     if (text != null && text != '') {
         nerd.annotate(api_instance, apiID, ext, doc_type, text, gran, to, function (err, data) {
-            if (err) {
-                console.log(err);
-                res.send(500, err.message);
-            } else {
-                console.log('sending entities from nerd');
-                nerdCache.set(cacheKey, data);
-                res.json(data);
-            }
+            callback(err, data);
         });
     } else {
-        res.send(400, 'Empty Text');
+        callback(true, 'Empty Text');
     }
-}
+};
+exports.getEntities = getEntities;
 
 function getFromCache(key) {
     if (!nerdCache) {
