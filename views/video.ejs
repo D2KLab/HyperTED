@@ -96,27 +96,21 @@
             <div class="descr-cont" id="descr-cont">
                 <% include partials/descr_partial.ejs %>
                 <button type="button" class="see-all" for="descr">see more</button>
-
-                <% if(!enriched && !videoInfo.sub){ %>
-                <form method="get" action="./nerdify" class="nerdify button-cont">
-                    <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
-                    <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
-                    <button type="submit" class="btn btn-danger btn-lg">Nerdify</button>
-                </form>
-                <% } %>
             </div>
             <% } %>
             <% if(videoInfo.sub) { %>
             <div id="sub-cont">
                 <% include partials/sub_partial.ejs %>
-                <% if(!enriched) { %>
-                <form method="get" action="./nerdify" class="nerdify button-cont">
-                    <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
-                    <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
-                    <button type="submit" class="btn btn-danger btn-lg">Nerdify Sub</button>
-                </form>
-                <% } %>
             </div>
+            <% } %>
+            <% if(!enriched) { %>
+            <form method="get" action="./video" data-action="./nerdify" class="nerdify button-cont">
+                <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
+                <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
+                <input type="hidden" name="uri" value="<%= videoURI %>"/>
+                <input type="hidden" name="enriched" value="true"/>
+                <button type="submit" class="btn btn-danger btn-lg">Nerdify Sub</button>
+            </form>
             <% } %>
         </div>
         <% } %>
@@ -185,6 +179,7 @@
     var videoURI = "<%=videoURI%>";
 
 </script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js"></script>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
 <script src="http://malsup.github.com/jquery.form.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
