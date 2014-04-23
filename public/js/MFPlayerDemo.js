@@ -56,7 +56,7 @@ $(document).ready(function () {
     });
 
     var $subCont = $('#sub-cont');
-    $('form.nerdify', $subCont).submit(function (e) {
+    $('form.nerdify').submit(function (e) {
         e.preventDefault();
         var $form = $(this);
         $('button[type="submit"]', $form).prop('disabled', true).addLoader('left');
@@ -65,9 +65,20 @@ $(document).ready(function () {
                 console.log(data);
                 var $data = $(data);
                 var $subText = $data.find('.sub-text');
-                $subCont.empty().html($subText);
+                if($subText.exists()){
+                    $subCont.empty().html($subText);
+                }else{
+                    var $descr = $data.find('.descr');
+                    var $actualDescr = $('#descr');
+                    if($actualDescr.hasClass('full')){
+                        $descr.addClass('full');
+                    }
+                    $actualDescr.replaceWith($descr);
+                }
                 var $entSect = $data.find('#entity-sect');
                 $('#playlist-sect').append($entSect);
+
+                $('form.nerdify').remove();
             },
             error: function () {
                 console.error('Something went wrong');
@@ -75,7 +86,7 @@ $(document).ready(function () {
         });
     });
 
-    $(document).on('click', 'span.entity', function () {
+    $(document).on('click', '.entity', function () {
         var startEntity = $(this).children('a').data('start-time') * 1000;
         var endEntity = $(this).children('a').data('end-time') * 1000;
 
@@ -245,5 +256,8 @@ jQuery.fn.extend({
             $(this).after($loaderImg);
         }
         return true;
+    },
+    exists: function(){
+       return $(this).length > 0;
     }
 });

@@ -93,8 +93,8 @@
                 </div>
             </div>
             <% if(videoInfo.descr) { %>
-            <div class="desc-cont" id="descr-cont">
-                <div class="descr" id="descr"><p><%= videoInfo.descr %></p></div>
+            <div class="descr-cont" id="descr-cont">
+                <% include partials/descr_partial.ejs %>
                 <button type="button" class="see-all" for="descr">see more</button>
 
                 <% if(!enriched && !videoInfo.sub){ %>
