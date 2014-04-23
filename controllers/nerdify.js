@@ -17,6 +17,7 @@ exports.start = function (req, res) {
     var vendor = req.query.vendor;
     var cacheKey = vendor + video_id + doc_type;
 
+    var json;
     if (json = getFromCache(cacheKey)) {
         console.log("sending entities from cache");
         res.json(json);
@@ -34,6 +35,7 @@ exports.start = function (req, res) {
         }
     });
 };
+
 function getEntities(doc_type, text, callback) {
     if (text != null && text != '') {
         nerd.annotate(api_instance, apiID, ext, doc_type, text, gran, to, function (err, data) {
@@ -42,7 +44,8 @@ function getEntities(doc_type, text, callback) {
     } else {
         callback(true, 'Empty Text');
     }
-};
+}
+
 exports.getEntities = getEntities;
 
 function getFromCache(key) {

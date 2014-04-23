@@ -56,113 +56,18 @@ $(document).ready(function () {
     });
 
     var $subCont = $('#sub-cont');
-    $('.button-cont', $subCont).submit(function (e) {
+    $('form.nerdify', $subCont).submit(function (e) {
         e.preventDefault();
         var $form = $(this);
         $('button[type="submit"]', $form).prop('disabled', true).addLoader('left');
         $form.ajaxSubmit({
-            dataType: 'json',
-            success: function (entityList) {
-
-                var strList = $('input[name="text"]',$form).val().split('\n\n');
-                var formattedSub = '';
-
-                for (var sub in strList) {
-                    var timeLine = true;
-                    var idLine = true;
-
-                    var lines = strList[sub].split('\n');
-                    lineLoop: for (var line in lines) {
-                        if (idLine) {
-                            //nothing for now
-                            idLine = false;
-                            continue lineLoop;
-                        }
-                        if (timeLine) {
-                            //nothing for now
-                            timeLine = false;
-                            continue lineLoop;
-                        }
-                        formattedSub += lines[line] + ' ';
-                    }
-                }
-
-                //sorting JSON for Start character desc
-                entityList.sort(function SortByStartChar(x, y) {
-                    return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
-                });
-
-                var new_subs = formattedSub;
-                var oldstart;
-
-                $.each(entityList, function (key, value) {
-                    var entity = value;
-
-                    var s1 = new_subs.substring(0, entity.startChar);
-                    var s2 = new_subs.substring(entity.startChar, entity.endChar);
-                    var s3 = new_subs.substring(entity.endChar);
-                    var href = entity.uri ? 'href="' + entity.uri + '" target="_blank"' : '';
-                    var nerdType = entity.nerdType.split('#')[1].toLowerCase();
-
-                    if (entity.endChar >= oldstart) {
-                        entity.html = '<span class="entity ' + nerdType + '"><a ' + href + '> #' + entity.label + '</a></span>';
-                        return;
-                    }
-
-
-
-                    new_subs = s1 + '<span class="entity ' + nerdType + '"><a href="#" +  data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
-                    entity.html = '<span class="entity ' + nerdType + '"><a ' + href + '> #' + s2 + '</a></span>';
-
-
-                    oldstart = entity.startChar;
-                });
-
-                $('.sub-text', $subCont).html(new_subs);
-                $form.remove();
-                $subCont.html(new_subs);
-
-                $('#entity-sect').show();
-
-                entityList.sort(function SortByNerdType(x, y) {
-                    return ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1 ));
-                });
-
-
-                var $entityCont = $('.entity-content').html("<p>In this video there are " + entityList.length + " entities</p>");
-
-                var typeEntities = [];
-                for (var key in entityList) {
-
-                    var actualEntity = entityList[key];
-                    if (key == 0 || actualEntity.nerdType == entityList[key - 1].nerdType) {
-                        typeEntities.push(actualEntity);
-                    } else {
-                        printEntityGroup(typeEntities);
-                        typeEntities = [];
-                        typeEntities.push(actualEntity);
-
-                    }
-                }
-                printEntityGroup(typeEntities);
-
-                function printEntityGroup(array) {
-
-                    var $typeEntity = $('<h3>').addClass('title').html(array.length + " " + array[0].nerdType.split('#')[1]);
-                    var $entityList = $('<ul>').addClass('displayEntity');
-
-                    for (var n in array) {
-                        var $entity = $('<li>').html(array[n].html);
-                        $entityList.append($entity);
-                    }
-                    $entityCont.append($typeEntity).append($entityList);
-                    console.log($entityList);
-                }
-
-
-
-
-                //TODO reformatted subs
+            success: function (data) {
+                console.log(data);
+                var $data = $(data);
+                var $subText = $data.find('.sub-text');
+                $subCont.empty().html($subText);
+                var $entSect = $data.find('#entity-sect');
+                $('#playlist-sect').append($entSect);
             },
             error: function () {
                 console.error('Something went wrong');
@@ -178,7 +83,6 @@ $(document).ready(function () {
         $player.play();
         highlight(startEntity, endEntity);
         var waitFragEndListener = function (event) {
-            console.log($player.getPosition());
             if (endEntity != null && $player.getPosition() >= endEntity) {
                 $player.pause();
                 $player.getMeplayer().media.removeEventListener(waitFragEndListener);

@@ -10,7 +10,7 @@ app.set('view engine', 'ejs');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/nerdify', nerdify.start);
+app.get('/nerdify', video.nerdify);
 app.get('/srt', video.getSub);
 app.get('/video', video.view);
 app.get('/', function (req, res) {

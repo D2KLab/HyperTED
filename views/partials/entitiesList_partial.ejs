@@ -26,9 +26,14 @@ var typeList = entityList.reduce(function (memo, ent) {
         <h3 class="title"><%= entTypeList.length %> <%= typeName %></h3>
         <ul class="displayEntity">
             <% entTypeList.forEach(function (ent) {
-                var href = ent.uri ? 'href="' + ent.uri + '" target="_blank"' : '';
+//                var href = ent.uri ? 'href="' + ent.uri + '" target="_blank"' : '';
+                var href = ""; //FIXME is empty for debug purpose
             %>
-            <li><span class="entity <%= typeName.toLowerCase() %>"><a <%= href %>>#<%= ent.label %></a></span></li>
+            <li><span class="entity <%= typeName.toLowerCase() %>">
+                    <a <%= href %> data-start-time="<%= ent.startNPT %>" data-end-time="<%= ent.endNPT %>">
+                        #<%= ent.label %>
+                    </a>
+                </span></li>
             <% }) %>
         </ul>
         <% } %>
