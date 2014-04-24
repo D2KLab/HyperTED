@@ -1,6 +1,11 @@
-var uri = videoURI.replace(new RegExp('&amp;', 'g'), '&');
+var uri = video.uri.replace(new RegExp('&amp;', 'g'), '&');
+var storageKey = 'fragmentenricher.';
+var videokey = storageKey + video.vendor + '-' + video.id + '.';
 
 $(document).ready(function () {
+        var $subCont = $('#sub-cont');
+        var hasVideoSub = $subCont.exists();
+
         var mfuri = uri; //Media Fragment URI
         //initialise smfplayer
         var $player = $("#video").smfplayer({
@@ -55,69 +60,105 @@ $(document).ready(function () {
             $this.text(text)
         });
 
-        var $subCont = $('#sub-cont');
-        if (Modernizr.history) {
-
+        if (Modernizr.history && Modernizr.localstorage) {
             var $nerdifyForm = $('form.nerdify');
             var ajaxAction = $nerdifyForm.data('action');
+            var $nerdified = $('.enriched').exists() ? $('.enriched') : undefined;
+            var $plain = $nerdified ? undefined : (hasVideoSub ? $('.sub-text') : $('#descr'));
+            var $entSect = $('#entity-sect').exists() ? $('#entity-sect') : undefined;
 
             $nerdifyForm.attr('action', ajaxAction).submit(function (e) {
                 e.preventDefault();
-                var $form = $(this);
-                var $submitButton = $('button[type="submit"]', $form);
+                var $submitButton = $('button[type="submit"]', $nerdifyForm);
                 $submitButton.prop('disabled', true).addLoader('left');
-                $form.ajaxSubmit({
+                $(this).ajaxSubmit({
                     success: function (data) {
                         var $data = $(data);
-                        var $subText = $data.find('.sub-text');
-                        if ($subText.exists()) {
-                            var $actualSubText = $('.sub-text', $subCont);
-                            $actualSubText.replaceWith($subText);
+                        if (hasVideoSub) {
+                            $nerdified = $data.find('.sub-text');
+                            $plain = $('.sub-text', $subCont);
                         } else {
-                            var $descr = $data.find('.descr');
-                            var $actualDescr = $('#descr');
-                            if ($actualDescr.hasClass('full')) {
-                                $descr.addClass('full');
+                            $nerdified = $data.find('.descr');
+                            $plain = $('#descr');
+                            if ($plain.hasClass('full')) {
+                                $nerdified.addClass('full');
                             }
-                            $actualDescr.replaceWith($descr);
                         }
-                        var $entSect = $data.find('#entity-sect').hide();
-                        $('#playlist-sect').append($entSect);
-                        $entSect.fadeIn();
+                        $plain.replaceWith($nerdified);
 
-                        $('form.nerdify').fadeOut();
+                        $entSect = $data.find('#entity-sect').hide();
+                        $('#playlist-sect').append($entSect);
+
+                        try {
+                            localStorage[videokey + 'ent-sect'] = $entSect[0].outerHTML;
+                            localStorage[videokey + 'nerd'] = $nerdified[0].outerHTML;
+                            localStorage[videokey + 'plain'] = $plain[0].outerHTML;
+                        } catch (e) {
+                            if (e == QUOTA_EXCEEDED_ERR) {
+                                console.warn('Quota exceeded! Delete all and write');
+                                localStorage.clear();
+                                localStorage[videokey + 'ent-sect'] = $entSect[0].outerHTML;
+                                localStorage[videokey + 'nerd'] = $nerdified[0].outerHTML;
+                                localStorage[videokey + 'plain'] = $plain[0].outerHTML;
+                            }
+                        }
+
+
+                        $entSect.fadeIn();
+                        $nerdifyForm.fadeOut();
                         $submitButton.prop('disabled', false).removeLoader();
 
                         var joinSymbol = location.search ? '&' : '?';
                         var new_url = location.href + joinSymbol + 'enriched=true';
                         history.pushState(null, null, new_url);
-
-                        $(window).off('popstate.nerdify').on('popstate.nerdify', function () {
-                            if (getParameterByName('enriched')) {
-                                $entSect.fadeIn();
-                                $('form.nerdify').fadeOut();
-                                if ($subText.exists()) {
-                                    $actualSubText.replaceWith($subText);
-                                } else {
-                                    $actualDescr.replaceWith($descr);
-                                }
-                            } else {
-                                $entSect.fadeOut();
-                                $('form.nerdify').fadeIn();
-                                if ($subText.exists()) {
-                                    $subText.replaceWith($actualSubText);
-                                } else {
-                                    $descr.replaceWith($actualDescr);
-                                }
-                            }
-                        });
                     },
                     error: function () {
                         console.error('Something went wrong');
                     }
                 });
             });
+
+            $(window).off('popstate.nerdify').on('popstate.nerdify', function () {
+                synchEnrichment();
+            });
+
+            function synchEnrichment() {
+                var isEnriched = getParameterByName('enriched');
+                $entSect = $entSect || localStorage[videokey + 'ent-sect'];
+                $nerdified = $nerdified || localStorage[videokey + 'nerd'];
+                $plain = $plain || localStorage[videokey + 'plain'];
+
+                if (isEnriched) {
+                    if ($entSect && $nerdified) {
+                        $nerdified = $($nerdified);
+                        $plain = $($plain);
+                        $entSect = $($entSect);
+
+                        $entSect.fadeIn();
+                        $nerdifyForm.fadeOut();
+                        $plain.replaceWith($nerdified);
+                    } else {
+                        // submit form
+                        $nerdifyForm.submit();
+                    }
+                } else {
+                    if (!$plain) {
+                        //refresh page for taking info from server
+                        location.reload();
+                    } else {
+                        $nerdified = $($nerdified);
+                        $plain = $($plain);
+                        $entSect = $($entSect);
+
+                        $entSect.fadeOut();
+                        $nerdifyForm.fadeIn();
+                        $nerdified.replaceWith($plain);
+                    }
+                }
+            }
         }
+
+
         $(document).on('click', '.entity', function () {
             var startEntity = $(this).children('a').data('start-time') * 1000;
             var endEntity = $(this).children('a').data('end-time') * 1000;
@@ -171,7 +212,7 @@ $(document).ready(function () {
                 video_info.vendor = 'youtube';
                 var retriveSub = function () {
                     return;
-                }
+                };
                 if (full) {
                     retriveSub = $.get;
                 }

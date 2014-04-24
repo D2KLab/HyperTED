@@ -17,5 +17,5 @@
         });
     }
 %>
-<div class="descr" id="descr"><p><%- text %></p></div>
+<div class="descr <% if (enriched && !videoInfo.sub) { %>enriched<% } %>" id="descr"><p><%- text %></p></div>
 <% } %>

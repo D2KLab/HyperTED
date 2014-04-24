@@ -176,8 +176,11 @@
 
 </div>
 <script>
-    var videoURI = "<%=videoURI%>";
-
+    var video = {
+        uri: "<%= videoURI %>",
+        id: "<%= videoInfo.id %>",
+        vendor: "<%= videoInfo.vendor %>"
+    }
 </script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js"></script>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
