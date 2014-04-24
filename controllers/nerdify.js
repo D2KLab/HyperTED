@@ -2,7 +2,7 @@ var nerd = require("nerd4node");
 
 var api_instance = "nerd.eurecom.fr/api/";
 var apiID = '1qb6bi7kjmcudkh5gsqr79ufmflo4mlu';
-var ext = 'textrazor';
+var ext = 'combined';
 var t = "";
 var gran = "oed";
 var to = 10; //timeOut
