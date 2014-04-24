@@ -71,6 +71,20 @@ $(document).ready(function () {
                 e.preventDefault();
                 var $submitButton = $('button[type="submit"]', $nerdifyForm);
                 $submitButton.prop('disabled', true).addLoader('left');
+
+                var joinSymbol = location.search ? '&' : '?';
+                var new_url = location.href + joinSymbol + 'enriched=true';
+
+                $entSect = $entSect || localStorage[videokey + 'ent-sect'];
+                $nerdified = $nerdified || localStorage[videokey + 'nerd'];
+                $plain = $plain || localStorage[videokey + 'plain'];
+                if($nerdified && $plain && $entSect){
+                    $submitButton.prop('disabled', false).removeLoader();
+                    history.pushState(null, null, new_url);
+                    synchEnrichment();
+                    return false;
+                }
+
                 $(this).ajaxSubmit({
                     success: function (data) {
                         var $data = $(data);
@@ -84,7 +98,6 @@ $(document).ready(function () {
                                 $nerdified.addClass('full');
                             }
                         }
-                        $plain.replaceWith($nerdified);
 
                         $entSect = $data.find('#entity-sect').hide();
                         $('#playlist-sect').append($entSect);
@@ -103,14 +116,9 @@ $(document).ready(function () {
                             }
                         }
 
-
-                        $entSect.fadeIn();
-                        $nerdifyForm.fadeOut();
                         $submitButton.prop('disabled', false).removeLoader();
-
-                        var joinSymbol = location.search ? '&' : '?';
-                        var new_url = location.href + joinSymbol + 'enriched=true';
                         history.pushState(null, null, new_url);
+                        synchEnrichment();
                     },
                     error: function () {
                         console.error('Something went wrong');
@@ -136,7 +144,7 @@ $(document).ready(function () {
 
                         $entSect.fadeIn();
                         $nerdifyForm.fadeOut();
-                        $plain.replaceWith($nerdified);
+                        $('.sub-text').not('.enriched').replaceWith($nerdified);
                     } else {
                         // submit form
                         $nerdifyForm.submit();
@@ -152,7 +160,7 @@ $(document).ready(function () {
 
                         $entSect.fadeOut();
                         $nerdifyForm.fadeIn();
-                        $nerdified.replaceWith($plain);
+                        $('.sub-text.enriched').replaceWith($plain);
                     }
                 }
             }

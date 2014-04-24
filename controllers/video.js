@@ -142,6 +142,7 @@ exports.nerdify = function (req, res) {
             videoCache.set(cacheKey, info);
         });
     } else {
+        console.log(LOG_TAG + 'nerdifying form cache ' + cacheKey);
         var source = {
             videoInfo: info,
             enriched: true
