@@ -78,7 +78,7 @@ $(document).ready(function () {
                 $entSect = $entSect || localStorage[videokey + 'ent-sect'];
                 $nerdified = $nerdified || localStorage[videokey + 'nerd'];
                 $plain = $plain || localStorage[videokey + 'plain'];
-                if($nerdified && $plain && $entSect){
+                if ($nerdified && $plain && $entSect) {
                     $submitButton.prop('disabled', false).removeLoader();
                     history.pushState(null, null, new_url);
                     synchEnrichment();
@@ -168,23 +168,42 @@ $(document).ready(function () {
 
 
         $(document).on('click', '.entity', function () {
-            var startEntity = $(this).children('a').data('start-time') * 1000;
-            var endEntity = $(this).children('a').data('end-time') * 1000;
+            var $entity = $(this).children('a');
+            var startEntity = $entity.data('start-time') * 1000;
+            var endEntity = $entity.data('end-time') * 1000;
+            changeMF(startEntity, endEntity)
 
-            $player.setPosition(startEntity);
+        });
+
+        $(document).on('click', '.sub-text p[data-time]', function () {
+            var srtTime = $(this).data('time');
+            var hms = srtTime.split('-->');
+            var ms = [];
+            hms.forEach(function (t) {
+                var a = t.trim().split(/[:,]+/);
+                console.log(a);
+                var milliseconds = ((+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2])) * 1000 + a[3] *1;
+                ms.push(milliseconds);
+            });
+
+            changeMF(ms[0], ms[1]);
+        });
+
+        function changeMF(start, end) {
+            console.log(start+'-'+end);
+            $player.setPosition(start);
             $player.play();
-            highlight(startEntity, endEntity);
-            var waitFragEndListener = function (event) {
-                if (endEntity != null && $player.getPosition() >= endEntity) {
+            highlight(start, end);
+            var waitFragEndListener = function () {
+                if (end != null && $player.getPosition() >= end) {
                     $player.pause();
                     $player.getMeplayer().media.removeEventListener(waitFragEndListener);
-                    endEntity = null;
+                    end = null;
                 }
             };
 
             $player.getMeplayer().media.addEventListener('timeupdate', waitFragEndListener, false);
-        });
-
+        }
 
         $('.video-list .video-link').each(function () {
             var $li = $(this);
