@@ -405,3 +405,28 @@ ul.video-list {
 .button-cont {
   text-align: right;
   clear: both; }
+
+#sub-cont {
+  clear: both; }
+
+.sub-text {
+  border: 1px solid #f4f4f4;
+  margin: 5px 0;
+  height: 200px;
+  overflow: auto;
+  resize: vertical; }
+  .sub-text p {
+    font-size: 0.9em;
+    line-height: 1.8em;
+    margin: 0;
+    padding: 0 10px;
+    font-weight: 400;
+    -webkit-transition: font-weight 100ms ease-out;
+    -moz-transition: font-weight 100ms ease-out;
+    -o-transition: font-weight 100ms ease-out;
+    transition: font-weight 100ms ease-out;
+    cursor: pointer; }
+    .sub-text p:nth-child(odd) {
+      background: #f4f4f4; }
+    .sub-text p:hover {
+      font-weight: 700; }

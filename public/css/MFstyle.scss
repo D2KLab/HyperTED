@@ -333,3 +333,30 @@ ul.video-list {
   text-align: right;
   clear: both;
 }
+
+#sub-cont {
+  clear: both;
+}
+
+.sub-text {
+  border: 1px solid $light_gray;
+  margin: 5px 0;
+  height: 200px;
+  overflow: auto;
+  resize: vertical;
+  p {
+    font-size: 0.9em;
+    line-height: 1.8em;
+    margin: 0;
+    padding: 0 10px;
+    font-weight: 400;
+    @include transition(font-weight, 100ms);
+    cursor: pointer;
+    &:nth-child(odd) {
+      background: $light_gray;
+    }
+    &:hover{
+      font-weight: 700;
+    }
+  }
+}

@@ -1,6 +1,5 @@
 var express = require('express'),
     path = require("path"),
-    nerdify = require('./controllers/nerdify'),
     video = require('./controllers/video');
 
 var app = express();
