@@ -31,21 +31,25 @@ if (videoInfo.sub) {
             var entityList = videoInfo.entities;
             var subIndex = subList.length - 1;
 
-            //sorting JSON for Start character desc
+            //sorting JSON for end character desc and by length
             entityList.sort(function SortByStartChar(x, y) {
-                return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
+                if (x.endChar == y.endChar) {
+                        var lunghezzaX= x.endChar - x.startChar;
+                        var lunghezzaY= y.endChar - y.startChar;
+                        return ((lunghezzaX == lunghezzaY) ? 0 : (lunghezzaX < lunghezzaY) ? 1 : -1)
+                } else if (x.endChar > y.endChar) return -1;
+                else return 1;
+
             });
 
+
+
             entityList.forEach(function (entity) {
+
                 while (subIndex >= 0) {
                     var thisSub = subList[subIndex];
-                    var oldstart;
-
                     if (entity.startChar >= thisSub.startChar && entity.endChar <= thisSub.endChar) {
-                        if (oldstart && oldstart >= entity.startChar) {
-                            console.log("uguale");
-                            return;
-                        }
+
                         var deltaStart = entity.startChar - thisSub.startChar;
                         var deltaEnd = entity.endChar - thisSub.startChar;
                         var text = thisSub.text;
@@ -56,9 +60,6 @@ if (videoInfo.sub) {
                         var nerdType = entity.nerdType.split('#')[1].toLowerCase();
 
                         thisSub.text = s1 + '<span class="entity ' + nerdType + '"><a href="#" +  data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
-
-                        oldstart = entity.startChar;
-                        console.log(oldstart);
 
                         break;
                     } else {
