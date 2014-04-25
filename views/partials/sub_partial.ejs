@@ -39,7 +39,13 @@ if (videoInfo.sub) {
             entityList.forEach(function (entity) {
                 while (subIndex >= 0) {
                     var thisSub = subList[subIndex];
+                    var oldstart;
+
                     if (entity.startChar >= thisSub.startChar && entity.endChar <= thisSub.endChar) {
+                        if (oldstart && oldstart >= entity.startChar) {
+                            console.log("uguale");
+                            return;
+                        }
                         var deltaStart = entity.startChar - thisSub.startChar;
                         var deltaEnd = entity.endChar - thisSub.startChar;
                         var text = thisSub.text;
@@ -50,6 +56,10 @@ if (videoInfo.sub) {
                         var nerdType = entity.nerdType.split('#')[1].toLowerCase();
 
                         thisSub.text = s1 + '<span class="entity ' + nerdType + '"><a href="#" +  data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
+
+                        oldstart = entity.startChar;
+                        console.log(oldstart);
+
                         break;
                     } else {
                         subIndex--;
