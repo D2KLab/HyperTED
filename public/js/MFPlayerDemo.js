@@ -5,6 +5,7 @@ var videokey = storageKey + video.vendor + '-' + video.id + '.';
 $(document).ready(function () {
         var $subCont = $('#sub-cont');
         var hasVideoSub = $subCont.exists();
+        var parsedJSON;
 
         var mfuri = uri; //Media Fragment URI
         //initialise smfplayer
@@ -12,7 +13,6 @@ $(document).ready(function () {
             mfURI: mfuri,
             ontimeready: highlight
         });
-
 
         $("#mfDiv").appendTo($(".mejs-controls"));
 
@@ -29,19 +29,18 @@ $(document).ready(function () {
             var totDuration = $player.getDuration();
             var timeUnit = player_width / totDuration;
 
-            var parsedJSON = $player.getMFJson();
 
             if (arguments.length == 2) {
                 MEstart = arguments[0];
                 MEend = arguments[1];
             } else {
+                parsedJSON = parsedJSON || $player.getMFJson();
                 var MEt = parsedJSON.hash.t || parsedJSON.query.t;
                 if (typeof MEt != 'undefined') {
                     var MEstart = MEt[0].startNormalized * 1000; //media frame starting point in milliseconds
                     var MEend = MEt[0].endNormalized * 1000; //media frame ending point in milliseconds
 
                     MEend = (MEend > 0) ? MEend : totDuration;
-
                 }
             }
 
@@ -181,8 +180,7 @@ $(document).ready(function () {
             var ms = [];
             hms.forEach(function (t) {
                 var a = t.trim().split(/[:,]+/);
-                console.log(a);
-                var milliseconds = ((+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2])) * 1000 + a[3] *1;
+                var milliseconds = ((+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2])) * 1000 + a[3] * 1;
                 ms.push(milliseconds);
             });
 
@@ -190,7 +188,6 @@ $(document).ready(function () {
         });
 
         function changeMF(start, end) {
-            console.log(start+'-'+end);
             $player.setPosition(start);
             $player.play();
             highlight(start, end);
@@ -203,6 +200,20 @@ $(document).ready(function () {
             };
 
             $player.getMeplayer().media.addEventListener('timeupdate', waitFragEndListener, false);
+
+            if (Modernizr.history) {
+                var startNormalized = start / 1000, endNormalized = end / 1000;
+
+                var video_url = mfuri.parseURL();
+                video_url.search.t = startNormalized + ',' + endNormalized;
+                delete video_url.hash.t;
+
+                var page_url = window.location.toString().parseURL();
+                delete page_url.search.t;
+                delete page_url.hash.t;
+                page_url.search.uri = video_url.toString();
+                history.pushState(null, null, page_url.toString());
+            }
         }
 
         $('.video-list .video-link').each(function () {
@@ -271,7 +282,7 @@ $(document).ready(function () {
 
                 var retrieveSub = function () {
                     return;
-                }
+                };
                 if (full) {
                     retrieveSub = $.get;
                 }
@@ -305,7 +316,6 @@ $(document).ready(function () {
 )
 ;
 
-
 jQuery.fn.extend({
     addLoader: function (direction) {
         if (!jQuery.loaderImg) {
@@ -330,9 +340,79 @@ jQuery.fn.extend({
         return $(this).length > 0;
     }
 });
-function getParameterByName(name) {
+
+function getParameterByName(name, url) {
+    var URL = url || location.search;
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
+        results = regex.exec(URL);
     return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
+
+String.prototype.parseURL = function () {
+    if (typeof this != "string" && !(this instanceof String))
+        throw "You can use parseURL only on strings";
+
+    var parser = document.createElement('a');
+    parser.href = this + '';
+
+    var searchPart = parser.search ? parser.search.substring(1).split('&') : undefined;
+    if (searchPart) {
+        var searchList = [];
+        searchPart.forEach(function (s) {
+            s = s.split('=', 2);
+            searchList[s[0]] = [s[1]];
+        });
+
+        searchPart = searchList;
+    } else {
+        searchPart = {};
+    }
+
+    var hashPart = parser.hash ? parser.hash.substring(1).split('&') : undefined;
+    if (hashPart) {
+        var hashList = {};
+        hashPart.forEach(function (s) {
+            s = s.split('=', 2);
+            hashList[s[0]] = s[1];
+        });
+
+        hashPart = hashList;
+    } else {
+        hashPart = {};
+    }
+
+    return {
+        protocol: parser.protocol,
+        hostname: parser.hostname,
+        port: parser.port,
+        pathname: parser.pathname,
+        search: searchPart,
+        hash: hashPart,
+        host: parser.host,
+        toString: function () {
+            var joinSymbol;
+            var search = '';
+            if (Object.keys(this.search).length > 0) {
+                joinSymbol = '?';
+                for (var sKey in this.search) {
+                    if (this.search.hasOwnProperty(sKey)) {
+                        search += joinSymbol + sKey + '=' + this.search[sKey];
+                        joinSymbol = '&';
+                    }
+                }
+            }
+            var hash = '';
+            if (Object.keys(this.hash).length > 0) {
+                joinSymbol = '#';
+                for (var hKey in this.hash) {
+                    if (this.hash.hasOwnProperty(hKey)) {
+                        hash += joinSymbol + hKey + '=' + this.hash[hKey];
+                        joinSymbol = '&';
+                    }
+                }
+            }
+            return this.protocol + '//' + this.host + this.pathname + search + hash;
+        }
+    };
+};
