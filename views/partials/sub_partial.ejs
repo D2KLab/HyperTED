@@ -34,62 +34,34 @@ if (videoInfo.sub) {
             //sorting JSON for end character desc and by length
             entityList.sort(function SortByStartChar(x, y) {
                 if (x.endChar == y.endChar) {
-                    var lengthX = x.endChar - x.startChar;
-                    var lengthY = y.endChar - y.startChar;
-                    return ((lengthX == lengthY) ? 0 : (lengthX < lengthY) ? 1 : -1)
+                    return ((x.label.length == y.label.length) ? 0 : (x.label.length < y.label.length) ? 1 : -1)
                 } else if (x.endChar > y.endChar) return -1;
                 else return 1;
 
             });
 
-            var oldstart;
-            var oldEnd;
+
             entityList.forEach(function (entity) {
                 while (subIndex >= 0) {
                     var thisSub = subList[subIndex];
                     if (entity.startChar >= thisSub.startChar && entity.endChar <= thisSub.endChar) {
 
-//                        var thisStart = thisSub.text.indexOf(entity.label);
-                        var thisStart = entity.startChar;
-                        var thisEnd = entity.endChar;
-
-                        var deltaStart = thisStart - thisSub.startChar;
-                        var deltaEnd = thisEnd - thisSub.startChar;
                         var text = thisSub.text;
-                        var s1 = text.substring(0, deltaStart);
-                        var s2 = text.substring(deltaStart, deltaEnd);
-                        var s3 = text.substring(deltaEnd);
+                        var start = text.indexOf(entity.label);
+                        var end = start + entity.label.length;
                         var href = entity.uri ? 'href="' + entity.uri + '" target="_blank"' : '';
                         var nerdType = entity.nerdType.split('#')[1].toLowerCase();
 
-                        if (oldstart == thisStart) {
-                            console.log("same start!");
-                            console.log(entity.label);
-                            return;
-                        }
-                        if (oldEnd == thisEnd) {
-                            var deltaStart = thisStart - oldstart;
-                            console.log("same end!");
-                            console.log(entity.label);
+                        var str = '<span class="entity ' + nerdType + '"><a ' + href + '" +  data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + entity.label + '</a></span>';
+                        text.replace(entity.label, str);
+//                        console.log(thisSub.text.replace(entity.label, str));
 
-                            var spanTag = text.indexOf('>');
-                            var s1 = text.substring(0, spanTag);
-                            var s2 = text.substring(spanTag, (text.indexOf('>', spanTag + 1) + deltaStart));
-
-                            thisSub.text = s1 + s2 + '<span class="entity ' + nerdType + '"><a href="#" +  data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + entity.label + '</a></span></a></span>';
-                            //return;
-                        } else thisSub.text = s1 + '<span class="entity ' + nerdType + '"><a href="#" +  data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + s2 + '</a></span>' + s3;
-
-
-                        oldEnd = thisEnd;
-                        oldstart = thisStart;
                         break;
                     } else {
                         subIndex--;
                     }
                 }
             });
-
         }
 
             subList.forEach(function(sub){
