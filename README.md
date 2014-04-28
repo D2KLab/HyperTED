@@ -3,7 +3,7 @@ MediaFragPlayerDemo
 
 Media Fragment Player Demo
 
-<h1>Node dependencies</h1>
+<h2>Node dependencies</h2>
 
 <pre>
   npm install express
