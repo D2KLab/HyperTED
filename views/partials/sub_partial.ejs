@@ -27,7 +27,7 @@ if (videoInfo.sub) {
             subList.push(sub);
         }
 
-        if (enriched) {
+        if (enriched && videoInfo.entities) {
             var entityList = videoInfo.entities;
             var subIndex = subList.length - 1;
 

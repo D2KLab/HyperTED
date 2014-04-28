@@ -53,23 +53,22 @@ $caviar: CaviarDreams, Helvetica, sans-serif;
     }
   }
 }
-
 .smfplayer-overlay {
   border: none;
-
-  &.dark {
-    display: block;
-    background: rgba(0, 0, 0, .8);
-    @include box-shadow(0, 0, 0, 0, #fff);
-    @include transition(opacity,100ms);
-  }
+}
+.smfplayer-overlay-dark {
+  display: block;
+  position: absolute;
+  z-index: 1;
+  background: rgba(0, 0, 0, .8);
+  @include transition(opacity,100ms);
 }
 
 .dark-divs{
   position: absolute;
   top:0;
   bottom:0;
-  &:hover .dark{
+  &:hover .smfplayer-overlay-dark{
     opacity: 0.5;
   }
 }

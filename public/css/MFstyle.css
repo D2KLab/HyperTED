@@ -110,22 +110,22 @@
 
 .smfplayer-overlay {
   border: none; }
-  .smfplayer-overlay.dark {
-    display: block;
-    background: rgba(0, 0, 0, 0.8);
-    -moz-box-shadow: 0 0 0 0 white;
-    -webkit-box-shadow: 0 0 0 0 white;
-    box-shadow: 0 0 0 0 white;
-    -webkit-transition: opacity 100ms ease-out;
-    -moz-transition: opacity 100ms ease-out;
-    -o-transition: opacity 100ms ease-out;
-    transition: opacity 100ms ease-out; }
+
+.smfplayer-overlay-dark {
+  display: block;
+  position: absolute;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.8);
+  -webkit-transition: opacity 100ms ease-out;
+  -moz-transition: opacity 100ms ease-out;
+  -o-transition: opacity 100ms ease-out;
+  transition: opacity 100ms ease-out; }
 
 .dark-divs {
   position: absolute;
   top: 0;
   bottom: 0; }
-  .dark-divs:hover .dark {
+  .dark-divs:hover .smfplayer-overlay-dark {
     opacity: 0.5; }
 
 /* colors */
@@ -223,15 +223,16 @@ html, body {
 #player-container {
   position: relative; }
 
-#mfDiv {
+#mfHighlight {
   display: none;
   position: absolute;
-  bottom: 10px;
+  bottom: 0;
   height: 6px;
   background-color: yellow;
   z-index: 5;
   opacity: 0.5;
   pointer-events: none;
+  min-width: 1px;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   -ms-border-radius: 2px;

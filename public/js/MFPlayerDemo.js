@@ -1,6 +1,7 @@
 var uri = video.uri.replace(new RegExp('&amp;', 'g'), '&');
 var storageKey = 'fragmentenricher.';
 var videokey = storageKey + video.vendor + '-' + video.id + '.';
+var waitFragEndListener;
 
 $(document).ready(function () {
     var $subCont = $('#sub-cont');
@@ -11,43 +12,39 @@ $(document).ready(function () {
     //initialise smfplayer
     var $player = $("#video").smfplayer({
         mfURI: mfuri,
-        ontimeready: highlight
+        spatialOverlay: true,
+        success: function (mediaElement, domObject) {
+            $(mediaElement).one('timeupdate', highlight);
+        }
     });
 
-    $("#mfDiv").appendTo($(".mejs-controls"));
-
     function highlight() {
-        var player_width = $(".mejs-time-total").width(); //total width of timeline
-        var player_height = $(".mejs-time-total").height();
+        var $timeline_container = $(".mejs-time-total");
 
-        var $highligthedMF = $('#mfDiv');
-        if ($highligthedMF.length == 0) {
-            $highligthedMF = $("<div>").attr('id', 'mfDiv');
-            $highligthedMF.height(player_height);
+        var $highligthedMF = $('#mfHighlight');
+        if (!$highligthedMF.exists()) {
+            $highligthedMF = $("<div>").attr('id', 'mfHighlight').height($timeline_container.height());
         }
-
         var totDuration = $player.getDuration();
-        var timeUnit = player_width / totDuration;
 
-
+        var start, end;
         if (arguments.length == 2) {
-            MEstart = arguments[0];
-            MEend = arguments[1];
+            start = arguments[0];
+            end = arguments[1];
         } else {
             parsedJSON = parsedJSON || $player.getMFJson();
             var MEt = parsedJSON.hash.t || parsedJSON.query.t;
             if (typeof MEt != 'undefined') {
-                var MEstart = MEt[0].startNormalized * 1000; //media frame starting point in milliseconds
-                var MEend = MEt[0].endNormalized * 1000; //media frame ending point in milliseconds
-
-                MEend = (MEend > 0) ? MEend : totDuration;
+                start = MEt[0].startNormalized * 1000; //media frame starting point in milliseconds
+                end = MEt[0].endNormalized * 1000; //media frame ending point in milliseconds
+                end = (end > 0) ? end : totDuration;
             }
         }
 
-        if (MEstart && MEend) {
-            $highligthedMF.css("left", $(".mejs-playpause-button").outerWidth() + $(".mejs-currenttime-container").outerWidth() + (MEstart * timeUnit) + 5);
-            $highligthedMF.width(Math.ceil((MEend - MEstart) * timeUnit)); //width of Media Frame Highlighting
-            $highligthedMF.appendTo($(".mejs-controls")).show();
+        if (start && end) {
+            $highligthedMF.css("left", (start * 100 / totDuration) + '%')
+                .width(((end - start) * 100 / totDuration) + '%')
+                .appendTo($timeline_container).show();
         }
     }
 
@@ -170,7 +167,7 @@ $(document).ready(function () {
         var startEntity = $entity.data('start-time') * 1000;
         var endEntity = $entity.data('end-time') * 1000;
         changeMF(startEntity, endEntity);
-        updateMFurl(start, end);
+        updateMFurl(startEntity, endEntity);
     });
 
     $(document).on('click', '.sub-text p[data-time]', function () {
@@ -189,10 +186,11 @@ $(document).ready(function () {
     });
 
     function changeMF(start, end) {
+        $player.getMeplayer().media.removeEventListener(waitFragEndListener);
         $player.setPosition(start);
         $player.play();
         highlight(start, end);
-        var waitFragEndListener = function () {
+        waitFragEndListener = function () {
             if (end != null && $player.getPosition() >= end) {
                 $player.pause();
                 $player.getMeplayer().media.removeEventListener(waitFragEndListener);
