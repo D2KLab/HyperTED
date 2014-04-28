@@ -10,6 +10,6 @@ Media Fragment Player Demo
   npm install ejs
   npm install node-cache
   npm install async
-<pre>
+</pre>
 
 Also install <a href="https://github.com/giusepperizzo/nerd4node">Nerd4Node</a>
