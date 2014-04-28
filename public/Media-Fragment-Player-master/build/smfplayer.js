@@ -930,7 +930,6 @@ smfplayer.utils={
 			}; //in miliseconds
 			this.getDuration=function(){ //in milliseconds
 				var player = $(this).data('smfplayer').smfplayer;
-
                 if(player !== undefined)
 					return player.media.duration*1000;
 				else
@@ -999,6 +998,7 @@ smfplayer.utils={
 	     				if(VERBOSE)
 							console.log("smfplayer init success.");
 
+
 				        if(settings.autoStart === true)
 				        {
 					        if(mediaElement.pluginType == 'flash')
@@ -1046,7 +1046,6 @@ smfplayer.utils={
 
 					        }
 				        }
-                        var ontimereadytriggered = false;
 
 				        mediaElement.addEventListener('timeupdate', function(e) {
 
@@ -1109,14 +1108,6 @@ smfplayer.utils={
 						            }
 						        }
 					        }
-
-                            if (typeof settings.ontimeready == 'function') {
-                                if (!ontimereadytriggered) {
-                                    settings.ontimeready();
-                                    ontimereadytriggered = true;
-                                }
-                            }
-
 
                         }, false);
 

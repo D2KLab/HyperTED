@@ -11,8 +11,11 @@ $(document).ready(function () {
     //initialise smfplayer
     var $player = $("#video").smfplayer({
         mfURI: mfuri,
-        ontimeready: highlight
+        success: function (mediaElement, domObject) {
+            $(mediaElement).one('timeupdate', highlight);
+        }
     });
+
 
     $("#mfDiv").appendTo($(".mejs-controls"));
 

@@ -1576,8 +1576,8 @@ mejs.YouTubeApi = {
 			case 5:
 				// cued?
 				break;
-		}
 
+		}
 
     }
 }
@@ -4536,4 +4536,3 @@ $.extend(mejs.MepDefaults,
 	});
 	
 })(mejs.$);
-
