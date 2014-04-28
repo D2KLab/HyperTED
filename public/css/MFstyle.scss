@@ -259,15 +259,18 @@ ul.video-list {
   @include border-radius(5px);
   @include border-box-sizing;
   padding: 4px;
+  color: #ffffff;
+
+  a{
+    color: #ffffff;
+  }
 
   background: {
     color: #000000;
   }
-  a {
-    color: #ffffff;
-  }
 
   &.thing {
+    color: #000000;
     a {
       color: #000000;
     }
@@ -276,6 +279,7 @@ ul.video-list {
     }
   }
   &.amount {
+    color: #000000;
     a {
       color: #000000;
     }
@@ -310,6 +314,7 @@ ul.video-list {
 
   }
   &.person {
+    color: #000000;
     a {
       color: #000000;
     }
