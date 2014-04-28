@@ -1,4 +1,0 @@
-npm install express
-npm install ejs
-npm install node-cache
-npm install async

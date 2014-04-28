@@ -111,15 +111,16 @@ html, body {
   position: relative;
 }
 
-#mfDiv {
+#mfHighlight {
   display: none;
   position: absolute;
-  bottom: 10px;
+  bottom: 0;
   height: 6px;
   background-color: rgb(255, 255, 0);
   z-index: 5;
   opacity: 0.5;
   pointer-events: none;
+  min-width: 1px;
   @include border-radius(2px);
 }
 
