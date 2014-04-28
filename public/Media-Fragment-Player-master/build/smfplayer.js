@@ -675,7 +675,8 @@ smfplayer.utils={
 			isVideo:true, //is the URI indicating a video or audio
 			mfAlwaysEnabled:false, //the media fragment is always enabled, i.e. you can only play the media fragment
 			spatialEnabled:true, //spatial dimension of the media fragment is enabled
-			spatialStyle:{}, //a json object to specify the style of the outline of the spatial area
+            spatialStyle:{}, //a json object to specify the style of the outline of the spatial area
+            spatialOverlay:false, //spatial fragment overflow is not partially overshadow as default
 			autoStart:true, //auto start playing after initialising the player
 			//xywhoverlay: jquery object of a div to identify xywh area
 			tracks: []//a JSON array like {srclang:"en", kind:"subtitles", type:"text/vtt", src:"somefile.vtt"} or {srclang:"zh", kind:"chapter", type:"text/plain", src:"somefile.srt"}
@@ -770,57 +771,59 @@ smfplayer.utils={
 		           	spatial_div.css(data.settings.spatialStyle);
 		           	spatial_div.addClass('smfplayer-overlay').appendTo(this);
 
-                    var $topdiv = $('<div>').addClass('smfplayer-overlay dark'),
-                        $leftdiv = $('<div>').addClass('smfplayer-overlay dark'),
-                        $rightdiv = $('<div>').addClass('smfplayer-overlay dark'),
-                        $bottomdiv = $('<div>').addClass('smfplayer-overlay dark');
+                    if(data.settings.spatialOverlay){
+                        var $topdiv = $('<div>').addClass('smfplayer-overlay-dark'),
+                            $leftdiv = $topdiv.clone(),
+                            $rightdiv =$topdiv.clone(),
+                            $bottomdiv = $topdiv.clone();
 
-                    $topdiv.css({
-                        top: 0,
-                        left: 0,
-                        height:xywh.y,
-                        width: "100%"
-                    });
+                        $topdiv.css({
+                            top: 0,
+                            left: 0,
+                            height:xywh.y,
+                            width: "100%"
+                        });
 
-                    $leftdiv.css({
-                        top:xywh.y+'px',
-                        left:0,
-                        height: xywh.h,
-                        width: xywh.x
-                    });
+                        $leftdiv.css({
+                            top:xywh.y+'px',
+                            left:0,
+                            height: xywh.h,
+                            width: xywh.x
+                        });
 
-                    $rightdiv.css({
-                        top:xywh.y+"px",
-                        right:0,
-                        height: xywh.h,
-                        width: (options.width || defaults.width) - (parseInt(xywh.x) + parseInt(xywh.w))
-                    });
+                        $rightdiv.css({
+                            top:xywh.y+"px",
+                            right:0,
+                            height: xywh.h,
+                            width: (data.settings.width) - (parseInt(xywh.x) + parseInt(xywh.w))
+                        });
 
-                    $bottomdiv.css({
-                        bottom:0,
-                        left:0,
-                        height: (options.height || defaults.height) - (parseInt(xywh.y) + parseInt(xywh.h)),
-                        width: "100%"
-                    });
-                    dark_divs = $('<div>').addClass('dark-divs').append($topdiv, $leftdiv, $rightdiv, $bottomdiv);
-                    dark_divs.height(options.height || defaults.height).width(options.width || defaults.width).appendTo(this);
+                        $bottomdiv.css({
+                            bottom:0,
+                            left:0,
+                            height: (data.settings.height) - (parseInt(xywh.y) + parseInt(xywh.h)),
+                            width: "100%"
+                        });
+                        dark_divs = $('<div>').addClass('dark-divs').append($topdiv, $leftdiv, $rightdiv, $bottomdiv);
+                        dark_divs.height(data.settings.height).width(data.settings.width).appendTo(this);
 
-                    var superThis = this;
-                    dark_divs.add(spatial_div).click(function(){
-                        var player = superThis.getMeplayer();
+                        spatial_div = spatial_div.add(dark_divs);
+                    }
+
+                    var super_this = this;
+                    spatial_div.click(function(){
+                        var player = super_this.getMeplayer();
                         if(player.media.paused){
                             player.play();
                         }else{
                             player.pause();
                         }
                     });
-                    data.settings.xywhoverlaydark =  dark_divs;
                     data.settings.xywhoverlay =  spatial_div;
 			    }
 			    else
 			    {
 				    spatial_div = data.settings.xywhoverlay;
-                    dark_divs  = data.settings.xywhoverlaydark;
 			    }
 
 			    //console.log(xywh);
@@ -843,9 +846,8 @@ smfplayer.utils={
 		           	h=Math.floor((h/100)*data.settings.height);
 	           	}
 
-	           	spatial_div.css({'width':w,'height':h,'top':y+'px','left':x+'px'});
+	           	spatial_div.filter('.smfplayer-overlay').css({'width':w,'height':h,'top':y+'px','left':x+'px'});
 	           	spatial_div.show();
-                dark_divs.show();
 			};
 
 			this.hidexywh = function()
@@ -863,7 +865,6 @@ smfplayer.utils={
 				if(data.settings.xywhoverlay !== undefined)
 				{
                     data.settings.xywhoverlay.hide();
-                    data.settings.xywhoverlaydark.fadeOut();
 				}
 			};
 

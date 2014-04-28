@@ -11,6 +11,7 @@ $(document).ready(function () {
     //initialise smfplayer
     var $player = $("#video").smfplayer({
         mfURI: mfuri,
+        spatialOverlay: true,
         success: function (mediaElement, domObject) {
             $(mediaElement).one('timeupdate', highlight);
         }
