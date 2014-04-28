@@ -167,7 +167,7 @@ $(document).ready(function () {
         var startEntity = $entity.data('start-time') * 1000;
         var endEntity = $entity.data('end-time') * 1000;
         changeMF(startEntity, endEntity);
-        updateMFurl(start, end);
+        updateMFurl(startEntity, endEntity);
     });
 
     $(document).on('click', '.sub-text p[data-time]', function () {
