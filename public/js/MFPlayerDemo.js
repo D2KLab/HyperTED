@@ -26,6 +26,13 @@ $(document).ready(function () {
             $highligthedMF = $("<div>").attr('id', 'mfHighlight').height($timeline_container.height());
         }
         var totDuration = $player.getDuration();
+        if (totDuration == 0) {
+            //retry in 500ms
+            setTimeout(function () {
+                highlight(arguments);
+            }, 500);
+            return false;
+        }
 
         var start, end;
         if (arguments.length == 2) {
@@ -46,6 +53,8 @@ $(document).ready(function () {
                 .width(((end - start) * 100 / totDuration) + '%')
                 .appendTo($timeline_container).show();
         }
+
+        return true;
     }
 
     $('.see-all').click(function () {
@@ -322,7 +331,8 @@ $(document).ready(function () {
         //TODO other video platforms
     }
 
-});
+})
+;
 
 jQuery.fn.extend({
     addLoader: function (direction) {
