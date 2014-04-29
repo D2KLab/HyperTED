@@ -1,4 +1,4 @@
-var uri = video.uri.replace(new RegExp('&amp;', 'g'), '&')+window.location.hash;
+var uri = video.uri.replace(new RegExp('&amp;', 'g'), '&') + window.location.hash;
 var storageKey = 'fragmentenricher.';
 var videokey = storageKey + video.vendor + '-' + video.id + '.';
 var waitFragEndListener;
@@ -174,54 +174,38 @@ $(document).ready(function () {
 
     $(document).on('click', '.entity', function () {
         var $entity = $(this).children('a');
-        var startEntity = $entity.data('start-time') * 1000;
-        var endEntity = $entity.data('end-time') * 1000;
-        changeMF(startEntity, endEntity);
-        updateMFurl(startEntity, endEntity);
+        var startEntity = $entity.data('start-time');
+        var endEntity = $entity.data('end-time');
+        $player.setmf('t=' + startEntity + ',' + endEntity).playmf();
+        updateMFurl();
     });
 
     $(document).on('click', '.sub-text p[data-time]', function () {
         var srtTime = $(this).data('time');
-        var hms = srtTime.split('-->');
-        var ms = [];
-        hms.forEach(function (t) {
-            var a = t.trim().split(/[:,]+/);
-            var milliseconds = ((+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2])) * 1000 + a[3] * 1;
-            ms.push(milliseconds);
-        });
-
-        var start = ms[0], end = ms[1];
-        changeMF(start, end);
-        updateMFurl(start, end);
+        var hms = srtTime.replace(/,/g, '.').replace(' --> ', ',');
+        $player.setmf('t=' + hms).playmf();
+        updateMFurl();
     });
 
-    function changeMF(start, end) {
-        $player.getMeplayer().media.removeEventListener(waitFragEndListener);
-        $player.setPosition(start);
-        $player.play();
-        highlight(start, end);
-        waitFragEndListener = function () {
-            if (end != null && $player.getPosition() >= end) {
-                $player.pause();
-                $player.getMeplayer().media.removeEventListener(waitFragEndListener);
-                end = null;
-            }
-        };
 
-        $player.getMeplayer().media.addEventListener('timeupdate', waitFragEndListener, false);
-    }
-
-    function updateMFurl(start, end) {
+    function updateMFurl() {
         if (Modernizr.history) {
-            var startNormalized = start / 1000, endNormalized = end / 1000;
-
+            parsedJSON = $player.getMFJson();
             var video_url = mfuri.parseURL();
-            video_url.search.t = startNormalized + ',' + endNormalized;
-            delete video_url.hash.t;
+            var hash = parsedJSON.hash;
+            if (!$.isEmptyObject(hash)) {
+                for (var key in hash) {
+                    video_url.hash[key] = hash[key][0].value;
+                }
+            } else {
+                video_url.hash = {};
+            }
 
             var page_url = window.location.toString().parseURL();
             delete page_url.search.t;
-            delete page_url.hash.t;
+            delete page_url.search.xywh;
+            page_url.hash = {};
+
             page_url.search.uri = video_url.toString();
             history.pushState(null, null, page_url.toString());
         }
@@ -230,10 +214,18 @@ $(document).ready(function () {
 
     $(window).off('popstate.changemf').on('popstate.changemf', function () {
         var page_url = window.location.toString().parseURL();
-        console.log(page_url);
+        var frag;
         var t = page_url.search.t || page_url.hash.t;
-        t = t.split(',');
-        changeMF(t[0] * 1000, t[1] * 1000);
+        if (t) {
+            frag = 't=' + t;
+        }
+        var xywh = page_url.search.xywh || page_url.hash.xywh;
+        if (xywh) {
+            frag = frag ? frag + '&' + 'xywh=' + xywh : 'xywh=' + xywh;
+        }
+
+        $player.setmf(frag);
+        updateMFurl();
     });
 
     $('.video-list .video-link').each(function () {

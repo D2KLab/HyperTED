@@ -271,6 +271,13 @@
                 return $(this).data('smfplayer').mfjson;
             };
 
+            this.setmf = function (frag) {
+                frag = (frag.indexOf('#') == -1) ? '#' + frag : frag;
+                var newProp = MediaFragments.parse(frag);
+                $.extend($(this).data('smfplayer').mfjson, newProp);
+                return this;
+            };
+
             //get the original mejs player
             this.getMeplayer = function () {
                 return $(this).data('smfplayer').smfplayer;
