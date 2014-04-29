@@ -1,4 +1,4 @@
-var uri = video.uri.replace(new RegExp('&amp;', 'g'), '&');
+var uri = video.uri.replace(new RegExp('&amp;', 'g'), '&')+window.location.hash;
 var storageKey = 'fragmentenricher.';
 var videokey = storageKey + video.vendor + '-' + video.id + '.';
 var waitFragEndListener;
@@ -17,6 +17,7 @@ $(document).ready(function () {
             $(mediaElement).one('timeupdate', highlight);
         }
     });
+    video.player = $player;
 
     function highlight() {
         var $timeline_container = $(".mejs-time-total");
@@ -331,8 +332,7 @@ $(document).ready(function () {
         //TODO other video platforms
     }
 
-})
-;
+});
 
 jQuery.fn.extend({
     addLoader: function (direction) {
