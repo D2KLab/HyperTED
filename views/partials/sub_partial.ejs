@@ -47,14 +47,13 @@ if (videoInfo.sub) {
                     if (entity.startChar >= thisSub.startChar && entity.endChar <= thisSub.endChar) {
 
                         var text = thisSub.text;
-//                        var start = text.indexOf(entity.label);
-//                        var end = start + entity.label.length;
                         var href = entity.uri ? 'href="' + entity.uri + '" target="_blank"' : '';
                         var nerdType = entity.nerdType.split('#')[1].toLowerCase();
 
-                        //var str = '<span class="entity ' + nerdType + '"><a ' + href + '" +  data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + entity.label + '</a></span>';
+//                        var str = '<span class="entity ' + nerdType + '"><a ' + href + ' data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + entity.label + '</a></span>';
                         var str = '<span class="entity ' + nerdType + '">' + entity.label + '</span>';
                         thisSub.text = text.replace(entity.label, str);
+
 
                         break;
                     } else {
@@ -69,4 +68,4 @@ if (videoInfo.sub) {
     <p data-id="<%= sub.id %>" data-time="<%= sub.time %>"><%- sub.text %></p>
     <% }); %>
 </div>
-<% } %>
+<% }%>
