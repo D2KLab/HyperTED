@@ -3053,7 +3053,8 @@ if (typeof jQuery != 'undefined') {
 		setCurrentRail: function() {
 
 			var t = this;
-		
+
+
 			if (t.media.currentTime != undefined && t.media.duration) {
 
 				// update bar and handle

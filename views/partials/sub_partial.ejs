@@ -1,6 +1,6 @@
 <%
-if (videoInfo.sub) {
-    var strList = videoInfo.sub.split('\n\n'), subList = [];
+if (videoInfo && videoInfo.timedtext) {
+    var strList = videoInfo.timedtext.split('\n\n'), subList = [];
     var charIndex = -1;
 %>
 <div class="sub-text <% if (enriched) { %>enriched<% } %>">

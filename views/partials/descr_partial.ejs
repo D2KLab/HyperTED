@@ -1,6 +1,6 @@
 <% if (videoInfo.descr) {
     var text = videoInfo.descr;
-    if (enriched && !videoInfo.sub) {
+    if (enriched && !videoInfo.timedtext) {
         var entityList = videoInfo.entities;
 
         //sorting JSON for Start character desc
@@ -17,5 +17,5 @@
         });
     }
 %>
-<div class="descr <% if (enriched && !videoInfo.sub) { %>enriched<% } %>" id="descr"><p><%- text %></p></div>
+<div class="descr <% if (enriched && !videoInfo.timedtext) { %>enriched<% } %>" id="descr"><p><%- text %></p></div>
 <% } %>

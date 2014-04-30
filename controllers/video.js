@@ -99,7 +99,12 @@ exports.view = function (req, res) {
                     if (err) {
                         //TODO
                         console.log(LOG_TAG + 'ERR - ' + JSON.stringify(err));
+                        if (!response) {
+                            sendResp(null);
+                            return;
+                        }
                     }
+
                     info = response || info;
                     if (enriched) {
                         getEntities(info, function (err, data) {
@@ -120,6 +125,8 @@ exports.view = function (req, res) {
             }
 
         }
+    } else {
+        sendResp(null);
     }
 };
 
@@ -158,9 +165,9 @@ exports.nerdify = function (req, res) {
 
 function getEntities(video_info, callback) {
     var doc_type, text;
-    if (video_info.sub) {
+    if (video_info.timedtext) {
         doc_type = 'timedtext';
-        text = video_info.sub;
+        text = video_info.timedtext;
     } else {
         doc_type = 'text';
         text = video_info.descr;
@@ -203,10 +210,10 @@ function getMetadata(video_id, vendor, callback) {
                     getYouTubeSub(video_info.video_id, function (err, data) {
                         if (err) {
                             console.log(err);
-                            video_info.sub = false;
+                            video_info.timedtext = false;
                             async_callback(true);
                         } else {
-                            video_info.sub = data;
+                            video_info.timedtext = data;
                             async_callback(false);
                         }
                     });
@@ -243,10 +250,10 @@ function getMetadata(video_id, vendor, callback) {
                     getDailymotionSub(video_info.video_id, function (err, data) {
                         if (err) {
                             console.log(err);
-                            video_info.sub = false;
+                            video_info.timedtext = false;
                             async_callback(false);
                         } else {
-                            video_info.sub = data;
+                            video_info.timedtext = data;
                             async_callback(false);
                         }
                     });
@@ -256,16 +263,58 @@ function getMetadata(video_id, vendor, callback) {
                 callback(err, video_info);
             });
             break;
+        case 'vimeo':
+            async.parallel([
+                function (async_callback) {
+                    var json_url = 'http://vimeo.com/api/v2/video/' + video_info.video_id + '.json';
+                    console.log('retrieving metadata from ' + json_url);
+                    http.getJSON(json_url, function (err, data) {
+                        if (!err) {
+                            video_info.title = data.title;
+                            video_info.thumb = data.thumbnail_small;
+                            video_info.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
+                            video_info.views = data.stats_number_of_plays;
+                            video_info.favourites = "n.a.";
+                            video_info.comments = data.stats_number_of_comments;
+                            video_info.likes = data.stats_number_of_likes;
+                            video_info.avgRate = "n.a.";
+                            video_info.published = data.upload_date;
+                            video_info.category = data.tags;
+                            async_callback(false);
+                        } else {
+                            //TODO
+                            async_callback(true);
+                        }
+                    });
+                },
+                function (async_callback) {
+                    getVimeoSub(video_info.video_id, function (err, data) {
+                        if (err) {
+                            console.log('Retrieving sub with error');
+                            video_info.timedtext = false;
+                            async_callback(false);
+                        } else {
+                            video_info.timedtext = data;
+                            async_callback(false);
+                        }
+                    });
+                }
+            ], function (err) {
+                callback(err, video_info);
+            });
+            break;
         default :
             callback(true, 'Vendor undefined or not recognized');
     }
 
 }
 
-function getYouTubeSub(video_id, callback) {
-    var subUrl = "http://www.youtube.com/api/timedtext?lang=en&format=srt&v=" + video_id;
-    //TODO chiederli anche in altre lingue
-    http.getRemoteFile(subUrl, callback);
+function getVimeoSub(video_id, callback) {
+//    var subUrl = "http://www.youtube.com/api/timedtext?lang=en&format=srt&v=" + video_id;
+//    //TODO chiederli anche in altre lingue
+//    http.getRemoteFile(subUrl, callback);
+
+    callback(true, null);
 }
 
 function getDailymotionSub(video_id, callback) {
@@ -286,6 +335,12 @@ function getDailymotionSub(video_id, callback) {
     });
 }
 
+function getYouTubeSub(video_id, callback) {
+    var subUrl = "http://www.youtube.com/api/timedtext?lang=en&format=srt&v=" + video_id;
+    //TODO chiederli anche in altre lingue
+    http.getRemoteFile(subUrl, callback);
+}
+
 var vendors = [
     {
         code: 1,
@@ -302,7 +357,8 @@ var vendors = [
     {
         code: 3,
         name: 'vimeo',
-        url_pattern: /^.+vimeo.com\/(\d+)?/
+        url_pattern: /(www.)?(player.)?vimeo.com\/([a-z]*\/)*([0-9]{6,11})[?]?.*/,
+        id_pattern: /\/([0-9]{6,11})$/
     }
 ];
 

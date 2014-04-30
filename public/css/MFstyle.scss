@@ -111,19 +111,6 @@ html, body {
   position: relative;
 }
 
-#mfHighlight {
-  display: none;
-  position: absolute;
-  bottom: 0;
-  height: 6px;
-  background-color: rgb(255, 255, 0);
-  z-index: 5;
-  opacity: 0.5;
-  pointer-events: none;
-  min-width: 1px;
-  @include border-radius(2px);
-}
-
 #video {
   position: relative;
   z-index: 2;
