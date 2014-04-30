@@ -181,24 +181,14 @@ $(document).ready(function () {
     });
 
     $('p > span.entity').has('span').addClass('nesting');
-    //salva i label
-    //al mouse colora la nesting del colore giusto
-    //apri le nested a ventaglio
-    var nesting = $('.nesting').text();
-    var nested = $('.nesting').children().text();
 
-    console.log(nesting);
-    console.log(nested);
-    console.log("*****");
-
-    $( ".nesting" ).on({
-        mouseenter: function() {
-            $( this ).attr('id', 'nestEntity' );
-        }, mouseleave: function() {
-            $( this ).removeAttr( 'id' );
+    $(".nesting").on({
+        mouseenter: function () {
+            $(this).find('span').attr('id', 'nestEntity');
+        }, mouseleave: function () {
+            $(this).find('span').removeAttr('id');
         }
     });
-
 
 
     $(document).on('click', '.sub-text p[data-time]', function () {
