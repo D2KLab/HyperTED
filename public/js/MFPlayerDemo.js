@@ -1,7 +1,6 @@
 var uri = video.uri.replace(new RegExp('&amp;', 'g'), '&') + window.location.hash;
 var storageKey = 'fragmentenricher.';
 var videokey = storageKey + video.vendor + '-' + video.id + '.';
-var waitFragEndListener;
 
 $(document).ready(function () {
     var $subCont = $('#sub-cont');
@@ -13,50 +12,11 @@ $(document).ready(function () {
     var $player = $("#video").smfplayer({
         mfURI: mfuri,
         spatialOverlay: true,
-        success: function (mediaElement, domObject) {
-            $(mediaElement).one('timeupdate', highlight);
-        }
+        temporalHighlight: true
     });
     video.player = $player;
 
-    function highlight() {
-        var $timeline_container = $(".mejs-time-total");
 
-        var $highligthedMF = $('#mfHighlight');
-        if (!$highligthedMF.exists()) {
-            $highligthedMF = $("<div>").attr('id', 'mfHighlight').height($timeline_container.height());
-        }
-        var totDuration = $player.getDuration();
-        if (totDuration == 0) {
-            //retry in 500ms
-            setTimeout(function () {
-                highlight(arguments);
-            }, 500);
-            return false;
-        }
-
-        var start, end;
-        if (arguments.length == 2) {
-            start = arguments[0];
-            end = arguments[1];
-        } else {
-            parsedJSON = parsedJSON || $player.getMFJson();
-            var MEt = parsedJSON.hash.t || parsedJSON.query.t;
-            if (typeof MEt != 'undefined') {
-                start = MEt[0].startNormalized * 1000; //media frame starting point in milliseconds
-                end = MEt[0].endNormalized * 1000; //media frame ending point in milliseconds
-                end = (end > 0) ? end : totDuration;
-            }
-        }
-
-        if (start && end) {
-            $highligthedMF.css("left", (start * 100 / totDuration) + '%')
-                .width(((end - start) * 100 / totDuration) + '%')
-                .appendTo($timeline_container).show();
-        }
-
-        return true;
-    }
 
     $('.see-all').click(function () {
         var $this = $(this);

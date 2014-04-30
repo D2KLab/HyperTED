@@ -12,6 +12,7 @@
         spatialEnabled: true, //spatial dimension of the media fragment is enabled
         spatialStyle: {}, //a json object to specify the style of the outline of the spatial area
         spatialOverlay: false, //spatial fragment overflow is not partially overshadow as default
+        temporalHighlight: false, //temporal fragments are not highlighted as default
         autoStart: true, //auto start playing after initialising the player
         //xywhoverlay: jquery object of a div to identify xywh area
         tracks: []//a JSON array like {srclang:"en", kind:"subtitles", type:"text/vtt", src:"somefile.vtt"} or {srclang:"zh", kind:"chapter", type:"text/plain", src:"somefile.srt"}
@@ -165,7 +166,7 @@
                     w = xywh.w,
                     h = xywh.h;
 
-                //unit is 'pixal' or 'percent'
+                //unit is 'pixel' or 'percent'
                 if (unit === 'percent') {
                     //var wratio = data.settings.width/data.settings.originalWidth;
                     //var hratio = data.settings.height/data.settings.originalHeight;
@@ -178,6 +179,38 @@
 
                 spatial_div.filter('.smfplayer-overlay').css({'width': w, 'height': h, 'top': y + 'px', 'left': x + 'px'});
                 spatial_div.show();
+            };
+
+            this.highlight = function () {
+                var mediaDuration = self.getDuration();
+                if (mediaDuration == 0) {
+                    //retry in 500ms
+                    setTimeout(function () {
+                        return self.highlight;
+                    }, 500);
+                }
+
+                var $timeline_container = $(".mejs-time-total", self);
+                var $highligthedMF = $('.mfHighlight', $timeline_container);
+
+                if (!$highligthedMF.exists()) {
+                    $highligthedMF = $("<div>").addClass('mfHighlight').height($timeline_container.height());
+                }
+
+                var MEt = self.getMFJson().hash.t || self.getMFJson().query.t;
+                if (typeof MEt != 'undefined') {
+
+                    var startMS = MEt[0].startNormalized * 1000; //media frame starting point in milliseconds
+                    var endMS = MEt[0].endNormalized * 1000; //media frame ending point in milliseconds
+                    endMS = (endMS > 0) ? endMS : mediaDuration;
+
+                    $highligthedMF.css("left", (startMS * 100 / mediaDuration) + '%')
+                        .width(((endMS - startMS) * 100 / mediaDuration) + '%')
+                        .appendTo($timeline_container).show();
+                    console.log($highligthedMF);
+
+                }
+                return this;
             };
 
             this.hidexywh = function () {
@@ -275,23 +308,28 @@
                 frag = (frag.indexOf('#') == -1) ? '#' + frag : frag;
                 var newProp = MediaFragments.parse(frag);
                 $.extend($(this).data('smfplayer').mfjson, newProp);
+
+                var data = $(this).data('smfplayer');
+                if (data.settings.temporalHighlight) {
+                    $(self.getMeplayer().media).one('timeupdate', self.highlight);
+                }
                 return this;
             };
 
             //get the original mejs player
             this.getMeplayer = function () {
                 return $(this).data('smfplayer').smfplayer;
-            }
+            };
 
             //get the setting options
             this.getOptions = function () {
                 return $(this).data('smfplayer').settings;
-            }
+            };
 
             //get the video/audio dom object
             this.getDomObject = function () {
                 return $(this).data('smfplayer').smfplayer.domNode;
-            }
+            };
 
             /*-----------Public attributes declaration ends----------------*/
 
@@ -422,6 +460,10 @@
                             }
 
                         }, false);
+
+                        if (settings.temporalHighlight) {
+                            $(mediaElement).one('timeupdate', self.highlight);
+                        }
 
                         mediaElement.addEventListener('play', function (e) {
 
