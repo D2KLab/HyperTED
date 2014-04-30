@@ -12,39 +12,22 @@ smfplayer.utils={
 	isDailyMotionURL:function(url,bool) 
 	{
 		var m = url.match(/^.+dailymotion.com\/(video|hub)\/([^_]+)[^#]*(#video=([^_&]+))?/);
-	    if (m !== null) {
-	        return true;
-	    }
-	    else
-	    {
-	    	return false;
-	    }
+	    return m !== null;
 	},
 	isVimeoURL:function(url,bool)
 	{
 		var m = url.match(/^.+vimeo.com\/(\d+)?/);
-	    if (m !== null) {
-	        return true;
-	    }
-	    else
-	    {
-	    	return false;
-	    }
+	    return m !== null;
 
 	},
 	isValidURL:function(str) {
 	
 		var pattern = /^(([\w]+:)?\/\/)?(([\d\w]|%[a-fA-f\d]{2,2})+(:([\d\w]|%[a-fA-f\d]{2,2})+)?@)?([\d\w][-\d\w]{0,253}[\d\w]\.)+[\w]{2,4}(:[\d]+)?(\/([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)*(\?(&?([-+_~.\d\w]|%[a-fA-f\d]{2,2})=?)*)?(#([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)?$/;
-			if(!pattern.test(str)) {
-			  return false;
-		  } else {
-			  return true;
-		  }
+			return pattern.test(str);
 		
 	},
 	isiPad:function(){
-		var isiPad = (navigator.userAgent.match(/iPad/i) == null)?false:true;
-		return isiPad;
+        return (navigator.userAgent.match(/iPad/i) != null);
 	},
 	
 	getTemporalMF:function(t)

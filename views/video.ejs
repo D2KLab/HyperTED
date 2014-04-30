@@ -47,7 +47,9 @@
 
 <div class="main-content">
     <section id="player-sect">
+        <% if (videoInfo) { %>
         <h1 id="video-title" class="title"><%= videoInfo.title %></h1>
+        <% } %>
 
         <div id="player-container" class="clearfix">
             <div id="video"></div>
@@ -111,7 +113,7 @@
                 <button type="submit" class="btn btn-danger btn-lg">Nerdify</button>
             </form>
 
-            <% if(videoInfo.sub) { %>
+            <% if(videoInfo.timedtext) { %>
             <div id="sub-cont">
                 <% include partials/sub_partial.ejs %>
             </div>
@@ -189,8 +191,8 @@
 <script>
     var video = {
         uri: "<%= videoURI %>",
-        id: "<%= videoInfo.video_id %>",
-        vendor: "<%= videoInfo.vendor %>"
+        id: "<%= videoInfo && videoInfo.video_id %>",
+        vendor: "<%= videoInfo && videoInfo.vendor %>"
     }
 </script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js"></script>
