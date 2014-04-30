@@ -351,6 +351,27 @@ ul.video-list {
       #video-info div .see-all:hover {
         opacity: 1; }
 
+p span.entity.nesting {
+  color: #000000;
+  background: linear-gradient(white, #cccccc);
+  border: solid 1px black; }
+  p span.entity.nesting span.entity {
+    color: #000000;
+    background-color: inherit; }
+
+#nestEntity {
+  background: linear-gradient(red, #cccccc);
+  animation: showNested 1s;
+  /*Safari and Chrome:*/
+  -webkit-animation: showNested 1s; }
+
+@keyframes showNested {
+  100% {
+    transform: translate(-25px, -25px); } }
+/*Safari and Chrome:*/
+@-webkit-keyframes showNested {
+  100% {
+    -webkit-transform: translate(-25px, -25px); } }
 .entity {
   cursor: pointer;
   -webkit-border-radius: 5px;
@@ -364,7 +385,7 @@ ul.video-list {
   /* Firefox, other Gecko */
   box-sizing: border-box;
   /* Opera/IE 8+ */
-  padding: 4px;
+  padding: 3px;
   color: #ffffff;
   background-color: #000000; }
   .entity a {
