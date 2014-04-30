@@ -96,6 +96,10 @@ exports.view = function (req, res) {
                 }
             } else {
                 info = getMetadata(id, vendor, function (err, response) {
+                    if (err) {
+                        //TODO
+                        console.log(LOG_TAG + 'ERR - ' + JSON.stringify(err));
+                    }
                     info = response || info;
                     if (enriched) {
                         getEntities(info, function (err, data) {
@@ -213,7 +217,7 @@ function getMetadata(video_id, vendor, callback) {
             break;
         case 'dailymotion':
             async.parallel([
-                function () {
+                function (async_callback) {
                     var json_url = 'https://api.dailymotion.com/video/' + video_info.video_id + '?fields=title,thumbnail_60_url,description,views_total,bookmarks_total,comments_total,ratings_total,rating,created_time,genre';
                     console.log('retrieving metadata from ' + json_url);
                     http.getJSON(json_url, function (err, data) {
@@ -228,21 +232,27 @@ function getMetadata(video_id, vendor, callback) {
                             video_info.avgRate = data.rating;
                             video_info.published = data.created_time;
                             video_info.category = data.genre;
-                        } else {//TODO
+                            async_callback(false);
+                        } else {
+                            //TODO
+                            async_callback(true);
                         }
                     })
                 },
-                function () {
+                function (async_callback) {
                     getDailymotionSub(video_info.video_id, function (err, data) {
                         if (err) {
                             console.log(err);
                             video_info.sub = false;
+                            async_callback(false);
                         } else {
                             video_info.sub = data;
+                            async_callback(false);
                         }
                     });
                 }
             ], function (err) {
+                console.log('done');
                 callback(err, video_info);
             });
             break;
@@ -260,33 +270,20 @@ function getYouTubeSub(video_id, callback) {
 
 function getDailymotionSub(video_id, callback) {
     var subListUrl = 'https://api.dailymotion.com/video/' + video_id + '/subtitles?fields=id,language%2Curl';
+    console.log('retrieving sub list from ' + subListUrl);
     http.getJSON(subListUrl, function (err, data) {
         if (!err) {
             if (data.total > 0) {
                 var subUrl = (data.list[0].url);
                 http.getRemoteFile(subUrl, callback);
+            } else {
+                console.log('no sub available')
+                callback(false, null);
             }
+        } else {
+            callback(err, err.message);
         }
     });
-}
-
-function empty(data) {
-    if (typeof(data) == 'number' || typeof(data) == 'boolean') {
-        return false;
-    }
-    if (typeof(data) == 'undefined' || data === null) {
-        return true;
-    }
-    if (typeof(data.length) != 'undefined') {
-        return data.length == 0;
-    }
-    var count = 0;
-    for (var i in data) {
-        if (data.hasOwnProperty(i)) {
-            count++;
-        }
-    }
-    return count == 0;
 }
 
 var vendors = [
