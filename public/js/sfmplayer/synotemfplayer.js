@@ -207,8 +207,6 @@
                     $highligthedMF.css("left", (startMS * 100 / mediaDuration) + '%')
                         .width(((endMS - startMS) * 100 / mediaDuration) + '%')
                         .appendTo($timeline_container).show();
-                    console.log($highligthedMF);
-
                 }
                 return this;
             };
