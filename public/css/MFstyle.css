@@ -343,27 +343,26 @@ ul.video-list {
       #video-info div .see-all:hover {
         opacity: 1; }
 
-p span.entity.nesting {
+p span.entity.nesting:not(:hover) {
   color: #000000;
   background: linear-gradient(white, #cccccc);
   border: solid 1px black; }
-  p span.entity.nesting span.entity {
+  p span.entity.nesting:not(:hover) .entity {
     color: #000000;
-    background-color: inherit; }
+    background-color: transparent; }
+p span.entity.nesting:hover #nestEntity {
+  -webkit-transform: translate(0px, -25px) rotate(-5deg);
+  /* Chrome, Safari, Opera */
+  -webkit-transform-origin: top left 0;
+  transform: rotate(-40deg);
+  transform-origin: top left 0; }
 
 #nestEntity {
-  background: linear-gradient(red, #cccccc);
-  animation: showNested 1s;
-  /*Safari and Chrome:*/
-  -webkit-animation: showNested 1s; }
+  display: inline-block;
+  -webkit-transition: -webkit-transform 0.5s;
+  /* For Safari 3.1 to 6.0 */
+  transition: transform 0.5s; }
 
-@keyframes showNested {
-  100% {
-    transform: translate(-25px, -25px); } }
-/*Safari and Chrome:*/
-@-webkit-keyframes showNested {
-  100% {
-    -webkit-transform: translate(-25px, -25px); } }
 .entity {
   cursor: pointer;
   -webkit-border-radius: 5px;

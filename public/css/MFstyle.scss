@@ -243,42 +243,41 @@ ul.video-list {
 
 p {
 
-  span.entity.nesting {
+  span.entity.nesting{
 
-    color: #000000;
-    background: linear-gradient(#ffffff, #cccccc);
-    border: solid 1px black;
-
-    span.entity{
+    &:not(:hover) {
       color: #000000;
-      background: {
-        color: inherit;
+      background: linear-gradient(#ffffff, #cccccc);
+      border: solid 1px black;
+
+      .entity {
+        color: #000000;
+        background: {
+          color: transparent;
+        }
       }
+    }
+
+    &:hover #nestEntity{
+      -webkit-transform: translate(0px,-25px) rotate(-5deg);/* Chrome, Safari, Opera */
+      -webkit-transform-origin: top left 0;
+      transform: rotate(-40deg);
+      transform-origin: top left 0;
+      //background:not();
+
     }
   }
 }
-#nestEntity{
-  background: linear-gradient(red, #cccccc);
-  animation: showNested 1s;
-  /*Safari and Chrome:*/
-  -webkit-animation: showNested 1s;
 
-}
+#nestEntity {
+  display: inline-block;
+  -webkit-transition: -webkit-transform 0.5s; /* For Safari 3.1 to 6.0 */
+  transition: transform 0.5s;
 
-@keyframes showNested {
-  100% {
-    transform: translate(-25px, -25px);
-  }
-}
-
-/*Safari and Chrome:*/
-@-webkit-keyframes showNested {
-  100% {
-    -webkit-transform: translate(-25px, -25px);
-  }
 }
 
 .entity {
+
   cursor: pointer;
   @include border-radius(5px);
   @include border-box-sizing;
