@@ -41,6 +41,7 @@ exports.view = function (req, res) {
         function sendResp(infoObj) {
             var source = {
                 videoURI: videoURI,
+                uuid: uuid,
                 videoInfo: infoObj,
                 enriched: enriched
             };

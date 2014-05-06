@@ -37,15 +37,15 @@ $(document).ready(function () {
             var $submitButton = $('button[type="submit"]', $nerdifyForm);
             $submitButton.prop('disabled', true).addLoader('left');
 
-            var joinSymbol = location.search ? '&' : '?';
-            var new_url = location.href + joinSymbol + 'enriched=true';
+            var page_url = window.location.toString().parseURL();
+            page_url.search.enriched = true;
 
             $entSect = $entSect || localStorage[videokey + 'ent-sect'];
             $nerdified = $nerdified || localStorage[videokey + 'nerd'];
             $plain = $plain || localStorage[videokey + 'plain'];
             if ($nerdified && $plain && $entSect) {
                 $submitButton.prop('disabled', false).removeLoader();
-                history.pushState(null, null, new_url);
+                history.pushState(null, null, page_url);
                 synchEnrichment();
                 return false;
             }
@@ -82,7 +82,7 @@ $(document).ready(function () {
                     }
 
                     $submitButton.prop('disabled', false).removeLoader();
-                    history.pushState(null, null, new_url);
+                    history.pushState(null, null, page_url.toString());
                     synchEnrichment();
                 },
                 error: function () {
@@ -194,7 +194,6 @@ $(document).ready(function () {
         }
 
         $player.setmf(frag);
-        updateMFurl();
     });
 
     $('.video-list .video-link').each(function () {
@@ -228,7 +227,7 @@ $(document).ready(function () {
 jQuery.fn.extend({
     addLoader: function (direction) {
         if (!jQuery.loaderImg) {
-            jQuery.loaderImg = $("<img>").attr('src', 'img/ajax-loader.gif');
+            jQuery.loaderImg = $("<img>").attr('src', '/img/ajax-loader.gif');
         }
 
         var $loaderImg = jQuery.loaderImg;
