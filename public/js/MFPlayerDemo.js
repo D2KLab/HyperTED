@@ -8,14 +8,13 @@ $(document).ready(function () {
     var parsedJSON;
 
     var mfuri = uri; //Media Fragment URI
-    //initialise smfplayer
+    //init smfplayer
     var $player = $("#video").smfplayer({
         mfURI: mfuri,
         spatialOverlay: true,
         temporalHighlight: true
     });
     video.player = $player;
-
 
 
     $('.see-all').click(function () {
@@ -152,14 +151,13 @@ $(document).ready(function () {
     console.log(nested);
     console.log("*****");
 
-    $( ".nesting" ).on({
-        mouseenter: function() {
-            $( this ).attr('id', 'nestEntity' );
-        }, mouseleave: function() {
-            $( this ).removeAttr( 'id' );
+    $(".nesting").on({
+        mouseenter: function () {
+            $(this).attr('id', 'nestEntity');
+        }, mouseleave: function () {
+            $(this).removeAttr('id');
         }
     });
-
 
 
     $(document).on('click', '.sub-text p[data-time]', function () {
@@ -173,28 +171,27 @@ $(document).ready(function () {
     function updateMFurl() {
         if (Modernizr.history) {
             parsedJSON = $player.getMFJson();
-            var video_url = mfuri.parseURL();
             var hash = parsedJSON.hash;
+            var page_url = window.location.toString().parseURL();
+
             if (!$.isEmptyObject(hash)) {
                 for (var key in hash) {
-                    video_url.hash[key] = hash[key][0].value;
+                    page_url.hash[key] = hash[key][0].value;
                 }
             } else {
-                video_url.hash = {};
+                page_url.hash = {};
             }
 
-            var page_url = window.location.toString().parseURL();
             delete page_url.search.t;
             delete page_url.search.xywh;
-            page_url.hash = {};
 
-            page_url.search.uri = video_url.toString();
             history.pushState(null, null, page_url.toString());
         }
     }
 
 
     $(window).off('popstate.changemf').on('popstate.changemf', function () {
+        console.info("popstate.changemf");
         var page_url = window.location.toString().parseURL();
         var frag;
         var t = page_url.search.t || page_url.hash.t;
@@ -212,10 +209,14 @@ $(document).ready(function () {
 
     $('.video-list .video-link').each(function () {
         var $li = $(this);
-        var video_url = $li.data('url');
-        if (typeof video_url != 'undefined' && video_url != "") {
+        var video_uuid = $li.data('uuid');
 
-            retrieveInfo(video_url, function (video_info) {
+        if (typeof video_uuid != 'undefined' && video_uuid != "") {
+            retrieveInfo(video_uuid, function (video_info) {
+                if (video_info.error) {
+                    console.error(video_info.error);
+                    return;
+                }
                 $('h4 a', $li).text(video_info.title).attr('alt', video_info.title);
                 var $thumb = $('<img>').attr('src', video_info.thumb).addClass('thumb');
                 $('.thumb-cont', $li).attr('title', video_info.title).append($thumb);
@@ -225,85 +226,11 @@ $(document).ready(function () {
                     $(this).addClass('visible');
                 });
             });
-
-            $('.frag-link a', $li).click(function () {
-                var frag_param = $(this).data('frag') || "";
-                var complete_url = video_url + frag_param;
-
-                var $form = $('#video-search');
-                $('input[name=uri]').val(complete_url);
-                $form.submit();
-            });
         }
     });
 
-    function retrieveInfo(uri, callback, full) {
-        var video_info = {};
-        if (smfplayer.utils.isYouTubeURL(uri)) {
-            video_info.video_id = uri.match(/v=(.{11})/)[1];
-            video_info.vendor = 'youtube';
-            var retriveSub = function () {
-                return;
-            };
-            if (full) {
-                retriveSub = $.get;
-            }
-
-            $.when(
-                $.getJSON('http://gdata.youtube.com/feeds/api/videos/' + video_info.video_id + '?v=2&alt=json-in-script&callback=?', function (data) {
-                    video_info.title = data.entry.title.$t;
-                    video_info.thumb = data.entry.media$group.media$thumbnail[0].url;
-                    video_info.descr = data.entry.media$group.media$description.$t.replace(new RegExp('<br />', 'g'), '\n');
-                    video_info.views = data.entry.yt$statistics.viewCount;
-                    video_info.favourites = data.entry.yt$statistics.favoriteCount;
-                    video_info.comments = data.entry.gd$comments.gd$feedLink.countHint;
-                    video_info.likes = data.entry.yt$rating.numLikes;
-                    video_info.avgRate = data.entry.gd$rating.average;
-                    video_info.published = data.entry.published.$t;
-                    video_info.category = data.entry.category[1].term;
-                }),
-                retriveSub('./srt?video_id=' + video_info.video_id + '&vendor=youtube', function (data) {
-                    video_info.sub = data;
-                })
-            ).then(function () {
-                    callback(video_info);
-                }, function () {
-                    callback(video_info);
-                });
-        } else if (smfplayer.utils.isDailyMotionURL(uri)) {
-            video_info.video_id = uri.match(/video\/([^_||^#]+)/)[1];
-            video_info.vendor = 'dailymotion';
-
-            var retrieveSub = function () {
-                return;
-            };
-            if (full) {
-                retrieveSub = $.get;
-            }
-
-            $.when(
-                $.getJSON('https://api.dailymotion.com/video/' + video_info.video_id + '?fields=title,thumbnail_60_url,description,views_total,bookmarks_total,comments_total,ratings_total,rating,created_time,genre&callback=?', function (data) {
-                    video_info.title = data.title;
-                    video_info.thumb = data.thumbnail_60_url;
-                    video_info.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
-                    video_info.views = data.views_total;
-                    video_info.favourites = data.bookmarks_total;
-                    video_info.comments = data.comments_total;
-                    video_info.likes = data.ratings_total;
-                    video_info.avgRate = data.rating;
-                    video_info.published = data.created_time;
-                    video_info.category = data.genre;
-                }),
-                retrieveSub('./srt?video_id=' + video_info.video_id + '&vendor=dailymotion', function (data) {
-                    video_info.sub = data;
-                })
-            ).then(function () {
-                    callback(video_info);
-                }, function () {
-                    callback(video_info);
-                });
-        }
-        //TODO other video platforms
+    function retrieveInfo(uuid, callback) {
+        $.getJSON('/metadata/' + uuid, callback);
     }
 
 });

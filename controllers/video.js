@@ -3,110 +3,60 @@ var http = require('http'),
     url = require("url"),
     async = require('async'),
     Cache = require("node-cache"),
-    nerd = require('./nerdify');
+    nerd = require('./nerdify'),
+    db = require('./database');
 
 var LOG_TAG = '[VIDEO.JS]: ';
 var videoCache;
 
-
-//exports.getSub = function (vendor, video_id, callback) {
-exports.getSub = function (req, res) {
-    var video_id = req.query.video_id;
-    var vendor = req.query.vendor;
-    if (video_id == null || video_id == '') {
-        console.error(LOG_TAG + "Empty video id");
-        res.send(400, "Empty video id");
-        return;
-    }
-
-    var subFunction;
-
-    switch (vendor) {
-        case 'youtube':
-            subFunction = getYouTubeSub;
-            break;
-        case 'dailymotion':
-            subFunction = getDailymotionSub;
-            break;
-        default :
-            console.log(LOG_TAG + 'Vendor not recognized or not supported.');
-            res.send(400, "Vendor not recognized or not supported.");
-            return;
-    }
-
-    subFunction(video_id, function (err, msg) {
-        if (err) {
-            res.send(404, msg);
-        } else {
-            res.send(200, msg);
-        }
-    });
-};
-
 exports.view = function (req, res) {
-    var videoURI = req.query.uri;
-    var enriched = req.query.enriched;
-    if (!videoURI) {
+    var uuid = req.param('uuid');
+    if (!uuid) {
         res.redirect('/');
         return;
     }
-    var concSign = url.parse(videoURI).hash ? '&' : '#';
+    db.getLocator(uuid, function (err, data) {
+        if (err) {
+            //TODO a 404 page
+            res.redirect('/');
+            return;
+        }
 
-    var t = req.query.t;
-    if (t) {
-        videoURI += concSign + 't=' + t;
-        concSign = '&';
-    }
-    var xywh = req.query.xywh;
-    if (xywh) {
-        videoURI += concSign + 'xywh=' + xywh;
+        var videoURI = data.locator;
+        var enriched = req.query.enriched;
+
+        var concSign = url.parse(videoURI).hash ? '&' : '#';
+
+        var t = req.query.t;
+        if (t) {
+            videoURI += concSign + 't=' + t;
+            concSign = '&';
+        }
+        var xywh = req.query.xywh;
+        if (xywh) {
+            videoURI += concSign + 'xywh=' + xywh;
 //        concSign = '&';
-    }
+        }
 
-    function sendResp(infoObj) {
-        var source = {
-            videoURI: videoURI,
-            videoInfo: infoObj,
-            enriched: enriched
-        };
-        res.render('video.ejs', source);
-    }
+        function sendResp(infoObj) {
+            var source = {
+                videoURI: videoURI,
+                videoInfo: infoObj,
+                enriched: enriched
+            };
+            res.render('video.ejs', source);
+        }
 
-    var vendor = detectVendor(videoURI);
-    if (vendor) {
-        var id = detectId(videoURI, vendor);
-        if (id) {
-            var cacheKey = vendor.code + '-' + id;
-            var info = getFromCache(cacheKey);
-            if (info) {
-                if (!enriched || info.entities) {
-                    sendResp(info);
-                } else {
-                    getEntities(info, function (err, data) {
-                        if (err) {
-                            console.log(LOG_TAG + data);
-                            // TODO
-                        } else {
-                            info.entities = data;
-                        }
-
+        var vendor = detectVendor(videoURI);
+        if (vendor) {
+            var id = detectId(videoURI, vendor);
+            if (id) {
+                var cacheKey = vendor.code + '-' + id;
+                var info = getFromCache(cacheKey);
+                if (info) {
+                    if (!enriched || info.entities) {
                         sendResp(info);
-                        videoCache.set(cacheKey, info);
-                    });
-                }
-            } else {
-                info = getMetadata(id, vendor, function (err, response) {
-                    if (err) {
-                        //TODO
-                        console.log(LOG_TAG + 'ERR - ' + JSON.stringify(err));
-                        if (!response) {
-                            sendResp(null);
-                            return;
-                        }
-                    }
-
-                    info = response || info;
-                    if (enriched) {
+                    } else {
                         getEntities(info, function (err, data) {
                             if (err) {
                                 console.log(LOG_TAG + data);
@@ -114,20 +64,92 @@ exports.view = function (req, res) {
                             } else {
                                 info.entities = data;
                             }
+
                             sendResp(info);
                             videoCache.set(cacheKey, info);
                         });
-                    } else {
-                        sendResp(info);
-                        videoCache.set(cacheKey, info);
                     }
-                });
-            }
+                } else {
+                    info = getMetadata(id, vendor, function (err, response) {
+                        if (err) {
+                            //TODO
+                            console.log(LOG_TAG + 'ERR - ' + JSON.stringify(err));
+                            if (!response) {
+                                sendResp(null);
+                                return;
+                            }
+                        }
 
+                        info = response || info;
+                        if (enriched) {
+                            getEntities(info, function (err, data) {
+                                if (err) {
+                                    console.log(LOG_TAG + data);
+                                    // TODO
+                                } else {
+                                    info.entities = data;
+                                }
+                                sendResp(info);
+                                videoCache.set(cacheKey, info);
+                            });
+                        } else {
+                            sendResp(info);
+                            videoCache.set(cacheKey, info);
+                        }
+                    });
+                }
+
+            }
+        } else {
+            sendResp(null);
         }
-    } else {
-        sendResp(null);
+
+    });
+
+};
+
+exports.search = function (req, res) {
+    var videoURI = req.query.uri;
+    if (!videoURI) {
+        res.redirect('/');
+        return;
     }
+    var parsedURI = url.parse(videoURI, true);
+    var locator = parsedURI.protocol + '//' + parsedURI.host + parsedURI.pathname;
+    var fragPart = '', separator = '?', fragSeparator = '?';
+
+    for (var k in parsedURI.query) {
+        var parsedQueryUnit = k + '=' + parsedURI.query[k];
+        if (k == 't' || k == 'xywh' || k == 'track' || k == 'id' || k == 'enriched') {
+            fragPart += fragSeparator + parsedQueryUnit;
+            fragSeparator = '&';
+        } else {
+            locator += separator + parsedQueryUnit;
+            separator = '&';
+        }
+    }
+
+    for (var j in req.query) {
+        if (j == 'uri') continue;
+        var queryUnit = j + '=' + req.query[j];
+        fragPart += fragSeparator + queryUnit;
+    }
+
+    db.insert(locator, function (err, data) {
+        if (err) {
+            console.log("DATABASE ERROR" + JSON.stringify(err));
+            //TODO error page
+            res.redirect('/');
+            return;
+        } else {
+            var uuid = data.id;
+            var hashPart = parsedURI.hash || '';
+            var redirectUrl = '/video/' + uuid + fragPart + hashPart;
+            console.log('Redirecting to ' + redirectUrl);
+            res.redirect(redirectUrl);
+        }
+    });
+
 };
 
 exports.nerdify = function (req, res) {
@@ -308,6 +330,40 @@ function getMetadata(video_id, vendor, callback) {
     }
 
 }
+
+
+exports.ajaxGetMetadata = function (req, res) {
+    var uuid = req.param('uuid');
+    if (!uuid) {
+        res.json({error: 'empty uuid'});
+        return;
+    }
+    db.getLocator(uuid, function (err, data) {
+        if (err) {
+            res.json({error: 'video not found in db'});
+            return;
+        }
+
+        var videoURI = data.locator;
+        var vendor = detectVendor(videoURI);
+        if (!vendor) {
+            res.json({error: 'vendor not recognized or not supported'});
+            return;
+        }
+        var id = detectId(videoURI, vendor);
+
+        if (!id) {
+            res.json({error: 'error in detecting id for ' + vendor.name + ' video.'});
+            return;
+        }
+
+        getMetadata(id,vendor,function(err,data){
+            res.json(data);
+        });
+
+    });
+
+};
 
 function getVimeoSub(video_id, callback) {
 //    var subUrl = "http://www.youtube.com/api/timedtext?lang=en&format=srt&v=" + video_id;
