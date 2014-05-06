@@ -43,6 +43,7 @@ $(document).ready(function () {
             $entSect = $entSect || localStorage[videokey + 'ent-sect'];
             $nerdified = $nerdified || localStorage[videokey + 'nerd'];
             $plain = $plain || localStorage[videokey + 'plain'];
+
             if ($nerdified && $plain && $entSect) {
                 $submitButton.prop('disabled', false).removeLoader();
                 history.pushState(null, null, page_url);
@@ -59,6 +60,7 @@ $(document).ready(function () {
                     } else {
                         $nerdified = $data.find('.descr');
                         $plain = $('#descr');
+
                         if ($plain.hasClass('full')) {
                             $nerdified.addClass('full');
                         }
@@ -107,9 +109,9 @@ $(document).ready(function () {
                     $plain = $($plain);
                     $entSect = $($entSect);
 
-                    $entSect.fadeIn();
+                    $entSect.appendTo('#playlist-sect').fadeIn();
                     $nerdifyForm.fadeOut();
-                    $('.sub-text').not('.enriched').replaceWith($nerdified);
+                    $('.sub-text, .descr').not('.enriched').replaceWith($nerdified);
                 } else {
                     // submit form
                     $nerdifyForm.submit();
@@ -125,7 +127,7 @@ $(document).ready(function () {
 
                     $entSect.fadeOut();
                     $nerdifyForm.fadeIn();
-                    $('.sub-text.enriched').replaceWith($plain);
+                    $('.sub-text.enriched, .descr.enriched').replaceWith($plain);
                 }
             }
         }
