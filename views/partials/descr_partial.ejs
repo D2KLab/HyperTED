@@ -1,6 +1,6 @@
 <% if (videoInfo.descr) {
     var text = videoInfo.descr;
-    if (enriched && !videoInfo.timedtext) {
+    if (enriched && !videoInfo.timedtext && videoInfo.entities) {
         var entityList = videoInfo.entities;
 
         //sorting JSON for Start character desc

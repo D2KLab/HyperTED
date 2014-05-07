@@ -12,6 +12,7 @@ Media Fragment Player Demo
   npm install async
   npm install node-uuid
   npm install sqlite3
+  npm install sparql
 </pre>
 
 <p>You need a <a href="http://www.sqlite.org/">SQLite</a> database on your computer.</p>

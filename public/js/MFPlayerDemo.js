@@ -74,7 +74,8 @@ $(document).ready(function () {
                         localStorage[videokey + 'nerd'] = $nerdified[0].outerHTML;
                         localStorage[videokey + 'plain'] = $plain[0].outerHTML;
                     } catch (e) {
-                        if (e == QUOTA_EXCEEDED_ERR) {
+                        console.log(e);
+                        if (e == DOMException.QUOTA_EXCEEDED_ERR) {
                             console.warn('Quota exceeded! Delete all and write');
                             localStorage.clear();
                             localStorage[videokey + 'ent-sect'] = $entSect[0].outerHTML;
@@ -111,7 +112,7 @@ $(document).ready(function () {
 
                     $entSect.appendTo('#playlist-sect').fadeIn();
                     $nerdifyForm.fadeOut();
-                    $('.sub-text, .descr').not('.enriched').replaceWith($nerdified);
+                    $plain.filter('body *').replaceWith($nerdified);
                 } else {
                     // submit form
                     $nerdifyForm.submit();
@@ -127,7 +128,7 @@ $(document).ready(function () {
 
                     $entSect.fadeOut();
                     $nerdifyForm.fadeIn();
-                    $('.sub-text.enriched, .descr.enriched').replaceWith($plain);
+                    $nerdified.filter('body *').replaceWith($plain);
                 }
             }
         }
@@ -195,7 +196,9 @@ $(document).ready(function () {
             frag = frag ? frag + '&' + 'xywh=' + xywh : 'xywh=' + xywh;
         }
 
-        $player.setmf(frag);
+        if (frag) {
+            $player.setmf(frag);
+        }
     });
 
     $('.video-list .video-link').each(function () {

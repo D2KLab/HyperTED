@@ -19,5 +19,6 @@ app.get('/', function (req, res) {
     res.render('welcome.ejs')
 });
 
+app.get('/sparql/:uuid', video.sparql);
 app.listen(8080);
 console.log("Server Running on 8080");
