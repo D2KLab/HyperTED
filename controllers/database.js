@@ -3,6 +3,7 @@ var fs = require("fs"),
     UUID = require("node-uuid");
 var db;
 
+
 exports.prepare = function () {
     var file = 'database/video.db';
 
