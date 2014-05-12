@@ -3,29 +3,21 @@ var http = require('http'),
     url = require("url"),
     async = require('async'),
     Cache = require("node-cache"),
-    nerd = require('./nerdify'),
-    db = require('./database'),
-    ts = require('./linkedTVconnection');
+    nerd = require('./nerdify');
 
 var LOG_TAG = '[VIDEO.JS]: ';
 var videoCache;
-ts.prepare();
 
 
-function viewVideo(req, res, videoURI, uuid) {
-    function sendResp(infoObj) {
-        var source = {
-            videoURI: videoURI,
-            uuid: uuid,
-            videoInfo: infoObj,
-            enriched: enriched
-        };
-        res.render('video.ejs', source);
-    }
-
+exports.view = function (req, res) {
+    var videoURI = req.query.uri;
     var enriched = req.query.enriched;
-
+    if (!videoURI) {
+        res.redirect('/');
+        return;
+    }
     var concSign = url.parse(videoURI).hash ? '&' : '#';
+
     var t = req.query.t;
     if (t) {
         videoURI += concSign + 't=' + t;
@@ -37,6 +29,14 @@ function viewVideo(req, res, videoURI, uuid) {
 //        concSign = '&';
     }
 
+    function sendResp(infoObj) {
+        var source = {
+            videoURI: videoURI,
+            videoInfo: infoObj,
+            enriched: enriched
+        };
+        res.render('video.ejs', source);
+    }
 
     var vendor = detectVendor(videoURI);
     if (vendor) {
@@ -92,88 +92,8 @@ function viewVideo(req, res, videoURI, uuid) {
 
         }
     } else {
-        sendResp(res, null);
+        sendResp(null);
     }
-
-}
-exports.sparql = function (req, res) {
-    var uuid = req.param('uuid');
-    ts.getLocator(uuid, function (err, data) {
-        if (err) {
-            res.send(data);
-            return;
-        }
-        if (data.type != 'uri') {
-            //TODO
-        }
-        var videoURI = data.value;
-
-        viewVideo(req, res, videoURI, uuid);
-
-    });
-};
-exports.view = function (req, res) {
-    var uuid = req.param('uuid');
-    if (!uuid) {
-        res.redirect('/');
-        return;
-    }
-    db.getLocator(uuid, function (err, data) {
-        if (err) {
-            //TODO a 404 page
-            res.redirect('/');
-            return;
-        }
-
-        var videoURI = data.locator;
-
-        viewVideo(req, res, videoURI, uuid);
-    });
-
-};
-
-exports.search = function (req, res) {
-    var videoURI = req.query.uri;
-    if (!videoURI) {
-        res.redirect('/');
-        return;
-    }
-    var parsedURI = url.parse(videoURI, true);
-    var locator = parsedURI.protocol + '//' + parsedURI.host + parsedURI.pathname;
-    var fragPart = '', separator = '?', fragSeparator = '?';
-
-    for (var k in parsedURI.query) {
-        var parsedQueryUnit = k + '=' + parsedURI.query[k];
-        if (k == 't' || k == 'xywh' || k == 'track' || k == 'id' || k == 'enriched') {
-            fragPart += fragSeparator + parsedQueryUnit;
-            fragSeparator = '&';
-        } else {
-            locator += separator + parsedQueryUnit;
-            separator = '&';
-        }
-    }
-
-    for (var j in req.query) {
-        if (j == 'uri') continue;
-        var queryUnit = j + '=' + req.query[j];
-        fragPart += fragSeparator + queryUnit;
-    }
-
-    db.insert(locator, function (err, data) {
-        if (err) {
-            console.log("DATABASE ERROR" + JSON.stringify(err));
-            //TODO error page
-            res.redirect('/');
-            return;
-        } else {
-            var uuid = data.id;
-            var hashPart = parsedURI.hash || '';
-            var redirectUrl = '/video/' + uuid + fragPart + hashPart;
-            console.log('Redirecting to ' + redirectUrl);
-            res.redirect(redirectUrl);
-        }
-    });
-
 };
 
 exports.nerdify = function (req, res) {
@@ -354,39 +274,6 @@ function getMetadata(video_id, vendor, callback) {
     }
 
 }
-
-exports.ajaxGetMetadata = function (req, res) {
-    var uuid = req.param('uuid');
-    if (!uuid) {
-        res.json({error: 'empty uuid'});
-        return;
-    }
-    db.getLocator(uuid, function (err, data) {
-        if (err) {
-            res.json({error: 'video not found in db'});
-            return;
-        }
-
-        var videoURI = data.locator;
-        var vendor = detectVendor(videoURI);
-        if (!vendor) {
-            res.json({error: 'vendor not recognized or not supported'});
-            return;
-        }
-        var id = detectId(videoURI, vendor);
-
-        if (!id) {
-            res.json({error: 'error in detecting id for ' + vendor.name + ' video.'});
-            return;
-        }
-
-        getMetadata(id, vendor, function (err, data) {
-            res.json(data);
-        });
-
-    });
-
-};
 
 function getVimeoSub(video_id, callback) {
 //    var subUrl = "http://www.youtube.com/api/timedtext?lang=en&format=srt&v=" + video_id;

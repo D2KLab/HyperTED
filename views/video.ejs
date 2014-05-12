@@ -108,7 +108,6 @@
                     >
                 <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
                 <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
-                <input type="hidden" name="uuid" value="<%= uuid %>"/>
                 <input type="hidden" name="uri" value="<%= videoURI %>"/>
                 <input type="hidden" name="enriched" value="true"/>
                 <button type="submit" class="btn btn-danger btn-lg">Nerdify</button>
@@ -123,8 +122,65 @@
         <% } %>
     </section>
     <section id="playlist-sect">
-        <% include partials/playlist.ejs %>
+        <h1 class="title">see also</h1>
+        <ul class="video-list">
+            <li class="video-link" data-url="http://www.youtube.com/watch?v=86x-u-tz0MA">
+                <img class="loader" src="img/ajax-loader.gif">
 
+                <div class="content">
+                    <h4><a href="./video?uri=http://www.youtube.com/watch?v=86x-u-tz0MA">Video 1</a></h4>
+                    <a class="thumb-cont" href="./video?uri=http://www.youtube.com/watch?v=86x-u-tz0MA"></a>
+                    <ul class="frag-list">
+                        <li class="frag-link"><a href='#' data-frag="#t=0:03:08,0:04:05">About writers reputation <br/>(0:03:08
+                                - 0:04:05)</a></li>
+                        <li class="frag-link"><a href='#' data-frag="#t=0:10:11,0:11:43&xywh=pixel:160,95,319,305">Ruth
+                                Stone's creative process <br/>(0:10:11 - 0:11:43)</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="video-link" data-url="http://www.youtube.com/watch?v=GqnJFm1C-3c">
+                <img class="loader" src="img/ajax-loader.gif">
+
+                <div class="content">
+                    <h4><a href="./video?uri=http://www.youtube.com/watch?v=GqnJFm1C-3c">Video 2</a></h4>
+                    <a class="thumb-cont" href="./video?uri=http://www.youtube.com/watch?v=GqnJFm1C-3c"></a>
+                    <ul class="frag-list">
+                        <li class="frag-link"><a href='#' data-frag="#t=0:00:23,0:00:49">Middle East loves to laugh<br/>(0:00:23
+                                - 0:00:49)</a></li>
+                        <li class="frag-link"><a href='#' data-frag="#t=0:07:32,0:08:08">Three questions<br/>(0:07:32 -
+                                0:08:08)</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="video-link" data-url="http://www.youtube.com/watch?v=xjBIsp8mS-c">
+                <img class="loader" src="img/ajax-loader.gif">
+
+                <div class="content">
+                    <h4><a href="./video?uri=http://www.youtube.com/watch?v=xjBIsp8mS-c">Video 3</a></h4>
+                    <a class="thumb-cont" href="./video?uri=http://www.youtube.com/watch?v=xjBIsp8mS-c"></a>
+                    <ul class="frag-list">
+                        <li class="frag-link"><a href='#' data-frag="#t=0:05:20,0:05:32">How did the universe
+                                begin?<br/>(0:05:20 - 0:05:32)</a></li>
+                        <li class="frag-link"><a href='#' data-frag="#t=0:09:10,0:10:12">Fragment to the end<br/>(0:09:10
+                                - end)</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="video-link" data-url="http://www.youtube.com/watch?v=CDsNZJTWw0w">
+                <img class="loader" src="img/ajax-loader.gif">
+
+                <div class="content">
+                    <h4><a href="./video?uri=http://www.youtube.com/watch?v=CDsNZJTWw0w">Video 3</a></h4>
+                    <a class="thumb-cont" href="./video?uri=http://www.youtube.com/watch?v=CDsNZJTWw0w"></a>
+                    <ul class="frag-list">
+                        <li class="frag-link"><a href='#' data-frag="#t=0:01:42,0:03:49">Herr's experience<br/>(0:01:42,0:03:49)</a>
+                        </li>
+                        <li class="frag-link"><a href='#' data-frag="#t=0:14:55,0:15:59">On the dance floor<br/>(0:14:55,0:15:59)</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
         <% if (enriched && videoInfo.entities) { %>
         <% include partials/entitiesList_partial.ejs %>
         <% } %>
