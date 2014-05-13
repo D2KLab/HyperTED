@@ -6,56 +6,48 @@
   src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: normal; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: normal; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: italic; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: italic; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: normal; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: normal; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: italic; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: italic; }
-
 /* colors */
 /*font*/
 .mejs-container {
@@ -81,14 +73,14 @@
     /*current and total time*/
     /*progress bars*/ }
     .mejs-container div.mejs-controls .mejs-time span {
-      color: #444444;
-      @font-face {
-        font-family: "CaviarDreams";
-        src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
-        src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
-        font-weight: bold;
-        font-style: normal; }
- }
+      color: #444444; }
+@font-face {
+  .mejs-container div.mejs-controls .mejs-time span {
+    font-family: "CaviarDreams";
+    src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
+    src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
+    font-weight: bold;
+    font-style: normal; } }
     .mejs-container div.mejs-controls .mejs-time-rail {
       /*current time progress bar*/
       /*loaded time progress bar*/ }
@@ -171,7 +163,7 @@ html, body {
   .home_header h1 {
     text-align: center;
     font-size: 4.5em;
-    color: #3276b1;
+    color: #b11200;
     margin: -0.5em auto 0;
     position: relative;
     top: 50%;
@@ -187,8 +179,10 @@ html, body {
   -moz-border-radius: 0;
   -ms-border-radius: 0;
   -o-border-radius: 0;
-  border-radius: 0; }
-  .navbar .form-group {
+  border-radius: 0;
+  min-height: 100px; }
+  .navbar .navbar-collapse .form-group {
+    padding-top: 23px;
     max-width: 300px; }
 
 .main-content {
@@ -306,7 +300,7 @@ ul.video-list {
       #video-info .stats-cont .stat .key {
         text-transform: uppercase;
         font-size: 0.8em;
-        color: #2a6496; }
+        color: #b11200; }
   #video-info div {
     line-height: 200%; }
     #video-info div .descr {
