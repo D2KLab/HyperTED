@@ -1,0 +1,101 @@
+@import "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css";
+@import "font";
+@import "mixins";
+
+/* colors */
+$light_gray: #f4f4f4;
+$gray: #929292;
+$darker_gray: #444444;
+$red: #ff0000;
+/*font*/
+$caviar: CaviarDreams, Helvetica, sans-serif;
+
+.mejs-container {
+
+  .mejs-video {
+    @include box-shadow(0, 1px, 8px, -2px, $darker_gray);
+  }
+  .mejs-mediaelement, .mejs-overlay {
+    position: relative;
+  }
+
+  /*player control and progress bar container*/
+  div.mejs-controls {
+    position: absolute;
+    background: {
+      image: none;
+      /* Fallback for web browsers that don't support RGBa */
+      color: $light_gray;
+      /* RGBa with 0.7 opacity */
+      color: rgba(244, 244, 244, 0.7);
+      /* For IE 5.5 - 7*/
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#99f4f4f4, endColorstr=#99f4f4f4);
+      /* For IE 8*/
+      -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99f4f4f4, endColorstr=#99f4f4f4)";
+    }
+    z-index: 100;
+
+    /*current and total time*/
+    .mejs-time span {
+      color: $darker_gray;
+      @include font-face(CaviarDreams, Caviar_Dreams_Bold-webfont, bold);
+    }
+
+    /*progress bars*/
+    .mejs-time-rail {
+
+      /*current time progress bar*/
+      span.mejs-time-current {
+        @include vert-gradient-bg(rgb(128, 8, 12), rgb(200, 55, 76));
+      }
+
+      /*loaded time progress bar*/
+      span.mejs-time-loaded {
+        @include vert-gradient-bg($darker_gray, $gray);
+      }
+
+    }
+  }
+}
+
+.smfplayer-container {
+  margin: auto;
+}
+
+.smfplayer-overlay {
+  border: none;
+}
+
+.smfplayer-overlay-dark {
+  display: block;
+  position: absolute;
+  z-index: 1;
+  background: rgba(0, 0, 0, .8);
+  @include transition(opacity, 100ms);
+}
+
+.overlay-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  &:hover .smfplayer-overlay-dark {
+    opacity: 0.5;
+  }
+}
+
+.mejs-overlay-play {
+  background: -moz-linear-gradient(left, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%,
+          rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, rgba(0, 0, 0, 1) 100%);
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%, rgba(0, 0, 0, 1)),
+          color-stop(18%, rgba(0, 0, 0, 0.5)), color-stop(28%, rgba(0, 0, 0, 0)), color-stop(78%, rgba(0, 0, 0, 0)),
+          color-stop(88%, rgba(0, 0, 0, 0.5)), color-stop(100%, rgba(0, 0, 0, 1)));
+  background: -webkit-linear-gradient(left, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%,
+          rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, rgba(0, 0, 0, 1) 100%);
+  background: -o-linear-gradient(left, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%,
+          rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, rgba(0, 0, 0, 1) 100%);
+  background: -ms-linear-gradient(left, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%,
+          rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, rgba(0, 0, 0, 1) 100%);
+  background: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%,
+          rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, rgba(0, 0, 0, 1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#000000', endColorstr='#000000', GradientType=1);
+}

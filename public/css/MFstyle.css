@@ -64,7 +64,10 @@
     -moz-box-shadow: 0 1px 8px -2px #444444;
     -webkit-box-shadow: 0 1px 8px -2px #444444;
     box-shadow: 0 1px 8px -2px #444444; }
+  .mejs-container .mejs-mediaelement, .mejs-container .mejs-overlay {
+    position: relative; }
   .mejs-container div.mejs-controls {
+    position: absolute;
     background-image: none;
     /* Fallback for web browsers that don't support RGBa */
     background-color: #f4f4f4;
@@ -108,6 +111,9 @@
         background: linear-gradient(to bottom, #444444 0%, #929292 100%);
         filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$topColor', endColorstr='$bottomColor', GradientType=0); }
 
+.smfplayer-container {
+  margin: auto; }
+
 .smfplayer-overlay {
   border: none; }
 
@@ -121,12 +127,21 @@
   -o-transition: opacity 100ms ease-out;
   transition: opacity 100ms ease-out; }
 
-.dark-divs {
+.overlay-container {
   position: absolute;
   top: 0;
   bottom: 0; }
-  .dark-divs:hover .smfplayer-overlay-dark {
+  .overlay-container:hover .smfplayer-overlay-dark {
     opacity: 0.5; }
+
+.mejs-overlay-play {
+  background: -moz-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%, black), color-stop(18%, rgba(0, 0, 0, 0.5)), color-stop(28%, rgba(0, 0, 0, 0)), color-stop(78%, rgba(0, 0, 0, 0)), color-stop(88%, rgba(0, 0, 0, 0.5)), color-stop(100%, black));
+  background: -webkit-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  background: -o-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  background: -ms-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  background: linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#000000', endColorstr='#000000', GradientType=1); }
 
 /* colors */
 .clearfix:before, .clearfix:after {
@@ -164,6 +179,7 @@ html, body {
 
 .navbar {
   background: #fff;
+  margin-bottom: 0;
   -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
   -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
   box-shadow: 0 1px 8px -2px #5d5d5d;
@@ -176,34 +192,13 @@ html, body {
     max-width: 300px; }
 
 .main-content {
-  display: -webkit-box;
-  /* OLD - iOS 6-, Safari 3.1-6 */
-  display: -moz-box;
-  /* OLD - Firefox 19- (buggy but mostly works) */
-  display: -ms-flexbox;
-  /* TWEENER - IE 10 */
-  display: -webkit-flex;
-  /* NEW - Chrome */
-  display: flex;
-  /* NEW, Spec - Opera 12.1, Firefox 20+ */
-  flex-direction: row;
   justify-content: space-between;
   max-width: 1200px;
   min-width: 1000px;
   margin: auto; }
   .main-content section {
     margin: 10px; }
-    .main-content section#player-sect {
-      flex: 2.0;
-      max-width: 640px; }
-      .main-content section#player-sect .title {
-        text-align: right;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        height: 39px; }
     .main-content section#playlist-sect {
-      flex: 1.0;
       max-width: 400px; }
       .main-content section#playlist-sect #entity-sect .entity-content {
         line-height: 200%;
@@ -213,14 +208,32 @@ html, body {
         -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
         box-shadow: 0 1px 8px -2px #5d5d5d; }
 
+#player-sect {
+  background: #000000;
+  width: 100%;
+  position: relative; }
+  #player-sect .info-on-player {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 47%;
+    overflow: auto; }
+    #player-sect .info-on-player .title {
+      margin: 30px;
+      color: #fff;
+      font-weight: bold; }
+
+#video {
+  padding-left: 10em; }
+  #video .mejs-container {
+    position: static;
+    margin: auto; }
+
 .title {
   color: #aaaaaa;
   padding-bottom: 0;
   margin: 20px 10px -6px;
   z-index: 5;
-  position: relative; }
-
-#player-container {
   position: relative; }
 
 #video {

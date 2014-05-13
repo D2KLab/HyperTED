@@ -2,7 +2,7 @@
 //@import "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css";
 @import "font";
 @import "mixins";
-@import "customPlayer";
+@import "video_player";
 
 /* colors */
 $light_gray: #f4f4f4;
@@ -55,6 +55,7 @@ html, body {
 
 .navbar {
   background: #fff;
+  margin-bottom: 0;
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
   @include border-radius(0);
 
@@ -64,27 +65,16 @@ html, body {
 }
 
 .main-content {
-  @include flexBox;
-  flex-direction: row;
+  //  @include flexBox;
+  //  flex-direction: row;
   justify-content: space-between;
   max-width: 1200px;
   min-width: 1000px;
   margin: auto;
   section {
     margin: 10px;
-    &#player-sect {
-      flex: 2.0;
-      max-width: 640px;
-      .title {
-        text-align: right;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        height: 39px;
-      }
-    }
     &#playlist-sect {
-      flex: 1.0;
+      //      flex: 1.0;
       max-width: 400px;
       #entity-sect {
         .entity-content {
@@ -99,15 +89,39 @@ html, body {
   }
 }
 
+#player-sect {
+  background: #000000;
+  width: 100%;
+  position: relative;
+  .info-on-player {
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    width: 47%;
+    overflow: auto;
+    .title {
+      margin: 30px;
+      color: #fff;
+      font-weight: bold;
+    }
+
+  }
+}
+
+#video {
+  padding-left: 10em;
+  .mejs-container {
+    position: static;
+    margin: auto;
+  }
+}
+
 .title {
   color: $medium_gray;
   padding-bottom: 0;
   margin: 20px 10px -6px;
   z-index: 5;
-  position: relative;
-}
-
-#player-container {
   position: relative;
 }
 
@@ -243,7 +257,7 @@ ul.video-list {
 
 p {
 
-  span.entity.nesting{
+  span.entity.nesting {
 
     &:not(:hover) {
       color: #000000;
@@ -258,8 +272,8 @@ p {
       }
     }
 
-    &:hover #nestEntity{
-      -webkit-transform: translate(0px,-25px) rotate(-5deg);/* Chrome, Safari, Opera */
+    &:hover #nestEntity {
+      -webkit-transform: translate(0px, -25px) rotate(-5deg); /* Chrome, Safari, Opera */
       -webkit-transform-origin: top left 0;
       transform: rotate(-40deg);
       transform-origin: top left 0;

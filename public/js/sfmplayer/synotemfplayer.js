@@ -95,14 +95,15 @@
                 if ($.isEmptyObject(xywh) || data.settings.spatialEnabled !== true)
                     return;
 
-                var spatial_div, dark_divs;
+                var spatial_div, overlay_container;
                 if (data.settings.xywhoverlay === undefined) //the overlay hasn't been created
                 {
                     this.addClass('smfplayer-container');
-                    //var cssStr = "top:"+x+";left:"+y+";width:"+w+";height:"+h+";";
-                    spatial_div = $("<div/>");
-                    spatial_div.css(data.settings.spatialStyle);
-                    spatial_div.addClass('smfplayer-overlay').appendTo(this);
+                    var mejsCont = this.find('.mejs-container');
+
+                    overlay_container = $('<div>').addClass('overlay-container');
+                    overlay_container.height(data.settings.height).width(data.settings.width).appendTo(mejsCont);
+                    spatial_div = $("<div/>").css(data.settings.spatialStyle).addClass('smfplayer-overlay').appendTo(overlay_container);
 
                     if (data.settings.spatialOverlay) {
                         var $topdiv = $('<div>').addClass('smfplayer-overlay-dark'),
@@ -137,10 +138,8 @@
                             height: (data.settings.height) - (parseInt(xywh.y) + parseInt(xywh.h)),
                             width: "100%"
                         });
-                        dark_divs = $('<div>').addClass('dark-divs').append($topdiv, $leftdiv, $rightdiv, $bottomdiv);
-                        dark_divs.height(data.settings.height).width(data.settings.width).appendTo(this);
-
-                        spatial_div = spatial_div.add(dark_divs);
+                        overlay_container.append($topdiv, $leftdiv, $rightdiv, $bottomdiv);
+                        spatial_div = spatial_div.add(overlay_container);
                     }
 
                     var super_this = this;
@@ -523,13 +522,8 @@
                     if (VERBOSE)
                         console.log(videosrc);
 
-                    var mm;
-                    if (settings.isVideo === false) {
-                        mm = $("<audio/>").prop("width", settings.width).prop("height", settings.height).prop('preload', 'auto').appendTo($this);
-                    }
-                    else {
-                        mm = $("<video/>").prop("width", settings.width).prop("height", settings.height).prop('preload', 'auto').appendTo($this);
-                    }
+                    var mm = settings.isVideo ? $("<video/>") : $("<audio/>");
+                    mm.prop("width", settings.width).prop("height", settings.height).prop('preload', 'auto').appendTo($this);
                     var mmSource = $("<source/>").prop("src", videosrc).appendTo(mm);
 
                     //Decide the type of the video or audio

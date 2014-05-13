@@ -45,20 +45,10 @@
 
 @mixin rotate($degree) {
   transform: rotate(#{$degree}deg);
-
-  /* Safari */
   -webkit-transform: rotate(#{$degree}deg);
-
-  /* Firefox */
   -moz-transform: rotate(#{$degree}deg);
-
-  /* IE */
   -ms-transform: rotate(#{$degree}deg);
-
-  /* Opera */
   -o-transform: rotate(#{$degree}deg);
-
-  /* Internet Explorer */
   filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=#{round($degree / 90)});
 }
 

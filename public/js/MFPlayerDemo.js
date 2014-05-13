@@ -12,7 +12,8 @@ $(document).ready(function () {
     var $player = $("#video").smfplayer({
         mfURI: mfuri,
         spatialOverlay: true,
-        temporalHighlight: true
+        temporalHighlight: true,
+        autoStart: false  //TODO remove
     });
     video.player = $player;
 

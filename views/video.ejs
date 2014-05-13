@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title>Media Fragment Player Demo</title>
     <link rel="icon" type="image/png" href="/img/favicons/favicon_48.png">
-    <!--[if IE]><link rel="shortcut icon" href="/img/favicons/favicon.ico"/><![endif]-->
+    <!--[if IE]>
+    <link rel="shortcut icon" href="/img/favicons/favicon.ico"/><![endif]-->
     <link rel="apple-touch-icon" href="apple-touch-icon-precomposed.png">
     <!-- For the iPad mini and the first- and second-generation iPad on iOS ≤ 6: -->
     <link rel="apple-touch-icon" sizes="72x72" href="apple-touch-icon-72x72-precomposed.png">
@@ -18,7 +19,6 @@
     <link rel="apple-touch-icon" sizes="144x144" href="apple-touch-icon-144x144-precomposed.png">
     <!-- For iPad with high-resolution Retina display running iOS ≥ 7: -->
     <link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
-
 
 
     <link rel="stylesheet" type="text/css" href="/js/sfmplayer/mediaelementplayer.min.css"/>
@@ -62,83 +62,89 @@
     <!-- /.container-fluid -->
 </nav>
 
-<div class="main-content">
-    <section id="player-sect">
-        <% if (videoInfo) { %>
+
+<section id="player-sect">
+    <div id="player-container" class="clearfix">
+        <div id="video"></div>
+    </div>
+
+    <% if (videoInfo) { %>
+    <div class="info-on-player">
         <h1 id="video-title" class="title"><%= videoInfo.title %></h1>
-        <% } %>
+    </div>
+    <% } %>
 
-        <div id="player-container" class="clearfix">
-            <div id="video"></div>
-        </div>
-        <% if (videoInfo) { %>
-        <div id="video-info">
-            <div class="stats-cont">
-                <div class="left-col">
-                    <%
-                        var leftVals = {
-                            'Published': videoInfo.published,
-                            'Category': videoInfo.category
-                        };
+</section>
 
-                            for(key in leftVals) {
-                        var value = leftVals [key];
-                        if (value == undefined || value == null) continue;
-                    %>
-                    <div class="stat">
-                        <label class="key"><%= key %></label>
-                        <span class="value"><%= value %></span>
-                    </div>
-                    <% } %>
+<div class="main-content">
+
+    <% if (videoInfo) { %>
+    <div id="video-info">
+        <div class="stats-cont">
+            <div class="left-col">
+                <%
+                    var leftVals = {
+                        'Published': videoInfo.published,
+                        'Category': videoInfo.category
+                    };
+
+                        for(key in leftVals) {
+                    var value = leftVals [key];
+                    if (value == undefined || value == null) continue;
+                %>
+                <div class="stat">
+                    <label class="key"><%= key %></label>
+                    <span class="value"><%= value %></span>
                 </div>
-                <div class="right-col">
-                    <%
-                        var rightVals = {
-                            'Views': {obj: videoInfo.views, gliph: 'eye-open'},
-                            'Likes': {obj: videoInfo.likes, gliph: 'thumbs-up'},
-                            'Favourites': {obj: videoInfo.favourites, gliph: 'star'},
-                            'AVG Rating': {obj: videoInfo.avgRate, gliph: 'signal'}
-                        };
+                <% } %>
+            </div>
+            <div class="right-col">
+                <%
+                    var rightVals = {
+                        'Views': {obj: videoInfo.views, gliph: 'eye-open'},
+                        'Likes': {obj: videoInfo.likes, gliph: 'thumbs-up'},
+                        'Favourites': {obj: videoInfo.favourites, gliph: 'star'},
+                        'AVG Rating': {obj: videoInfo.avgRate, gliph: 'signal'}
+                    };
 
-                            for(key in rightVals) {
-                        var value = rightVals [key].obj;
-                        if (value == undefined || value == null) continue;
-                    %>
-                    <div class="stat little">
+                        for(key in rightVals) {
+                    var value = rightVals [key].obj;
+                    if (value == undefined || value == null) continue;
+                %>
+                <div class="stat little">
                         <span class="key glyphicon glyphicon-<%= rightVals [key].gliph %>"
                               title="<%= key %>"></span>
-                        <span class="value"><%= value %></span>
-                    </div>
-                    <% } %>
+                    <span class="value"><%= value %></span>
                 </div>
+                <% } %>
             </div>
-            <% if(videoInfo.descr) { %>
-            <div class="descr-cont" id="descr-cont">
-                <% include partials/descr_partial.ejs %>
-                <button type="button" class="see-all" for="descr">see more</button>
-            </div>
-            <% } %>
-
-            <form method="get" action="/video" data-action="/nerdify" class="nerdify button-cont"
-                  <% if(enriched) { %>style="display: none"
-                    <% } %>
-                    >
-                <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
-                <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
-                <input type="hidden" name="uuid" value="<%= uuid %>"/>
-                <input type="hidden" name="uri" value="<%= videoURI %>"/>
-                <input type="hidden" name="enriched" value="true"/>
-                <button type="submit" class="btn btn-danger btn-lg">Nerdify</button>
-            </form>
-
-            <% if(videoInfo.timedtext) { %>
-            <div id="sub-cont">
-                <% include partials/sub_partial.ejs %>
-            </div>
-            <% } %>
+        </div>
+        <% if(videoInfo.descr) { %>
+        <div class="descr-cont" id="descr-cont">
+            <% include partials/descr_partial.ejs %>
+            <button type="button" class="see-all" for="descr">see more</button>
         </div>
         <% } %>
-    </section>
+
+        <form method="get" action="/video" data-action="/nerdify" class="nerdify button-cont"
+              <% if(enriched) { %>style="display: none"
+                <% } %>
+                >
+            <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
+            <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
+            <input type="hidden" name="uuid" value="<%= uuid %>"/>
+            <input type="hidden" name="uri" value="<%= videoURI %>"/>
+            <input type="hidden" name="enriched" value="true"/>
+            <button type="submit" class="btn btn-danger btn-lg">Nerdify</button>
+        </form>
+
+        <% if(videoInfo.timedtext) { %>
+        <div id="sub-cont">
+            <% include partials/sub_partial.ejs %>
+        </div>
+        <% } %>
+    </div>
+    <% } %>
     <section id="playlist-sect">
         <% include partials/playlist.ejs %>
 
