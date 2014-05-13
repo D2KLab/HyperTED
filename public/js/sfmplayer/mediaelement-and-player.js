@@ -1824,8 +1824,8 @@ if (typeof jQuery != 'undefined') {
 							  ],
 						action: function(player, media) {
 								if (media.paused || media.ended) {
-										media.play();	
-								} else {
+										media.play();
+                                } else {
 										media.pause();
 								}										
 						}
@@ -2286,10 +2286,12 @@ if (typeof jQuery != 'undefined') {
 					} else {
 						// click controls
 						var clickElement = (t.media.pluginType == 'native') ? t.$media : $(t.media.pluginElement);
-						
-						if(t.media.pluginType != 'dailymotion') { // fires an exception on IE with dailymotion
+
+						if(t.media.pluginType != 'dailymotion' && t.media.pluginType != 'flash') {
+                            // fires an exception on IE with dailymotion
+                            // cannot stop video on FF with youtube
 						    clickElement.click(function() {
-							    if (media.paused) {
+                                if (media.paused) {
 								    media.play();
 							    } else {
 								    media.pause();

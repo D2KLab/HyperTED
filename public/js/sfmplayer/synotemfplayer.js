@@ -161,7 +161,7 @@
                 //console.log(xywh);
 
                 var unit = xywh.unit;
-                x = xywh.x,
+                var x = xywh.x,
                     y = xywh.y,
                     w = xywh.w,
                     h = xywh.h;
