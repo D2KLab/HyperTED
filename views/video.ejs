@@ -126,17 +126,17 @@
         </div>
         <% } %>
 
-        <form method="get" action="/video" data-action="/nerdify" class="nerdify button-cont"
-              <% if(enriched) { %>style="display: none"
-                <% } %>
-                >
-            <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
-            <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
-            <input type="hidden" name="uuid" value="<%= uuid %>"/>
-            <input type="hidden" name="uri" value="<%= videoURI %>"/>
-            <input type="hidden" name="enriched" value="true"/>
-            <button type="submit" class="btn btn-danger btn-lg">Nerdify</button>
-        </form>
+            <form method="get" action="/video" data-action="/nerdify" class="nerdify button-cont"
+                  <% if(enriched) { %>style="display: none"
+                    <% } %>
+                    >
+                <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
+                <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
+                <input type="hidden" name="uuid" value="<%= uuid %>"/>
+                <input type="hidden" name="uri" value="<%= videoURI %>"/>
+                <input type="hidden" name="enriched" value="true"/>
+                <button type="submit" class="btn btn-danger btn-lg">Nerdify</button>
+            </form>
 
         <% if(videoInfo.timedtext) { %>
         <div id="sub-cont">

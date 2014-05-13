@@ -47,7 +47,7 @@ $(document).ready(function () {
 
             if ($nerdified && $plain && $entSect) {
                 $submitButton.prop('disabled', false).removeLoader();
-                history.pushState(null, null, page_url);
+                history.pushState(null, null, page_url.toString());
                 synchEnrichment();
                 return false;
             }
@@ -226,9 +226,9 @@ $(document).ready(function () {
 
     function retrieveInfo(uuid, callback) {
         $.getJSON('/metadata/' + uuid, callback);
-    }
+        }
 
-});
+            });
 
 jQuery.fn.extend({
     addLoader: function (direction) {
@@ -274,7 +274,13 @@ String.prototype.parseURL = function () {
     if (searchPart) {
         var searchList = {};
         searchPart.forEach(function (s) {
-            s = s.split('=', 2);
+            s = s.split('=');
+            if (s.length > 2) {
+                s[1] += '';
+                for (var i = 2; i < s.length; i++) {
+                    s[1] += '=' + s[i];
+                }
+            }
             searchList[s[0]] = s[1];
         });
 
