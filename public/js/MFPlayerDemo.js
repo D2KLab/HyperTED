@@ -61,7 +61,6 @@ $(document).ready(function () {
                     } else {
                         $nerdified = $data.find('.descr');
                         $plain = $('#descr');
-
                         if ($plain.hasClass('full')) {
                             $nerdified.addClass('full');
                         }
@@ -226,9 +225,9 @@ $(document).ready(function () {
 
     function retrieveInfo(uuid, callback) {
         $.getJSON('/metadata/' + uuid, callback);
-        }
+    }
 
-            });
+});
 
 jQuery.fn.extend({
     addLoader: function (direction) {
