@@ -9,14 +9,28 @@ $(document).ready(function () {
 
     var mfuri = uri; //Media Fragment URI
     //init smfplayer
+    var $playerSect = $('#player-sect');
     var $player = $("#video").smfplayer({
         mfURI: mfuri,
         spatialOverlay: true,
         temporalHighlight: true,
-        autoStart: false  //TODO remove
+        width: 640,
+        height: 360,
+        alwaysShowControls: true,
+        autoStart: false,  //TODO remove
+        success: function (media, domObj) {
+            $(media).on('play', function () {
+                console.log('play');
+                console.log($('.info-on-player', $playerSect));
+
+                $('.info-on-player', $playerSect).hide();
+            }).on('pause', function(){
+                console.log('pause');
+                $('.info-on-player', $playerSect).show();
+            });
+        }
     });
     video.player = $player;
-
 
     $('.see-all').click(function () {
         var $this = $(this);

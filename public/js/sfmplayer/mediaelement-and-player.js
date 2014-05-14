@@ -3271,6 +3271,7 @@ if (typeof jQuery != 'undefined') {
 
             var
                 t = this,
+                rail = controls.find('.mejs-time-rail'),
                 total = controls.find('.mejs-time-total'),
                 loaded  = controls.find('.mejs-time-loaded'),
                 current  = controls.find('.mejs-time-current'),
@@ -3321,7 +3322,7 @@ if (typeof jQuery != 'undefined') {
 
             // handle clicks
             //controls.find('.mejs-time-rail').delegate('span', 'click', handleMouseMove);
-            total
+            rail
                 .bind('mousedown touchstart', function (e) {
                     // only handle left clicks or touch
                     if (e.which === 1 || e.which === 0) {

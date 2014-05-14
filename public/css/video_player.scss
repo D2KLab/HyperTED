@@ -24,38 +24,57 @@ $caviar: CaviarDreams, Helvetica, sans-serif;
     position: absolute;
     background: {
       image: none;
-      /* Fallback for web browsers that don't support RGBa */
-      color: $light_gray;
-      /* RGBa with 0.7 opacity */
-      color: rgba(244, 244, 244, 0.7);
-      /* For IE 5.5 - 7*/
-      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#99f4f4f4, endColorstr=#99f4f4f4);
-      /* For IE 8*/
-      -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99f4f4f4, endColorstr=#99f4f4f4)";
+      color: #141414;
+      color: rgba(0, 0, 0, 0.7);
     }
     z-index: 100;
 
     /*current and total time*/
     .mejs-time span {
-      color: $darker_gray;
       @include font-face(CaviarDreams, Caviar_Dreams_Bold-webfont, bold);
     }
 
     /*progress bars*/
     .mejs-time-rail {
-
-      /*current time progress bar*/
-      span.mejs-time-current {
-        @include vert-gradient-bg(rgb(128, 8, 12), rgb(200, 55, 76));
+      cursor: pointer;
+      span {
+        &:not(.mejs-time-float) {
+          height: 3px;
+          @include linear-transition(width, 100ms);
+        }
+        &:not(.mejs-time-float span) {
+          color: #fff;
+        }
+      }
+      .mejs-time-total {
+        margin-top: 8px;
+        background: #606060;
+      }
+      .mejs-time-current {
+        background: #80080C;
       }
 
       /*loaded time progress bar*/
-      span.mejs-time-loaded {
-        @include vert-gradient-bg($darker_gray, $gray);
+      .mejs-time-loaded {
+        background: #a8a8a8;
+      }
+      .mfHighlight {
+        @include box-shadow(0, 0, 7px, 8px, rgba(255, 248, 86, 0.5));
       }
 
     }
+
+    .mejs-button {
+      cursor: pointer;
+      button:focus {
+        outline: none;
+      }
+      &:hover button {
+        background-image: url(/js/sfmplayer/controls_hover.png);
+      }
+    }
   }
+
 }
 
 .smfplayer-container {
@@ -84,6 +103,7 @@ $caviar: CaviarDreams, Helvetica, sans-serif;
 }
 
 .mejs-overlay-play {
+  /* alpha gradient on stopped video */
   background: -moz-linear-gradient(left, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%,
           rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, rgba(0, 0, 0, 1) 100%);
   background: -webkit-gradient(linear, left top, right top, color-stop(0%, rgba(0, 0, 0, 1)),

@@ -193,7 +193,7 @@
                 var $highligthedMF = $('.mfHighlight', $timeline_container);
 
                 if (!$highligthedMF.exists()) {
-                    $highligthedMF = $("<div>").addClass('mfHighlight').height($timeline_container.height());
+                    $highligthedMF = $("<span>").addClass('mfHighlight');
                 }
 
                 var MEt = self.getMFJson().hash.t || self.getMFJson().query.t;

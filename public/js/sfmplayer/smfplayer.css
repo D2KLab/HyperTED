@@ -41,7 +41,7 @@
     opacity: 0.5;
 }
 
-.mejs-container .mejs-controls div.mfHighlight {
+.mejs-container .mejs-controls .mfHighlight {
     display: none;
     position: absolute;
     bottom: 0;
