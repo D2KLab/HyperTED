@@ -53,32 +53,89 @@ html, body {
   }
 }
 
+$brandMarkPadding: 10px;
+$navbarTransitionTime: 100ms;
 .navbar {
   background: #fff;
   margin-bottom: 0;
-  @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
-  @include border-radius(0);
   position: fixed;
   z-index: 100;
   height: 96px;
   width: 100%;
+
+  @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
+  @include border-radius(0);
+  @include transition(height, $navbarTransitionTime);
+
   .navbar-brand {
+    position: relative;
     height: 96px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
 
-  .navbar-collapse {
-    .form-group {
-      padding-top: 23px;
-      max-width: 300px;
-
+  .form-group {
+    padding-top: 23px;
+    max-width: 300px;
+    @include transition(padding, $navbarTransitionTime);
+  }
+  .top-brand {
+    img {
+      height: 66px;
+      display: inline-block;
+      @include transition(all, $navbarTransitionTime);
+    }
+    .logo-text {
+      width: 119px;
+    }
+    .left-mark, .right-mark {
+      width: 56px;
+      @include transition(padding, 100ms);
+    }
+    .left-mark {
+      padding-left: $brandMarkPadding;
+    }
+    .right-mark {
+      padding-right: $brandMarkPadding;
+    }
+    &:hover {
+      .left-mark {
+        padding-left: 0;
+        padding-right: $brandMarkPadding;
+      }
+      .right-mark {
+        padding-left: $brandMarkPadding;
+        padding-right: 0;
+      }
     }
   }
 
-  &.navbar-placeholder{
+  &.compact {
+    height: 40px;
+    .navbar-brand {
+      top: -7px;
+      height: 40px;
+    }
+    .top-brand {
+      img {
+        height: 30px;
+      }
+      .logo-text {
+        width: 54px;
+      }
+      .left-mark, .right-mark {
+        width: 31px;
+      }
+    }
+    .form-group {
+      padding-top: 0;
+    }
+  }
+
+  &.navbar-placeholder {
     position: static;
+    background: #000000;
   }
 
 }
@@ -91,10 +148,10 @@ html, body {
   margin: 80px auto auto auto;
   padding-top: 50px;
 
-    #playlist-sect {
-      margin: 10px;
+  #playlist-sect {
+    margin: 10px;
 
-    }
+  }
   #entity-sect {
     margin: 10px;
     .entity-content {
@@ -105,39 +162,11 @@ html, body {
   }
 }
 
-$brandMarkPadding: 10px;
-.top-brand {
-  img {
-    height: 100%;
-    display: inline-block;
-  }
-  .left-mark, .right-mark {
-    @include transition(padding, 100ms);
-  }
-  .left-mark {
-    padding-left: $brandMarkPadding;
-  }
-  .right-mark {
-    padding-right: $brandMarkPadding;
-  }
-  &:hover {
-    .left-mark {
-      padding-left: 0;
-      padding-right: $brandMarkPadding;
-    }
-    .right-mark {
-      padding-left: $brandMarkPadding;
-      padding-right: 0;
-    }
-  }
-
-}
-
 .red_rule {
   background-color: #b11200;
   height: 5px;
-  margin-left:0;
-  text-align:left;
+  margin-left: 0;
+  text-align: left;
 }
 
 #player-sect {

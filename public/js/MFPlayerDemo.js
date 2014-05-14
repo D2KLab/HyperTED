@@ -3,13 +3,11 @@ var storageKey = 'fragmentenricher.';
 var videokey = storageKey + video.vendor + '-' + video.id + '.';
 
 $(document).ready(function () {
-//    var $navbar = $('.navbar').not('.navbar-placeholder');
-//    $(window).scroll(function () {
-//       if( $(window).scrollTop() >  20 ){
-//
-//       }
-//    });
-
+    var $navbar = $('.navbar').not('.navbar-placeholder');
+    var navHeight = $navbar.height();
+    $(window).scroll(function () {
+        $navbar.toggleClass('compact', $(window).scrollTop() > navHeight);
+    });
 
 
     var $subCont = $('#sub-cont');
@@ -26,12 +24,12 @@ $(document).ready(function () {
         width: 640,
         height: 360,
         alwaysShowControls: true,
-        features: ['playpause','current','progress','duration','volume'],
+        features: ['playpause', 'current', 'progress', 'duration', 'volume'],
         autoStart: false,  //TODO remove
         success: function (media, domObj) {
             $(media).on('play', function () {
                 $('.info-on-player', $playerSect).hide();
-            }).on('pause', function(){
+            }).on('pause', function () {
                 $('.info-on-player', $playerSect).show();
             });
         }
