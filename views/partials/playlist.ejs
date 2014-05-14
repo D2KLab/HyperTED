@@ -1,86 +1,100 @@
-<h1 class="title">see also</h1>
-<%
-var videoList = [
-    {
-        uuid: '55449885-c1bd-4616-9c25-efb77b48bce8',
-        frags: [
-            {
-                title: 'About writers reputation',
-                timing: '0:03:08 - 0:04:05',
-                hash: '#t=0:03:08,0:04:05'
-            },
-            {
-                title: "Ruth Stone's creative process",
-                timing: '0:10:11 - 0:11:43',
-                hash: '#t=0:10:11,0:11:43&xywh=pixel:160,95,319,305'
-            }
-        ]
-    },
-    {
-        uuid: '44255f5a-8a4f-444d-a142-4074a5d52bf3',
-        frags: [
-            {
-                title: 'Middle East loves to laugh',
-                timing: '0:00:23 - 0:00:49',
-                hash: '#t=0:00:23,0:00:49'
-            },
-            {
-                title: "Three questions",
-                timing: '0:07:32 - 0:08:08',
-                hash: '#t=0:07:32,0:08:08'
-            }
-        ]
-    },
-    {
-        uuid: 'cf566df3-7320-4616-9d5d-0cb82943b95e',
-        frags: [
-            {
-                title: 'How did the universe begin?',
-                timing: '0:05:20 - 0:05:32',
-                hash: '#t=0:05:20,0:05:32'
-            },
-            {
-                title: "Fragment to the end",
-                timing: '0:09:10 - end',
-                hash: '#t=0:09:10'
-            }
-        ]
-    },
-    {
-        uuid: '73b7054c-8a2e-47e4-91eb-acf7d64a2bc2',
-        frags: [
-            {
-                title: "Herr's experience?",
-                timing: '0:01:42,0:03:49',
-                hash: '#t=0:01:42,0:03:49'
-            },
-            {
-                title: "On the dance floor",
-                timing: '0:14:55,0:15:59',
-                hash: '#t=0:14:55,0:15:59'
-            }
-        ]
-    }
-];
-%>
+<div class="row">
+    <div class="col-md-7 col-lg-7">
+        <hr class="red_rule">
+    </div>
 
-<ul class="video-list">
-    <% videoList.forEach(function(v){ %>
-    <li class="video-link" data-uuid="<%= v.uuid %>">
-        <img class="loader" src="/img/ajax-loader.gif">
+    <div class="col-md-5 col-lg-5">
+        <h1 class="title">see also</h1>
+    </div>
+</div>
 
-        <div class="content">
-            <h4><a href="/video/<%= v.uuid %>"></a></h4>
-            <a class="thumb-cont" href="/video/<%= v.uuid %>"></a>
-            <ul class="frag-list">
-                <% v.frags.forEach(function(frag){ %>
-                <li class="frag-link">
-                    <a href='/video/<%= v.uuid %><%= frag.hash %>'><%= frag.title %>
-                        <br/>(<%= frag.timing %>)</a>
-                </li>
-                <% }) %>
-            </ul>
-        </div>
-    </li>
-    <% }) %>
-</ul>
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <%
+        var videoList = [
+            {
+                uuid: '55449885-c1bd-4616-9c25-efb77b48bce8',
+                frags: [
+                    {
+                        title: 'About writers reputation',
+                        timing: '0:03:08 - 0:04:05',
+                        hash: '#t=0:03:08,0:04:05'
+                    },
+                    {
+                        title: "Ruth Stone's creative process",
+                        timing: '0:10:11 - 0:11:43',
+                        hash: '#t=0:10:11,0:11:43&xywh=pixel:160,95,319,305'
+                    }
+                ]
+            },
+            {
+                uuid: '44255f5a-8a4f-444d-a142-4074a5d52bf3',
+                frags: [
+                    {
+                        title: 'Middle East loves to laugh',
+                        timing: '0:00:23 - 0:00:49',
+                        hash: '#t=0:00:23,0:00:49'
+                    },
+                    {
+                        title: "Three questions",
+                        timing: '0:07:32 - 0:08:08',
+                        hash: '#t=0:07:32,0:08:08'
+                    }
+                ]
+            },
+            {
+                uuid: 'cf566df3-7320-4616-9d5d-0cb82943b95e',
+                frags: [
+                    {
+                        title: 'How did the universe begin?',
+                        timing: '0:05:20 - 0:05:32',
+                        hash: '#t=0:05:20,0:05:32'
+                    },
+                    {
+                        title: "Fragment to the end",
+                        timing: '0:09:10 - end',
+                        hash: '#t=0:09:10'
+                    }
+                ]
+            },
+            {
+                uuid: '73b7054c-8a2e-47e4-91eb-acf7d64a2bc2',
+                frags: [
+                    {
+                        title: "Herr's experience?",
+                        timing: '0:01:42,0:03:49',
+                        hash: '#t=0:01:42,0:03:49'
+                    },
+                    {
+                        title: "On the dance floor",
+                        timing: '0:14:55,0:15:59',
+                        hash: '#t=0:14:55,0:15:59'
+                    }
+                ]
+            }
+        ];
+        %>
+
+        <ul class="video-list">
+            <% videoList.forEach(function(v){ %>
+            <li class="video-link" data-uuid="<%= v.uuid %>">
+                <img class="loader" src="/img/ajax-loader.gif">
+
+                <div class="content">
+                    <h4><a href="/video/<%= v.uuid %>"></a></h4>
+                    <a class="thumb-cont" href="/video/<%= v.uuid %>"></a>
+                    <ul class="frag-list">
+                        <% v.frags.forEach(function(frag){ %>
+                        <li class="frag-link">
+                            <a href='/video/<%= v.uuid %> <%= frag.hash %>'><%= frag.title %>
+                                <br/>(<%= frag.timing %>)</a>
+                        </li>
+                        <% }) %>
+                    </ul>
+                </div>
+            </li>
+            <% }) %>
+        </ul>
+
+    </div>
+</div>
