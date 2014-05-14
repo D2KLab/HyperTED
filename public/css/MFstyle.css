@@ -195,8 +195,7 @@ html, body {
   margin: 80px auto auto auto;
   padding-top: 50px; }
   .nerdificable #playlist-sect {
-    margin: 10px;
-    max-width: 400px; }
+    margin: 10px; }
   .nerdificable #entity-sect {
     margin: 10px; }
     .nerdificable #entity-sect .entity-content {
@@ -205,7 +204,9 @@ html, body {
 
 .red_rule {
   background-color: #b11200;
-  height: 5px; }
+  height: 5px;
+  margin-left: 0;
+  text-align: left; }
 
 #player-sect {
   background: #000000;
