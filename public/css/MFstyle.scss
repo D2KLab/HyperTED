@@ -91,10 +91,10 @@ html, body {
   margin: 80px auto auto auto;
   padding-top: 50px;
 
-  #playlist-sect {
-    margin: 10px;
-    max-width: 400px;
-  }
+    #playlist-sect {
+      margin: 10px;
+
+    }
   #entity-sect {
     margin: 10px;
     .entity-content {
@@ -136,6 +136,8 @@ $brandMarkPadding: 10px;
 .red_rule {
   background-color: #b11200;
   height: 5px;
+  margin-left:0;
+  text-align:left;
 }
 
 #player-sect {
