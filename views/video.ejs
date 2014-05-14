@@ -40,7 +40,13 @@
                     <span class="icon-bar"></span>
                 </button>
             </div>
-            <a class="navbar-brand" href="/"><img src="../img/logos/hTedLogo_big.png"></a>
+            <a class="navbar-brand" href="/">
+                <span class="top-brand">
+                   <img class="left-mark" src="/img/logos/left_mark.png">
+                   <img class="logo-text" src="/img/logos/hTedLogo_big_text.png">
+                   <img class="right-mark" src="/img/logos/right_mark.png">
+                </span>
+            </a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -63,7 +69,7 @@
     <!-- /.container-fluid -->
 </nav>
 
-
+<nav class="navbar navbar-placeholder"></nav>
 <section id="player-sect">
     <div id="player-container" class="clearfix">
         <div id="video"></div>
@@ -125,56 +131,56 @@
 <!--aggiunto da Mariella per dividere le stat da subs e descriz-->
 
 <div class="nerdificable">
-<div class="container-fluid">
+    <div class="container-fluid">
 
-<!--TODO fix titles in case of section absence (below too)-->
-<div class="row">
+        <!--TODO fix titles in case of section absence (below too)-->
+        <div class="row">
 
-    <% if(videoInfo.timedtext) { %>
-    <div class="col-md-7 col-lg-7">
-        <div id="sub-cont">
-            <% include partials/sub_partial.ejs %>
+            <% if(videoInfo.timedtext) { %>
+            <div class="col-md-7 col-lg-7">
+                <div id="sub-cont">
+                    <% include partials/sub_partial.ejs %>
+                </div>
+
+                <form method="get" action="/video" data-action="/nerdify" class="nerdify button-cont"
+                      <% if(enriched) { %>style="display: none"
+                        <% } %>
+                        >
+                    <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
+                    <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
+                    <input type="hidden" name="uri" value="<%= videoURI %>"/>
+                    <input type="hidden" name="enriched" value="true"/>
+                    <button type="submit" class="btn btn-danger btn-block">Nerdify</button>
+                </form>
+            </div>
+            <% } %>
+
+            <% if(videoInfo.descr) { %>
+            <div class="descr-cont <% if(videoInfo.timedtext) { %>col-md-5<% } %>" id="descr-cont">
+                <% include partials/descr_partial.ejs %>
+                <button type="button" class="see-all" for="descr">see more</button>
+            </div>
+            <% } %>
+
         </div>
 
-        <form method="get" action="/video" data-action="/nerdify" class="nerdify button-cont"
-              <% if(enriched) { %>style="display: none"
-                <% } %>
-                >
-            <input type="hidden" name="vendor" value="<%= videoInfo.vendor %>"/>
-            <input type="hidden" name="videoid" value="<%= videoInfo.video_id %>"/>
-            <input type="hidden" name="uri" value="<%= videoURI %>"/>
-            <input type="hidden" name="enriched" value="true"/>
-            <button type="submit" class="btn btn-danger btn-block">Nerdify</button>
-        </form>
-    </div>
-    <% } %>
-
-        <% if(videoInfo.descr) { %>
-        <div class="descr-cont <% if(videoInfo.timedtext) { %>col-md-5<% }  %>" id="descr-cont">
-            <% include partials/descr_partial.ejs %>
-            <button type="button" class="see-all" for="descr">see more</button>
-        </div>
         <% } %>
 
-    </div>
+        <div class="row">
 
-<% } %>
+            <div class="col-md-7 col-lg-7">
+                <% if (enriched && videoInfo.entities) { %>
+                <% include partials/entitiesList_partial.ejs %>
+                <% } %>
+            </div>
 
-    <div class="row">
-
-        <div class="col-md-7 col-lg-7">
-            <% if (enriched && videoInfo.entities) { %>
-            <% include partials/entitiesList_partial.ejs %>
-            <% } %>
-        </div>
-
-        <div class="col-md-5 col-lg-5">
-            <div id="playlist-sect">
-                 <% include partials/playlist.ejs %>
+            <div class="col-md-5 col-lg-5">
+                <div id="playlist-sect">
+                    <% include partials/playlist.ejs %>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 
 

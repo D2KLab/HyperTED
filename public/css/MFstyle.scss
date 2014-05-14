@@ -58,7 +58,16 @@ html, body {
   margin-bottom: 0;
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
   @include border-radius(0);
-  min-height: 100px;
+  position: fixed;
+  z-index: 100;
+  height: 96px;
+  width: 100%;
+  .navbar-brand {
+    height: 96px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
 
   .navbar-collapse {
     .form-group {
@@ -68,32 +77,11 @@ html, body {
     }
   }
 
-}
+  &.navbar-placeholder{
+    position: static;
+  }
 
-//.main-content {
-//  //  @include flexBox;
-//  //  flex-direction: row;
-//  justify-content: space-between;
-//  max-width: 1200px;
-//  min-width: 1000px;
-//  margin: auto;
-//  section {
-//    margin: 10px;
-//    &#playlist-sect {
-//      //      flex: 1.0;
-//      max-width: 400px;
-//      #entity-sect {
-//        .entity-content {
-//          line-height: 200%;
-//          background: #fff;
-//          padding: 0 10px;
-//          @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
-//        }
-//      }
-//    }
-//
-//  }
-//}
+}
 
 .nerdificable {
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
@@ -103,10 +91,10 @@ html, body {
   margin: 80px auto auto auto;
   padding-top: 50px;
 
-    #playlist-sect {
-      margin: 10px;
-      max-width: 400px;
-    }
+  #playlist-sect {
+    margin: 10px;
+    max-width: 400px;
+  }
   #entity-sect {
     margin: 10px;
     .entity-content {
@@ -117,9 +105,37 @@ html, body {
   }
 }
 
-.red_rule{
+$brandMarkPadding: 10px;
+.top-brand {
+  img {
+    height: 100%;
+    display: inline-block;
+  }
+  .left-mark, .right-mark {
+    @include transition(padding, 100ms);
+  }
+  .left-mark {
+    padding-left: $brandMarkPadding;
+  }
+  .right-mark {
+    padding-right: $brandMarkPadding;
+  }
+  &:hover {
+    .left-mark {
+      padding-left: 0;
+      padding-right: $brandMarkPadding;
+    }
+    .right-mark {
+      padding-left: $brandMarkPadding;
+      padding-right: 0;
+    }
+  }
+
+}
+
+.red_rule {
   background-color: #b11200;
-height: 5px;
+  height: 5px;
 }
 
 #player-sect {
@@ -140,7 +156,7 @@ height: 5px;
     }
 
   }
-  #player-container{
+  #player-container {
     min-height: 360px;
   }
 }
@@ -250,8 +266,7 @@ ul.video-list {
 
 }
 
-
-div.descr-cont{
+div.descr-cont {
   line-height: 200%;
   .descr {
     margin-top: 10px;
@@ -293,7 +308,6 @@ div.descr-cont{
   }
 
 }
-
 
 p {
 
@@ -439,9 +453,9 @@ p {
     font-weight: 400;
     @include transition(font-weight, 100ms);
     cursor: pointer;
-//    &:nth-child(odd) {
-//      background: $light_gray;
-//    }
+    //    &:nth-child(odd) {
+    //      background: $light_gray;
+    //    }
     &:hover {
       font-weight: 700;
     }

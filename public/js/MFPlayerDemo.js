@@ -3,6 +3,15 @@ var storageKey = 'fragmentenricher.';
 var videokey = storageKey + video.vendor + '-' + video.id + '.';
 
 $(document).ready(function () {
+//    var $navbar = $('.navbar').not('.navbar-placeholder');
+//    $(window).scroll(function () {
+//       if( $(window).scrollTop() >  20 ){
+//
+//       }
+//    });
+
+
+
     var $subCont = $('#sub-cont');
     var hasVideoSub = $subCont.exists();
     var parsedJSON;
