@@ -86,11 +86,12 @@
       cursor: pointer;
       /*loaded time progress bar*/ }
       .mejs-container div.mejs-controls .mejs-time-rail span:not(.mejs-time-float) {
-        height: 3px;
-        -webkit-transition: width 100ms linear;
-        -moz-transition: width 100ms linear;
-        -o-transition: width 100ms linear;
-        transition: width 100ms linear; }
+        height: 3px; }
+      .mejs-container div.mejs-controls .mejs-time-rail span.mejs-time-current, .mejs-container div.mejs-controls .mejs-time-rail span.mejs-time-loaded, .mejs-container div.mejs-controls .mejs-time-rail span.mfHighlight {
+        -webkit-transition: all 100ms linear;
+        -moz-transition: all 100ms linear;
+        -o-transition: all 100ms linear;
+        transition: all 100ms linear; }
       .mejs-container div.mejs-controls .mejs-time-rail span:not(.mejs-time-float span) {
         color: #fff; }
       .mejs-container div.mejs-controls .mejs-time-rail .mejs-time-total {
@@ -252,6 +253,7 @@ html, body {
   .navbar.compact .form-group {
     padding-top: 0; }
   .navbar.navbar-placeholder {
+    height: 96px;
     position: static;
     background: #000000; }
 
@@ -295,11 +297,12 @@ html, body {
   #player-sect #player-container {
     min-height: 360px; }
 
-#video {
-  padding-left: 10em; }
-  #video .mejs-container {
-    position: static;
-    margin: auto; }
+@media (min-width: 768px) {
+  #video {
+    padding-left: 10em; } }
+#video .mejs-container {
+  position: static;
+  margin: auto; }
 
 .title {
   color: #aaaaaa;

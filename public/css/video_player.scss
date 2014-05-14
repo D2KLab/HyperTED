@@ -40,7 +40,9 @@ $caviar: CaviarDreams, Helvetica, sans-serif;
       span {
         &:not(.mejs-time-float) {
           height: 3px;
-          @include linear-transition(width, 100ms);
+        }
+        &.mejs-time-current, &.mejs-time-loaded, &.mfHighlight {
+          @include linear-transition(all, 100ms);
         }
         &:not(.mejs-time-float span) {
           color: #fff;
@@ -94,6 +96,9 @@ $caviar: CaviarDreams, Helvetica, sans-serif;
 }
 
 .overlay-container {
+  @media (min-width: 768px) {
+  }
+
   position: absolute;
   top: 0;
   bottom: 0;

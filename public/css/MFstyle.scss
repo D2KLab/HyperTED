@@ -137,6 +137,7 @@ $navbarTransitionTime: 100ms;
   }
 
   &.navbar-placeholder {
+    height: 96px;
     position: static;
     background: #000000;
   }
@@ -196,7 +197,9 @@ $navbarTransitionTime: 100ms;
 }
 
 #video {
-  padding-left: 10em;
+  @media (min-width: 768px) {
+    padding-left: 10em;
+  }
   .mejs-container {
     position: static;
     margin: auto;
