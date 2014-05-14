@@ -17,15 +17,12 @@ $(document).ready(function () {
         width: 640,
         height: 360,
         alwaysShowControls: true,
+        features: ['playpause','current','progress','duration','volume'],
         autoStart: false,  //TODO remove
         success: function (media, domObj) {
             $(media).on('play', function () {
-                console.log('play');
-                console.log($('.info-on-player', $playerSect));
-
                 $('.info-on-player', $playerSect).hide();
             }).on('pause', function(){
-                console.log('pause');
                 $('.info-on-player', $playerSect).show();
             });
         }
