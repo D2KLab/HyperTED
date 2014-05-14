@@ -85,7 +85,7 @@ $(document).ready(function () {
                     }
 
                     $entSect = $data.find('#entity-sect').hide();
-                    $('#playlist-sect').append($entSect);
+                    $('#ent_append').append($entSect);
 
                     try {
                         localStorage[videokey + 'ent-sect'] = $entSect[0].outerHTML;
@@ -128,7 +128,7 @@ $(document).ready(function () {
                     $plain = $($plain);
                     $entSect = $($entSect);
 
-                    $entSect.appendTo('#playlist-sect').fadeIn();
+                    $entSect.appendTo('#ent_append').fadeIn();
                     $nerdifyForm.fadeOut();
                     $plain.filter('body *').replaceWith($nerdified);
                 } else {
