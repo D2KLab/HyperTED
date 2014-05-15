@@ -1,60 +1,59 @@
 <div id="entity-sect">
-<div class="row">
-    <div class="col-md-9 col-lg-9 col-sm-7 col-xs-7">
-        <hr class="red_rule">
-    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-9 col-lg-9 col-sm-7 col-xs-7">
+                <hr class="red_rule">
+            </div>
 
-    <div class="col-md-3 col-lg-3 col-sm-5 col-xs-5">
-        <h1 class="title">entities</h1>
-    </div>
-</div>
+            <div class="col-md-3 col-lg-3 col-sm-5 col-xs-5">
+                <h1 class="title">entities</h1>
+            </div>
+        </div>
 
-<div class="row">
-    <div class="col-md-12 col-lg-12 col-sm-8 col-xs-8">
+        <div class="row">
+            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
 
-        <%
-        var entityList = videoInfo.entities;
-                if(entityList){
-            entityList.sort(function SortByNerdType(x, y) {
-                return ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1 ));
-            });
-
-            var typeList = entityList.reduce(function (memo, ent) {
-                if (!memo[ent.nerdType]) {
-                    memo[ent.nerdType] = [];
-                }
-                memo[ent.nerdType].push(ent);
-                return memo;
-            }, {});
-        %>
-
-
-
-
-            <div class="entity-content">
-                <p>In this video there are <%= entityList.length %> entities</p>
                 <%
-                for (type in typeList) {
-                    var typeName = type.split('#')[1];
-                    var entTypeList = typeList[type];
+                var entityList = videoInfo.entities;
+                        if(entityList){
+                    entityList.sort(function SortByNerdType(x, y) {
+                        return ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1 ));
+                    });
+
+                    var typeList = entityList.reduce(function (memo, ent) {
+                        if (!memo[ent.nerdType]) {
+                            memo[ent.nerdType] = [];
+                        }
+                        memo[ent.nerdType].push(ent);
+                        return memo;
+                    }, {});
                 %>
-                <h3 class="title"><%= entTypeList.length %> <%= typeName %></h3>
-                <ul class="displayEntity">
-                    <% entTypeList.forEach(function (ent) {
-//                var href = ent.uri ? 'href="' + ent.uri + '" target="_blank"' : '';
-                        var href = ""; //FIXME is empty for debug purpose
+
+                <div class="entity-content">
+                    <p>In this video there are <%= entityList.length %> entities</p>
+                    <%
+                    for (type in typeList) {
+                        var typeName = type.split('#')[1];
+                        var entTypeList = typeList[type];
                     %>
-                    <li><span class="entity <%= typeName.toLowerCase() %>">
+                    <h3 class="title"><%= entTypeList.length %> <%= typeName %></h3>
+                    <ul class="displayEntity">
+                        <% entTypeList.forEach(function (ent) {
+//                var href = ent.uri ? 'href="' + ent.uri + '" target="_blank"' : '';
+                            var href = ""; //FIXME is empty for debug purpose
+                        %>
+                        <li><span class="entity <%= typeName.toLowerCase() %>">
                     <a <%= href %> data-start-time="<%= ent.startNPT %>" data-end-time="<%= ent.endNPT %>">
                         #<%= ent.label %>
                     </a>
                 </span></li>
-                    <% }) %>
-                </ul>
-                <% } %>
+                        <% }) %>
+                    </ul>
+                    <% } %>
+                </div>
             </div>
-        </div>
-        <% } %>
+            <% } %>
 
+        </div>
     </div>
 </div>

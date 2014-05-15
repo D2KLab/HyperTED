@@ -1,37 +1,40 @@
-<div class="row">
-    <div class="col-md-7 col-lg-7 col-sm-7 col-xs-7">
-        <hr class="red_rule">
-    </div>
-
-    <div class="col-md-5 col-lg-5 col-sm-5 col-xs-5">
-        <h1 class="title">description</h1>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-12 col-lg-12 col-sm-8 col-xs-8">
-
-        <% if (videoInfo.descr) {
-            var text = videoInfo.descr;
-            if (enriched && !videoInfo.timedtext && videoInfo.entities) {
-                var entityList = videoInfo.entities;
-
-                //sorting JSON for Start character desc
-                entityList.sort(function SortByStartChar(x, y) {
-                    return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
-                }).forEach(function (entity) {
-                    var s1 = text.substring(0, entity.startChar);
-                    var s2 = text.substring(entity.startChar, entity.endChar);
-                    var s3 = text.substring(entity.endChar);
-                    var href = entity.uri ? 'href="' + entity.uri + '" target="_blank"' : '';
-                    var nerdType = entity.nerdType.split('#')[1].toLowerCase();
-
-                    text = s1 + '<span class="entity ' + nerdType + '"><a href="#">' + s2 + '</a></span>' + s3;
-                });
-            }
-        %>
-        <div class="descr <% if (enriched && !videoInfo.timedtext) { %>enriched<% } %>" id="descr"><p><%- text %></p>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-7 col-lg-7 col-sm-7 col-xs-7">
+            <hr class="red_rule">
         </div>
-        <% } %>
+
+        <div class="col-md-5 col-lg-5 col-sm-5 col-xs-5">
+            <h1 class="title">description</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+
+            <% if (videoInfo.descr) {
+                var text = videoInfo.descr;
+                if (enriched && !videoInfo.timedtext && videoInfo.entities) {
+                    var entityList = videoInfo.entities;
+
+                    //sorting JSON for Start character desc
+                    entityList.sort(function SortByStartChar(x, y) {
+                        return ((x.startChar == y.startChar) ? 0 : ((x.startChar > y.startChar) ? -1 : 1 ));
+                    }).forEach(function (entity) {
+                        var s1 = text.substring(0, entity.startChar);
+                        var s2 = text.substring(entity.startChar, entity.endChar);
+                        var s3 = text.substring(entity.endChar);
+                        var href = entity.uri ? 'href="' + entity.uri + '" target="_blank"' : '';
+                        var nerdType = entity.nerdType.split('#')[1].toLowerCase();
+
+                        text = s1 + '<span class="entity ' + nerdType + '"><a href="#">' + s2 + '</a></span>' + s3;
+                    });
+                }
+            %>
+            <div class="descr <% if (enriched && !videoInfo.timedtext) { %>enriched<% } %>" id="descr">
+                <p><%- text %></p>
+            </div>
+            <% } %>
+        </div>
     </div>
 </div>
