@@ -363,23 +363,20 @@ p {
       }
     }
 
-    &:hover #nestEntity {
-      -webkit-transform: translate(0px, -25px) rotate(-5deg); /* Chrome, Safari, Opera */
-      -webkit-transform-origin: top left 0;
-      transform: rotate(-40deg);
-      transform-origin: top left 0;
-      //background:not();
+    span {
+      display: inline-block;
+      @include transition(transform, 0.5s);
+      -webkit-transition: -webkit-transform 0.5s; /* For Safari 3.1 to 6.0 */
 
+    }
+
+    &:hover span{
+      -webkit-transform: translate(0px, -10px); /* Chrome, Safari, Opera */
     }
   }
 }
 
-#nestEntity {
-  display: inline-block;
-  -webkit-transition: -webkit-transform 0.5s; /* For Safari 3.1 to 6.0 */
-  transition: transform 0.5s;
 
-}
 
 .entity {
 
@@ -399,12 +396,8 @@ p {
 
   &.thing {
 
-    color: #000000;
-    a {
-      color: #000000;
-    }
     background: {
-      color: #3fff21;
+      color: #15417B;
     }
   }
   &.amount {
@@ -413,12 +406,12 @@ p {
       color: #000000;
     }
     background: {
-      color: #09fffc;
+      color: #1EDC3A;
     }
   }
   &.animal {
     background: {
-      color: #1004ff;
+      color: #DD1B4B;
     }
   }
   &.event {
@@ -428,17 +421,21 @@ p {
   }
   &.function {
     background: {
-      color: #ff00aa;
+      color: #F12606;
     }
   }
   &.location {
     background: {
-      color: #ff0040;
+      color: #F1A02A;
     }
   }
   &.organization {
+    color: #000000;
+    a {
+      color: #000000;
+    }
     background: {
-      color: #ff7408;
+      color: #54B9DD;
     }
 
   }
@@ -448,18 +445,22 @@ p {
       color: #000000;
     }
     background: {
-      color: #fff600;
+      color: #EDF10B;
     }
   }
   &.product {
 
     background: {
-      color: #8e5300;
+      color: #5B007B;
     }
   }
   &.time {
+    color: #000000;
+    a {
+      color: #000000;
+    }
     background: {
-      color: #771ebe;
+      color: #D0F181;
     }
   }
 }

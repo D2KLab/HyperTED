@@ -131,6 +131,7 @@ $(document).ready(function () {
                     $entSect.appendTo('#ent_append').fadeIn();
                     $nerdifyForm.fadeOut();
                     $plain.filter('body *').replaceWith($nerdified);
+                    $('p > span.entity').has('span').addClass('nesting');
                 } else {
                     // submit form
                     $nerdifyForm.submit();
@@ -163,13 +164,7 @@ $(document).ready(function () {
 
     $('p > span.entity').has('span').addClass('nesting');
 
-    $(".nesting").on({
-        mouseenter: function () {
-            $(this).find('span').attr('id', 'nestEntity');
-        }, mouseleave: function () {
-            $(this).find('span').removeAttr('id');
-        }
-    });
+
 
     $(document).on('click', '.sub-text p[data-time]', function () {
         var srtTime = $(this).data('time');

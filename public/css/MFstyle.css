@@ -425,18 +425,17 @@ p span.entity.nesting:not(:hover) {
   p span.entity.nesting:not(:hover) .entity {
     color: #000000;
     background-color: transparent; }
-p span.entity.nesting:hover #nestEntity {
-  -webkit-transform: translate(0px, -25px) rotate(-5deg);
-  /* Chrome, Safari, Opera */
-  -webkit-transform-origin: top left 0;
-  transform: rotate(-40deg);
-  transform-origin: top left 0; }
-
-#nestEntity {
+p span.entity.nesting span {
   display: inline-block;
+  -webkit-transition: transform 0.5s ease-out;
+  -moz-transition: transform 0.5s ease-out;
+  -o-transition: transform 0.5s ease-out;
+  transition: transform 0.5s ease-out;
   -webkit-transition: -webkit-transform 0.5s;
-  /* For Safari 3.1 to 6.0 */
-  transition: transform 0.5s; }
+  /* For Safari 3.1 to 6.0 */ }
+p span.entity.nesting:hover span {
+  -webkit-transform: translate(0px, -10px);
+  /* Chrome, Safari, Opera */ }
 
 .entity {
   cursor: pointer;
@@ -457,34 +456,37 @@ p span.entity.nesting:hover #nestEntity {
   .entity a {
     color: #ffffff; }
   .entity.thing {
-    color: #000000;
-    background-color: #3fff21; }
-    .entity.thing a {
-      color: #000000; }
+    background-color: #15417B; }
   .entity.amount {
     color: #000000;
-    background-color: #09fffc; }
+    background-color: #1EDC3A; }
     .entity.amount a {
       color: #000000; }
   .entity.animal {
-    background-color: #1004ff; }
+    background-color: #DD1B4B; }
   .entity.event {
     background-color: #b200ff; }
   .entity.function {
-    background-color: #ff00aa; }
+    background-color: #F12606; }
   .entity.location {
-    background-color: #ff0040; }
+    background-color: #F1A02A; }
   .entity.organization {
-    background-color: #ff7408; }
+    color: #000000;
+    background-color: #54B9DD; }
+    .entity.organization a {
+      color: #000000; }
   .entity.person {
     color: #000000;
-    background-color: #fff600; }
+    background-color: #EDF10B; }
     .entity.person a {
       color: #000000; }
   .entity.product {
-    background-color: #8e5300; }
+    background-color: #5B007B; }
   .entity.time {
-    background-color: #771ebe; }
+    color: #000000;
+    background-color: #D0F181; }
+    .entity.time a {
+      color: #000000; }
 
 .button-cont {
   text-align: right;
