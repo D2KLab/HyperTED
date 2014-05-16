@@ -83,7 +83,7 @@
 
 </section>
 
-<div class="main-content">
+<!--<div class="main-content">
 
     <% if (videoInfo) { %>
     <div id="video-info">
@@ -127,7 +127,27 @@
             </div>
         </div>
     </div>
+</div>-->
+<% if (videoInfo) { %>
+    <div id="related-frags">
+        <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+
+                    <% include partials/chapter.ejs %>
+            </div>
+
+            <!-- Controls -->
+            <a class="left carousel-control" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+            </a>
+            <a class="right carousel-control" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
+
+        </div>
+    </div>
 </div>
+
 
 <div class="nerdificable">
     <div class="container-fluid">
@@ -181,7 +201,8 @@
         </div>
     </div>
 </div>
-    </div>
+
+<% } %>
 
 
 
