@@ -12,7 +12,7 @@ var videoCache;
 ts.prepare();
 
 
-function viewVideo(req, res, videoURI, uuid) {
+function viewVideo(req, res, videoURI, uuid, sparql) {
     function sendResp(infoObj) {
         var source = {
             videoURI: videoURI,
@@ -37,64 +37,75 @@ function viewVideo(req, res, videoURI, uuid) {
 //        concSign = '&';
     }
 
-
-    var vendor = detectVendor(videoURI);
-    if (vendor) {
-        var id = detectId(videoURI, vendor);
-        if (id) {
-            var cacheKey = vendor.code + '-' + id;
-            var info = getFromCache(cacheKey);
-            if (info) {
-                if (!enriched || info.entities) {
-                    sendResp(info);
-                } else {
-                    getEntities(info, function (err, data) {
-                        if (err) {
-                            console.log(LOG_TAG + 'getEntit' +data);
-                            // TODO
-                        } else {
-                            info.entities = data;
-                        }
-
+    if (sparql) {
+       getSubtitlesTV2RDF(uuid, function (err, data) {
+            if (err) {
+                console.log('SPARQL ERROR: ' + err.message);
+                sendResp(null);
+            }
+            var videoInfo = {
+                timedtext: data
+            };
+            sendResp(videoInfo);
+        });
+    } else {
+        var vendor = detectVendor(videoURI);
+        if (vendor) {
+            var id = detectId(videoURI, vendor);
+            if (id) {
+                var cacheKey = vendor.code + '-' + id;
+                var info = getFromCache(cacheKey);
+                if (info) {
+                    if (!enriched || info.entities) {
                         sendResp(info);
-                        videoCache.set(cacheKey, info);
-                    });
-                }
-            } else {
-                info = getMetadata(id, vendor, function (err, response) {
-                    if (err) {
-                        //TODO
-                        console.log(LOG_TAG + 'ERR - ' + JSON.stringify(err));
-                        if (!response) {
-                            sendResp(null);
-                            return;
-                        }
-                    }
-
-                    info = response || info;
-                    if (enriched) {
+                    } else {
                         getEntities(info, function (err, data) {
                             if (err) {
-                                console.log(LOG_TAG + data);
+                                console.log(LOG_TAG + 'getEntit' + data);
                                 // TODO
                             } else {
                                 info.entities = data;
                             }
+
                             sendResp(info);
                             videoCache.set(cacheKey, info);
                         });
-                    } else {
-                        sendResp(info);
-                        videoCache.set(cacheKey, info);
                     }
-                });
+                } else {
+                    info = getMetadata(id, vendor, function (err, response) {
+                        if (err) {
+                            //TODO
+                            console.log(LOG_TAG + 'ERR - ' + JSON.stringify(err));
+                            if (!response) {
+                                sendResp(null);
+                                return;
+                            }
+                        }
+
+                        info = response || info;
+                        if (enriched) {
+                            getEntities(info, function (err, data) {
+                                if (err) {
+                                    console.log(LOG_TAG + data);
+                                    // TODO
+                                } else {
+                                    info.entities = data;
+                                }
+                                sendResp(info);
+                                videoCache.set(cacheKey, info);
+                            });
+                        } else {
+                            sendResp(info);
+                            videoCache.set(cacheKey, info);
+                        }
+                    });
+                }
+
             }
-
+        } else {
+            sendResp(null);
         }
-    } else {
-        sendResp(res, null);
     }
-
 }
 exports.sparql = function (req, res) {
     var uuid = req.param('uuid');
@@ -108,8 +119,7 @@ exports.sparql = function (req, res) {
         }
         var videoURI = data.value;
 
-        viewVideo(req, res, videoURI, uuid);
-
+        viewVideo(req, res, videoURI, uuid, true);
     });
 };
 exports.view = function (req, res) {
@@ -412,6 +422,10 @@ function getDailymotionSub(video_id, callback) {
             callback(err, err.message);
         }
     });
+}
+
+function getSubtitlesTV2RDF(uuid, callback) {
+    http.getRemoteFile('http://linkedtv.eurecom.fr/tv2rdf/api/mediaresource/'+uuid+'/metadata?metadataType=subtitle', callback);
 }
 
 function getYouTubeSub(video_id, callback) {

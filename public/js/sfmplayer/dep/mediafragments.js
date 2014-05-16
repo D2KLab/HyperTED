@@ -136,9 +136,9 @@ var MediaFragments = (function(window) {
       // hours:minutes:seconds:frames.further-subdivison-of-frames
       var smpte = /^(\d+\:\d\d\:\d\d(\:\d\d(\.\d\d)?)?)?$/;      
       var prefix = start.replace(/^(smpte(-25|-30|-30-drop)?).*/, '$1');
-      start = start.replace(/^smpte(-25|-30|-30-drop)?\:/, '');      
-      if ((smpte.test(start)) && (smpte.test(end))) {
-        // we interpret frames as milliseconds, and further-subdivison-of-frames
+      start = start.replace(/^smpte(-25|-30|-30-drop)?\:/, '');
+        if ((smpte.test(start)) && (smpte.test(end))) {
+            // we interpret frames as milliseconds, and further-subdivison-of-frames
         // as microseconds. this allows for relatively easy comparison.
         var convertToSeconds = function(time) {
           if (time === '') {
@@ -222,7 +222,7 @@ var MediaFragments = (function(window) {
       var wallClock = /^((\d{4})(-(\d{2})(-(\d{2})(T(\d{2})\:(\d{2})(\:(\d{2})(\.(\d+))?)?(Z|(([-\+])(\d{2})\:(\d{2})))?)?)?)?)?$/;      
       start = start.replace('clock:', '');
       if ((wallClock.test(start)) && (wallClock.test(end))) {
-        // the last condition is to ensure ISO 8601 date conformance.
+          // the last condition is to ensure ISO 8601 date conformance.
         // not all browsers parse ISO 8601, so we can only use date parsing
         // when it's there.
         if (start && end && !isNaN(Date.parse('2009-07-26T11:19:01Z'))) {
@@ -359,8 +359,8 @@ var MediaFragments = (function(window) {
       }
       // the key name needs to be decoded
       var key = decodeURIComponent(components[0]);
-      // only allow keys that are currently supported media fragments dimensions
-      var dimensionChecker = dimensions[key];
+        // only allow keys that are currently supported media fragments dimensions
+        var dimensionChecker = dimensions[key];
       // the value needs to be decoded
       var value = decodeURIComponent(components[1]);
       if (dimensionChecker) {
@@ -377,10 +377,10 @@ var MediaFragments = (function(window) {
       if (!keyValues[key]) {
         keyValues[key] = [];
       }
-      if (key !== 't') {
+        if (key !== 't') {
         keyValues[key].push(value);
       } else {
-        keyValues[key][0] = value;
+          keyValues[key][0] = value;
       }
     });
     return keyValues;

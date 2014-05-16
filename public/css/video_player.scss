@@ -18,6 +18,14 @@ $caviar: CaviarDreams, Helvetica, sans-serif;
   .mejs-mediaelement, .mejs-overlay {
     position: relative;
   }
+  .mejs-mediaelement video{
+    position: absolute;
+  }
+
+  .mejs-layer:not(.mejs-overlay-play){
+    position: absolute;
+    left: inherit;
+  }
 
   /*player control and progress bar container*/
   div.mejs-controls {
@@ -63,7 +71,6 @@ $caviar: CaviarDreams, Helvetica, sans-serif;
       .mfHighlight {
         @include box-shadow(0, 0, 7px, 8px, rgba(255, 248, 86, 0.5));
       }
-
     }
 
     .mejs-button {

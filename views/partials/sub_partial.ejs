@@ -14,19 +14,21 @@
             <%
             if (videoInfo && videoInfo.timedtext) {
                 var strList = videoInfo.timedtext.split('\n\n'), subList = [];
+                if (strList.length < 2) {
+                    strList = videoInfo.timedtext.substr(1).split('\n\r');
+                }
                 var charIndex = -1;
             %>
             <div class="sub-text <% if (enriched) { %>enriched<% } %>">
                 <%
                     for (var index in strList) {
                         var sub = {text: '', lineNum: 0};
-
                         var lines = strList[index].split('\n');
                         for (var line in lines) {
                             if (!sub.id) {
                                 sub.id = lines[line];
                             } else if (!sub.time) {
-                                sub.time = lines[line];
+                                sub.time = lines[line].replace('\r', '');
                             } else {
                                 var start = sub.lineNum > 0 ? '\n' : '';
                                 sub.text += start + lines[line];
@@ -50,7 +52,6 @@
                                 return ((x.label.length == y.label.length) ? 0 : (x.label.length < y.label.length) ? 1 : -1)
                             } else if (x.endChar > y.endChar) return -1;
                             else return 1;
-
                         });
 
 
