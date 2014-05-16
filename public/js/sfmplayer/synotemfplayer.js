@@ -303,6 +303,7 @@
 
             this.setmf = function (frag) {
                 frag = (frag.indexOf('#') == -1) ? '#' + frag : frag;
+                window.frag = frag;
                 var newProp = MediaFragments.parse(frag);
                 $.extend($(this).data('smfplayer').mfjson, newProp);
 

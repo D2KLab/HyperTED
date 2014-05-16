@@ -10,7 +10,7 @@ exports.prepare = function () {
 };
 
 exports.getLocator = function (uuid, callback) {
-    var identifier = "<http://data.linkedtv.eu/media/" + uuid + ">";
+    var identifier = generateIdentifier(uuid);
     var q = new Query().select('?locator', true).where(identifier, 'a', 'ma:MediaResource').where(identifier, 'ma:locator', '?locator');
 
     console.log("[SPARQL]  " + q.toString());
@@ -23,10 +23,20 @@ exports.getLocator = function (uuid, callback) {
         if (bindings.length == 0) {
             callback(true, 'No results');
         }
-        callback(false, bindings[0].locator);
+
+        var locator = bindings[0].locator;
+
+        if (locator.value.indexOf('http://stream17.noterik.com/') >= 0) {
+            locator.value += '/rawvideo/2/raw.mp4';
+        }
+        callback(false, locator);
     });
 };
 
+
+function generateIdentifier(uuid) {
+    return "<http://data.linkedtv.eu/media/" + uuid + ">";
+}
 
 function Query() {
     this.q = {
