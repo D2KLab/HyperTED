@@ -38,16 +38,33 @@ function viewVideo(req, res, videoURI, uuid, sparql) {
     }
 
     if (sparql) {
-       getSubtitlesTV2RDF(uuid, function (err, data) {
-            if (err) {
-                console.log('SPARQL ERROR: ' + err.message);
-                sendResp(null);
+        var videoInfo = {};
+        async.parallel(
+            [
+                function (asyncCallback) {
+                    getSubtitlesTV2RDF(uuid, function (err, data) {
+                        if (data) {
+                            videoInfo.timedtext = data;
+                        }
+                        asyncCallback(err);
+                    });
+                },
+                function (asyncCallback) {
+                    ts.getChapters(uuid, function (err, data) {
+                        if (data) {
+                            videoInfo.chapters = data;
+                        }
+                        asyncCallback(err);
+                    });
+                }
+            ], function (err) {
+                if (err) {
+                    //TODO
+                    console.log('SPARQL ERROR: ' + err.message);
+                }
+                sendResp(videoInfo);
             }
-            var videoInfo = {
-                timedtext: data
-            };
-            sendResp(videoInfo);
-        });
+        )
     } else {
         var vendor = detectVendor(videoURI);
         if (vendor) {
@@ -425,7 +442,7 @@ function getDailymotionSub(video_id, callback) {
 }
 
 function getSubtitlesTV2RDF(uuid, callback) {
-    http.getRemoteFile('http://linkedtv.eurecom.fr/tv2rdf/api/mediaresource/'+uuid+'/metadata?metadataType=subtitle', callback);
+    http.getRemoteFile('http://linkedtv.eurecom.fr/tv2rdf/api/mediaresource/' + uuid + '/metadata?metadataType=subtitle', callback);
 }
 
 function getYouTubeSub(video_id, callback) {
