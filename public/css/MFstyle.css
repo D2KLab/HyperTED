@@ -6,56 +6,48 @@
   src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: normal; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: normal; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: italic; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: italic; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: normal; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: normal; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: italic; }
-
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: italic; }
-
 /* colors */
 /*font*/
 .mejs-container {
@@ -79,14 +71,13 @@
     z-index: 100;
     /*current and total time*/
     /*progress bars*/ }
-    .mejs-container div.mejs-controls .mejs-time span {
-      @font-face {
-        font-family: "CaviarDreams";
-        src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
-        src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
-        font-weight: bold;
-        font-style: normal; }
- }
+@font-face {
+  .mejs-container div.mejs-controls .mejs-time span {
+    font-family: "CaviarDreams";
+    src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
+    src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
+    font-weight: bold;
+    font-style: normal; } }
     .mejs-container div.mejs-controls .mejs-time-rail {
       cursor: pointer;
       /*loaded time progress bar*/ }
@@ -142,12 +133,12 @@
 
 .mejs-overlay-play {
   /* alpha gradient on stopped video */
-  background: -moz-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
-  background: -webkit-gradient(linear, left top, right top, color-stop(0%, black), color-stop(18%, rgba(0, 0, 0, 0.5)), color-stop(28%, rgba(0, 0, 0, 0)), color-stop(78%, rgba(0, 0, 0, 0)), color-stop(88%, rgba(0, 0, 0, 0.5)), color-stop(100%, black));
-  background: -webkit-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
-  background: -o-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
-  background: -ms-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
-  background: linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  background: -moz-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, transparent 28%, transparent 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%, black), color-stop(18%, rgba(0, 0, 0, 0.5)), color-stop(28%, transparent), color-stop(78%, transparent), color-stop(88%, rgba(0, 0, 0, 0.5)), color-stop(100%, black));
+  background: -webkit-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, transparent 28%, transparent 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  background: -o-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, transparent 28%, transparent 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  background: -ms-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, transparent 28%, transparent 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  background: linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.5) 18%, transparent 28%, transparent 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#000000', endColorstr='#000000', GradientType=1); }
 
 /* colors */
@@ -309,6 +300,7 @@ html, body {
   margin: auto; }
 
 .chap-link {
+  position: relative;
   min-height: 100px;
   background: linear-gradient(white, #cccccc);
   -webkit-border-radius: 5px;
@@ -319,11 +311,60 @@ html, body {
   -moz-box-shadow: 2px 2px 6px 1px #b11200;
   -webkit-box-shadow: 2px 2px 6px 1px #b11200;
   box-shadow: 2px 2px 6px 1px #b11200;
-  margin: 20px; }
+  margin: 20px;
+  text-align: center;
+  padding-top: 10px; }
+  @media (max-width: 768px) {
+    .chap-link {
+      min-height: 40px;
+      padding: 0;
+      text-align: left; } }
+  .chap-link .chap-timing {
+    position: absolute;
+    height: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #b11200;
+    opacity: 0.7;
+    color: #f4f4f4;
+    -webkit-transition: height 200ms linear;
+    -moz-transition: height 200ms linear;
+    -o-transition: height 200ms linear;
+    transition: height 200ms linear; }
+    .chap-link .chap-timing h4 {
+      visibility: hidden; }
+    @media (max-width: 768px) {
+      .chap-link .chap-timing {
+        height: 100%;
+        right: 0;
+        width: 0%;
+        -webkit-transition: width 200ms linear;
+        -moz-transition: width 200ms linear;
+        -o-transition: width 200ms linear;
+        transition: width 200ms linear; } }
   .chap-link:hover {
-    -moz-box-shadow: 1px 1px 1px 1px #b11200;
-    -webkit-box-shadow: 1px 1px 1px 1px #b11200;
-    box-shadow: 1px 1px 1px 1px #b11200; }
+    -moz-box-shadow: 0 0 0 0 0;
+    -webkit-box-shadow: 0 0 0 0 0;
+    box-shadow: 0 0 0 0 0; }
+    .chap-link:hover .chap-timing {
+      height: 50%;
+      -webkit-border-radius: 0 0 5px 5px;
+      -moz-border-radius: 0 0 5px 5px;
+      -ms-border-radius: 0 0 5px 5px;
+      -o-border-radius: 0 0 5px 5px;
+      border-radius: 0 0 5px 5px; }
+      .chap-link:hover .chap-timing h4 {
+        visibility: visible; }
+      @media (max-width: 768px) {
+        .chap-link:hover .chap-timing {
+          height: 100%;
+          padding-left: 20px;
+          width: 50%;
+          -webkit-border-radius: 0 5px 5px 0;
+          -moz-border-radius: 0 5px 5px 0;
+          -ms-border-radius: 0 5px 5px 0;
+          -o-border-radius: 0 5px 5px 0;
+          border-radius: 0 5px 5px 0; } }
 
 .title {
   color: #aaaaaa;

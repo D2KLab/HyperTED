@@ -6,6 +6,22 @@
   border-radius: $radius;
 }
 
+@mixin border-radius-bottom($radius){
+-webkit-border-radius: 0 0 $radius $radius;
+-moz-border-radius: 0 0 $radius $radius;
+-ms-border-radius: 0 0 $radius $radius;
+-o-border-radius: 0 0 $radius $radius;
+border-radius: 0 0 $radius $radius;
+}
+
+@mixin border-radius-right($radius){
+  -webkit-border-radius: 0 $radius $radius 0;
+  -moz-border-radius: 0 $radius $radius 0;
+  -ms-border-radius: 0 $radius $radius 0;
+  -o-border-radius: 0 $radius $radius 0;
+  border-radius: 0 $radius $radius 0;
+}
+
 @mixin transition($prop, $time) {
   -webkit-transition: $prop $time ease-out;
   -moz-transition: $prop $time ease-out;
