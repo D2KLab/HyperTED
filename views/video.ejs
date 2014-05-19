@@ -90,15 +90,15 @@
         <div class="stats-cont">
             <div class="left-col">
                 <%
-                    var leftVals = {
-                        'Published': videoInfo.published,
-                        'Category': videoInfo.category
-                    };
+    var leftVals = {
+        'Published': videoInfo.published,
+        'Category': videoInfo.category
+    };
 
-                        for(key in leftVals) {
-                    var value = leftVals [key];
-                    if (value == undefined || value == null) continue;
-                %>
+        for(key in leftVals) {
+    var value = leftVals [key];
+    if (value == undefined || value == null) continue;
+%>
                 <div class="stat">
                     <label class="key"><%= key %></label>
                     <span class="value"><%= value %></span>
@@ -107,17 +107,17 @@
             </div>
             <div class="right-col">
                 <%
-                    var rightVals = {
-                        'Views': {obj: videoInfo.views, gliph: 'eye-open'},
-                        'Likes': {obj: videoInfo.likes, gliph: 'thumbs-up'},
-                        'Favourites': {obj: videoInfo.favourites, gliph: 'star'},
-                        'AVG Rating': {obj: videoInfo.avgRate, gliph: 'signal'}
-                    };
+    var rightVals = {
+        'Views': {obj: videoInfo.views, gliph: 'eye-open'},
+        'Likes': {obj: videoInfo.likes, gliph: 'thumbs-up'},
+        'Favourites': {obj: videoInfo.favourites, gliph: 'star'},
+        'AVG Rating': {obj: videoInfo.avgRate, gliph: 'signal'}
+    };
 
-                        for(key in rightVals) {
-                    var value = rightVals [key].obj;
-                    if (value == undefined || value == null) continue;
-                %>
+        for(key in rightVals) {
+    var value = rightVals [key].obj;
+    if (value == undefined || value == null) continue;
+%>
                 <div class="stat little">
                         <span class="key glyphicon glyphicon-<%= rightVals [key].gliph %>"
                               title="<%= key %>"></span>
@@ -129,23 +129,23 @@
     </div>
 </div>-->
 <% if (videoInfo) { %>
-    <div id="related-frags">
-        <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner">
+<div id="related-frags">
+    <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
 
-                    <% include partials/chapter.ejs %>
-            </div>
-
-            <!-- Controls -->
-            <a class="left carousel-control" data-slide="prev">
-                <span class="glyphicon glyphicon-chevron-left"></span>
-            </a>
-            <a class="right carousel-control" data-slide="next">
-                <span class="glyphicon glyphicon-chevron-right"></span>
-            </a>
-
+            <% include partials/chapter.ejs %>
         </div>
+
+        <!-- Controls -->
+        <a class="left carousel-control" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+        <a class="right carousel-control" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </a>
+
     </div>
+</div>
 </div>
 
 
@@ -172,7 +172,6 @@
             </div>
             <% } %>
 
-
             <div class="col-md-5 col-lg-5">
                 <% include partials/playlist.ejs %>
             </div>
@@ -192,7 +191,7 @@
             </div>
 
             <% if(videoInfo.descr) { %>
-            <div class="descr-cont <% if(videoInfo.timedtext) { %>col-md-5 col-lg-5<% }  %>" id="descr-cont">
+            <div class="descr-cont <% if(videoInfo.timedtext) { %>col-md-5 col-lg-5<% } %>" id="descr-cont">
                 <% include partials/descr_partial.ejs %>
                 <button type="button" class="see-all" for="descr">see more</button>
             </div>
@@ -204,14 +203,15 @@
 
 <% } %>
 
-
-
 <script>
     var video = {
         uri: "<%= videoURI %>",
         id: "<%= videoInfo && videoInfo.video_id %>",
         vendor: "<%= videoInfo && videoInfo.vendor %>"
-    }
+    };
+    <% if (videoInfo && videoInfo.chapters) {%>
+    var chapter = <%- JSON.stringify(videoInfo.chapters) %>;
+    <%}%>
 </script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js"></script>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
