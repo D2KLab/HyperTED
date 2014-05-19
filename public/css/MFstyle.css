@@ -358,7 +358,8 @@ html, body {
       -o-border-radius: 0 0 5px 5px;
       border-radius: 0 0 5px 5px; }
       .chap-line .chap-link:hover .chap-timing p {
-        visibility: visible; }
+        visibility: visible;
+        margin-bottom: -4px; }
       @media (max-width: 768px) {
         .chap-line .chap-link:hover .chap-timing {
           height: 100%;
