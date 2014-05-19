@@ -39,7 +39,7 @@
                     <h3 class="title"><%= entTypeList.length %> <%= typeName %></h3>
                     <ul class="displayEntity">
                         <% entTypeList.forEach(function (ent) {
-                var href = ent.uri ? 'href="' + ent.uri + '" target="_blank"' : '';
+                var href = ent.uri ? 'href=' + ent.uri + ' target="_blank"' : '';
                             var href2 = ""; //FIXME is empty for debug purpose
                         %>
                         <li><span class="entity <%= typeName.toLowerCase() %>">
