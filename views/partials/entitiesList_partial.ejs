@@ -39,13 +39,18 @@
                     <h3 class="title"><%= entTypeList.length %> <%= typeName %></h3>
                     <ul class="displayEntity">
                         <% entTypeList.forEach(function (ent) {
-//                var href = ent.uri ? 'href="' + ent.uri + '" target="_blank"' : '';
-                            var href = ""; //FIXME is empty for debug purpose
+                var href = ent.uri ? 'href="' + ent.uri + '" target="_blank"' : '';
+                            var href2 = ""; //FIXME is empty for debug purpose
                         %>
                         <li><span class="entity <%= typeName.toLowerCase() %>">
-                    <a <%= href %> data-start-time="<%= ent.startNPT %>" data-end-time="<%= ent.endNPT %>">
+                    <a <%= href2 %> data-start-time="<%= ent.startNPT %>" data-end-time="<%= ent.endNPT %>">
                         #<%= ent.label %>
                     </a>
+                                <li>
+                                    <a <%=href%> >
+                                        #<%= ent.label %>
+                                    </a>
+                                </li>
                 </span></li>
                         <% }) %>
                     </ul>
