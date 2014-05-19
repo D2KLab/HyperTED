@@ -303,6 +303,16 @@ html, body {
   min-height: 55px;
   margin-top: 35px;
   text-align: right; }
+  .chap-label .glyphicon-chevron-down {
+    visibility: hidden; }
+  @media (max-width: 768px) {
+    .chap-label {
+      text-align: center;
+      min-height: 10px; }
+      .chap-label .glyphicon-chevron-down {
+        visibility: visible; }
+      .chap-label .glyphicon-chevron-right {
+        visibility: hidden; } }
 
 .chap-line {
   min-height: 55px;

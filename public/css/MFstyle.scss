@@ -209,6 +209,19 @@ $navbarTransitionTime: 100ms;
   min-height: 55px;
   margin-top: 35px;
   text-align: right;
+  .glyphicon-chevron-down{
+    visibility: hidden;
+  }
+  @media(max-width: 768px) {
+    text-align: center;
+    min-height: 10px;
+    .glyphicon-chevron-down{
+      visibility: visible;
+    }
+    .glyphicon-chevron-right{
+      visibility: hidden;
+    }
+  }
 }
 
 .chap-line {
