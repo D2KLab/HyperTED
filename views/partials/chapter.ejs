@@ -1,41 +1,43 @@
 <div class="container-fluid">
+
     <div class="row">
 
-        <%
-        var chapterList = [
-
-            {
-                title: 'Chapter 1',
-                timing: '0:00:23 - 0:00:49',
-                hash: '#t=0:00:23,0:00:49'
-            },
-            {
-                title: 'Chapter 2',
-                timing: '0:03:11 - 0:04:43',
-                hash: '#t=0:03:11,0:04:43&xywh=pixel:160,95,319,305'
-            },
-            {
-                title: 'Chapter 3',
-                timing: '0:06:11 - 0:08:43',
-                hash: '#t=0:06:11,0:08:43'
+        <% var chapterList = videoInfo.chapters; %>
+        <% function labelTime(time) {
+            if (time < 60) {
+                return "00:00:" + Math.floor(time);
+            } else if (time == 60 || time > 60 && time < 3600) {
+                return "00:" + Math.floor(time / 60) + ":" + Math.floor(time % 60);
+            } else if (time == 3600 || time > 3600) {
+                return Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":" + Math.floor((time % 3600) % 60);
             }
-        ];
-        %>
 
-        <!--<div class="chap-list">-->
-        <div class="col-md-2"></div>
-            <% chapterList.forEach(function(chap){ %>
-            <div class="col-md-2">
+        } %>
 
-                <div class="chap-link">
-                    <h3><%= chap.title %></h3>
-                    <div class="chap-timing">
-                    <h4><%= chap.timing %></h4>
-                        </div>
-                </div>
+        <div class="col-md-2">
+            <div class="chap-label">
+                <h3>chapters<span class="glyphicon glyphicon-chevron-right"></span></h3>
             </div>
-            <% }) %>
+        </div>
 
-        <!--</div>-->
+        <div class="col-md-10">
+
+            <div class="chap-line">
+                <%
+                chapterList.forEach(function(chap){
+                    var startTime = chap.tStart.value;
+                    var endTime = chap.tEnd.value;
+                    var tStart = labelTime(startTime);
+                    var tEnd = labelTime(endTime);
+                %>
+                <div class="chap-link" data-width>
+                    <div class="chap-timing">
+                        <p><%= tStart %> - <%= tEnd %></p>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+
+        </div>
     </div>
 </div>
