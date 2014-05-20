@@ -165,13 +165,31 @@ $(document).ready(function () {
     $('p > span.entity').has('span').addClass('nesting');
 
 
-
     $(document).on('click', '.sub-text p[data-time]', function () {
         var srtTime = $(this).data('time');
         var hms = srtTime.replace(/,/g, '.').replace(' --> ', ',');
         $player.setmf('t=' + hms).playmf();
         updateMFurl();
     });
+
+
+    $(document).on('click', '.chap-link', function () {
+        var $chapter = $(this).children('a');
+        var startChapter = $chapter.data('start-time');
+        var endChapter = $chapter.data('end-time');
+        $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
+        updateMFurl();
+    });
+
+    $('.chap-link').each(function () {
+        var chapter = $(this).children('a');
+        var startChapter = chapter.data('start-time');
+        var endChapter = chapter.data('end-time');
+        var totWidth = $('.chap-line .chap-link:last-child').children('a').data('end-time');
+        var width = (endChapter - startChapter) / totWidth * 100 + "%";
+
+        $(this).css("width", width);
+    })
 
 
     function updateMFurl() {

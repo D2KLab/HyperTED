@@ -4,14 +4,7 @@
 
         <% var chapterList = videoInfo.chapters; %>
         <% function labelTime(time) {
-            if (time < 60) {
-                return "00:00:" + Math.floor(time);
-            } else if (time == 60 || time > 60 && time < 3600) {
-                return "00:" + Math.floor(time / 60) + ":" + Math.floor(time % 60);
-            } else if (time == 3600 || time > 3600) {
-                return Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":" + Math.floor((time % 3600) % 60);
-            }
-
+            return (time < 60) ? "00:00:" + Math.floor(time) : (time == 60 || time > 60 && time < 3600) ? "00:" + Math.floor(time / 60) + ":" + Math.floor(time % 60) : Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":" + Math.floor((time % 3600) % 60);
         } %>
 
         <div class="col-md-2">
@@ -32,12 +25,18 @@
                     var endTime = chap.tEnd.value;
                     var tStart = labelTime(startTime);
                     var tEnd = labelTime(endTime);
+
                 %>
-                <div class="chap-link" data-width>
-                    <div class="chap-timing">
-                        <p><%= tStart %></p>
-                        <p><%= tEnd %></p>
-                    </div>
+                <div class="chap-link">
+                    <a data-start-time="<%= startTime %>" data-end-time="<%= endTime %>">
+
+                        <div class="chap-timing">
+                            <p><%= tStart %></p>
+
+                            <p><%= tEnd %></p>
+                        </div>
+
+                    </a>
                 </div>
                 <% }) %>
             </div>
