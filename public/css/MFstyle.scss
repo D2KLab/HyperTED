@@ -35,21 +35,61 @@ ul {
 html, body {
   background: $light_gray;
   height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .home_header {
   background: white;
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
   margin: 0 0 30px;
-  height: 50%;
-  h1 {
+  min-height: 40%;
+  width: 100%;
+
+  .HTlogo {
     text-align: center;
-    font-size: 4.5em;
-    color: #b11200;
-    margin: -0.5em auto 0;
-    position: relative;
-    top: 50%;
-    padding: 0 40px;
+    padding-top: 100px;
+  }
+}
+
+.container {
+  min-height: 40%;
+
+}
+
+.home_footer, .video_footer {
+
+  width: 100%;
+  .foo {
+    text-align: center;
+    hr {
+      margin: -6px 0 0 0;
+    }
+    .eurecomLogo, .mediamixerLogo  {
+      display: inline-block;
+      margin-top: 1.5em;
+    }
+
+    h1 {
+      margin: 0;
+    }
+  }
+}
+
+.home_footer {
+  background: white;
+  position: absolute;
+  bottom: 0;
+  height: 20%;
+}
+
+.video_footer {
+  margin-top: 50px;
+  .eurecomLogo, .mediamixerLogo  {
+    img{
+    width:55%;
+      height: auto;
+    }
   }
 }
 
@@ -150,6 +190,7 @@ $navbarTransitionTime: 100ms;
   max-width: 1200px;
   margin: 80px auto auto auto;
   padding-top: 50px;
+  padding-bottom: 50px;
 
   #playlist-sect {
     margin: 10px;
@@ -205,20 +246,20 @@ $navbarTransitionTime: 100ms;
   }
 }
 
-.chap-label{
+.chap-label {
   min-height: 55px;
   margin-top: 35px;
   text-align: right;
-  .glyphicon-chevron-down{
+  .glyphicon-chevron-down {
     visibility: hidden;
   }
   @media(max-width: 768px) {
     text-align: center;
     min-height: 10px;
-    .glyphicon-chevron-down{
+    .glyphicon-chevron-down {
       visibility: visible;
     }
-    .glyphicon-chevron-right{
+    .glyphicon-chevron-right {
       visibility: hidden;
     }
   }
@@ -232,14 +273,12 @@ $navbarTransitionTime: 100ms;
   .chap-link {
     margin-top: 20px;
     position: relative;
-    width: 12%;
     height: 20px;
     background-color: #b11200;
-    &:nth-child(odd){
+    &:nth-child(odd) {
       background-color: #e41300;
     }
     float: left;
-
 
     .chap-timing {
       position: absolute;
@@ -254,13 +293,6 @@ $navbarTransitionTime: 100ms;
       p {
         visibility: hidden;
       }
-
-      @media(max-width: 768px) {
-        height: 100%;
-        right: 0;
-        width: 0%;
-        @include linear-transition(width, 200ms);
-      }
     }
     &:hover {
 
@@ -271,13 +303,6 @@ $navbarTransitionTime: 100ms;
         p {
           visibility: visible;
           margin-bottom: -4px;
-        }
-
-        @media(max-width: 768px) {
-          height: 100%;
-          padding-left: 20px;
-          width: 50%;
-          @include border-radius-right(5px);
         }
       }
     }
