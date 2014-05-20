@@ -127,6 +127,7 @@ function viewVideo(req, res, videoURI, uuid, sparql) {
 exports.sparql = function (req, res) {
     var uuid = req.param('uuid');
     ts.getLocator(uuid, function (err, data) {
+        console.log('BBBBBBBBBBBBBB');
         if (err) {
             res.send(data);
             return;
@@ -193,7 +194,7 @@ exports.search = function (req, res) {
             res.redirect('/');
             return;
         } else {
-            var uuid = data.id;
+            var uuid = data.uuid;
             var hashPart = parsedURI.hash || '';
             var redirectUrl = '/video/' + uuid + fragPart + hashPart;
             console.log('Redirecting to ' + redirectUrl);
@@ -389,6 +390,7 @@ exports.ajaxGetMetadata = function (req, res) {
         return;
     }
     db.getLocator(uuid, function (err, data) {
+        console.log(JSON.stringify(data));
         if (err) {
             res.json({error: 'video not found in db'});
             return;
