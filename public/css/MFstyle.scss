@@ -65,7 +65,7 @@ html, body {
     hr {
       margin: -6px 0 0 0;
     }
-    .eurecomLogo, .mediamixerLogo  {
+    .eurecomLogo, .mediamixerLogo {
       display: inline-block;
       margin-top: 1.5em;
     }
@@ -85,9 +85,9 @@ html, body {
 
 .video_footer {
   margin-top: 50px;
-  .eurecomLogo, .mediamixerLogo  {
-    img{
-    width:55%;
+  .eurecomLogo, .mediamixerLogo {
+    img {
+      width: 55%;
       height: auto;
     }
   }
@@ -206,6 +206,18 @@ $navbarTransitionTime: 100ms;
   }
 }
 
+.stat {
+  label.key {
+    color: #b11200;
+  }
+  .value {
+    color: $light_gray;
+  }
+  .value, label.key {
+    display: inline-block;
+  }
+}
+
 .red_rule {
   background-color: #b11200;
   height: 5px;
@@ -296,7 +308,6 @@ $navbarTransitionTime: 100ms;
       }
     }
     &:hover {
-
       .chap-timing {
         height: 45px;
         @include border-radius-bottom(5px);
