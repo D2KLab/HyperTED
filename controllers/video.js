@@ -12,7 +12,15 @@ var videoCache;
 ts.prepare();
 
 
-function viewVideo(req, res, videoURI, uuid, sparql) {
+function viewVideo(req, res, video, sparql) {
+    var videoURI = video.locator;
+    var uuid = video.uuid;
+
+    if (videoURI.indexOf('http://stream17.noterik.com/') >= 0) {
+        videoURI += '/rawvideo/2/raw.mp4?ticket=77451bc0-e0bf-11e3-8b68-0800200c9a66';
+    }
+
+
     function sendResp(infoObj) {
         var source = {
             videoURI: videoURI,
@@ -127,17 +135,16 @@ function viewVideo(req, res, videoURI, uuid, sparql) {
 exports.sparql = function (req, res) {
     var uuid = req.param('uuid');
     ts.getLocator(uuid, function (err, data) {
-        console.log('BBBBBBBBBBBBBB');
         if (err) {
             res.send(data);
             return;
         }
-        if (data.type != 'uri') {
-            //TODO
-        }
-        var videoURI = data.value;
+        var video = {
+            uuid: uuid,
+            locator: data
+        };
 
-        viewVideo(req, res, videoURI, uuid, true);
+        viewVideo(req, res, video, true);
     });
 };
 exports.view = function (req, res) {
@@ -152,10 +159,7 @@ exports.view = function (req, res) {
             res.redirect('/');
             return;
         }
-
-        var videoURI = data.locator;
-
-        viewVideo(req, res, videoURI, uuid);
+        viewVideo(req, res, data);
     });
 
 };
@@ -186,6 +190,12 @@ exports.search = function (req, res) {
         var queryUnit = j + '=' + req.query[j];
         fragPart += fragSeparator + queryUnit;
     }
+
+    if(parsedURI.hostname = 'stream17.noterik.com'){
+        locator.replace(/\/rawvideo\/[0-9]\/raw.mp4/,'');
+        locator.replace(/\?ticket=.+/,'');
+    }
+    console.log(locator);
 
     db.insert(locator, function (err, data) {
         if (err) {
@@ -390,7 +400,6 @@ exports.ajaxGetMetadata = function (req, res) {
         return;
     }
     db.getLocator(uuid, function (err, data) {
-        console.log(JSON.stringify(data));
         if (err) {
             res.json({error: 'video not found in db'});
             return;

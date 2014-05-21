@@ -1,4 +1,5 @@
-var sparql = require("sparql");
+var http = require('http'),
+    sparql = require("sparql");
 var client;
 
 exports.prepare = function () {
@@ -28,10 +29,12 @@ exports.getLocator = function (uuid, callback) {
         }
 
         var locator = bindings[0].locator;
-
-        if (locator.value.indexOf('http://stream17.noterik.com/') >= 0) {
-            locator.value += '/rawvideo/2/raw.mp4';
+        if (locator.type != 'uri') {
+            //TODO
+        }else{
+            locator = locator.value;
         }
+
         callback(false, locator);
     });
 };
@@ -61,6 +64,31 @@ exports.getChapters = function (uuid, callback) {
     });
 };
 
+exports.findFromLocator = function (locator) {
+    var t = locator.indexOf('?ticket');
+    if (t > 0) {
+        locator = locator.substring(0, t);
+    }
+
+    var q = new Query().select('?MediaResource', true)
+        .where('?MediaResource', 'ma:locator', locator).where('?MediaResource', 'a', 'ma:MediaResource').limit(1);
+
+    client.query(q.toString(), function (err, data) {
+        if (err) {
+            callback(err, err.message);
+            return;
+        }
+        var bindings = data.results.bindings;
+        if (bindings.length == 0) {
+            callback(true, 'No results');
+        }
+
+        var locator = bindings[0].locator;
+
+        //TODO estrarre uuid
+        callback(false, locator);
+    });
+};
 
 function generateIdentifier(uuid) {
     return "<http://data.linkedtv.eu/media/" + uuid + ">";
@@ -70,7 +98,8 @@ function Query() {
     this.q = {
         select: null,
         where: [],
-        orderby: ''
+        orderby: '',
+        limit: -1
     }
 }
 
@@ -85,6 +114,14 @@ Query.prototype.where = function (subj, verb, obj) {
 };
 Query.prototype.orderby = function (subj) {
     this.q.orderby = subj;
+    return this;
+};
+Query.prototype.limit = function (n) {
+    if (typeof n != "number") {
+        console.log("Limit is not a number. I will ignore it");
+        return this;
+    }
+    this.q.limit = n;
     return this;
 };
 
@@ -102,6 +139,9 @@ Query.prototype.toString = function () {
     }
     if (q.orderby) {
         s += ' ORDER BY ' + q.orderby;
+    }
+    if (q.limit > 0) {
+        s += ' LIMIT ' + q.limit;
     }
     return s;
 };
