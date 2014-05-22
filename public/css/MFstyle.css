@@ -6,48 +6,56 @@
   src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: normal; }
+
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: normal; }
+
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: italic; }
+
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: italic; }
+
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: normal; }
+
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
   src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: normal; }
+
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_Italic-webfont.svg#CaviarDreams") format("svg");
   font-weight: normal;
   font-style: italic; }
+
 @font-face {
   font-family: "CaviarDreams";
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot");
   src: url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.woff") format("woff"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/CaviarDreams_BoldItalic-webfont.svg#CaviarDreams") format("svg");
   font-weight: bold;
   font-style: italic; }
+
 /* colors */
 /*font*/
 .mejs-container {
@@ -71,13 +79,14 @@
     z-index: 100;
     /*current and total time*/
     /*progress bars*/ }
-@font-face {
-  .mejs-container div.mejs-controls .mejs-time span {
-    font-family: "CaviarDreams";
-    src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
-    src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
-    font-weight: bold;
-    font-style: normal; } }
+    .mejs-container div.mejs-controls .mejs-time span {
+      @font-face {
+        font-family: "CaviarDreams";
+        src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot");
+        src: url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.woff") format("woff"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.ttf") format("truetype"), url("fonts/CaviarDreams/Caviar_Dreams_Bold-webfont.svg#CaviarDreams") format("svg");
+        font-weight: bold;
+        font-style: normal; }
+ }
     .mejs-container div.mejs-controls .mejs-time-rail {
       cursor: pointer;
       /*loaded time progress bar*/ }
@@ -133,12 +142,12 @@
 
 .mejs-overlay-play {
   /* alpha gradient on stopped video */
-  background: -moz-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, transparent 28%, transparent 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
-  background: -webkit-gradient(linear, left top, right top, color-stop(0%, black), color-stop(18%, rgba(0, 0, 0, 0.5)), color-stop(28%, transparent), color-stop(78%, transparent), color-stop(88%, rgba(0, 0, 0, 0.5)), color-stop(100%, black));
-  background: -webkit-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, transparent 28%, transparent 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
-  background: -o-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, transparent 28%, transparent 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
-  background: -ms-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, transparent 28%, transparent 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
-  background: linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.5) 18%, transparent 28%, transparent 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  background: -moz-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%, black), color-stop(18%, rgba(0, 0, 0, 0.5)), color-stop(28%, rgba(0, 0, 0, 0)), color-stop(78%, rgba(0, 0, 0, 0)), color-stop(88%, rgba(0, 0, 0, 0.5)), color-stop(100%, black));
+  background: -webkit-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  background: -o-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  background: -ms-linear-gradient(left, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
+  background: linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.5) 18%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.5) 88%, black 100%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#000000', endColorstr='#000000', GradientType=1); }
 
 /* colors */

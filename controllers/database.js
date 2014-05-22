@@ -14,30 +14,20 @@ exports.getLocator = function (uuid, callback) {
     videos.findOne({uuid: uuid}).on('complete', callback);
 };
 
-exports.getUUID = function (locator, callback) {
-//    videos.findOne({locator: ""+locator}).on('success', function(err, data){
-//        console.log(err);
-//    });
+exports.getFromLocator = function (locator, callback) {
     videos.findOne({locator: locator}).on('complete', callback);
 };
 
-exports.insert = function (locator, callback) {
-    var uuid = UUID.v4();
-    videos.insert({
-        "uuid": uuid,
-        "locator": locator
-    }, function (err, doc) {
+exports.insert = function (video, callback) {
+    video.uuid = UUID.v4();
+    //TODO check if used uuid
+    videos.insert(video, function (err, doc) {
         if (err) {
             console.log('DB insert fail. ' + JSON.stringify(err));
             console.log('Check for existent locator.');
             videos.findOne({locator: locator}).on('complete', callback);
         } else {
-            var data = {
-                uuid: uuid,
-                locator: locator
-            };
-            callback(false, data);
+            callback(err, doc);
         }
-
     });
 };

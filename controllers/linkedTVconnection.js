@@ -31,7 +31,7 @@ exports.getLocator = function (uuid, callback) {
         var locator = bindings[0].locator;
         if (locator.type != 'uri') {
             //TODO
-        }else{
+        } else {
             locator = locator.value;
         }
 
@@ -64,31 +64,98 @@ exports.getChapters = function (uuid, callback) {
     });
 };
 
-exports.findFromLocator = function (locator) {
+exports.getFromLocator = function (locator, callback) {
     var t = locator.indexOf('?ticket');
     if (t > 0) {
         locator = locator.substring(0, t);
     }
 
-    var q = new Query().select('?MediaResource', true)
-        .where('?MediaResource', 'ma:locator', locator).where('?MediaResource', 'a', 'ma:MediaResource').limit(1);
+    var q = new Query().select('?MediaResource')
+        .where('?MediaResource', 'a', 'ma:MediaResource')
+        .where('?MediaResource', 'ma:locator', '<' + locator + '>');
 
+    q = qAddChapterOf('?MediaResource', q);
+
+    console.log(q.toString());
     client.query(q.toString(), function (err, data) {
         if (err) {
-            callback(err, err.message);
+            //TODO
+            console.log(err);
+            callback(err, data);
             return;
         }
         var bindings = data.results.bindings;
         if (bindings.length == 0) {
-            callback(true, 'No results');
+            console.log("No results");
+            callback(err, null);
+            return;
+        } else if (bindings.length == 1) {
+            result = bindings[0];
+        } else {
+            var result;
+            bindings.forEach(function (row) {
+                if (!result) { //prima riga
+                    if (row.chapter) {
+                        result = {
+                            MediaResource: {
+                                type: row.MediaResource.type,
+                                value: row.MediaResource.value
+                            }
+                        };
+                        delete row.MediaResource;
+                        result.chapters = [];
+                        result.chapters.push(row);
+                    } else {
+                        result = row;
+                    }
+                    return;
+                }
+
+                if (row.MediaResource.value == result.MediaResource.value) {
+                    if (row.chapter) {
+                        delete row.MediaResource;
+                        if (!result.chapters) {
+                            result.chapters = [];
+                        }
+                        result.chapters.push(row);
+                    }//else not possible for now
+                } else {
+                    if (!result.chapters && row.chapter) { //prefere row to result
+                        result = {
+                            MediaResource: {
+                                type: row.MediaResource.type,
+                                value: row.MediaResource.value
+                            }
+                        };
+                        delete row.MediaResource;
+                        result.chapters = [];
+                        result.chapters.push(row);
+                    }//else do nothing
+                }
+            });
+
         }
 
-        var locator = bindings[0].locator;
+        //extract uuid
+        var re = /data\.linkedtv\.eu\/media\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i;
+        result.ltv_uuid = re.exec(result.MediaResource.value)[1];
 
-        //TODO estrarre uuid
-        callback(false, locator);
+        callback(err, result);
     });
 };
+
+function qAddChapterOf(mr, q) {
+    return q.select('?mediafragment, ?chapter, ?tEnd, ?tStart, ?tUnit')
+        .textWhere('?mediafragment a ma:MediaFragment. ' +
+            '?mediafragment ma:isFragmentOf ' + mr + ' . ' +
+            '?mediafragment nsa:temporalEnd ?tEnd. ' +
+            '?mediafragment nsa:temporalStart ?tStart. ' +
+            '?mediafragment nsa:temporalUnit ?tUnit. ' +
+            '?annotation a oa:Annotation. ' +
+            '?annotation oa:hasTarget ?mediafragment. ' +
+            '?annotation oa:hasBody ?chapter. ' +
+            '?chapter a linkedtv:Chapter. ', true).orderby('?tStart');
+}
 
 function generateIdentifier(uuid) {
     return "<http://data.linkedtv.eu/media/" + uuid + ">";
@@ -96,20 +163,29 @@ function generateIdentifier(uuid) {
 
 function Query() {
     this.q = {
-        select: null,
+        select: [],
         where: [],
         orderby: '',
         limit: -1
     }
 }
-
-Query.prototype.select = function (args, distinct) {
-    this.q.select = distinct ? 'DISTINCT ' + args : args;
+Query.prototype.select = function (args) {
+    this.q.select.push(args);
     return this;
 };
-
-Query.prototype.where = function (subj, verb, obj) {
-    this.q.where.push(subj + ' ' + verb + ' ' + obj);
+Query.prototype.where = function (subj, verb, obj, optional) {
+    var w = subj + ' ' + verb + ' ' + obj + ' . ';
+    if (optional) {
+        w = ' OPTIONAL { ' + w + ' } ';
+    }
+    this.q.where.push(w);
+    return this;
+};
+Query.prototype.textWhere = function (text, optional) {
+    if (optional) {
+        text = ' OPTIONAL { ' + text + ' } ';
+    }
+    this.q.where.push(text);
     return this;
 };
 Query.prototype.orderby = function (subj) {
@@ -124,16 +200,15 @@ Query.prototype.limit = function (n) {
     this.q.limit = n;
     return this;
 };
-
-
 Query.prototype.toString = function () {
     var q = this.q;
-    if (q.select == null) throw new Error('Select part undefined');
-    var s = 'SELECT ' + q.select;
+    if (q.select == null || q.select == []) throw new Error('Select part undefined');
+    var s = 'SELECT DISTINCT ' + q.select.toString();
+
     if (q.where) {
         s += ' WHERE {';
         q.where.forEach(function (w) {
-            s += w + ' . ';
+            s += w;
         });
         s += ' }'
     }
