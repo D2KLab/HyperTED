@@ -72,61 +72,33 @@
 
     <% if (videoInfo && videoInfo.title) { %>
     <div class="info-on-player">
+
         <h1 id="video-title" class="title"><%= videoInfo.title %></h1>
+
+        <% if (videoInfo) {
+            var leftVals = {
+                'Published': videoInfo.published,
+                'Category': videoInfo.category
+            };
+
+                for(key in leftVals) {
+            var value = leftVals [key];
+            if (value == undefined || value == null) continue;
+        %>
+        <div class="stat">
+            <label class="key"><%= key %></label>
+            <h5 class="value" class="title"><%= value %></h5>
+        </div>
+        <% } } %>
     </div>
     <% } %>
 
 </section>
 
-<div class="main-content">
 
-    <% if (videoInfo) { %>
-    <div id="video-info">
-        <div class="stats-cont">
-            <div class="left-col">
-                <%
-    var leftVals = {
-        'Published': videoInfo.published,
-        'Category': videoInfo.category
-    };
-
-        for(key in leftVals) {
-    var value = leftVals [key];
-    if (value == undefined || value == null) continue;
-%>
-                <div class="stat">
-                    <label class="key"><%= key %></label>
-                    <span class="value"><%= value %></span>
-                </div>
-                <% } %>
-            </div>
-            <div class="right-col">
-                <%
-    var rightVals = {
-        'Views': {obj: videoInfo.views, gliph: 'eye-open'},
-        'Likes': {obj: videoInfo.likes, gliph: 'thumbs-up'},
-        'Favourites': {obj: videoInfo.favourites, gliph: 'star'},
-        'AVG Rating': {obj: videoInfo.avgRate, gliph: 'signal'}
-    };
-
-        for(key in rightVals) {
-    var value = rightVals [key].obj;
-    if (value == undefined || value == null) continue;
-%>
-                <div class="stat little">
-                        <span class="key glyphicon glyphicon-<%= rightVals [key].gliph %>"
-                              title="<%= key %>"></span>
-                    <span class="value"><%= value %></span>
-                </div>
-                <% } %>
-            </div>
-        </div>
-    </div>
-</div>
-<% if (videoInfo) { %>
-<% if (videoInfo.chapters) { %>
+<% if (videoInfo.chapters) {%>
 <div id="related-frags">
-    <% include partials/chapter.ejs %>
+            <% include partials/chapter.ejs %>
 </div>
 <% } %>
 
@@ -160,7 +132,6 @@
 
         </div>
 
-        <% } %>
 
         <div class="row">
 
@@ -182,7 +153,6 @@
     </div>
 </div>
 
-<% } %>
 
 <script>
     var video = {
