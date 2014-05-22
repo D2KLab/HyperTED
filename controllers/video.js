@@ -14,13 +14,37 @@ ts.prepare();
 
 function viewVideo(req, res, videoURI, uuid, sparql) {
     function sendResp(infoObj) {
-        var source = {
-            videoURI: videoURI,
-            uuid: uuid,
-            videoInfo: infoObj,
-            enriched: enriched
-        };
-        res.render('video.ejs', source);
+
+        var uri;
+        if (infoObj.vendor == 4) {
+            http.getJSON('https://api.ted.com/v1/talks/' + infoObj.video_id + '.json?api-key=uzdyad5pnc2mv2dd8r8vd65c', function (err, data) {
+                if (err) {
+                    //TODO
+                } else {
+                    uri = data.talk.media.internal['320k'].uri;
+
+                    var source = {
+                        videoURI: uri,
+                        uuid: uuid,
+                        videoInfo: infoObj,
+                        enriched: enriched
+                    };
+
+                    res.render('video.ejs', source);
+                }
+            });
+            return;
+        } else {
+
+            var source = {
+                videoURI: videoURI,
+                uuid: uuid,
+                videoInfo: infoObj,
+                enriched: enriched
+            };
+
+            res.render('video.ejs', source);
+        }
     }
 
     var enriched = req.query.enriched;
@@ -377,6 +401,45 @@ function getMetadata(video_id, vendor, callback) {
                 callback(err, video_info);
             });
             break;
+        case 'ted':
+            async.parallel([
+                function (async_callback) {
+                    var json_url = 'https://api.ted.com/v1/talks/' + video_info.video_id + '.json?api-key=uzdyad5pnc2mv2dd8r8vd65c';
+                    console.log('retrieving metadata from ' + json_url);
+                    http.getJSON(json_url, function (err, data) {
+                        if (err) {
+                            //TODO
+                            async_callback(true);
+                        } else {
+                            video_info.title = data.talk.name;
+                            video_info.thumb = data.talk.images[1].image.url;
+                            video_info.descr = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
+                            video_info.views = data.talk.viewed_count;
+                            video_info.comments = data.talk.commented_count;
+                            video_info.published = data.talk.published_at;
+                            video_info.event = data.talk.event.name;
+
+
+                            async_callback(false);
+                        }
+                    })
+                },
+                function (async_callback) {
+                    getTedSub(video_info.video_id, function (err, data) {
+                        if (err) {
+                            console.log('Retrieving sub with error');
+                            video_info.timedtext = false;
+                            async_callback(false);
+                        } else {
+                            video_info.timedtext = data;
+                            async_callback(false);
+                        }
+                    });
+                }
+            ], function (err) {
+                callback(err, video_info);
+            });
+            break;
         default :
             callback(true, 'Vendor undefined or not recognized');
     }
@@ -452,6 +515,24 @@ function getYouTubeSub(video_id, callback) {
     //TODO chiederli anche in altre lingue
     http.getRemoteFile(subUrl, callback);
 }
+function getTedSub(video_id, callback) {
+    var subListUrl = 'https://api.ted.com/v1/talks/' + video_id + '/subtitles.json?api-key=uzdyad5pnc2mv2dd8r8vd65c';
+    json2SRT(subListUrl, callback);
+
+}
+
+function json2SRT(subURL) {
+    http.getJSON(subURL, function (err, data) {
+        if (err) {
+            //TODO
+        } else {
+            sub_info.sub_startTime = data;
+            sub_info.sub_duration = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
+            sub_info.sub_content = data.talk.viewed_count;
+        }
+    });
+}
+
 
 var vendors = [
     {
@@ -471,6 +552,12 @@ var vendors = [
         name: 'vimeo',
         url_pattern: /(www.)?(player.)?vimeo.com\/([a-z]*\/)*([0-9]{6,11})[?]?.*/,
         id_pattern: /\/([0-9]{6,11})$/
+    },
+    {
+        code: 4,
+        name: 'ted',
+        url_pattern: /^https?:\/\/(?:www\.)?ted\.com\/talks\/*([^?]+)/,
+        id_pattern: /talks\/([^?]+)/
     }
 ];
 
