@@ -489,7 +489,7 @@ function getMetadata(video_id, vendor, callback) {
                         if (err) {
                             console.log('Retrieving sub with error');
                             video_info.timedtext = false;
-                            async_callback(false);
+                            async_callback(true);
                         } else {
                             video_info.timedtext = data;
                             async_callback(false);
@@ -577,27 +577,50 @@ function getYouTubeSub(video_id, callback) {
 
 function getTedSub(video_id, callback) {
     var subListUrl = 'https://api.ted.com/v1/talks/' + video_id + '/subtitles.json?api-key=uzdyad5pnc2mv2dd8r8vd65c';
+
     http.getJSON(subListUrl, function (err, data) {
+        console.log("retrieving subs from " + subListUrl);
         if (err) {
-            //TODO
+            console.log("SUB ERROR");
+            callback(err, err.message);
         } else {
-            if (data.total > 0) {
-                for (var i = 0; i < data.total; i++) {
+            var mysrt = '';
+            var sub_offset = data._meta.preroll_offset;
 
+            for (key in data) {
+                if (key != '_meta') {
+                    var sub_startTime = data[key].caption.startTime;
+                    var sub_duration = data[key].caption.duration;
+                    var sub_content = data[key].caption.content;
 
-                    var sub_startTime = data;
-                    var sub_duration = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
-                    var sub_content = data.talk.viewed_count;
+                    mysrt = mysrt + jsonToSrt(++key, sub_offset, sub_startTime, sub_duration, sub_content);
                 }
             }
-            var mysrt = jsonToSrt(sub_startTime, sub_duration, sub_content);
-            callback(mysrt);
+            console.log(mysrt);
+            callback(false, mysrt);
 
         }
     });
 }
-function jsonToSrt() {
+function jsonToSrt(key, offset, start, duration, content) {
+    var newStart = (offset + start) / 1000;
+    var end = newStart + (duration / 1000);
 
+    return key + '\r\n' + subTime(newStart) + ' --> ' + subTime(end) + '\r\n' + content + '\r\n\r\n';
+}
+function subTime(time) {
+    if (time < 60) {
+        return (time > 9) ? "00:00:" + time.toFixed(3) : "00:00:0" + time.toFixed(3);
+    }
+    else if (time == 60 || time > 60 && time < 3600) {
+        var min = Math.floor(time / 60);
+        var sec = (time % 60).toFixed(3);
+        return (min > 9 && sec > 9) ? "00:" + min + ":" + sec : (min < 9 && sec > 9) ? "00:0" + Math.floor(time / 60) + ":" + sec : (min > 9 && sec < 9) ? "00:" + Math.floor(time / 60) + ":0" + sec : "00:0" + min + ":0" + sec;
+    }
+    else {
+        var sec = ((time % 3600) % 60).toFixed(3);
+        return (sec > 9) ? Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":" + sec : Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":0" + sec;
+    }
 }
 
 var vendors = [
