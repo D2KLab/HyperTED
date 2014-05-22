@@ -19,6 +19,7 @@ function viewVideo(req, res, videoInfo) {
     var enriched = req.query.enriched;
 
     function sendResp(infoObj) {
+
         var source = {
             videoURI: videoURI,
             uuid: uuid,
@@ -413,43 +414,33 @@ function getMetadata(video, callback) {
             });
             break;
         case 'ted':
-            async.parallel([
-                function (async_callback) {
-                    var json_url = 'https://api.ted.com/v1/talks/' + id + '.json?api-key=uzdyad5pnc2mv2dd8r8vd65c';
-                    console.log('retrieving metadata from ' + json_url);
-                    http.getJSON(json_url, function (err, data) {
-                        if (err) {
-                            console.log('[ERROR] on retrieving metadata from ' + json_url);
-                            async_callback(true);
-                        } else {
-                            video.videoLocator = data.talk.media.internal['320k'].uri;
+            var json_url = 'https://api.ted.com/v1/talks/' + id + '.json?api-key=uzdyad5pnc2mv2dd8r8vd65c';
+            console.log('retrieving metadata from ' + json_url);
+            http.getJSON(json_url, function (err, data) {
+                if (err) {
+                    console.log('[ERROR] on retrieving metadata from ' + json_url);
+                    callback(true);
+                } else {
+                    video.videoLocator = data.talk.media.internal['320k'].uri;
+                    video.tedID = data.talk.id;
+                    metadata.title = data.talk.name;
+                    metadata.thumb = data.talk.images[1].image.url;
+                    metadata.descr = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
+                    metadata.views = data.talk.viewed_count;
+                    metadata.comments = data.talk.commented_count;
+                    metadata.published = data.talk.published_at;
+                    metadata.event = data.talk.event.name;
 
-                            metadata.title = data.talk.name;
-                            metadata.thumb = data.talk.images[1].image.url;
-                            metadata.descr = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
-                            metadata.views = data.talk.viewed_count;
-                            metadata.comments = data.talk.commented_count;
-                            metadata.published = data.talk.published_at;
-                            metadata.event = data.talk.event.name;
-
-                            async_callback(false);
-                        }
-                    })
-                },
-                function (async_callback) {
-                    getTedSub(id, function (err, data) {
+                    getTedSub(video.tedID, function (err, data) {
                         if (err) {
                             console.log('[ERROR] on retrieving sub for ' + video.locator);
-                            async_callback(false);
-                            
+
                         } else {
                             metadata.timedtext = data;
-                            async_callback(false);
                         }
+                        callback(err, metadata);
                     });
                 }
-            ], function (err) {
-                callback(err, metadata);
             });
             break;
         default :
