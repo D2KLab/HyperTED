@@ -11,8 +11,7 @@
 
     <div class="row">
         <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
-
-            <% if (videoInfo.descr) {
+            <% if (videoInfo && videoInfo.descr) {
                 var text = videoInfo.descr;
                 if (enriched && !videoInfo.timedtext && videoInfo.entities) {
                     var entityList = videoInfo.entities;

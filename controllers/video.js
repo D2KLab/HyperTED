@@ -2,13 +2,11 @@ var http = require('http'),
     https = require('https'),
     url = require("url"),
     async = require('async'),
-    Cache = require("node-cache"),
     nerd = require('./nerdify'),
     db = require('./database'),
     ts = require('./linkedTVconnection');
 
 var LOG_TAG = '[VIDEO.JS]: ';
-var videoCache;
 ts.prepare();
 
 
@@ -22,7 +20,7 @@ function viewVideo(req, res, videoInfo) {
         var source = {
             videoURI: videoURI,
             uuid: uuid,
-            videoInfo: infoObj,
+            metadata: infoObj,
             enriched: enriched
         };
         res.render('video.ejs', source);
@@ -40,66 +38,19 @@ function viewVideo(req, res, videoInfo) {
 //        concSign = '&';
     }
 
-    sendResp(videoInfo.metadata);
-
-//    var vendor = detectVendor(videoURI);
-//    if (vendor) {
-//        var id = detectId(videoURI, vendor);
-//        if (id) {
-//            var cacheKey = vendor.code + '-' + id;
-//            var info = getFromCache(cacheKey);
-//            if (info) {
-//                info = mergeObj(videoInfo, info);
-//                if (!enriched || info.entities) {
-//                    sendResp(info);
-//                } else {
-//                    getEntities(info, function (err, data) {
-//                        if (err) {
-//                            console.log(LOG_TAG + 'getEntity ' + data);
-//                            // TODO
-//                        } else {
-//                            info.entities = data;
-//                        }
-//
-//                        sendResp(info);
-//                        videoCache.set(cacheKey, info);
-//                    });
-//                }
-//            } else {
-//                info = getMetadata(id, vendor, function (err, response) {
-//                    if (err) {
-//                        //TODO
-//                        console.log(LOG_TAG + 'ERR - ' + JSON.stringify(err));
-//                        if (!response) {
-//                            sendResp(videoInfo);
-//                            return;
-//                        }
-//                    }
-//
-//                    info = mergeObj(videoInfo, response);
-//                    if (enriched) {
-//                        getEntities(info, function (err, data) {
-//                            if (err) {
-//                                console.log(LOG_TAG + data);
-//                                // TODO
-//                            } else {
-//                                info.entities = data;
-//                            }
-//
-//                            sendResp(info);
-//                            videoCache.set(cacheKey, info);
-//                        });
-//                    } else {
-//                        sendResp(info);
-//                        videoCache.set(cacheKey, info);
-//                    }
-//                });
-//            }
-//
-//        }
-//    } else {
-//        sendResp(videoInfo);
-//    }
+    if (!enriched || videoInfo.entities) {
+        sendResp(videoInfo.metadata);
+    } else {
+        getEntities(videoInfo, function (err, data) {
+            if (err) {
+                console.log(LOG_TAG + 'getEntity ' + data);
+                // TODO
+            } else {
+                videoInfo.entities = data;
+            }
+            sendResp(videoInfo);
+        });
+    }
 }
 
 exports.view = function (req, res) {
@@ -108,7 +59,7 @@ exports.view = function (req, res) {
         res.redirect('/');
         return;
     }
-    db.getLocator(uuid, function (err, data) {
+    db.getFromUuid(uuid, function (err, data) {
         if (err) {
             //TODO a 404 page
             res.redirect('/');
@@ -215,48 +166,47 @@ exports.search = function (req, res) {
 };
 
 exports.nerdify = function (req, res) {
-    var id = req.query.videoid;
-    var vendor = req.query.vendor;
-    var cacheKey = vendor + '-' + id;
-    var info = getFromCache(cacheKey);
+    var uuid = req.query.uuid;
+    db.getFromUuid(uuid, function (err, video_data) {
+        if (!video_data) {
+            console.log("Error from DB");
+            res.json("Error from DB");
+            return;
+        }
 
-    if (!info.entities) {
-        console.log(LOG_TAG + 'nerdifying ' + cacheKey);
-        getEntities(info, function (err, data) {
-            if (err) {
-                console.log(LOG_TAG + data);
-                // TODO
-            } else {
-                info.entities = data;
-            }
-            var source = {
-                videoInfo: info,
-                enriched: true
-            };
-            res.render('nerdify_resp.ejs', source);
-            videoCache.set(cacheKey, info);
-        });
-    } else {
-        console.log(LOG_TAG + 'nerdifying form cache ' + cacheKey);
-        var source = {
-            videoInfo: info,
-            enriched: true
-        };
-        res.render('nerdify_resp.ejs', source);
-
-    }
+        if (video_data.entities) {
+            video_data.enriched = true;
+            res.render('nerdify_resp.ejs', video_data);
+        } else {
+            console.log(LOG_TAG + 'nerdifying ' + uuid);
+            getEntities(video_data, function (err, data) {
+                if (err) {
+                    console.log(LOG_TAG + err);
+                    // TODO
+                } else {
+                    video_data.entities = data;
+                }
+                res.render('nerdify_resp.ejs', video_data);
+            });
+        }
+    });
 };
 
 function getEntities(video_info, callback) {
     var doc_type, text;
-    if (video_info.timedtext) {
+    if (video_info.metadata.timedtext) {
         doc_type = 'timedtext';
-        text = video_info.timedtext;
+        text = video_info.metadata.timedtext;
     } else {
         doc_type = 'text';
-        text = video_info.descr;
+        text = video_info.metadata.descr;
     }
-    nerd.getEntities(doc_type, text, callback);
+    nerd.getEntities(doc_type, text, function (err, data) {
+        if (!err && data) {
+            db.addEntities(video_info.uuid, data);
+        }
+        callback(err, data);
+    });
 }
 
 function getMetadataFromSparql(video, callback) {
@@ -463,7 +413,7 @@ exports.ajaxGetMetadata = function (req, res) {
         return;
     }
 
-    db.getLocator(uuid, function (err, data) {
+    db.getFromUuid(uuid, function (err, data) {
         if (err || !data) {
             res.json({error: 'video not found in db'});
             return;
@@ -620,15 +570,6 @@ if (typeof String.prototype.startsWith != 'function') {
     };
 }
 
-function getFromCache(key) {
-    if (!videoCache) {
-        videoCache = new Cache();
-        return false;
-    } else {
-        var cachedData = videoCache.get(key);
-        return cachedData[key];
-    }
-}
 
 function mergeObj() {
     var mObj = {};

@@ -13,7 +13,7 @@ exports.prepare = function () {
     };
 };
 
-exports.getLocator = function (uuid, callback) {
+exports.getFromUuid = function (uuid, callback) {
     var identifier = generateIdentifier(uuid);
     var q = new Query().select('?locator', true).where(identifier, 'a', 'ma:MediaResource').where(identifier, 'ma:locator', '?locator');
 
