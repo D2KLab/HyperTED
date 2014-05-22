@@ -2,7 +2,8 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>HyperTED</title>
+    <% var pageTitle = (videoInfo && videoInfo.title) ? videoInfo.title + '|HyperTED' : 'HyperTED'; %>
+    <title><%= pageTitle %></title>
     <link rel="icon" type="image/png" href="/img/favicons/favicon_48.png">
     <!--[if IE]>
     <link rel="shortcut icon" href="/img/favicons/favicon.ico"/><![endif]-->
@@ -69,7 +70,7 @@
         <div id="video"></div>
     </div>
 
-    <% if (videoInfo.title) { %>
+    <% if (videoInfo && videoInfo.title) { %>
     <div class="info-on-player">
 
         <h1 id="video-title" class="title"><%= videoInfo.title %></h1>
@@ -178,7 +179,9 @@
 
 <footer class="video_footer">
     <div class="foo">
-        <div class="foo-line"><hr class="red_rule"></div>
+        <div class="foo-line">
+            <hr class="red_rule">
+        </div>
 
         <div class="eurecomLogo"><img src="../img/logos/eurecom_logo.png"/></div>
         <div class="mediamixerLogo"><img src="../img/logos/mediamixer_logo.png"/></div>

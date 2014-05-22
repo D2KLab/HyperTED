@@ -12,7 +12,15 @@ var videoCache;
 ts.prepare();
 
 
-function viewVideo(req, res, videoURI, uuid, sparql) {
+function viewVideo(req, res, videoInfo, sparql) {
+    var videoURI = videoInfo.locator;
+    var uuid = videoInfo.uuid;
+
+    if (videoURI.indexOf('http://stream17.noterik.com/') >= 0) {
+        videoURI += '/rawvideo/2/raw.mp4?ticket=77451bc0-e0bf-11e3-8b68-0800200c9a66';
+    }
+
+
     function sendResp(infoObj) {
 
         var uri;
@@ -62,7 +70,6 @@ function viewVideo(req, res, videoURI, uuid, sparql) {
     }
 
     if (sparql) {
-        var videoInfo = {};
         async.parallel(
             [
                 function (asyncCallback) {
@@ -97,6 +104,7 @@ function viewVideo(req, res, videoURI, uuid, sparql) {
                 var cacheKey = vendor.code + '-' + id;
                 var info = getFromCache(cacheKey);
                 if (info) {
+                    info = mergeObj(videoInfo, info);
                     if (!enriched || info.entities) {
                         sendResp(info);
                     } else {
@@ -118,12 +126,12 @@ function viewVideo(req, res, videoURI, uuid, sparql) {
                             //TODO
                             console.log(LOG_TAG + 'ERR - ' + JSON.stringify(err));
                             if (!response) {
-                                sendResp(null);
+                                sendResp(videoInfo);
                                 return;
                             }
                         }
 
-                        info = response || info;
+                        info = mergeObj(videoInfo, response);
                         if (enriched) {
                             getEntities(info, function (err, data) {
                                 if (err) {
@@ -132,6 +140,7 @@ function viewVideo(req, res, videoURI, uuid, sparql) {
                                 } else {
                                     info.entities = data;
                                 }
+
                                 sendResp(info);
                                 videoCache.set(cacheKey, info);
                             });
@@ -144,24 +153,23 @@ function viewVideo(req, res, videoURI, uuid, sparql) {
 
             }
         } else {
-            sendResp(null);
+            sendResp(videoInfo);
         }
     }
 }
 exports.sparql = function (req, res) {
     var uuid = req.param('uuid');
     ts.getLocator(uuid, function (err, data) {
-        console.log('BBBBBBBBBBBBBB');
         if (err) {
             res.send(data);
             return;
         }
-        if (data.type != 'uri') {
-            //TODO
-        }
-        var videoURI = data.value;
+        var video = {
+            uuid: uuid,
+            locator: data
+        };
 
-        viewVideo(req, res, videoURI, uuid, true);
+        viewVideo(req, res, video, true);
     });
 };
 exports.view = function (req, res) {
@@ -176,10 +184,7 @@ exports.view = function (req, res) {
             res.redirect('/');
             return;
         }
-
-        var videoURI = data.locator;
-
-        viewVideo(req, res, videoURI, uuid);
+        viewVideo(req, res, data);
     });
 
 };
@@ -210,22 +215,56 @@ exports.search = function (req, res) {
         var queryUnit = j + '=' + req.query[j];
         fragPart += fragSeparator + queryUnit;
     }
+    var hashPart = parsedURI.hash || '';
 
-    db.insert(locator, function (err, data) {
-        if (err) {
+    if (parsedURI.hostname = 'stream17.noterik.com') {
+        locator.replace(/\/rawvideo\/[0-9]\/raw.mp4/, '');
+        locator.replace(/\?ticket=.+/, '');
+    }
+
+    db.getFromLocator(locator, function (err, data) {
+        if (err) { //db error
             console.log("DATABASE ERROR" + JSON.stringify(err));
             //TODO error page
             res.redirect('/');
             return;
-        } else {
-            var uuid = data.uuid;
-            var hashPart = parsedURI.hash || '';
-            var redirectUrl = '/video/' + uuid + fragPart + hashPart;
+        }
+
+        if (data) { //video in db
+            var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
+            console.log('Video at ' + locator + ' already in db.');
             console.log('Redirecting to ' + redirectUrl);
             res.redirect(redirectUrl);
+            return;
         }
-    });
 
+        //new video
+        var video = {locator: locator};
+        // 1. search for metadata in sparql
+        getMetadataFromSparql(video, function (err, data) {
+            if (err || !data) {
+                console.log("No data obtained from sparql");
+            } else {
+                video = mergeObj(video, data);
+            }
+
+            //2. TODO search metadata with vendor's api
+
+            //3. write in db
+            db.insert(video, function (err, data) {
+                if (err) {
+                    console.log("DATABASE ERROR" + JSON.stringify(err));
+                    //TODO error page
+                    res.redirect('/');
+                } else {
+                    var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
+                    console.log('Video at ' + locator + ' successfully added to db.');
+                    console.log('Redirecting to ' + redirectUrl);
+                    res.redirect(redirectUrl);
+                }
+            });
+        });
+    });
 };
 
 exports.nerdify = function (req, res) {
@@ -271,6 +310,27 @@ function getEntities(video_info, callback) {
         text = video_info.descr;
     }
     nerd.getEntities(doc_type, text, callback);
+}
+
+function getMetadataFromSparql(video, callback) {
+    ts.getFromLocator(video.locator, function (err, data) {
+        if (err || !data) {
+            callback(err, data);
+            return;
+        }
+        var sparql_data = data;
+        getSubtitlesTV2RDF(sparql_data.ltv_uuid, function (err, data) {
+            if (err || !data) {
+                console.log("No sub obtained from sparql");
+                callback(false, sparql_data);
+                return;
+            }
+            sparql_data.metadata = {
+                timedtext: data
+            };
+            callback(err, sparql_data);
+        });
+    });
 }
 
 function getMetadata(video_id, vendor, callback) {
@@ -453,7 +513,6 @@ exports.ajaxGetMetadata = function (req, res) {
         return;
     }
     db.getLocator(uuid, function (err, data) {
-        console.log(JSON.stringify(data));
         if (err) {
             res.json({error: 'video not found in db'});
             return;
@@ -638,3 +697,13 @@ function getFromCache(key) {
     }
 }
 
+function mergeObj() {
+    var mObj = {};
+    for (var o in arguments) {
+        var obj = arguments[o];
+        for (var attrname in obj) {
+            mObj[attrname] = obj[attrname];
+        }
+    }
+    return mObj;
+}
