@@ -17,6 +17,7 @@ function viewVideo(req, res, videoInfo) {
     var enriched = req.query.enriched;
 
     function sendResp(infoObj) {
+
         var source = {
             videoURI: videoURI,
             uuid: uuid,
@@ -363,42 +364,33 @@ function getMetadata(video, callback) {
             });
             break;
         case 'ted':
-            async.parallel([
-                function (async_callback) {
-                    var json_url = 'https://api.ted.com/v1/talks/' + id + '.json?api-key=uzdyad5pnc2mv2dd8r8vd65c';
-                    console.log('retrieving metadata from ' + json_url);
-                    http.getJSON(json_url, function (err, data) {
-                        if (err) {
-                            console.log('[ERROR] on retrieving metadata from ' + json_url);
-                            async_callback(true);
-                        } else {
-                            video.videoLocator = data.talk.media.internal['320k'].uri;
+            var json_url = 'https://api.ted.com/v1/talks/' + id + '.json?api-key=uzdyad5pnc2mv2dd8r8vd65c';
+            console.log('retrieving metadata from ' + json_url);
+            http.getJSON(json_url, function (err, data) {
+                if (err) {
+                    console.log('[ERROR] on retrieving metadata from ' + json_url);
+                    callback(true);
+                } else {
+                    video.videoLocator = data.talk.media.internal['320k'].uri;
+                    video.tedID = data.talk.id;
+                    metadata.title = data.talk.name;
+                    metadata.thumb = data.talk.images[1].image.url;
+                    metadata.descr = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
+                    metadata.views = data.talk.viewed_count;
+                    metadata.comments = data.talk.commented_count;
+                    metadata.published = data.talk.published_at;
+                    metadata.event = data.talk.event.name;
 
-                            metadata.title = data.talk.name;
-                            metadata.thumb = data.talk.images[1].image.url;
-                            metadata.descr = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
-                            metadata.views = data.talk.viewed_count;
-                            metadata.comments = data.talk.commented_count;
-                            metadata.published = data.talk.published_at;
-                            metadata.event = data.talk.event.name;
-
-                            async_callback(false);
-                        }
-                    })
-                },
-                function (async_callback) {
-                    getTedSub(id, function (err, data) {
+                    getTedSub(video.tedID, function (err, data) {
                         if (err) {
                             console.log('[ERROR] on retrieving sub for ' + video.locator);
-                            async_callback(false);
+
                         } else {
                             metadata.timedtext = data;
-                            async_callback(false);
                         }
+                        callback(err, metadata);
                     });
                 }
-            ], function (err) {
-                callback(err, metadata);
             });
             break;
         default :
@@ -464,24 +456,54 @@ function getYouTubeSub(video_id, callback) {
     //TODO chiederli anche in altre lingue
     http.getRemoteFile(subUrl, callback);
 }
+
 function getTedSub(video_id, callback) {
     var subListUrl = 'https://api.ted.com/v1/talks/' + video_id + '/subtitles.json?api-key=uzdyad5pnc2mv2dd8r8vd65c';
-    json2SRT(subListUrl, callback);
 
-}
-
-function json2SRT(subURL) {
-    http.getJSON(subURL, function (err, data) {
+    http.getJSON(subListUrl, function (err, data) {
+        console.log("retrieving subs from " + subListUrl);
         if (err) {
-            //TODO
+            console.log("SUB ERROR");
+            callback(err, err.message);
         } else {
-            sub_info.sub_startTime = data;
-            sub_info.sub_duration = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
-            sub_info.sub_content = data.talk.viewed_count;
+            var mysrt = '';
+            var sub_offset = data._meta.preroll_offset;
+
+            for (key in data) {
+                if (key != '_meta') {
+                    var sub_startTime = data[key].caption.startTime;
+                    var sub_duration = data[key].caption.duration;
+                    var sub_content = data[key].caption.content;
+
+                    mysrt = mysrt + jsonToSrt(++key, sub_offset, sub_startTime, sub_duration, sub_content);
+                }
+            }
+            console.log(mysrt);
+            callback(false, mysrt);
+
         }
     });
 }
+function jsonToSrt(key, offset, start, duration, content) {
+    var newStart = (offset + start) / 1000;
+    var end = newStart + (duration / 1000);
 
+    return key + '\r\n' + subTime(newStart) + ' --> ' + subTime(end) + '\r\n' + content + '\r\n\r\n';
+}
+function subTime(time) {
+    if (time < 60) {
+        return (time > 9) ? "00:00:" + time.toFixed(3) : "00:00:0" + time.toFixed(3);
+    }
+    else if (time == 60 || time > 60 && time < 3600) {
+        var min = Math.floor(time / 60);
+        var sec = (time % 60).toFixed(3);
+        return (min > 9 && sec > 9) ? "00:" + min + ":" + sec : (min < 9 && sec > 9) ? "00:0" + Math.floor(time / 60) + ":" + sec : (min > 9 && sec < 9) ? "00:" + Math.floor(time / 60) + ":0" + sec : "00:0" + min + ":0" + sec;
+    }
+    else {
+        var sec = ((time % 3600) % 60).toFixed(3);
+        return (sec > 9) ? Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":" + sec : Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":0" + sec;
+    }
+}
 
 var vendors = [
     {
