@@ -304,6 +304,13 @@ html, body {
       line-height: 200%;
       padding: 0 10px; }
 
+.stat label.key {
+  color: #b11200; }
+.stat .value {
+  color: #f4f4f4; }
+.stat .value, .stat label.key {
+  display: inline-block; }
+
 .red_rule {
   background-color: #b11200;
   height: 5px;
