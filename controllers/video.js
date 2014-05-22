@@ -12,50 +12,21 @@ var videoCache;
 ts.prepare();
 
 
-function viewVideo(req, res, videoInfo, sparql) {
-    var videoURI = videoInfo.locator;
+function viewVideo(req, res, videoInfo) {
+    var videoURI = videoInfo.videoLocator || videoInfo.locator;
     var uuid = videoInfo.uuid;
 
-    if (videoURI.indexOf('http://stream17.noterik.com/') >= 0) {
-        videoURI += '/rawvideo/2/raw.mp4?ticket=77451bc0-e0bf-11e3-8b68-0800200c9a66';
-    }
-
+    var enriched = req.query.enriched;
 
     function sendResp(infoObj) {
-
-        var uri;
-        if (infoObj.vendor == 4) {
-            http.getJSON('https://api.ted.com/v1/talks/' + infoObj.video_id + '.json?api-key=uzdyad5pnc2mv2dd8r8vd65c', function (err, data) {
-                if (err) {
-                    //TODO
-                } else {
-                    uri = data.talk.media.internal['320k'].uri;
-
-                    var source = {
-                        videoURI: uri,
-                        uuid: uuid,
-                        videoInfo: infoObj,
-                        enriched: enriched
-                    };
-
-                    res.render('video.ejs', source);
-                }
-            });
-            return;
-        } else {
-
-            var source = {
-                videoURI: videoURI,
-                uuid: uuid,
-                videoInfo: infoObj,
-                enriched: enriched
-            };
-
-            res.render('video.ejs', source);
-        }
+        var source = {
+            videoURI: videoURI,
+            uuid: uuid,
+            videoInfo: infoObj,
+            enriched: enriched
+        };
+        res.render('video.ejs', source);
     }
-
-    var enriched = req.query.enriched;
 
     var concSign = url.parse(videoURI).hash ? '&' : '#';
     var t = req.query.t;
@@ -69,109 +40,68 @@ function viewVideo(req, res, videoInfo, sparql) {
 //        concSign = '&';
     }
 
-    if (sparql) {
-        async.parallel(
-            [
-                function (asyncCallback) {
-                    getSubtitlesTV2RDF(uuid, function (err, data) {
-                        if (data) {
-                            videoInfo.timedtext = data;
-                        }
-                        asyncCallback(err);
-                    });
-                },
-                function (asyncCallback) {
-                    ts.getChapters(uuid, function (err, data) {
-                        if (data) {
-                            videoInfo.chapters = data;
-                        }
-                        asyncCallback(err);
-                    });
-                }
-            ], function (err) {
-                if (err) {
-                    //TODO
-                    console.log('SPARQL ERROR: ' + err.message);
-                }
-                sendResp(videoInfo);
-            }
-        )
-    } else {
-        var vendor = detectVendor(videoURI);
-        if (vendor) {
-            var id = detectId(videoURI, vendor);
-            if (id) {
-                var cacheKey = vendor.code + '-' + id;
-                var info = getFromCache(cacheKey);
-                if (info) {
-                    info = mergeObj(videoInfo, info);
-                    if (!enriched || info.entities) {
-                        sendResp(info);
-                    } else {
-                        getEntities(info, function (err, data) {
-                            if (err) {
-                                console.log(LOG_TAG + 'getEntit' + data);
-                                // TODO
-                            } else {
-                                info.entities = data;
-                            }
+    sendResp(videoInfo.metadata);
 
-                            sendResp(info);
-                            videoCache.set(cacheKey, info);
-                        });
-                    }
-                } else {
-                    info = getMetadata(id, vendor, function (err, response) {
-                        if (err) {
-                            //TODO
-                            console.log(LOG_TAG + 'ERR - ' + JSON.stringify(err));
-                            if (!response) {
-                                sendResp(videoInfo);
-                                return;
-                            }
-                        }
-
-                        info = mergeObj(videoInfo, response);
-                        if (enriched) {
-                            getEntities(info, function (err, data) {
-                                if (err) {
-                                    console.log(LOG_TAG + data);
-                                    // TODO
-                                } else {
-                                    info.entities = data;
-                                }
-
-                                sendResp(info);
-                                videoCache.set(cacheKey, info);
-                            });
-                        } else {
-                            sendResp(info);
-                            videoCache.set(cacheKey, info);
-                        }
-                    });
-                }
-
-            }
-        } else {
-            sendResp(videoInfo);
-        }
-    }
+//    var vendor = detectVendor(videoURI);
+//    if (vendor) {
+//        var id = detectId(videoURI, vendor);
+//        if (id) {
+//            var cacheKey = vendor.code + '-' + id;
+//            var info = getFromCache(cacheKey);
+//            if (info) {
+//                info = mergeObj(videoInfo, info);
+//                if (!enriched || info.entities) {
+//                    sendResp(info);
+//                } else {
+//                    getEntities(info, function (err, data) {
+//                        if (err) {
+//                            console.log(LOG_TAG + 'getEntity ' + data);
+//                            // TODO
+//                        } else {
+//                            info.entities = data;
+//                        }
+//
+//                        sendResp(info);
+//                        videoCache.set(cacheKey, info);
+//                    });
+//                }
+//            } else {
+//                info = getMetadata(id, vendor, function (err, response) {
+//                    if (err) {
+//                        //TODO
+//                        console.log(LOG_TAG + 'ERR - ' + JSON.stringify(err));
+//                        if (!response) {
+//                            sendResp(videoInfo);
+//                            return;
+//                        }
+//                    }
+//
+//                    info = mergeObj(videoInfo, response);
+//                    if (enriched) {
+//                        getEntities(info, function (err, data) {
+//                            if (err) {
+//                                console.log(LOG_TAG + data);
+//                                // TODO
+//                            } else {
+//                                info.entities = data;
+//                            }
+//
+//                            sendResp(info);
+//                            videoCache.set(cacheKey, info);
+//                        });
+//                    } else {
+//                        sendResp(info);
+//                        videoCache.set(cacheKey, info);
+//                    }
+//                });
+//            }
+//
+//        }
+//    } else {
+//        sendResp(videoInfo);
+//    }
 }
-exports.sparql = function (req, res) {
-    var uuid = req.param('uuid');
-    ts.getLocator(uuid, function (err, data) {
-        if (err) {
-            res.send(data);
-            return;
-        }
-        var video = {
-            uuid: uuid,
-            locator: data
-        };
 
-        viewVideo(req, res, video, true);
-    });
-};
 exports.view = function (req, res) {
     var uuid = req.param('uuid');
     if (!uuid) {
@@ -240,6 +170,10 @@ exports.search = function (req, res) {
 
         //new video
         var video = {locator: locator};
+        if (locator.indexOf('http://stream17.noterik.com/') >= 0) {
+            video.videoLocator = locator + '/rawvideo/2/raw.mp4?ticket=77451bc0-e0bf-11e3-8b68-0800200c9a66';
+        }
+
         // 1. search for metadata in sparql
         getMetadataFromSparql(video, function (err, data) {
             if (err || !data) {
@@ -248,21 +182,34 @@ exports.search = function (req, res) {
                 video = mergeObj(video, data);
             }
 
-            //2. TODO search metadata with vendor's api
-
-            //3. write in db
-            db.insert(video, function (err, data) {
+            //2. search metadata with vendor's api
+            console.log(video);
+            getMetadata(video, function (err, metadata) {
                 if (err) {
-                    console.log("DATABASE ERROR" + JSON.stringify(err));
-                    //TODO error page
-                    res.redirect('/');
-                } else {
-                    var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
-                    console.log('Video at ' + locator + ' successfully added to db.');
-                    console.log('Redirecting to ' + redirectUrl);
-                    res.redirect(redirectUrl);
+                    console.log(LOG_TAG + 'Metadata retrieved with errors.');
                 }
+                if (!metadata) {
+                    console.log(LOG_TAG + 'Metadata unavailable.');
+                } else {
+                    var oldmetadata = video.metadata || {};
+                    video.metadata = mergeObj(oldmetadata, metadata);
+                }
+
+                //3. write in db
+                db.insert(video, function (err, data) {
+                    if (err) {
+                        console.log("DATABASE ERROR" + JSON.stringify(err));
+                        //TODO error page
+                        res.redirect('/');
+                    } else {
+                        var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
+                        console.log('Video at ' + locator + ' successfully added to db.');
+                        console.log('Redirecting to ' + redirectUrl);
+                        res.redirect(redirectUrl);
+                    }
+                });
             });
+
         });
     });
 };
@@ -333,177 +280,180 @@ function getMetadataFromSparql(video, callback) {
     });
 }
 
-function getMetadata(video_id, vendor, callback) {
-    var video_info = {
-        video_id: video_id,
-        vendor: vendor.code
-    };
+function getMetadata(video, callback) {
+    var vendor = video.vendor || detectVendor(video.locator);
+    if (!vendor) {
+        callback(true, video);
+        return;
+    }
+    video.vendor = vendor;
+    var id = video.vendor_id || detectId(video.locator, vendor);
+    if (!id) {
+        callback(true, video);
+        return;
+    }
+    video.vendor_id = id;
+
+    var metadata = {};
 
     switch (vendor.name) {
         case 'youtube':
             async.parallel([
                 function (async_callback) {
-                    var json_url = 'http://gdata.youtube.com/feeds/api/videos/' + video_info.video_id + '?v=2&alt=json-in-script';
-                    console.log('retrieving metadata from ' + json_url);
+                    var json_url = 'http://gdata.youtube.com/feeds/api/videos/' + id + '?v=2&alt=json-in-script';
                     http.getJSON(json_url, function (err, data) {
-                        if (!err) {
-                            video_info.title = data.entry.title.$t;
-                            video_info.thumb = data.entry.media$group.media$thumbnail[0].url;
-                            video_info.descr = data.entry.media$group.media$description.$t.replace(new RegExp('<br />', 'g'), '\n');
-                            video_info.views = data.entry.yt$statistics.viewCount;
-                            video_info.favourites = data.entry.yt$statistics.favoriteCount;
-                            video_info.comments = data.entry.gd$comments ? data.entry.gd$comments.gd$feedLink.countHint : 0;
-                            video_info.likes = data.entry.yt$rating ? data.entry.yt$rating.numLikes : 0;
-                            video_info.avgRate = data.entry.gd$rating ? data.entry.gd$rating.average : 0;
-                            video_info.published = data.entry.published.$t;
-                            video_info.category = data.entry.category[1].term;
-                            async_callback(false);
-                        } else {
-                            //TODO
+                        if (err) {
+                            console.log('[ERROR] on retrieving metadata from ' + json_url);
                             async_callback(true);
+                        } else {
+                            metadata.title = data.entry.title.$t;
+                            metadata.thumb = data.entry.media$group.media$thumbnail[0].url;
+                            metadata.descr = data.entry.media$group.media$description.$t.replace(new RegExp('<br />', 'g'), '\n');
+                            metadata.views = data.entry.yt$statistics.viewCount;
+                            metadata.favourites = data.entry.yt$statistics.favoriteCount;
+                            metadata.comments = data.entry.gd$comments ? data.entry.gd$comments.gd$feedLink.countHint : 0;
+                            metadata.likes = data.entry.yt$rating ? data.entry.yt$rating.numLikes : 0;
+                            metadata.avgRate = data.entry.gd$rating ? data.entry.gd$rating.average : 0;
+                            metadata.published = data.entry.published.$t;
+                            metadata.category = data.entry.category[1].term;
+                            async_callback(false);
                         }
                     });
                 },
                 function (async_callback) {
-                    getYouTubeSub(video_info.video_id, function (err, data) {
+                    getYouTubeSub(id, function (err, data) {
                         if (err) {
-                            console.log(err);
-                            video_info.timedtext = false;
+                            console.log('[ERROR] on retrieving sub for ' + video.locator);
                             async_callback(true);
                         } else {
-                            video_info.timedtext = data;
+                            metadata.timedtext = data;
                             async_callback(false);
                         }
                     });
                 }
             ], function (err) {
-                callback(err, video_info);
+                callback(err, metadata);
             });
             break;
         case 'dailymotion':
             async.parallel([
                 function (async_callback) {
-                    var json_url = 'https://api.dailymotion.com/video/' + video_info.video_id + '?fields=title,thumbnail_60_url,description,views_total,bookmarks_total,comments_total,ratings_total,rating,created_time,genre';
-                    console.log('retrieving metadata from ' + json_url);
+                    var json_url = 'https://api.dailymotion.com/video/' + id + '?fields=title,thumbnail_60_url,description,views_total,bookmarks_total,comments_total,ratings_total,rating,created_time,genre';
                     http.getJSON(json_url, function (err, data) {
-                        if (!err) {
-                            video_info.title = data.title;
-                            video_info.thumb = data.thumbnail_60_url;
-                            video_info.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
-                            video_info.views = data.views_total;
-                            video_info.favourites = data.bookmarks_total;
-                            video_info.comments = data.comments_total;
-                            video_info.likes = data.ratings_total;
-                            video_info.avgRate = data.rating;
-                            video_info.published = data.created_time;
-                            video_info.category = data.genre;
-                            async_callback(false);
-                        } else {
-                            //TODO
+                        if (err) {
+                            console.log('[ERROR] on retrieving metadata from ' + json_url);
                             async_callback(true);
+                        } else {
+                            metadata.title = data.title;
+                            metadata.thumb = data.thumbnail_60_url;
+                            metadata.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
+                            metadata.views = data.views_total;
+                            metadata.favourites = data.bookmarks_total;
+                            metadata.comments = data.comments_total;
+                            metadata.likes = data.ratings_total;
+                            metadata.avgRate = data.rating;
+                            metadata.published = data.created_time;
+                            metadata.category = data.genre;
+                            async_callback(false);
                         }
                     })
                 },
                 function (async_callback) {
-                    getDailymotionSub(video_info.video_id, function (err, data) {
+                    getDailymotionSub(id, function (err, data) {
                         if (err) {
-                            console.log(err);
-                            video_info.timedtext = false;
+                            console.log('[ERROR] on retrieving sub for ' + video.locator);
                             async_callback(false);
                         } else {
-                            video_info.timedtext = data;
+                            metadata.timedtext = data;
                             async_callback(false);
                         }
                     });
                 }
             ], function (err) {
-                console.log('done');
-                callback(err, video_info);
+                callback(err, metadata);
             });
             break;
         case 'vimeo':
             async.parallel([
                 function (async_callback) {
-                    var json_url = 'http://vimeo.com/api/v2/video/' + video_info.video_id + '.json';
+                    var json_url = 'http://vimeo.com/api/v2/video/' + id + '.json';
                     console.log('retrieving metadata from ' + json_url);
                     http.getJSON(json_url, function (err, data) {
-                        if (!err) {
-                            video_info.title = data.title;
-                            video_info.thumb = data.thumbnail_small;
-                            video_info.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
-                            video_info.views = data.stats_number_of_plays;
-                            video_info.favourites = "n.a.";
-                            video_info.comments = data.stats_number_of_comments;
-                            video_info.likes = data.stats_number_of_likes;
-                            video_info.avgRate = "n.a.";
-                            video_info.published = data.upload_date;
-                            video_info.category = data.tags;
-                            async_callback(false);
-                        } else {
-                            //TODO
+                        if (err) {
+                            console.log('[ERROR] on retrieving metadata from ' + json_url);
                             async_callback(true);
+                        } else {
+                            metadata.title = data.title;
+                            metadata.thumb = data.thumbnail_small;
+                            metadata.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
+                            metadata.views = data.stats_number_of_plays;
+                            metadata.favourites = "n.a.";
+                            metadata.comments = data.stats_number_of_comments;
+                            metadata.likes = data.stats_number_of_likes;
+                            metadata.avgRate = "n.a.";
+                            metadata.published = data.upload_date;
+                            metadata.category = data.tags;
+                            async_callback(false);
                         }
                     });
                 },
                 function (async_callback) {
-                    getVimeoSub(video_info.video_id, function (err, data) {
+                    getVimeoSub(id, function (err, data) {
                         if (err) {
-                            console.log('Retrieving sub with error');
-                            video_info.timedtext = false;
+                            console.log('[ERROR] on retrieving sub for ' + video.locator);
                             async_callback(false);
                         } else {
-                            video_info.timedtext = data;
+                            metadata.timedtext = data;
                             async_callback(false);
                         }
                     });
                 }
             ], function (err) {
-                callback(err, video_info);
+                callback(err, metadata);
             });
             break;
         case 'ted':
             async.parallel([
                 function (async_callback) {
-                    var json_url = 'https://api.ted.com/v1/talks/' + video_info.video_id + '.json?api-key=uzdyad5pnc2mv2dd8r8vd65c';
+                    var json_url = 'https://api.ted.com/v1/talks/' + id + '.json?api-key=uzdyad5pnc2mv2dd8r8vd65c';
                     console.log('retrieving metadata from ' + json_url);
                     http.getJSON(json_url, function (err, data) {
                         if (err) {
-                            //TODO
+                            console.log('[ERROR] on retrieving metadata from ' + json_url);
                             async_callback(true);
                         } else {
-                            video_info.title = data.talk.name;
-                            video_info.thumb = data.talk.images[1].image.url;
-                            video_info.descr = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
-                            video_info.views = data.talk.viewed_count;
-                            video_info.comments = data.talk.commented_count;
-                            video_info.published = data.talk.published_at;
-                            video_info.event = data.talk.event.name;
+                            video.videoLocator = data.talk.media.internal['320k'].uri;
 
+                            metadata.title = data.talk.name;
+                            metadata.thumb = data.talk.images[1].image.url;
+                            metadata.descr = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
+                            metadata.views = data.talk.viewed_count;
+                            metadata.comments = data.talk.commented_count;
+                            metadata.published = data.talk.published_at;
+                            metadata.event = data.talk.event.name;
 
                             async_callback(false);
                         }
                     })
                 },
                 function (async_callback) {
-                    getTedSub(video_info.video_id, function (err, data) {
+                    getTedSub(id, function (err, data) {
                         if (err) {
-                            console.log('Retrieving sub with error');
-                            video_info.timedtext = false;
+                            console.log('[ERROR] on retrieving sub for ' + video.locator);
                             async_callback(false);
                         } else {
-                            video_info.timedtext = data;
+                            metadata.timedtext = data;
                             async_callback(false);
                         }
                     });
                 }
             ], function (err) {
-                callback(err, video_info);
+                callback(err, metadata);
             });
             break;
         default :
             callback(true, 'Vendor undefined or not recognized');
     }
-
 }
 
 exports.ajaxGetMetadata = function (req, res) {
@@ -512,29 +462,19 @@ exports.ajaxGetMetadata = function (req, res) {
         res.json({error: 'empty uuid'});
         return;
     }
+
     db.getLocator(uuid, function (err, data) {
-        if (err) {
+        if (err || !data) {
             res.json({error: 'video not found in db'});
             return;
         }
-
-        var videoURI = data.locator;
-        var vendor = detectVendor(videoURI);
-        if (!vendor) {
-            res.json({error: 'vendor not recognized or not supported'});
-            return;
+        if (data.metadata) {
+            res.json(data.metadata)
+        } else {
+            getMetadata(data, function (err, data) {
+                res.json(data);
+            });
         }
-        var id = detectId(videoURI, vendor);
-
-        if (!id) {
-            res.json({error: 'error in detecting id for ' + vendor.name + ' video.'});
-            return;
-        }
-
-        getMetadata(id, vendor, function (err, data) {
-            res.json(data);
-        });
-
     });
 
 };

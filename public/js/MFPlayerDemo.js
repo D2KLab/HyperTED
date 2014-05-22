@@ -237,14 +237,14 @@ $(document).ready(function () {
         var video_uuid = $li.data('uuid');
 
         if (typeof video_uuid != 'undefined' && video_uuid != "") {
-            retrieveInfo(video_uuid, function (video_info) {
-                if (video_info.error) {
-                    console.error(video_info.error);
+            retrieveInfo(video_uuid, function (metadata) {
+                if (metadata.error) {
+                    console.error(metadata.error);
                     return;
                 }
-                $('h4 a', $li).text(video_info.title).attr('alt', video_info.title);
-                var $thumb = $('<img>').attr('src', video_info.thumb).addClass('thumb');
-                $('.thumb-cont', $li).attr('title', video_info.title).append($thumb);
+                $('h4 a', $li).text(metadata.title).attr('alt', metadata.title);
+                var $thumb = $('<img>').attr('src', metadata.thumb).addClass('thumb');
+                $('.thumb-cont', $li).attr('title', metadata.title).append($thumb);
 
                 $('.loader', $li).hide();
                 $('.content', $li).show(function () {
