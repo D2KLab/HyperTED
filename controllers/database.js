@@ -31,3 +31,12 @@ exports.insert = function (video, callback) {
         }
     });
 };
+
+exports.update = function (video, callback) {
+    videos.update({uuid: video.uuid}, video, function (err, doc) {
+        if (err) {
+            console.log('DB update fail. ' + JSON.stringify(err));
+        }
+        callback(err, doc);
+    });
+};
