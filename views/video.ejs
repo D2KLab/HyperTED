@@ -2,7 +2,7 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <% var pageTitle = (videoInfo && videoInfo.title) ? videoInfo.title + '|HyperTED' : 'HyperTED'; %>
+    <% var pageTitle = (metadata && metadata.title) ? metadata.title + '|HyperTED' : 'HyperTED'; %>
     <title><%= pageTitle %></title>
     <link rel="icon" type="image/png" href="/img/favicons/favicon_48.png">
     <!--[if IE]>
@@ -70,16 +70,16 @@
         <div id="video"></div>
     </div>
 
-    <% if (videoInfo && videoInfo.title) { %>
+    <% if (metadata && metadata.title) { %>
     <div class="info-on-player">
 
-        <h1 id="video-title" class="title"><%= videoInfo.title %></h1>
+        <h1 id="video-title" class="title"><%= metadata.title %></h1>
 
-        <% if (videoInfo) {
+        <% if (metadata) {
             var leftVals = {
-                'Published': videoInfo.published,
-                'Event': videoInfo.event,
-                'Category': videoInfo.category
+                'Published': metadata.published,
+                'Event': metadata.event,
+                'Category': metadata.category
             };
 
                 for(key in leftVals) {
@@ -96,9 +96,9 @@
 
 </section>
 
-<% if (videoInfo && videoInfo.chapters) { %>
+<% if (locals.chapters) { %>
 <div id="related-frags">
-            <% include partials/chapter.ejs %>
+    <% include partials/chapter.ejs %>
 </div>
 <% } %>
 
@@ -106,18 +106,17 @@
     <div class="container-fluid">
 
         <div class="row">
-            <% if(videoInfo && videoInfo.timedtext) { %>
+            <% if(metadata && metadata.timedtext) { %>
             <div class="col-md-7 col-lg-7">
                 <div id="sub-cont">
                     <% include partials/sub_partial.ejs %>
                 </div>
 
                 <form method="get" action="/video" data-action="/nerdify" class="nerdify button-cont"
-                      <% if(enriched) { %>style="display: none"
+                      <% if(locals.enriched) { %>style="display: none"
                         <% } %>
                         >
                     <input type="hidden" name="uuid" value="<%= uuid %>"/>
-                    <input type="hidden" name="uri" value="<%= videoURI %>"/>
                     <input type="hidden" name="enriched" value="true"/>
                     <button type="submit" class="btn btn-danger btn-block">Nerdify</button>
                 </form>
@@ -136,13 +135,13 @@
 
             <div class="col-md-7 col-lg-7">
                 <div id="ent_append"></div>
-                <% if (enriched && videoInfo.entities) { %>
+                <% if (locals.enriched && entities) { %>
                 <% include partials/entitiesList_partial.ejs %>
                 <% } %>
             </div>
 
-            <% if(videoInfo && videoInfo.descr) { %>
-            <div class="descr-cont <% if(videoInfo.timedtext) { %>col-md-5 col-lg-5<% } %>" id="descr-cont">
+            <% if(metadata && metadata.descr) { %>
+            <div class="descr-cont <% if(metadata.timedtext) { %>col-md-5 col-lg-5<% } %>" id="descr-cont">
                 <% include partials/descr_partial.ejs %>
                 <button type="button" class="see-all" for="descr">see more</button>
             </div>
@@ -155,13 +154,8 @@
 
 <script>
     var video = {
-        uri: "<%= videoURI %>",
-        id: "<%= videoInfo && videoInfo.video_id %>",
-        vendor: "<%= videoInfo && videoInfo.vendor %>"
+        uri: "<%= videoURI %>"
     };
-    <% if (videoInfo && videoInfo.chapters) {%>
-    var chapter = <%- JSON.stringify(videoInfo.chapters) %>;
-    <%}%>
 </script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js"></script>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>

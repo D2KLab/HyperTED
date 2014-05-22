@@ -14,7 +14,7 @@
             <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
 
                 <%
-                var entityList = videoInfo.entities;
+                var entityList = entities;
                         if(entityList){
                     entityList.sort(function SortByNerdType(x, y) {
                         return ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1 ));

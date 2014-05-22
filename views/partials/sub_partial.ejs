@@ -12,14 +12,14 @@
     <div class="row">
         <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
             <%
-            if (videoInfo && videoInfo.timedtext) {
-                var strList = videoInfo.timedtext.split('\n\n'), subList = [];
+            if (metadata && metadata.timedtext) {
+                var strList = metadata.timedtext.split('\n\n'), subList = [];
                 if (strList.length < 2) {
-                    strList = videoInfo.timedtext.substr(1).split('\n\r');
+                    strList = metadata.timedtext.substr(1).split('\n\r');
                 }
                 var charIndex = -1;
             %>
-            <div class="sub-text <% if (enriched) { %>enriched<% } %>">
+            <div class="sub-text <% if (locals.enriched) { %>enriched<% } %>">
                 <%
                     for (var index in strList) {
                         var sub = {text: '', lineNum: 0};
@@ -42,8 +42,8 @@
                         subList.push(sub);
                     }
 
-                    if (enriched && videoInfo.entities) {
-                        var entityList = videoInfo.entities;
+                    if (locals.enriched && entities) {
+                        var entityList = entities;
                         var subIndex = subList.length - 1;
 
                         //sorting JSON for end character desc and by length

@@ -12,20 +12,9 @@ ts.prepare();
 
 function viewVideo(req, res, videoInfo) {
     var videoURI = videoInfo.videoLocator || videoInfo.locator;
-    var uuid = videoInfo.uuid;
 
     var enriched = req.query.enriched;
-
-    function sendResp(infoObj) {
-
-        var source = {
-            videoURI: videoURI,
-            uuid: uuid,
-            metadata: infoObj,
-            enriched: enriched
-        };
-        res.render('video.ejs', source);
-    }
+    videoInfo.enriched = enriched;
 
     var concSign = url.parse(videoURI).hash ? '&' : '#';
     var t = req.query.t;
@@ -39,17 +28,19 @@ function viewVideo(req, res, videoInfo) {
 //        concSign = '&';
     }
 
+    videoInfo.videoURI = videoURI;
+
     if (!enriched || videoInfo.entities) {
-        sendResp(videoInfo.metadata);
+        res.render('video.ejs', videoInfo);
     } else {
         getEntities(videoInfo, function (err, data) {
             if (err) {
-                console.log(LOG_TAG + 'getEntity ' + data);
+                console.log(LOG_TAG + 'error in getEntity ' + err);
                 // TODO
             } else {
                 videoInfo.entities = data;
             }
-            sendResp(videoInfo);
+            res.render('video.ejs', videoInfo);
         });
     }
 }
