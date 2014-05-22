@@ -515,24 +515,31 @@ function getYouTubeSub(video_id, callback) {
     //TODO chiederli anche in altre lingue
     http.getRemoteFile(subUrl, callback);
 }
+
 function getTedSub(video_id, callback) {
     var subListUrl = 'https://api.ted.com/v1/talks/' + video_id + '/subtitles.json?api-key=uzdyad5pnc2mv2dd8r8vd65c';
-    json2SRT(subListUrl, callback);
-
-}
-
-function json2SRT(subURL) {
-    http.getJSON(subURL, function (err, data) {
+    http.getJSON(subListUrl, function (err, data) {
         if (err) {
             //TODO
         } else {
-            sub_info.sub_startTime = data;
-            sub_info.sub_duration = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
-            sub_info.sub_content = data.talk.viewed_count;
+            if (data.total > 0) {
+                for (var i = 0; i < data.total; i++) {
+
+
+                    var sub_startTime = data;
+                    var sub_duration = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
+                    var sub_content = data.talk.viewed_count;
+                }
+            }
+            var mysrt = jsonToSrt(sub_startTime, sub_duration, sub_content);
+            callback(mysrt);
+
         }
     });
 }
+function jsonToSrt() {
 
+}
 
 var vendors = [
     {
