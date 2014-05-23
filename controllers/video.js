@@ -52,7 +52,7 @@ exports.view = function (req, res) {
         return;
     }
     db.getFromUuid(uuid, function (err, data) {
-        if (err) {
+        if (err || !data) {
             //TODO a 404 page
             res.redirect('/');
             return;
@@ -379,7 +379,6 @@ function getMetadata(video, callback) {
                     getTedSub(video.tedID, function (err, data) {
                         if (err) {
                             console.log('[ERROR] on retrieving sub for ' + video.locator);
-
                         } else {
                             metadata.timedtext = data;
                         }
@@ -433,7 +432,7 @@ function getDailymotionSub(video_id, callback) {
                 var subUrl = (data.list[0].url);
                 http.getRemoteFile(subUrl, callback);
             } else {
-                console.log('no sub available')
+                console.log('no sub available');
                 callback(false, null);
             }
         } else {
@@ -479,7 +478,7 @@ function jsonToSrt(jsonUrl, callback) {
                     var newStart = (sub_offset + sub_startTime) / 1000;
                     var end = newStart + (sub_duration / 1000);
 
-                    mysrt += ++key + '\r\n' + subTime(newStart) + ' --> ' + subTime(end) + '\r\n' + sub_content + '\r\n\r\n';
+                    mysrt += ++key + '\n' + subTime(newStart) + ' --> ' + subTime(end) + '\n' + sub_content + '\n\n';
                 }
             }
             var myUTFsrt = encodeUTF(mysrt);
@@ -490,24 +489,27 @@ function jsonToSrt(jsonUrl, callback) {
 }
 
 function subTime(time) {
+    var fTime;
     if (time < 60) {
-        return (time > 9) ? "00:00:" + time.toFixed(3) : "00:00:0" + time.toFixed(3);
+        fTime = (time > 9) ? "00:00:" + time.toFixed(3) : "00:00:0" + time.toFixed(3);
     }
     else if (time == 60 || time > 60 && time < 3600) {
         var min = Math.floor(time / 60);
         var sec = (time % 60).toFixed(3);
-        return (min > 9 && sec > 9) ? "00:" + min + ":" + sec : (min < 9 && sec > 9) ? "00:0" + Math.floor(time / 60) + ":" + sec : (min > 9 && sec < 9) ? "00:" + Math.floor(time / 60) + ":0" + sec : "00:0" + min + ":0" + sec;
+        fTime = (min > 9 && sec > 9) ? "00:" + min + ":" + sec : (min < 9 && sec > 9) ? "00:0" + Math.floor(time / 60) + ":" + sec : (min > 9 && sec < 9) ? "00:" + Math.floor(time / 60) + ":0" + sec : "00:0" + min + ":0" + sec;
     }
     else {
         var sec = ((time % 3600) % 60).toFixed(3);
-        return (sec > 9) ? Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":" + sec : Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":0" + sec;
+        fTime = (sec > 9) ? Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":" + sec : Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":0" + sec;
     }
+
+    return fTime.replace(/\./g, ',');
 }
 
 
 // public method for url encoding
 function encodeUTF(string) {
-    string = string.replace(/\r\n/g, '\n');
+    string = string.replace(/\r/g, '');
     var utftext = "";
 
     for (var n = 0; n < string.length; n++) {
