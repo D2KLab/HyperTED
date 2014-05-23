@@ -9,7 +9,9 @@ exports.prepare = function () {
         'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
         'oa': 'http://www.w3.org/ns/oa#',
         'linkedtv': 'http://data.linkedtv.eu/ontologies/core#',
-        'nsa': 'http://multimedialab.elis.ugent.be/organon/ontologies/ninsuna#'
+        'nsa': 'http://multimedialab.elis.ugent.be/organon/ontologies/ninsuna#',
+        'dc': 'http://purl.org/dc/elements/1.1/',
+        'owl': 'http://www.w3.org/2002/07/owl#'
     };
 };
 
@@ -39,31 +41,6 @@ exports.getFromUuid = function (uuid, callback) {
     });
 };
 
-exports.getChapters = function (uuid, callback) {
-    var identifier = generateIdentifier(uuid);
-    var q = new Query().select('?mediafragment, ?chapter, ?tEnd, ?tStart, ?tUnit', true)
-        .where('?mediafragment', 'a', 'ma:MediaFragment')
-        .where('?mediafragment', 'ma:isFragmentOf', identifier)
-        .where('?mediafragment', 'nsa:temporalEnd', '?tEnd')
-        .where('?mediafragment', 'nsa:temporalStart', '?tStart')
-        .where('?mediafragment', 'nsa:temporalUnit', '?tUnit')
-        .where('?annotation', 'a', 'oa:Annotation')
-        .where('?annotation', 'oa:hasTarget', '?mediafragment')
-        .where('?annotation', 'oa:hasBody', '?chapter')
-        .where('?chapter', 'a', 'linkedtv:Chapter').orderby('?tStart');
-
-
-    console.log("[SPARQL]  " + q.toString());
-    client.rows(q.toString(), function (err, data) {
-        if (err) {
-            console.log(err);
-            callback(err, err.message);
-            return;
-        }
-        callback(false, data);
-    });
-};
-
 exports.getFromLocator = function (locator, callback) {
     var t = locator.indexOf('?ticket');
     if (t > 0) {
@@ -75,7 +52,7 @@ exports.getFromLocator = function (locator, callback) {
         .where('?MediaResource', 'ma:locator', '<' + locator + '>');
 
     q = qAddChapterOf('?MediaResource', q);
-
+    q = qAddEntitiesOf('?MediaResource', q);
     console.log(q.toString());
     client.query(q.toString(), function (err, data) {
         if (err) {
@@ -155,6 +132,22 @@ function qAddChapterOf(mr, q) {
             '?annotation oa:hasTarget ?mediafragment. ' +
             '?annotation oa:hasBody ?chapter. ' +
             '?chapter a linkedtv:Chapter. ', true).orderby('?tStart');
+}
+
+function qAddEntitiesOf(mr, q) {
+    return q.select('?mediafragment, ?keyURL, ?label, ?source')
+        .textWhere('?mediafragment a ma:MediaFragment. ' +
+            '?mediafragment ma:isFragmentOf ' + mr + ' . ' +
+            '?mediafragment nsa:temporalEnd ?tEnd. ' +
+            '?mediafragment nsa:temporalStart ?tStart. ' +
+            '?mediafragment nsa:temporalUnit ?tUnit. ' +
+            '?mediafragment linkedtv:hasSubtitle ?subtitle.' +
+            '?entityAnnotation a oa:Annotation. ' +
+            '?entityAnnotation oa:hasTarget ?mediafragment. ' +
+            '?entityAnnotation oa:hasBody ?entity. ' +
+            '?entity owl:sameAs ?keyURL. ' +
+            'OPTIONAL{ ?entity rdfs:label ?label.}' +
+            'OPTIONAL{ ?entity dc:source ?source.}', true).orderby('?tStart');
 }
 
 function generateIdentifier(uuid) {
