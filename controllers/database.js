@@ -40,7 +40,7 @@ function update(uuid, newVideo, callback) {
         }
         callback(err, doc);
     });
-};
+}
 
 exports.update = update;
 
