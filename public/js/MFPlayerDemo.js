@@ -1,7 +1,7 @@
 var uri = video.uri.replace(new RegExp('&amp;', 'g'), '&') + window.location.hash;
 var storageKey = 'fragmentenricher.';
 var videokey = storageKey + video.vendor + '-' + video.id + '.';
-
+var localStorage = function(){return null;};
 $(document).ready(function () {
     var $navbar = $('.navbar').not('.navbar-placeholder');
     var navHeight = $navbar.height();
