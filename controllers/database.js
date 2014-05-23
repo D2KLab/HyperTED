@@ -10,7 +10,7 @@ exports.prepare = function () {
     videos.index('locator', {unique: true});
 };
 
-function getFromUuid (uuid, callback) {
+function getFromUuid(uuid, callback) {
     videos.findOne({uuid: uuid}).on('complete', callback);
 };
 
@@ -40,7 +40,7 @@ function update(uuid, newVideo, callback) {
         }
         callback(err, doc);
     });
-}
+};
 
 exports.update = update;
 

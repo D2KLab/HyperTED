@@ -126,6 +126,7 @@ exports.search = function (req, res) {
             }
 
             //2. search metadata with vendor's api
+            console.log(video);
             getMetadata(video, function (err, metadata) {
                 if (err) {
                     console.log(LOG_TAG + 'Metadata retrieved with errors.');
@@ -454,8 +455,14 @@ function getYouTubeSub(video_id, callback) {
 function getTedSub(video_id, callback) {
     var subListUrl = 'https://api.ted.com/v1/talks/' + video_id + '/subtitles.json?api-key=uzdyad5pnc2mv2dd8r8vd65c';
 
-    http.getJSON(subListUrl, function (err, data) {
-        console.log("retrieving subs from " + subListUrl);
+    jsonToSrt(subListUrl, callback);
+
+}
+
+
+function jsonToSrt(jsonUrl, callback) {
+    http.getJSON(jsonUrl, function (err, data) {
+        console.log("retrieving subs from " + jsonUrl);
         if (err) {
             console.log("SUB ERROR");
             callback(err, err.message);
@@ -469,20 +476,19 @@ function getTedSub(video_id, callback) {
                     var sub_duration = data[key].caption.duration;
                     var sub_content = data[key].caption.content;
 
-                    mysrt = mysrt + jsonToSrt(++key, sub_offset, sub_startTime, sub_duration, sub_content);
+                    var newStart = (sub_offset + sub_startTime) / 1000;
+                    var end = newStart + (sub_duration / 1000);
+
+                    mysrt += ++key + '\r\n' + subTime(newStart) + ' --> ' + subTime(end) + '\r\n' + sub_content + '\r\n\r\n';
                 }
             }
-            callback(false, mysrt);
+            var myUTFsrt = encodeUTF(mysrt);
+            callback(false, myUTFsrt);
 
         }
     });
 }
-function jsonToSrt(key, offset, start, duration, content) {
-    var newStart = (offset + start) / 1000;
-    var end = newStart + (duration / 1000);
 
-    return key + '\r\n' + subTime(newStart) + ' --> ' + subTime(end) + '\r\n' + content + '\r\n\r\n';
-}
 function subTime(time) {
     if (time < 60) {
         return (time > 9) ? "00:00:" + time.toFixed(3) : "00:00:0" + time.toFixed(3);
@@ -497,6 +503,66 @@ function subTime(time) {
         return (sec > 9) ? Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":" + sec : Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":0" + sec;
     }
 }
+
+
+// public method for url encoding
+function encodeUTF(string) {
+    string = string.replace(/\r\n/g, '\n');
+    var utftext = "";
+
+    for (var n = 0; n < string.length; n++) {
+
+        var c = string.charCodeAt(n);
+
+        if (c < 128) {
+            utftext += String.fromCharCode(c);
+        }
+        else if ((c > 127) && (c < 2048)) {
+            utftext += String.fromCharCode((c >> 6) | 192);
+            utftext += String.fromCharCode((c & 63) | 128);
+        }
+        else {
+            utftext += String.fromCharCode((c >> 12) | 224);
+            utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+            utftext += String.fromCharCode((c & 63) | 128);
+        }
+
+    }
+
+    return utftext;
+}
+
+// public method for url decoding
+function decodeUTF(utftext) {
+    var string = "";
+    var i = 0;
+    var c = c1 = c2 = 0;
+
+    while (i < utftext.length) {
+
+        c = utftext.charCodeAt(i);
+
+        if (c < 128) {
+            string += String.fromCharCode(c);
+            i++;
+        }
+        else if ((c > 191) && (c < 224)) {
+            c2 = utftext.charCodeAt(i + 1);
+            string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+            i += 2;
+        }
+        else {
+            c2 = utftext.charCodeAt(i + 1);
+            c3 = utftext.charCodeAt(i + 2);
+            string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+            i += 3;
+        }
+
+    }
+
+    return string;
+}
+
 
 var vendors = [
     {
