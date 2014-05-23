@@ -35,7 +35,7 @@ function viewVideo(req, res, videoInfo) {
     } else {
         getEntities(videoInfo, function (err, data) {
             if (err) {
-                console.log(LOG_TAG + 'error in getEntity ' + err);
+                console.log(LOG_TAG + 'error in getEntity: ' + err.message);
                 // TODO
             } else {
                 videoInfo.entities = data;
@@ -91,8 +91,8 @@ exports.search = function (req, res) {
     var hashPart = parsedURI.hash || '';
 
     if (parsedURI.hostname = 'stream17.noterik.com') {
-        locator.replace(/\/rawvideo\/[0-9]\/raw.mp4/, '');
-        locator.replace(/\?ticket=.+/, '');
+        locator = locator.replace(/rawvideo\/[0-9]\/raw.mp4/, '');
+        locator = locator.replace(/\?ticket=.+/, '');
     }
 
     db.getFromLocator(locator, function (err, data) {
@@ -126,7 +126,6 @@ exports.search = function (req, res) {
             }
 
             //2. search metadata with vendor's api
-            console.log(video);
             getMetadata(video, function (err, metadata) {
                 if (err) {
                     console.log(LOG_TAG + 'Metadata retrieved with errors.');
@@ -173,11 +172,14 @@ exports.nerdify = function (req, res) {
             console.log(LOG_TAG + 'nerdifying ' + uuid);
             getEntities(video_data, function (err, data) {
                 if (err) {
-                    console.log(LOG_TAG + err);
+                    console.log(LOG_TAG + err.message);
+                    res.json("Error from NERD");
                     // TODO
-                } else {
-                    video_data.entities = data;
+                    return;
                 }
+
+                video_data.entities = data;
+                video_data.enriched = true;
                 res.render('nerdify_resp.ejs', video_data);
             });
         }
@@ -195,7 +197,8 @@ function getEntities(video_info, callback) {
     }
     nerd.getEntities(doc_type, text, function (err, data) {
         if (!err && data) {
-            db.addEntities(video_info.uuid, data);
+            db.addEntities(video_info.uuid, data, function () {
+            });
         }
         callback(err, data);
     });
@@ -469,7 +472,6 @@ function getTedSub(video_id, callback) {
                     mysrt = mysrt + jsonToSrt(++key, sub_offset, sub_startTime, sub_duration, sub_content);
                 }
             }
-            console.log(mysrt);
             callback(false, mysrt);
 
         }
