@@ -74,7 +74,6 @@ exports.view = function (req, res) {
                 }
 
                 //2. search metadata with vendor's api
-                console.log(video);
                 getMetadata(video, function (err, metadata) {
                     if (err) {
                         console.log(LOG_TAG + 'Metadata retrieved with errors.');
@@ -152,49 +151,62 @@ exports.search = function (req, res) {
             return;
         }
 
-        //new video
-        var video = {locator: locator};
-        if (locator.indexOf('http://stream17.noterik.com/') >= 0) {
-            video.videoLocator = locator + '/rawvideo/2/raw.mp4?ticket=77451bc0-e0bf-11e3-8b68-0800200c9a66';
-        }
-
-        // 1. search for metadata in sparql
-        getMetadataFromSparql(video, function (err, data) {
-            if (err || !data) {
-                console.log("No data obtained from sparql");
-            } else {
-                video = mergeObj(video, data);
+        var vendor = detectVendor(locator);
+        var id = detectId(locator, vendor);
+        db.getFromVendorId(vendor,id, function(err, data){
+            if(!err && data){
+                var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
+                console.log('Video at ' + locator + ' already in db.');
+                console.log('Redirecting to ' + redirectUrl);
+                res.redirect(redirectUrl);
+                return;
             }
 
-            //2. search metadata with vendor's api
-            console.log(video);
-            getMetadata(video, function (err, metadata) {
-                if (err) {
-                    console.log(LOG_TAG + 'Metadata retrieved with errors.');
-                }
-                if (!metadata) {
-                    console.log(LOG_TAG + 'Metadata unavailable.');
+            //new video
+            var video = {locator: locator};
+            if (locator.indexOf('http://stream17.noterik.com/') >= 0) {
+                video.videoLocator = locator + '/rawvideo/2/raw.mp4?ticket=77451bc0-e0bf-11e3-8b68-0800200c9a66';
+            }
+
+            // 1. search for metadata in sparql
+            getMetadataFromSparql(video, function (err, data) {
+                if (err || !data) {
+                    console.log("No data obtained from sparql");
                 } else {
-                    var oldmetadata = video.metadata || {};
-                    video.metadata = mergeObj(oldmetadata, metadata);
+                    video = mergeObj(video, data);
                 }
 
-                //3. write in db
-                db.insert(video, function (err, data) {
+                //2. search metadata with vendor's api
+                getMetadata(video, function (err, metadata) {
                     if (err) {
-                        console.log("DATABASE ERROR" + JSON.stringify(err));
-                        //TODO error page
-                        res.redirect('/');
-                    } else {
-                        var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
-                        console.log('Video at ' + locator + ' successfully added to db.');
-                        console.log('Redirecting to ' + redirectUrl);
-                        res.redirect(redirectUrl);
+                        console.log(LOG_TAG + 'Metadata retrieved with errors.');
                     }
-                });
-            });
+                    if (!metadata) {
+                        console.log(LOG_TAG + 'Metadata unavailable.');
+                    } else {
+                        var oldmetadata = video.metadata || {};
+                        video.metadata = mergeObj(oldmetadata, metadata);
+                    }
 
+                    //3. write in db
+                    db.insert(video, function (err, data) {
+                        if (err) {
+                            console.log("DATABASE ERROR" + JSON.stringify(err));
+                            //TODO error page
+                            res.redirect('/');
+                        } else {
+                            var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
+                            console.log('Video at ' + locator + ' successfully added to db.');
+                            console.log('Redirecting to ' + redirectUrl);
+                            res.redirect(redirectUrl);
+                        }
+                    });
+                });
+
+            });
         });
+
+
     });
 };
 
@@ -645,7 +657,7 @@ function detectVendor(url) {
 }
 
 function detectId(url, vendor) {
-    if (vendor.id_pattern)
+    if (vendor && vendor.id_pattern)
         return url.match(vendor.id_pattern)[1];
     return undefined;
 }

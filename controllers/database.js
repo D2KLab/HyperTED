@@ -18,6 +18,10 @@ exports.getFromUuid = getFromUuid;
 exports.getFromLocator = function (locator, callback) {
     videos.findOne({locator: locator}).on('complete', callback);
 };
+exports.getFromVendorId = function (vendor, id, callback) {
+    if(!vendor || !id) callback(true);
+    videos.findOne({vendor: vendor, vendor_id: id}).on('complete', callback);
+};
 
 exports.insert = function (video, callback) {
     video.uuid = UUID.v4();
