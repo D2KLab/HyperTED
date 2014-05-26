@@ -40,7 +40,7 @@ function viewVideo(req, res, videoInfo) {
         getEntities(videoInfo, function (err, data) {
             if (err) {
                 console.log(LOG_TAG + 'error in getEntity: ' + err.message);
-                // TODO
+                videoInfo.error = "Sorry. We are not able to retrieving NERD entities now.";
             } else {
                 videoInfo.entities = data;
             }
@@ -212,10 +212,11 @@ exports.search = function (req, res) {
 
 exports.nerdify = function (req, res) {
     var uuid = req.query.uuid;
+
     db.getFromUuid(uuid, function (err, video_data) {
         if (!video_data) {
             console.log("Error from DB");
-            res.json("Error from DB");
+            res.json({error:"Error from DB"});
             return;
         }
 
@@ -227,8 +228,7 @@ exports.nerdify = function (req, res) {
             getEntities(video_data, function (err, data) {
                 if (err) {
                     console.log(LOG_TAG + err.message);
-                    res.json("Error from NERD");
-                    // TODO
+                    res.json({error:"Error from NERD"});
                     return;
                 }
 
@@ -448,13 +448,13 @@ function getMetadata(video, callback) {
 exports.ajaxGetMetadata = function (req, res) {
     var uuid = req.param('uuid');
     if (!uuid) {
-        res.json({error: 'empty uuid'});
+        res.json({error:'empty uuid'});
         return;
     }
 
     db.getFromUuid(uuid, function (err, data) {
         if (err || !data) {
-            res.json({error: 'video not found in db'});
+            res.json({error:'video not found in db'});
             return;
         }
         if (data.metadata) {

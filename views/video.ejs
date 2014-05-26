@@ -103,6 +103,9 @@
 <% } %>
 
 <div class="nerdificable">
+    <% if(locals.error){ %>
+    <div class="alert alert-danger"><%= error %></div>
+    <% } %>
     <div class="container-fluid">
 
         <div class="row">

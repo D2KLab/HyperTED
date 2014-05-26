@@ -25,14 +25,18 @@ exports.getFromVendorId = function (vendor, id, callback) {
 
 exports.insert = function (video, callback) {
     video.uuid = UUID.v4();
-    //TODO check if used uuid (?)
     video.timestamp = Date.now();
-
     videos.insert(video, function (err, doc) {
         if (err) {
             console.log('DB insert fail. ' + JSON.stringify(err));
-            console.log('Check for existent locator.');
-            videos.findOne({locator: locator}).on('complete', callback);
+            console.log('Check for existent uuid.');
+            videos.findOne({uuid: uuid}).on('complete', function(e, data){
+                if(!e && data){ //retry with another uuid
+                    exports.insert(video, callback);
+                }else{
+                    callback(err, data);
+                }
+            });
         } else {
             callback(err, doc);
         }

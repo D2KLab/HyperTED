@@ -71,6 +71,18 @@ $(document).ready(function () {
 
             $(this).ajaxSubmit({
                 success: function (data) {
+                    try {
+                        if (data.error) {
+                            var alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
+                            alert.appendTo($nerdifyForm).alert();
+                            $submitButton.removeLoader();
+                            console.error(data.error);
+                            return;
+                        }
+                    } catch (e) {
+                        //DO NOTHING
+                    }
+
                     var $data = $(data);
                     if (hasVideoSub) {
                         $nerdified = $data.find('.sub-text');
@@ -106,6 +118,9 @@ $(document).ready(function () {
                     synchEnrichment();
                 },
                 error: function () {
+                    var alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
+                    alert.appendTo($nerdifyForm).alert();
+                    $submitButton.removeLoader();
                     console.error('Something went wrong');
                 }
             });
@@ -295,7 +310,7 @@ function getParameterByName(name, url) {
 function getEnrichmentFromLocalStorage(key) {
     try {
         var data = JSON.parse(localStorage[key]);
-    }catch (e){
+    } catch (e) {
         return null;
     }
     if (!data.timestamp || Date.now() - data.timestamp > 86400000) {
