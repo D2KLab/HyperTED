@@ -12,16 +12,18 @@ exports.prepare = function () {
 
 function getFromUuid(uuid, callback) {
     videos.findOne({uuid: uuid}).on('complete', callback);
-};
-
+}
 exports.getFromUuid = getFromUuid;
+
 exports.getFromLocator = function (locator, callback) {
     videos.findOne({locator: locator}).on('complete', callback);
 };
 
 exports.insert = function (video, callback) {
     video.uuid = UUID.v4();
-    //TODO check if used uuid
+    //TODO check if used uuid (?)
+    video.timestamp = Date.now();
+
     videos.insert(video, function (err, doc) {
         if (err) {
             console.log('DB insert fail. ' + JSON.stringify(err));
@@ -40,7 +42,7 @@ function update(uuid, newVideo, callback) {
         }
         callback(err, doc);
     });
-};
+}
 
 exports.update = update;
 
@@ -51,7 +53,7 @@ exports.addEntities = function (uuid, entities, callback) {
             callback(err, video);
         }
         video.entities = entities;
-
+        video.entTimestap = Date.now();
         update(uuid, video, callback);
     });
 

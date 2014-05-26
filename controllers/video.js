@@ -7,6 +7,7 @@ var http = require('http'),
     ts = require('./linkedTVconnection');
 
 var LOG_TAG = '[VIDEO.JS]: ';
+var time1d = 86400000; //one day
 ts.prepare();
 
 
@@ -30,7 +31,10 @@ function viewVideo(req, res, videoInfo) {
 
     videoInfo.videoURI = videoURI;
 
-    if (!enriched || videoInfo.entities) {
+    var areEntitiesUpdated = videoInfo.entities && videoInfo.entTimestap
+        && videoInfo.timestamp && videoInfo.entTimestap > videoInfo.timestamp;
+
+    if (!enriched || areEntitiesUpdated) {
         res.render('video.ejs', videoInfo);
     } else {
         getEntities(videoInfo, function (err, data) {
@@ -51,13 +55,50 @@ exports.view = function (req, res) {
         res.redirect('/');
         return;
     }
-    db.getFromUuid(uuid, function (err, data) {
-        if (err || !data) {
+    db.getFromUuid(uuid, function (err, video) {
+        if (err || !video) {
             //TODO a 404 page
             res.redirect('/');
             return;
         }
-        viewVideo(req, res, data);
+
+        if (!video.timestamp || Date.now() - video.timestamp > time1d) {
+            //UPDATE METADATA
+            console.log("updating metadata for video " + uuid);
+            // 1. search for metadata in sparql
+            getMetadataFromSparql(video, function (err, data) {
+                if (err || !data) {
+                    console.log("No data obtained from sparql");
+                } else {
+                    video = mergeObj(video, data);
+                }
+
+                //2. search metadata with vendor's api
+                console.log(video);
+                getMetadata(video, function (err, metadata) {
+                    if (err) {
+                        console.log(LOG_TAG + 'Metadata retrieved with errors.');
+                    }
+                    if (!metadata) {
+                        console.log(LOG_TAG + 'Metadata unavailable.');
+                    } else {
+                        var oldmetadata = video.metadata || {};
+                        video.metadata = mergeObj(oldmetadata, metadata);
+                    }
+
+                    //3. write in db
+                    video.timestamp = Date.now();
+                    db.update(uuid, video, function (err, data) {
+                        if (err) {
+                            console.log("DATABASE ERROR" + JSON.stringify(err));
+                            console.log("Can not update");
+                        }
+                    });
+
+                });
+            });
+        }
+        viewVideo(req, res, video);
     });
 
 };
