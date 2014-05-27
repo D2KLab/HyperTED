@@ -4,7 +4,8 @@ var http = require('http'),
     async = require('async'),
     nerd = require('./nerdify'),
     db = require('./database'),
-    ts = require('./linkedTVconnection');
+    ts = require('./linkedTVconnection'),
+    errorMsg = require('./error_msg');
 
 var LOG_TAG = '[VIDEO.JS]: ';
 var time1d = 86400000; //one day
@@ -52,13 +53,12 @@ function viewVideo(req, res, videoInfo) {
 exports.view = function (req, res) {
     var uuid = req.param('uuid');
     if (!uuid) {
-        res.redirect('/');
+        res.render('error.ejs', errorMsg.e400);
         return;
     }
     db.getFromUuid(uuid, function (err, video) {
         if (err || !video) {
-            //TODO a 404 page
-            res.redirect('/');
+            res.render('error.ejs', errorMsg.e404);
             return;
         }
 
@@ -138,8 +138,7 @@ exports.search = function (req, res) {
     db.getFromLocator(locator, function (err, data) {
         if (err) { //db error
             console.log("DATABASE ERROR" + JSON.stringify(err));
-            //TODO error page
-            res.redirect('/');
+            res.render('error.ejs', errorMsg.e500);
             return;
         }
 
@@ -192,8 +191,7 @@ exports.search = function (req, res) {
                     db.insert(video, function (err, data) {
                         if (err) {
                             console.log("DATABASE ERROR" + JSON.stringify(err));
-                            //TODO error page
-                            res.redirect('/');
+                            res.render('error.ejs', errorMsg.e500);
                         } else {
                             var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
                             console.log('Video at ' + locator + ' successfully added to db.');

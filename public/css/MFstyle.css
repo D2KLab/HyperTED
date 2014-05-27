@@ -243,31 +243,6 @@ html, body {
     -moz-transition: padding 100ms ease-out;
     -o-transition: padding 100ms ease-out;
     transition: padding 100ms ease-out; }
-  .navbar .top-brand img {
-    height: 66px;
-    display: inline-block;
-    -webkit-transition: all 100ms ease-out;
-    -moz-transition: all 100ms ease-out;
-    -o-transition: all 100ms ease-out;
-    transition: all 100ms ease-out; }
-  .navbar .top-brand .logo-text {
-    width: 119px; }
-  .navbar .top-brand .left-mark, .navbar .top-brand .right-mark {
-    width: 56px;
-    -webkit-transition: padding 100ms ease-out;
-    -moz-transition: padding 100ms ease-out;
-    -o-transition: padding 100ms ease-out;
-    transition: padding 100ms ease-out; }
-  .navbar .top-brand .left-mark {
-    padding-left: 10px; }
-  .navbar .top-brand .right-mark {
-    padding-right: 10px; }
-  .navbar .top-brand:hover .left-mark {
-    padding-left: 0;
-    padding-right: 10px; }
-  .navbar .top-brand:hover .right-mark {
-    padding-left: 10px;
-    padding-right: 0; }
   @media (min-width: 768px) {
     .navbar.compact {
       height: 40px; } }
@@ -286,6 +261,32 @@ html, body {
     height: 96px;
     position: static;
     background: #000000; }
+
+.top-brand img {
+  height: 66px;
+  display: inline-block;
+  -webkit-transition: all 100ms ease-out;
+  -moz-transition: all 100ms ease-out;
+  -o-transition: all 100ms ease-out;
+  transition: all 100ms ease-out; }
+.top-brand .logo-text {
+  width: 119px; }
+.top-brand .left-mark, .top-brand .right-mark {
+  width: 56px;
+  -webkit-transition: padding 100ms ease-out;
+  -moz-transition: padding 100ms ease-out;
+  -o-transition: padding 100ms ease-out;
+  transition: padding 100ms ease-out; }
+.top-brand .left-mark {
+  padding-left: 10px; }
+.top-brand .right-mark {
+  padding-right: 10px; }
+.top-brand:hover .left-mark {
+  padding-left: 0;
+  padding-right: 10px; }
+.top-brand:hover .right-mark {
+  padding-left: 10px;
+  padding-right: 0; }
 
 .nerdificable {
   -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
@@ -609,3 +610,13 @@ p span.entity.nesting:hover span {
     cursor: pointer; }
     .sub-text p:hover {
       font-weight: 700; }
+
+.errorcode {
+  font-family: Arial Black, Arial, Verdana, sans-serif;
+  font-weight: bold;
+  font-size: 5em;
+  color: #fe2a05;
+  vertical-align: middle; }
+
+.error_header {
+  text-align: center; }

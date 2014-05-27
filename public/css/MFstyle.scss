@@ -8,6 +8,7 @@
 $light_gray: #f4f4f4;
 $medium_gray: #aaaaaa;
 $dark_gray: #5d5d5d;
+$ted_red: #FE2A05;
 
 .clearfix {
   &:before,
@@ -121,36 +122,6 @@ $navbarTransitionTime: 100ms;
     max-width: 300px;
     @include transition(padding, $navbarTransitionTime);
   }
-  .top-brand {
-    img {
-      height: 66px;
-      display: inline-block;
-      @include transition(all, $navbarTransitionTime);
-    }
-    .logo-text {
-      width: 119px;
-    }
-    .left-mark, .right-mark {
-      width: 56px;
-      @include transition(padding, 100ms);
-    }
-    .left-mark {
-      padding-left: $brandMarkPadding;
-    }
-    .right-mark {
-      padding-right: $brandMarkPadding;
-    }
-    &:hover {
-      .left-mark {
-        padding-left: 0;
-        padding-right: $brandMarkPadding;
-      }
-      .right-mark {
-        padding-left: $brandMarkPadding;
-        padding-right: 0;
-      }
-    }
-  }
 
   &.compact {
     @media (min-width: 768px) {
@@ -182,6 +153,37 @@ $navbarTransitionTime: 100ms;
     background: #000000;
   }
 
+}
+
+.top-brand {
+  img {
+    height: 66px;
+    display: inline-block;
+    @include transition(all, $navbarTransitionTime);
+  }
+  .logo-text {
+    width: 119px;
+  }
+  .left-mark, .right-mark {
+    width: 56px;
+    @include transition(padding, 100ms);
+  }
+  .left-mark {
+    padding-left: $brandMarkPadding;
+  }
+  .right-mark {
+    padding-right: $brandMarkPadding;
+  }
+  &:hover {
+    .left-mark {
+      padding-left: 0;
+      padding-right: $brandMarkPadding;
+    }
+    .right-mark {
+      padding-left: $brandMarkPadding;
+      padding-right: 0;
+    }
+  }
 }
 
 .nerdificable {
@@ -594,4 +596,18 @@ p {
       font-weight: 700;
     }
   }
+}
+
+.errorcode {
+  font: {
+    family: Arial Black, Arial, Verdana, sans-serif;
+    weight: bold;
+    size: 5em;
+  }
+  color: $ted_red;
+  vertical-align: middle;
+}
+
+.error_header{
+  text-align: center;
 }

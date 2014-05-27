@@ -1,7 +1,8 @@
 var express = require('express'),
     path = require("path"),
     video = require('./controllers/video'),
-    db = require('./controllers/database');
+    db = require('./controllers/database'),
+    err = require('./controllers/error_msg');
 
 var app = express();
 db.prepare();
@@ -18,6 +19,8 @@ app.get('/video?', video.search);
 app.get('/', function (req, res) {
     res.render('welcome.ejs')
 });
-
+app.get('*', function(req,res){
+   res.render('error.ejs', err.e404);
+});
 app.listen(8080);
 console.log("Server Running on 8080");
