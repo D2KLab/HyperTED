@@ -172,22 +172,47 @@ $(document).ready(function () {
     });
 
 
-    $(document).on('click', '.chap-link', function () {
+//////CHAPTERS
+    $('.chap-link').each(function () {
         var $chapter = $(this).children('a');
         var startChapter = $chapter.data('start-time');
         var endChapter = $chapter.data('end-time');
-        $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
-        updateMFurl();
-    });
-
-    $('.chap-link').each(function () {
-        var chapter = $(this).children('a');
-        var startChapter = chapter.data('start-time');
-        var endChapter = chapter.data('end-time');
         var totWidth = $('.chap-line .chap-link:last-child').children('a').data('end-time');
-        var width = (endChapter - startChapter) / totWidth * 100 + "%";
+        var width = (endChapter - startChapter) / totWidth * 100;
+        $(this).css("width", width + "%");
 
-        $(this).css("width", width);
+        if ($(this).width() < 175) {
+
+            var $totChapters = $('.chap-link').length;
+            var index = $('.chap-line .chap-link').index(this);
+
+            $(this).hover(function () {
+
+                    var opt = {
+                        bottom: "30px",
+                        opacity: "1"
+                    };
+
+                    if (index > Math.floor($totChapters / 2)) {
+                        opt.right = 0;
+                    }
+                    $chapter.children('.chap-timing').css(opt);
+                },
+                function () {
+                    //do nothing
+                });
+        }
+
+
+        $(this).on('click', function () {
+            $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
+
+            $('.chap-link').removeClass('selected-chap');
+            $(this).addClass('selected-chap');
+
+            updateMFurl();
+        });
+
     });
 
 

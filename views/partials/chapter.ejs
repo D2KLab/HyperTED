@@ -25,16 +25,19 @@
                     var endTime = chap.tEnd.value;
                     var tStart = labelTime(startTime);
                     var tEnd = labelTime(endTime);
-
                 %>
                 <div class="chap-link">
                     <a data-start-time="<%= startTime %>" data-end-time="<%= endTime %>">
 
                         <div class="chap-timing">
-                            <p><%= tStart %></p>
 
-                            <p><%= tEnd %></p>
+                            <h5><span class="glyphicon glyphicon-chevron-left"></span>
+                                <%= tStart %> - <%= tEnd %>
+
+                                <span class="glyphicon glyphicon-chevron-right"></span></h5>
+
                         </div>
+
 
                     </a>
                 </div>
