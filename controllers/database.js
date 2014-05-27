@@ -12,21 +12,31 @@ exports.prepare = function () {
 
 function getFromUuid(uuid, callback) {
     videos.findOne({uuid: uuid}).on('complete', callback);
-};
-
+}
 exports.getFromUuid = getFromUuid;
+
 exports.getFromLocator = function (locator, callback) {
     videos.findOne({locator: locator}).on('complete', callback);
+};
+exports.getFromVendorId = function (vendor, id, callback) {
+    if(!vendor || !id) callback(true);
+    videos.findOne({vendor: vendor, vendor_id: id}).on('complete', callback);
 };
 
 exports.insert = function (video, callback) {
     video.uuid = UUID.v4();
-    //TODO check if used uuid
+    video.timestamp = Date.now();
     videos.insert(video, function (err, doc) {
         if (err) {
             console.log('DB insert fail. ' + JSON.stringify(err));
-            console.log('Check for existent locator.');
-            videos.findOne({locator: locator}).on('complete', callback);
+            console.log('Check for existent uuid.');
+            videos.findOne({uuid: uuid}).on('complete', function(e, data){
+                if(!e && data){ //retry with another uuid
+                    exports.insert(video, callback);
+                }else{
+                    callback(err, data);
+                }
+            });
         } else {
             callback(err, doc);
         }
@@ -40,7 +50,7 @@ function update(uuid, newVideo, callback) {
         }
         callback(err, doc);
     });
-};
+}
 
 exports.update = update;
 
@@ -51,7 +61,7 @@ exports.addEntities = function (uuid, entities, callback) {
             callback(err, video);
         }
         video.entities = entities;
-
+        video.entTimestap = Date.now();
         update(uuid, video, callback);
     });
 

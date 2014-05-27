@@ -16,7 +16,10 @@
                 <%
                 var entityList = locals.entities;
                         if(entityList){
-                    entityList.sort(function SortByNerdType(x, y) {
+                    entityList.sort(/**
+                     * @return {number}
+                     */
+                            function SortByNerdType(x, y) {
                         return ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1 ));
                     });
 

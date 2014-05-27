@@ -30,13 +30,7 @@ exports.getFromUuid = function (uuid, callback) {
             callback(true, 'No results');
         }
 
-        var locator = bindings[0].locator;
-        if (locator.type != 'uri') {
-            //TODO
-        } else {
-            locator = locator.value;
-        }
-
+        var locator = bindings[0].locator.value;
         callback(false, locator);
     });
 };
@@ -56,7 +50,6 @@ exports.getFromLocator = function (locator, callback) {
     console.log(q.toString());
     client.query(q.toString(), function (err, data) {
         if (err) {
-            //TODO
             console.log(err);
             callback(err, data);
             return;

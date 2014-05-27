@@ -4,9 +4,11 @@ var http = require('http'),
     async = require('async'),
     nerd = require('./nerdify'),
     db = require('./database'),
-    ts = require('./linkedTVconnection');
+    ts = require('./linkedTVconnection'),
+    errorMsg = require('./error_msg');
 
 var LOG_TAG = '[VIDEO.JS]: ';
+var time1d = 86400000; //one day
 ts.prepare();
 
 
@@ -30,13 +32,16 @@ function viewVideo(req, res, videoInfo) {
 
     videoInfo.videoURI = videoURI;
 
-    if (!enriched || videoInfo.entities) {
+    var areEntitiesUpdated = videoInfo.entities && videoInfo.entTimestap
+        && videoInfo.timestamp && videoInfo.entTimestap > videoInfo.timestamp;
+
+    if (!enriched || areEntitiesUpdated) {
         res.render('video.ejs', videoInfo);
     } else {
         getEntities(videoInfo, function (err, data) {
             if (err) {
                 console.log(LOG_TAG + 'error in getEntity: ' + err.message);
-                // TODO
+                videoInfo.error = "Sorry. We are not able to retrieving NERD entities now.";
             } else {
                 videoInfo.entities = data;
             }
@@ -48,16 +53,51 @@ function viewVideo(req, res, videoInfo) {
 exports.view = function (req, res) {
     var uuid = req.param('uuid');
     if (!uuid) {
-        res.redirect('/');
+        res.render('error.ejs', errorMsg.e400);
         return;
     }
-    db.getFromUuid(uuid, function (err, data) {
-        if (err || !data) {
-            //TODO a 404 page
-            res.redirect('/');
+    db.getFromUuid(uuid, function (err, video) {
+        if (err || !video) {
+            res.render('error.ejs', errorMsg.e404);
             return;
         }
-        viewVideo(req, res, data);
+
+        if (!video.timestamp || Date.now() - video.timestamp > time1d) {
+            //UPDATE METADATA
+            console.log("updating metadata for video " + uuid);
+            // 1. search for metadata in sparql
+            getMetadataFromSparql(video, function (err, data) {
+                if (err || !data) {
+                    console.log("No data obtained from sparql");
+                } else {
+                    video = mergeObj(video, data);
+                }
+
+                //2. search metadata with vendor's api
+                getMetadata(video, function (err, metadata) {
+                    if (err) {
+                        console.log(LOG_TAG + 'Metadata retrieved with errors.');
+                    }
+                    if (!metadata) {
+                        console.log(LOG_TAG + 'Metadata unavailable.');
+                    } else {
+                        var oldmetadata = video.metadata || {};
+                        video.metadata = mergeObj(oldmetadata, metadata);
+                    }
+
+                    //3. write in db
+                    video.timestamp = Date.now();
+                    db.update(uuid, video, function (err, data) {
+                        if (err) {
+                            console.log("DATABASE ERROR" + JSON.stringify(err));
+                            console.log("Can not update");
+                        }
+                    });
+
+                });
+            });
+        }
+        viewVideo(req, res, video);
     });
 
 };
@@ -98,8 +138,7 @@ exports.search = function (req, res) {
     db.getFromLocator(locator, function (err, data) {
         if (err) { //db error
             console.log("DATABASE ERROR" + JSON.stringify(err));
-            //TODO error page
-            res.redirect('/');
+            res.render('error.ejs', errorMsg.e500);
             return;
         }
 
@@ -111,58 +150,71 @@ exports.search = function (req, res) {
             return;
         }
 
-        //new video
-        var video = {locator: locator};
-        if (locator.indexOf('http://stream17.noterik.com/') >= 0) {
-            video.videoLocator = locator + '/rawvideo/2/raw.mp4?ticket=77451bc0-e0bf-11e3-8b68-0800200c9a66';
-        }
-
-        // 1. search for metadata in sparql
-        getMetadataFromSparql(video, function (err, data) {
-            if (err || !data) {
-                console.log("No data obtained from sparql");
-            } else {
-                video = mergeObj(video, data);
+        var vendor = detectVendor(locator);
+        var id = detectId(locator, vendor);
+        db.getFromVendorId(vendor,id, function(err, data){
+            if(!err && data){
+                var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
+                console.log('Video at ' + locator + ' already in db.');
+                console.log('Redirecting to ' + redirectUrl);
+                res.redirect(redirectUrl);
+                return;
             }
 
-            //2. search metadata with vendor's api
-            console.log(video);
-            getMetadata(video, function (err, metadata) {
-                if (err) {
-                    console.log(LOG_TAG + 'Metadata retrieved with errors.');
-                }
-                if (!metadata) {
-                    console.log(LOG_TAG + 'Metadata unavailable.');
+            //new video
+            var video = {locator: locator};
+            if (locator.indexOf('http://stream17.noterik.com/') >= 0) {
+                video.videoLocator = locator + '/rawvideo/2/raw.mp4?ticket=77451bc0-e0bf-11e3-8b68-0800200c9a66';
+            }
+
+            // 1. search for metadata in sparql
+            getMetadataFromSparql(video, function (err, data) {
+                if (err || !data) {
+                    console.log("No data obtained from sparql");
                 } else {
-                    var oldmetadata = video.metadata || {};
-                    video.metadata = mergeObj(oldmetadata, metadata);
+                    video = mergeObj(video, data);
                 }
 
-                //3. write in db
-                db.insert(video, function (err, data) {
+                //2. search metadata with vendor's api
+                getMetadata(video, function (err, metadata) {
                     if (err) {
-                        console.log("DATABASE ERROR" + JSON.stringify(err));
-                        //TODO error page
-                        res.redirect('/');
-                    } else {
-                        var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
-                        console.log('Video at ' + locator + ' successfully added to db.');
-                        console.log('Redirecting to ' + redirectUrl);
-                        res.redirect(redirectUrl);
+                        console.log(LOG_TAG + 'Metadata retrieved with errors.');
                     }
-                });
-            });
+                    if (!metadata) {
+                        console.log(LOG_TAG + 'Metadata unavailable.');
+                    } else {
+                        var oldmetadata = video.metadata || {};
+                        video.metadata = mergeObj(oldmetadata, metadata);
+                    }
 
+                    //3. write in db
+                    db.insert(video, function (err, data) {
+                        if (err) {
+                            console.log("DATABASE ERROR" + JSON.stringify(err));
+                            res.render('error.ejs', errorMsg.e500);
+                        } else {
+                            var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
+                            console.log('Video at ' + locator + ' successfully added to db.');
+                            console.log('Redirecting to ' + redirectUrl);
+                            res.redirect(redirectUrl);
+                        }
+                    });
+                });
+
+            });
         });
+
+
     });
 };
 
 exports.nerdify = function (req, res) {
     var uuid = req.query.uuid;
+
     db.getFromUuid(uuid, function (err, video_data) {
         if (!video_data) {
             console.log("Error from DB");
-            res.json("Error from DB");
+            res.json({error:"Error from DB"});
             return;
         }
 
@@ -174,8 +226,7 @@ exports.nerdify = function (req, res) {
             getEntities(video_data, function (err, data) {
                 if (err) {
                     console.log(LOG_TAG + err.message);
-                    res.json("Error from NERD");
-                    // TODO
+                    res.json({error:"Error from NERD"});
                     return;
                 }
 
@@ -395,13 +446,13 @@ function getMetadata(video, callback) {
 exports.ajaxGetMetadata = function (req, res) {
     var uuid = req.param('uuid');
     if (!uuid) {
-        res.json({error: 'empty uuid'});
+        res.json({error:'empty uuid'});
         return;
     }
 
     db.getFromUuid(uuid, function (err, data) {
         if (err || !data) {
-            res.json({error: 'video not found in db'});
+            res.json({error:'video not found in db'});
             return;
         }
         if (data.metadata) {
@@ -604,7 +655,7 @@ function detectVendor(url) {
 }
 
 function detectId(url, vendor) {
-    if (vendor.id_pattern)
+    if (vendor && vendor.id_pattern)
         return url.match(vendor.id_pattern)[1];
     return undefined;
 }
