@@ -1,24 +1,18 @@
 <div class="container-fluid">
 
-    <div class="row">
 
+    <div class="chap-label">
+        <h1>chapters</h1>
+    </div>
+
+    <div class="row">
         <% var chapterList = chapters; %>
         <% function labelTime(time) {
             return (time < 60) ? "00:00:" + Math.floor(time) : (time == 60 || time > 60 && time < 3600) ? "00:" + Math.floor(time / 60) + ":" + Math.floor(time % 60) : Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":" + Math.floor((time % 3600) % 60);
         } %>
+        <div class="col-md-12">
 
-        <div class="col-md-2">
-            <div class="chap-label">
-                <h3>chapters
-                    <span class="glyphicon glyphicon-chevron-right"></span>
-                    <span class="glyphicon glyphicon-chevron-down"></span>
-                </h3>
-            </div>
-        </div>
-
-        <div class="col-md-10">
-
-            <div class="chap-line">
+        <div class="chap-line">
                 <%
                 chapterList.forEach(function(chap){
                     var startTime = chap.tStart.value;

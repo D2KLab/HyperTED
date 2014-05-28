@@ -327,45 +327,6 @@ html, body {
     transition: padding 100ms ease-out;
 }
 
-.navbar .top-brand img {
-    height: 66px;
-    display: inline-block;
-    -webkit-transition: all 100ms ease-out;
-    -moz-transition: all 100ms ease-out;
-    -o-transition: all 100ms ease-out;
-    transition: all 100ms ease-out;
-}
-
-.navbar .top-brand .logo-text {
-    width: 119px;
-}
-
-.navbar .top-brand .left-mark, .navbar .top-brand .right-mark {
-    width: 56px;
-    -webkit-transition: padding 100ms ease-out;
-    -moz-transition: padding 100ms ease-out;
-    -o-transition: padding 100ms ease-out;
-    transition: padding 100ms ease-out;
-}
-
-.navbar .top-brand .left-mark {
-    padding-left: 10px;
-}
-
-.navbar .top-brand .right-mark {
-    padding-right: 10px;
-}
-
-.navbar .top-brand:hover .left-mark {
-    padding-left: 0;
-    padding-right: 10px;
-}
-
-.navbar .top-brand:hover .right-mark {
-    padding-left: 10px;
-    padding-right: 0;
-}
-
 @media (min-width: 768px) {
     .navbar.compact {
         height: 40px;
@@ -397,6 +358,45 @@ html, body {
     height: 96px;
     position: static;
     background: #000000;
+}
+
+.top-brand img {
+    height: 66px;
+    display: inline-block;
+    -webkit-transition: all 100ms ease-out;
+    -moz-transition: all 100ms ease-out;
+    -o-transition: all 100ms ease-out;
+    transition: all 100ms ease-out;
+}
+
+.top-brand .logo-text {
+    width: 119px;
+}
+
+.top-brand .left-mark, .top-brand .right-mark {
+    width: 56px;
+    -webkit-transition: padding 100ms ease-out;
+    -moz-transition: padding 100ms ease-out;
+    -o-transition: padding 100ms ease-out;
+    transition: padding 100ms ease-out;
+}
+
+.top-brand .left-mark {
+    padding-left: 10px;
+}
+
+.top-brand .right-mark {
+    padding-right: 10px;
+}
+
+.top-brand:hover .left-mark {
+    padding-left: 0;
+    padding-right: 10px;
+}
+
+.top-brand:hover .right-mark {
+    padding-left: 10px;
+    padding-right: 0;
 }
 
 .nerdificable {
@@ -478,13 +478,11 @@ html, body {
 }
 
 .chap-label {
-    min-height: 55px;
+    color: #aaaaaa;
+    min-height: 20px;
     margin-top: 35px;
-    text-align: right;
-}
-
-.chap-label .glyphicon-chevron-down {
-    visibility: hidden;
+    margin-bottom: 0;
+    text-align: center;
 }
 
 @media (max-width: 768px) {
@@ -492,23 +490,19 @@ html, body {
         text-align: center;
         min-height: 10px;
     }
-
-    .chap-label .glyphicon-chevron-down {
-        visibility: visible;
-    }
-
-    .chap-label .glyphicon-chevron-right {
-        visibility: hidden;
-    }
 }
 
 .chap-line {
     min-height: 55px;
-    margin: 20px;
+    margin: 0 50px 20px 50px;
     text-align: center;
 }
 
 .chap-line .chap-link {
+    -webkit-transition: background-color 300ms;
+    -moz-transition: background-color 300ms;
+    -ms-transition: background-color 300ms;
+    transition: background-color 300ms;
     margin-top: 20px;
     position: relative;
     height: 30px;
@@ -517,7 +511,7 @@ html, body {
 }
 
 .chap-line .chap-link:nth-child(odd) {
-    background-color: #e41300;
+    background-color: #fe2a05;
 }
 
 .chap-line .chap-link:first-child {
@@ -542,9 +536,9 @@ html, body {
     bottom: 0;
     width: 0;
     margin-left: 50%;
-    background-color: #f4f4f4;
-    opacity: 0.7;
-    color: #f4f4f4;
+    background-color: #dfafaa;
+    opacity: 0.8;
+    color: #dfafaa;
     overflow: hidden;
     -webkit-transition: width 200ms, margin 200ms, color 1s;
     -moz-transition: width 200ms, margin 200ms, color 1s;
@@ -554,6 +548,10 @@ html, body {
 
 .chap-line .chap-link .chap-timing h5 {
     visibility: hidden;
+}
+
+.chap-line .chap-link:hover, .chap-line .chap-link.selected-chap {
+    background-color: rgba(223, 175, 170, 0.82);
 }
 
 .chap-line .chap-link:hover .chap-timing, .chap-line .chap-link.selected-chap .chap-timing {
@@ -573,6 +571,12 @@ html, body {
         bottom: 30px;
         width: 175px;
         opacity: 1;
+    }
+}
+
+@media (max-width: 767px) {
+    .chap-line .chap-link:hover, .chap-line .chap-link.selected-chap {
+        background-color: #dfafaa;
     }
 }
 
@@ -868,4 +872,16 @@ p span.entity.nesting:hover span {
 
 .sub-text p:hover {
     font-weight: 700;
+}
+
+.errorcode {
+    font-family: Arial Black, Arial, Verdana, sans-serif;
+    font-weight: bold;
+    font-size: 5em;
+    color: #fe2a05;
+    vertical-align: middle;
+}
+
+.error_header {
+    text-align: center;
 }
