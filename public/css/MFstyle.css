@@ -485,6 +485,10 @@ html, body {
     text-align: center;
 }
 
+.chap-label h1 {
+    display: inline-block;
+}
+
 @media (max-width: 768px) {
     .chap-label {
         text-align: center;
@@ -550,6 +554,10 @@ html, body {
     visibility: hidden;
 }
 
+.chap-line .chap-link .chap-timing h5 .glyphicon-chevron-left, .chap-line .chap-link .chap-timing h5 .glyphicon-chevron-right {
+    font-size: 1em;
+}
+
 .chap-line .chap-link:hover, .chap-line .chap-link.selected-chap {
     background-color: rgba(223, 175, 170, 0.82);
 }
@@ -580,12 +588,30 @@ html, body {
     }
 }
 
-.title {
+.title, .noCont {
     color: #aaaaaa;
-    padding-bottom: 0;
-    margin: 0px 6px 15px -10px;
     z-index: 5;
     position: relative;
+}
+
+.title {
+    padding-bottom: 0;
+    margin: 0px 6px 15px -10px;
+    display: inline-block;
+}
+
+.noCont {
+    padding-bottom: 200px;
+}
+
+.noCont .glyphicon-chevron-left, .noCont .glyphicon-chevron-right {
+    font-size: 1em;
+}
+
+.glyphicon-chevron-left, .glyphicon-chevron-right {
+    color: #444444;
+    display: inline-block;
+    font-size: 2em;
 }
 
 #video {

@@ -268,6 +268,9 @@ $navbarTransitionTime: 100ms;
   margin-top: 35px;
   margin-bottom: 0;
   text-align: center;
+  h1 {
+    display: inline-block;
+  }
 
   @media(max-width: 768px) {
     text-align: center;
@@ -319,6 +322,9 @@ $navbarTransitionTime: 100ms;
 
       h5 {
         visibility: hidden;
+        .glyphicon-chevron-left, .glyphicon-chevron-right {
+          font-size: 1em;
+        }
       }
     }
 
@@ -349,12 +355,29 @@ $navbarTransitionTime: 100ms;
 
 }
 
-.title {
+.title, .noCont {
   color: $medium_gray;
-  padding-bottom: 0;
-  margin: 0px 6px 15px -10px;
   z-index: 5;
   position: relative;
+}
+
+.title {
+  padding-bottom: 0;
+  margin: 0px 6px 15px -10px;
+  display: inline-block;
+}
+
+.noCont {
+  padding-bottom: 200px;
+  .glyphicon-chevron-left, .glyphicon-chevron-right {
+    font-size: 1em;
+  }
+}
+
+.glyphicon-chevron-left, .glyphicon-chevron-right {
+  color: $darker_gray;
+  display: inline-block;
+  font-size: 2em;
 }
 
 #video {

@@ -216,6 +216,7 @@ $(document).ready(function () {
                 }
             },
             function () {
+                $chapter.children('.chap-timing').css("bottom", "0");
             });
 
 
