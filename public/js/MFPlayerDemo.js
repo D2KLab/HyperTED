@@ -34,6 +34,7 @@ $(document).ready(function () {
         }
     });
     video.player = $player;
+    console.log($player);
 
     $('.see-all').click(function () {
         var $this = $(this);
@@ -196,27 +197,27 @@ $(document).ready(function () {
         var width = (endChapter - startChapter) / totWidth * 100;
         $(this).css("width", width + "%");
 
-        if ($(this).width() < 175) {
 
-            var $totChapters = $('.chap-link').length;
-            var index = $('.chap-line .chap-link').index(this);
-
-            $(this).hover(function () {
-
+        var $totChapters = $('.chap-link').length;
+        var index = $('.chap-line .chap-link').index(this);
+        $(this).hover(function () {
+                if ($(this).width() < 175) {
                     var opt = {
                         bottom: "30px",
-                        opacity: "1"
+                        opacity: "1",
+                        "background-color": "#f4f4f4",
+                        cursor: "auto"
                     };
 
                     if (index > Math.floor($totChapters / 2)) {
                         opt.right = 0;
                     }
                     $chapter.children('.chap-timing').css(opt);
-                },
-                function () {
-                    //do nothing
-                });
-        }
+                }
+            },
+            function () {
+                $chapter.children('.chap-timing').css("bottom", "0");
+            });
 
 
         $(this).on('click', function () {
