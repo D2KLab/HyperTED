@@ -102,10 +102,11 @@ exports.view = function (req, res) {
 
 };
 
-exports.search = function (req, res) {
+exports.search = function (req, resp) {
     var videoURI = req.query.uri;
     if (!videoURI) {
-        res.redirect('/');
+        console.log(LOG_TAG+'No specified video uri.');
+        resp.redirect('/');
         return;
     }
     var parsedURI = url.parse(videoURI, true);
@@ -138,7 +139,7 @@ exports.search = function (req, res) {
     db.getFromLocator(locator, function (err, data) {
         if (err) { //db error
             console.log("DATABASE ERROR" + JSON.stringify(err));
-            res.render('error.ejs', errorMsg.e500);
+            resp.render('error.ejs', errorMsg.e500);
             return;
         }
 
@@ -146,22 +147,23 @@ exports.search = function (req, res) {
             var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
             console.log('Video at ' + locator + ' already in db.');
             console.log('Redirecting to ' + redirectUrl);
-            res.redirect(redirectUrl);
+            resp.redirect(redirectUrl);
             return;
         }
 
         var vendor = detectVendor(locator);
         var id = detectId(locator, vendor);
-        db.getFromVendorId(vendor,id, function(err, data){
-            if(!err && data){
+        db.getFromVendorId(vendor, id, function (err, data) {
+            if (!err && data) {
                 var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
                 console.log('Video at ' + locator + ' already in db.');
                 console.log('Redirecting to ' + redirectUrl);
-                res.redirect(redirectUrl);
+                resp.redirect(redirectUrl);
                 return;
             }
 
             //new video
+            console.log(LOG_TAG+'Preparing metadata for adding to db');
             var video = {locator: locator};
             if (locator.indexOf('http://stream17.noterik.com/') >= 0) {
                 video.videoLocator = locator + '/rawvideo/2/raw.mp4?ticket=77451bc0-e0bf-11e3-8b68-0800200c9a66';
@@ -169,6 +171,7 @@ exports.search = function (req, res) {
 
             // 1. search for metadata in sparql
             getMetadataFromSparql(video, function (err, data) {
+
                 if (err || !data) {
                     console.log("No data obtained from sparql");
                 } else {
@@ -191,13 +194,13 @@ exports.search = function (req, res) {
                     db.insert(video, function (err, data) {
                         if (err) {
                             console.log("DATABASE ERROR" + JSON.stringify(err));
-                            res.render('error.ejs', errorMsg.e500);
-                        } else {
-                            var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
-                            console.log('Video at ' + locator + ' successfully added to db.');
-                            console.log('Redirecting to ' + redirectUrl);
-                            res.redirect(redirectUrl);
+                            resp.render('error.ejs', errorMsg.e500);
+                            return;
                         }
+                        var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
+                        console.log('Video at ' + locator + ' successfully added to db.');
+                        console.log('Redirecting to ' + redirectUrl);
+                        resp.redirect(redirectUrl);
                     });
                 });
 
@@ -214,7 +217,7 @@ exports.nerdify = function (req, res) {
     db.getFromUuid(uuid, function (err, video_data) {
         if (!video_data) {
             console.log("Error from DB");
-            res.json({error:"Error from DB"});
+            res.json({error: "Error from DB"});
             return;
         }
 
@@ -226,7 +229,7 @@ exports.nerdify = function (req, res) {
             getEntities(video_data, function (err, data) {
                 if (err) {
                     console.log(LOG_TAG + err.message);
-                    res.json({error:"Error from NERD"});
+                    res.json({error: "Error from NERD"});
                     return;
                 }
 
@@ -446,13 +449,13 @@ function getMetadata(video, callback) {
 exports.ajaxGetMetadata = function (req, res) {
     var uuid = req.param('uuid');
     if (!uuid) {
-        res.json({error:'empty uuid'});
+        res.json({error: 'empty uuid'});
         return;
     }
 
     db.getFromUuid(uuid, function (err, data) {
         if (err || !data) {
-            res.json({error:'video not found in db'});
+            res.json({error: 'video not found in db'});
             return;
         }
         if (data.metadata) {

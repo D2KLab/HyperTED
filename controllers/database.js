@@ -19,7 +19,10 @@ exports.getFromLocator = function (locator, callback) {
     videos.findOne({locator: locator}).on('complete', callback);
 };
 exports.getFromVendorId = function (vendor, id, callback) {
-    if(!vendor || !id) callback(true);
+    if(!vendor || !id) {
+        callback(true);
+        return;
+    }
     videos.findOne({vendor: vendor, vendor_id: id}).on('complete', callback);
 };
 
@@ -30,7 +33,7 @@ exports.insert = function (video, callback) {
         if (err) {
             console.log('DB insert fail. ' + JSON.stringify(err));
             console.log('Check for existent uuid.');
-            videos.findOne({uuid: uuid}).on('complete', function(e, data){
+            videos.findOne({uuid: video.uuid}).on('complete', function(e, data){
                 if(!e && data){ //retry with another uuid
                     exports.insert(video, callback);
                 }else{

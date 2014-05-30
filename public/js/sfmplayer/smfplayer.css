@@ -31,11 +31,12 @@
     transition: opacity 100ms ease-out;
 }
 
-.dark-divs {
-    position: absolute;
-    top: 0;
-    bottom: 0;
+.smfplayer-overlay, .smfplayer-overlay-dark {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
+
 
 .dark-divs:hover .smfplayer-overlay-dark {
     opacity: 0.5;

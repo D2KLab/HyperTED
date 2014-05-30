@@ -20,7 +20,7 @@ app.get('/', function (req, res) {
     res.render('welcome.ejs')
 });
 app.get('*', function(req,res){
-   res.render('error.ejs', err.e404);
+    res.render('error.ejs', err.e404);
 });
 app.listen(8080);
 console.log("Server Running on 8080");
