@@ -19,7 +19,7 @@ exports.getFromLocator = function (locator, callback) {
     videos.findOne({locator: locator}).on('complete', callback);
 };
 exports.getFromVendorId = function (vendor, id, callback) {
-    if(!vendor || !id) {
+    if (!vendor || !id) {
         callback(true);
         return;
     }
@@ -29,14 +29,18 @@ exports.getFromVendorId = function (vendor, id, callback) {
 exports.insert = function (video, callback) {
     video.uuid = UUID.v4();
     video.timestamp = Date.now();
+    if (video.entities) {
+        video.entTimestap = Date.now();
+    }
+
     videos.insert(video, function (err, doc) {
         if (err) {
             console.log('DB insert fail. ' + JSON.stringify(err));
             console.log('Check for existent uuid.');
-            videos.findOne({uuid: video.uuid}).on('complete', function(e, data){
-                if(!e && data){ //retry with another uuid
+            videos.findOne({uuid: video.uuid}).on('complete', function (e, data) {
+                if (!e && data) { //retry with another uuid
                     exports.insert(video, callback);
-                }else{
+                } else {
                     callback(err, data);
                 }
             });
