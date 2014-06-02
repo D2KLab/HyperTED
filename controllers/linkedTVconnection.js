@@ -127,14 +127,16 @@ function reduceSparqlJSON(bindings) {
             if (row.keyURL) {
                 if (!MR.entities) {
                     MR.entities = [];
+                    MR.entTimestap = Date.now();
                 }
                 var entity = {
-                    keyURL: row.keyURL,
-                    label: row.label,
-                    source: row.source,
-                    tStart: row.tStart,
-                    tEnd: row.tEnd,
-                    tUnit: row.tUnit,
+                    uri: row.keyURL,
+                    label: row.label.value,
+                    extractor: row.source.value,
+                    startNPT: parseFloat(row.tStart.value).toFixed(2),
+                    endNPT: parseFloat(row.tEnd.value).toFixed(2),
+                    tUnit: row.tUnit.value,
+                    nerdType: 'http://nerd.eurecom.fr/ontology#Thing', //TODO
                     mediafragment: row.mediafragment
                 };
                 MR.entities.push(entity);

@@ -33,8 +33,6 @@ $(document).ready(function () {
             });
         }
     });
-    video.player = $player;
-    console.log($player);
 
     $('.see-all').click(function () {
         var $this = $(this);

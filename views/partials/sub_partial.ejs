@@ -68,11 +68,15 @@
 
                                     var subStart = calcTime(thisSub.time.substring(0, 12));
                                     var subEnd = calcTime(thisSub.time.substring(17, 30));
-                                    console.log("substart= " + subStart);
+
 
 
                                     var entStart = entity.startNPT;
                                     var entEnd = entity.endNPT;
+                                    console.log("substart= " + subStart);
+                                    console.log("entstart= " + entStart);
+                                    console.log("subend= " + subEnd);
+                                    console.log("entend= " + entEnd);
 
                                     if (entStart >= subStart && entEnd <= subEnd) {
 
