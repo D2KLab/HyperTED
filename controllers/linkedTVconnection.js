@@ -41,12 +41,29 @@ exports.getFromLocator = function (locator, callback) {
         locator = locator.substring(0, t);
     }
 
-    var q = new Query().select('?MediaResource')
+    var q = new Query().select('?MediaResource').select('?mediafragment, ?chapter, ?tEnd, ?tStart, ?tUnit, ?keyURL, ?label, ?source')
         .where('?MediaResource', 'a', 'ma:MediaResource')
-        .where('?MediaResource', 'ma:locator', '<' + locator + '>');
+        .where('?MediaResource', 'ma:locator', '<' + locator + '>').textWhere('?mediafragment a ma:MediaFragment. ' +
+            '?mediafragment ma:isFragmentOf ?MediaResource. ' +
+            '?mediafragment nsa:temporalEnd ?tEnd. ' +
+            '?mediafragment nsa:temporalStart ?tStart. ' +
+            '?mediafragment nsa:temporalUnit ?tUnit. ' +
+            'OPTIONAL { ' +
+            '?annotation a oa:Annotation.' +
+            '?annotation oa:hasTarget ?mediafragment.' +
+            '?annotation oa:hasBody ?chapter.' +
+            '?chapter a linkedtv:Chapter. }' +
+            ' OPTIONAL {' +
+            '?mediafragment linkedtv:hasSubtitle ?subtitle.' +
+            '?entityAnnotation a oa:Annotation.' +
+            '?entityAnnotation oa:hasTarget ?mediafragment.' +
+            '?entityAnnotation oa:hasBody ?entity.' +
+            '?entity owl:sameAs ?keyURL.' +
+            'OPTIONAL{ ?entity rdfs:label ?label.}' +
+            'OPTIONAL{ ?entity dc:source ?source.}}'
+        , true).orderby('?tStart');
 
-    q = qAddChapterOf('?MediaResource', q);
-    q = qAddEntitiesOf('?MediaResource', q);
+
     console.log(q.toString());
     client.query(q.toString(), function (err, data) {
         if (err) {
@@ -62,48 +79,7 @@ exports.getFromLocator = function (locator, callback) {
         } else if (bindings.length == 1) {
             result = bindings[0];
         } else {
-            var result;
-            bindings.forEach(function (row) {
-                if (!result) { //prima riga
-                    if (row.chapter) {
-                        result = {
-                            MediaResource: {
-                                type: row.MediaResource.type,
-                                value: row.MediaResource.value
-                            }
-                        };
-                        delete row.MediaResource;
-                        result.chapters = [];
-                        result.chapters.push(row);
-                    } else {
-                        result = row;
-                    }
-                    return;
-                }
-
-                if (row.MediaResource.value == result.MediaResource.value) {
-                    if (row.chapter) {
-                        delete row.MediaResource;
-                        if (!result.chapters) {
-                            result.chapters = [];
-                        }
-                        result.chapters.push(row);
-                    }//else not possible for now
-                } else {
-                    if (!result.chapters && row.chapter) { //prefere row to result
-                        result = {
-                            MediaResource: {
-                                type: row.MediaResource.type,
-                                value: row.MediaResource.value
-                            }
-                        };
-                        delete row.MediaResource;
-                        result.chapters = [];
-                        result.chapters.push(row);
-                    }//else do nothing
-                }
-            });
-
+            result = reduceSparqlJSON(bindings);
         }
 
         //extract uuid
@@ -113,34 +89,71 @@ exports.getFromLocator = function (locator, callback) {
         callback(err, result);
     });
 };
+function reduceSparqlJSON(bindings) {
+    "use strict";
+    var result;
 
-function qAddChapterOf(mr, q) {
-    return q.select('?mediafragment, ?chapter, ?tEnd, ?tStart, ?tUnit')
-        .textWhere('?mediafragment a ma:MediaFragment. ' +
-            '?mediafragment ma:isFragmentOf ' + mr + ' . ' +
-            '?mediafragment nsa:temporalEnd ?tEnd. ' +
-            '?mediafragment nsa:temporalStart ?tStart. ' +
-            '?mediafragment nsa:temporalUnit ?tUnit. ' +
-            '?annotation a oa:Annotation. ' +
-            '?annotation oa:hasTarget ?mediafragment. ' +
-            '?annotation oa:hasBody ?chapter. ' +
-            '?chapter a linkedtv:Chapter. ', true).orderby('?tStart');
-}
+    var IDs = [];
+    bindings.forEach(function (row) {
+        var thisID = row.MediaResource.value;
 
-function qAddEntitiesOf(mr, q) {
-    return q.select('?mediafragment, ?keyURL, ?label, ?source')
-        .textWhere('?mediafragment a ma:MediaFragment. ' +
-            '?mediafragment ma:isFragmentOf ' + mr + ' . ' +
-            '?mediafragment nsa:temporalEnd ?tEnd. ' +
-            '?mediafragment nsa:temporalStart ?tStart. ' +
-            '?mediafragment nsa:temporalUnit ?tUnit. ' +
-            '?mediafragment linkedtv:hasSubtitle ?subtitle.' +
-            '?entityAnnotation a oa:Annotation. ' +
-            '?entityAnnotation oa:hasTarget ?mediafragment. ' +
-            '?entityAnnotation oa:hasBody ?entity. ' +
-            '?entity owl:sameAs ?keyURL. ' +
-            'OPTIONAL{ ?entity rdfs:label ?label.}' +
-            'OPTIONAL{ ?entity dc:source ?source.}', true).orderby('?tStart');
+        if (IDs.length == 0 || !thisID in IDs) {
+            IDs.push(thisID);
+        }
+    });
+
+    var results = [];
+    IDs.forEach(function (id) {
+        var MR = {};
+        bindings.filter(function (row) {
+            return row.MediaResource.value == id;
+        }).forEach(function (row) {
+            if (!MR.MediaResource) {
+                MR.MediaResource = row.MediaResource;
+            }
+            if (row.chapter) {
+                if (!MR.chapters) {
+                    MR.chapters = [];
+                }
+                var chapter = {
+                    chapter: row.chapter,
+                    tStart: row.tStart,
+                    tEnd: row.tEnd,
+                    tUnit: row.tUnit,
+                    mediafragment: row.mediafragment
+                };
+                MR.chapters.push(chapter);
+            }
+            if (row.keyURL) {
+                if (!MR.entities) {
+                    MR.entities = [];
+                }
+                var entity = {
+                    keyURL: row.keyURL,
+                    label: row.label,
+                    source: row.source,
+                    tStart: row.tStart,
+                    tEnd: row.tEnd,
+                    tUnit: row.tUnit,
+                    mediafragment: row.mediafragment
+                };
+                MR.entities.push(entity);
+            }
+        });
+
+        results.push(MR);
+    });
+
+    result = results.filter(function (res) {
+        return res.chapters || res.entities;
+    });
+    if (result.length > 1) {
+        result = result.filter(function (res) {
+            return res.chapters;
+        });
+    }
+    console.log(result[0]);
+    return result[0];
 }
 
 function generateIdentifier(uuid) {
