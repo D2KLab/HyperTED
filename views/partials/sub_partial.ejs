@@ -15,6 +15,7 @@
                     for (var index in strList) {
                         var sub = {text: '', lineNum: 0};
                         var lines = strList[index].split('\n');
+
                         for (var line in lines) {
                             if (!sub.id) {
                                 sub.id = lines[line];
@@ -27,15 +28,29 @@
                             }
                         }
 
+//                        var subStart = strList[index].substring(4, 16);
+//                        var subEnd = strList[index].substring(21, 33);
+//
+////                        console.log(subStart);
+////                        console.log(subEnd);
+//                        console.log("*****");
+
+
                         sub.startChar = charIndex + 1;
                         charIndex = sub.startChar + sub.text.length; //because of a '\n' is a fake double char
                         sub.endChar = charIndex;
                         subList.push(sub);
                     }
 
+
+
                     if (locals.enriched && locals.entities) {
                         var entityList = entities;
                         var subIndex = subList.length - 1;
+
+                        function calcTime(subTime) {
+                            return (subTime < 60) ? "00:00:" + Math.floor(subTime) : (subTime == 60 || subTime > 60 && subTime < 3600) ? "00:" + Math.floor(subTime / 60) + ":" + Math.floor(subTime % 60) : Math.floor(subTime / 3600) + ":" + Math.floor((subTime % 3600) / 60) + ":" + Math.floor((subTime % 3600) % 60);
+                        }
 
                         //sorting JSON for end character desc and by length
                         entityList.sort(function SortByStartChar(x, y) {
@@ -48,8 +63,19 @@
 
                         entityList.forEach(function (entity) {
                             while (subIndex >= 0) {
+
                                 var thisSub = subList[subIndex];
-                                if (entity.startChar >= thisSub.startChar && entity.endChar <= thisSub.endChar) {
+                                if (thisSub.lineNum != 0) {
+                                    var subStart = thisSub.time.substring(0, 12);
+                                    var subEnd = thisSub.time.substring(18, 30);
+                                }
+
+                                var entStart = calcTime(entity.startNPT);
+                                var entEnd = calcTime(entity.endNPT);
+
+
+                                if (entStart >= subStart && entEnd <= subEnd) {
+
 
                                     var text = thisSub.text;
                                     var href = entity.uri ? 'href="' + entity.uri + '" target="_blank"' : '';
@@ -64,7 +90,8 @@
                                 } else {
                                     subIndex--;
                                 }
-                            }
+                                }
+
                         });
                     }
 
