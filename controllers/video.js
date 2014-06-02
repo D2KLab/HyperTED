@@ -87,7 +87,7 @@ exports.view = function (req, res) {
 
                     //3. write in db
                     video.timestamp = Date.now();
-                    db.update(uuid, video, function (err, data) {
+                    db.update(uuid, video, function (err) {
                         if (err) {
                             console.log("DATABASE ERROR" + JSON.stringify(err));
                             console.log("Can not update");
@@ -105,7 +105,7 @@ exports.view = function (req, res) {
 exports.search = function (req, resp) {
     var videoURI = req.query.uri;
     if (!videoURI) {
-        console.log(LOG_TAG+'No specified video uri.');
+        console.log(LOG_TAG + 'No specified video uri.');
         resp.redirect('/');
         return;
     }
@@ -163,7 +163,7 @@ exports.search = function (req, resp) {
             }
 
             //new video
-            console.log(LOG_TAG+'Preparing metadata for adding to db');
+            console.log(LOG_TAG + 'Preparing metadata for adding to db');
             var video = {locator: locator};
             if (locator.indexOf('http://stream17.noterik.com/') >= 0) {
                 video.videoLocator = locator + '/rawvideo/2/raw.mp4?ticket=77451bc0-e0bf-11e3-8b68-0800200c9a66';
@@ -283,13 +283,13 @@ function getMetadataFromSparql(video, callback) {
 function getMetadata(video, callback) {
     var vendor = video.vendor || detectVendor(video.locator);
     if (!vendor) {
-        callback(true, video);
+        callback(true);
         return;
     }
     video.vendor = vendor;
     var id = video.vendor_id || detectId(video.locator, vendor);
     if (!id) {
-        callback(true, video);
+        callback(true);
         return;
     }
     video.vendor_id = id;
