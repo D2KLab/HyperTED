@@ -43,9 +43,9 @@
                         function calcTime(subTime) {
                             var hh = parseInt(subTime.substring(0, 2));
                             var mm = parseInt(subTime.substring(3, 5));
-                            var ss = parseInt(subTime.substring(6, 8));
+                            var ss = parseFloat(subTime.substring(6).replace(",", "."));
 
-                            return (ss + (mm * 60) + (hh * 3600));
+                            return (((mm * 60) + (hh * 3600) + ss).toFixed(3));
                         }
 
                         //sorting JSON for end character desc and by length
@@ -68,27 +68,18 @@
 
                                     var subStart = calcTime(thisSub.time.substring(0, 12));
                                     var subEnd = calcTime(thisSub.time.substring(17, 30));
-                                    console.log("substart= " + subStart);
 
 
-                                    var entStart = entity.startNPT;
-                                    var entEnd = entity.endNPT;
-
+                                    var entStart = (entity.startNPT).toFixed(3);
+                                    var entEnd = (entity.endNPT).toFixed(3);
                                     if (entStart >= subStart && entEnd <= subEnd) {
 
-                                        console.log("ENTSTART= " + entStart);
-                                        console.log("**********");
-
-//                                        console.log('subindex:' + subIndex);
                                         var text = thisSub.text;
-//                                        console.log(text);
                                         var nerdType = entity.nerdType.split('#')[1].toLowerCase();
 
                                         var str = '<span class="entity ' + nerdType + '">' + entity.label + '</span>';
-//                                        console.log(str);
 
                                         thisSub.text = text.replace(entity.label, str);
-//                                        console.log(thisSub.text);
 
                                         break;
                                     } else {
