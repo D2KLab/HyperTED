@@ -28,14 +28,6 @@
                             }
                         }
 
-//                        var subStart = strList[index].substring(4, 16);
-//                        var subEnd = strList[index].substring(21, 33);
-//
-////                        console.log(subStart);
-////                        console.log(subEnd);
-//                        console.log("*****");
-
-
                         sub.startChar = charIndex + 1;
                         charIndex = sub.startChar + sub.text.length; //because of a '\n' is a fake double char
                         sub.endChar = charIndex;
@@ -49,7 +41,11 @@
                         var subIndex = subList.length - 1;
 
                         function calcTime(subTime) {
-                            return (subTime < 60) ? "00:00:" + Math.floor(subTime) : (subTime == 60 || subTime > 60 && subTime < 3600) ? "00:" + Math.floor(subTime / 60) + ":" + Math.floor(subTime % 60) : Math.floor(subTime / 3600) + ":" + Math.floor((subTime % 3600) / 60) + ":" + Math.floor((subTime % 3600) % 60);
+                            var hh = parseInt(subTime.substring(0, 2));
+                            var mm = parseInt(subTime.substring(3, 5));
+                            var ss = parseInt(subTime.substring(6, 8));
+
+                            return (ss + (mm * 60) + (hh * 3600));
                         }
 
                         //sorting JSON for end character desc and by length
@@ -65,32 +61,41 @@
                             while (subIndex >= 0) {
 
                                 var thisSub = subList[subIndex];
-                                if (thisSub.lineNum != 0) {
-                                    var subStart = thisSub.time.substring(0, 12);
-                                    var subEnd = thisSub.time.substring(18, 30);
-                                }
-
-                                var entStart = calcTime(entity.startNPT);
-                                var entEnd = calcTime(entity.endNPT);
-
-
-                                if (entStart >= subStart && entEnd <= subEnd) {
-
-
-                                    var text = thisSub.text;
-                                    var href = entity.uri ? 'href="' + entity.uri + '" target="_blank"' : '';
-                                    var nerdType = entity.nerdType.split('#')[1].toLowerCase();
-
-//                        var str = '<span class="entity ' + nerdType + '"><a ' + href + ' data-start-time="' + entity.startNPT + '" data-end-time="' + entity.endNPT + '">' + entity.label + '</a></span>';
-                                    var str = '<span class="entity ' + nerdType + '">' + entity.label + '</span>';
-                                    thisSub.text = text.replace(entity.label, str);
-
-
-                                    break;
-                                } else {
+                                if (!thisSub.id || thisSub.id == '') {
                                     subIndex--;
+                                } else {
+
+
+                                    var subStart = calcTime(thisSub.time.substring(0, 12));
+                                    var subEnd = calcTime(thisSub.time.substring(17, 30));
+                                    console.log("substart= " + subStart);
+
+
+                                    var entStart = entity.startNPT;
+                                    var entEnd = entity.endNPT;
+
+                                    if (entStart >= subStart && entEnd <= subEnd) {
+
+                                        console.log("ENTSTART= " + entStart);
+                                        console.log("**********");
+
+//                                        console.log('subindex:' + subIndex);
+                                        var text = thisSub.text;
+//                                        console.log(text);
+                                        var nerdType = entity.nerdType.split('#')[1].toLowerCase();
+
+                                        var str = '<span class="entity ' + nerdType + '">' + entity.label + '</span>';
+//                                        console.log(str);
+
+                                        thisSub.text = text.replace(entity.label, str);
+//                                        console.log(thisSub.text);
+
+                                        break;
+                                    } else {
+                                        subIndex--;
+                                    }
                                 }
-                                }
+                            }
 
                         });
                     }
