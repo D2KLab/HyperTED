@@ -219,7 +219,7 @@ $(document).ready(function () {
             $(this).hover(function () {
                     if ($(this).width() < 175) {
                         var opt = {
-                            bottom: "30px",
+                            bottom: "31px",
                             opacity: "1",
                             "background-color": "#f4f4f4",
                             cursor: "auto"
@@ -232,7 +232,6 @@ $(document).ready(function () {
                     }
                 },
                 function () {
-                    $chapter.children('.chap-timing').css("bottom", "0");
                 });
 
 
