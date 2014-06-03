@@ -23,10 +23,14 @@ $(document).ready(function () {
         width: 640,
         height: 360,
         alwaysShowControls: true,
+        preload: 'metadata',
         features: ['playpause', 'current', 'progress', 'duration', 'volume'],
         autoStart: false,  //TODO remove
         success: function (media, domObj) {
-            $(media).on('play', function () {
+            $(this).trigger('ready');
+            $(media).one('loadedmetadata', function () {
+                displayChapters();
+            }).on('play', function () {
                 $('.info-on-player', $playerSect).hide();
             }).on('pause', function () {
                 $('.info-on-player', $playerSect).show();
@@ -34,7 +38,7 @@ $(document).ready(function () {
         }
     });
     video.player = $player;
-    console.log($player);
+
 
     $('.see-all').click(function () {
         var $this = $(this);
@@ -189,48 +193,62 @@ $(document).ready(function () {
 
 
 //////CHAPTERS
-    $('.chap-link').each(function () {
-        var $chapter = $(this).children('a');
-        var startChapter = $chapter.data('start-time');
-        var endChapter = $chapter.data('end-time');
-        var totWidth = $('.chap-line .chap-link:last-child').children('a').data('end-time');
-        var width = (endChapter - startChapter) / totWidth * 100;
-        $(this).css("width", width + "%");
+    function displayChapters() {
+        var oldChapStart = 0;
+        var oldChapEnd = 0;
+        $('.chap-link').each(function () {
+
+            var $chapter = $(this).children('a');
+            var startChapter = $chapter.data('start-time');
+            var endChapter = $chapter.data('end-time');
+
+            var totWidth = $player.getDuration() / 1000;
+            var width = ((endChapter - startChapter) / totWidth) * 100;
+            $(this).css("width", width + "%");
 
 
-        var $totChapters = $('.chap-link').length;
-        var index = $('.chap-line .chap-link').index(this);
-        $(this).hover(function () {
-                if ($(this).width() < 175) {
-                    var opt = {
-                        bottom: "30px",
-                        opacity: "1",
-                        "background-color": "#f4f4f4",
-                        cursor: "auto"
-                    };
+            oldChapStart = startChapter;
 
-                    if (index > Math.floor($totChapters / 2)) {
-                        opt.right = 0;
+            if (oldChapEnd < startChapter) {
+                var spaceWidth = ((startChapter - oldChapEnd) / totWidth) * 100;
+                $(this).css("margin-left", spaceWidth + "%");
+            }
+            oldChapEnd = endChapter;
+
+            var $totChapters = $('.chap-link').length;
+            var index = $('.chap-line .chap-link').index(this);
+            $(this).hover(function () {
+                    if ($(this).width() < 175) {
+                        var opt = {
+                            bottom: "30px",
+                            opacity: "1",
+                            "background-color": "#f4f4f4",
+                            cursor: "auto"
+                        };
+
+                        if (index > Math.floor($totChapters / 2)) {
+                            opt.right = 0;
+                        }
+                        $chapter.children('.chap-timing').css(opt);
                     }
-                    $chapter.children('.chap-timing').css(opt);
-                }
-            },
-            function () {
-                $chapter.children('.chap-timing').css("bottom", "0");
+                },
+                function () {
+                    $chapter.children('.chap-timing').css("bottom", "0");
+                });
+
+
+            $(this).on('click', function () {
+                $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
+
+                $('.chap-link').removeClass('selected-chap');
+                $(this).addClass('selected-chap');
+
+                updateMFurl();
             });
 
-
-        $(this).on('click', function () {
-            $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
-
-            $('.chap-link').removeClass('selected-chap');
-            $(this).addClass('selected-chap');
-
-            updateMFurl();
         });
 
-    });
-
+    }
 
     function updateMFurl() {
         if (Modernizr.history) {

@@ -280,16 +280,17 @@ $navbarTransitionTime: 100ms;
 }
 
 .chap-line {
-  min-height: 55px;
-  margin: 0 50px 20px 50px;
+  min-height: 32px;
+  margin: 20px 50px 20px 50px;
   text-align: center;
+  border: 1px solid $dark_red;
+  @include border-radius(8px);
 
   .chap-link {
     -webkit-transition: background-color 300ms;
     -moz-transition: background-color 300ms;
     -ms-transition: background-color 300ms;
     transition: background-color 300ms;
-    margin-top: 20px;
     position: relative;
     height: 30px;
     background-color: $dark_red;
