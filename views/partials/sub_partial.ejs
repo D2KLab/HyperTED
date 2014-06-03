@@ -42,11 +42,11 @@
 
                         function calcTime(subTime) {
                             var time = (subTime.split(":"));
-                            var hh = (time[0]);
-                            var mm = (time[1]);
-                            var ss = (time[2].replace(",", "."));
+                            var hh = parseInt(time[0]);
+                            var mm = parseInt(time[1]);
+                            var ss = parseFloat(time[2].replace(",", "."));
 
-                            return parseFloat((mm * 60) + (hh * 3600) + ss);
+                            return ((mm * 60) + (hh * 3600) + ss);
                         }
 
                         //sorting JSON for end character desc and by length
@@ -73,10 +73,6 @@
 
                                     var entStart = parseFloat(entity.startNPT)
                                     var entEnd = parseFloat(entity.endNPT);
-
-                                    console.log("STR " + subStartString);
-                                    console.log("SUB " + subStart);
-                                    console.log("ENT " + entStart);
 
                                     if (entStart >= subStart && entEnd <= subEnd) {
 
