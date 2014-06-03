@@ -29,6 +29,7 @@ $(document).ready(function () {
         success: function (media, domObj) {
             $(media).one('loadedmetadata', function () {
                 displayChapters();
+
             }).on('play', function () {
                 $('.info-on-player', $playerSect).hide();
             }).on('pause', function () {
@@ -190,9 +191,11 @@ $(document).ready(function () {
         updateMFurl();
     });
 
-
+    $("#related-frags").hide();
 //////CHAPTERS
     function displayChapters() {
+        $("#related-frags").fadeIn();
+
         var oldChapStart = 0;
         var oldChapEnd = 0;
         $('.chap-link').each(function () {
@@ -298,6 +301,14 @@ $(document).ready(function () {
                     console.error(metadata.error);
                     return;
                 }
+
+                if (!metadata.title) {
+                    metadata.title = "Video";
+                }
+                if (!metadata.thumb) {
+                    metadata.thumb = "../img/thumb-default.png";
+                }
+
                 $('h4 a', $li).text(metadata.title).attr('alt', metadata.title);
                 var $thumb = $('<img>').attr('src', metadata.thumb).addClass('thumb');
                 $('.thumb-cont', $li).attr('title', metadata.title).append($thumb);

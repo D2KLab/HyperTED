@@ -429,6 +429,7 @@ function getMetadata(video, callback) {
                     metadata.comments = data.talk.commented_count;
                     metadata.published = data.talk.published_at;
                     metadata.event = data.talk.event.name;
+                    metadata.poster = data.talk.images[2].image.url;
 
                     getTedSub(video.tedID, function (err, data) {
                         if (err) {

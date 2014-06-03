@@ -41,9 +41,10 @@
                         var subIndex = subList.length - 1;
 
                         function calcTime(subTime) {
-                            var hh = parseInt(subTime.substring(0, 2));
-                            var mm = parseInt(subTime.substring(3, 5));
-                            var ss = parseFloat(subTime.substring(6).replace(",", "."));
+                            var time = (subTime.split(":"));
+                            var hh = (time[0]);
+                            var mm = (time[1]);
+                            var ss = (time[2].replace(",", "."));
 
                             return parseFloat((mm * 60) + (hh * 3600) + ss);
                         }
@@ -64,11 +65,18 @@
                                 if (!thisSub.id || thisSub.id == '') {
                                     subIndex--;
                                 } else {
-                                    var subStart = Math.round(calcTime(thisSub.time.substring(0, 12))*1000)/1000;
-                                    var subEnd = Math.round(calcTime(thisSub.time.substring(17, 30))*1000)/1000;
+                                    var subStartString = calcTime(thisSub.time.split(' --> ')[0]);
+                                    var subStart = Math.round(subStartString * 1000) / 1000;
+
+                                    var subEndString = calcTime(thisSub.time.split(' --> ')[1]);
+                                    var subEnd = Math.round(subEndString * 1000) / 1000;
 
                                     var entStart = parseFloat(entity.startNPT)
                                     var entEnd = parseFloat(entity.endNPT);
+
+                                    console.log("STR " + subStartString);
+                                    console.log("SUB " + subStart);
+                                    console.log("ENT " + entStart);
 
                                     if (entStart >= subStart && entEnd <= subEnd) {
 
@@ -78,7 +86,6 @@
                                         var str = '<span class="entity ' + nerdType + '">' + entity.label + '</span>';
 
                                         thisSub.text = text.replace(entity.label, str);
-
                                         break;
                                     } else {
                                         subIndex--;
