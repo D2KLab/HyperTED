@@ -27,7 +27,6 @@ $(document).ready(function () {
         features: ['playpause', 'current', 'progress', 'duration', 'volume'],
         autoStart: false,  //TODO remove
         success: function (media, domObj) {
-            $(this).trigger('ready');
             $(media).one('loadedmetadata', function () {
                 displayChapters();
             }).on('play', function () {
@@ -38,7 +37,7 @@ $(document).ready(function () {
         }
     });
     video.player = $player;
-
+    console.log($player);
 
     $('.see-all').click(function () {
         var $this = $(this);

@@ -32,10 +32,10 @@ function viewVideo(req, res, videoInfo) {
 
     videoInfo.videoURI = videoURI;
 
-    var areEntitiesUpdated = videoInfo.entities && videoInfo.entTimestap
-        && videoInfo.timestamp && videoInfo.entTimestap > videoInfo.timestamp;
+    var areEntitiesUpdated = videoInfo.entities && !videoInfo.entitiesFromLTV && videoInfo.entTimestap
+        && videoInfo.timestamp && videoInfo.entTimestap >= videoInfo.timestamp;
 
-    if (!enriched || areEntitiesUpdated) {
+    if (!enriched || (videoInfo.entities && areEntitiesUpdated)) {
         res.render('video.ejs', videoInfo);
     } else {
         getEntities(videoInfo, function (err, data) {

@@ -41,7 +41,7 @@ exports.getFromLocator = function (locator, callback) {
         locator = locator.substring(0, t);
     }
 
-    var q = new Query().select('?MediaResource').select('?mediafragment, ?chapter, ?tEnd, ?tStart, ?tUnit, ?keyURL, ?label, ?source')
+    var q = new Query().select('?MediaResource').select('?mediafragment, ?chapter, ?tEnd, ?tStart, ?tUnit, ?keyURL, ?label, ?source, ?entType')
         .where('?MediaResource', 'a', 'ma:MediaResource')
         .where('?MediaResource', 'ma:locator', '<' + locator + '>').textWhere('?mediafragment a ma:MediaFragment. ' +
             '?mediafragment ma:isFragmentOf ?MediaResource. ' +
@@ -59,6 +59,7 @@ exports.getFromLocator = function (locator, callback) {
             '?entityAnnotation oa:hasTarget ?mediafragment.' +
             '?entityAnnotation oa:hasBody ?entity.' +
             '?entity owl:sameAs ?keyURL.' +
+            'OPTIONAL { ?entity rdf:type ?entType. }' +
             'OPTIONAL{ ?entity rdfs:label ?label.}' +
             'OPTIONAL{ ?entity dc:source ?source.}}'
         , true).orderby('?tStart');
@@ -127,17 +128,35 @@ function reduceSparqlJSON(bindings) {
             if (row.keyURL) {
                 if (!MR.entities) {
                     MR.entities = [];
+                    MR.entitiesFromLTV = true;
                 }
+
+                var entType = row.entType ? row.entType.value : null;
+                var source = row.source ? row.source.value : null;
+                var label = row.label ? row.label.value : null;
+
                 var entity = {
-                    keyURL: row.keyURL,
-                    label: row.label,
-                    source: row.source,
-                    tStart: row.tStart,
-                    tEnd: row.tEnd,
-                    tUnit: row.tUnit,
+                    uri: row.keyURL,
+                    label: label,
+                    extractor: source,
+                    startNPT: parseFloat(row.tStart.value).toFixed(3),
+                    endNPT: parseFloat(row.tEnd.value).toFixed(3),
+                    tUnit: row.tUnit.value,
+                    nerdType: entType,
                     mediafragment: row.mediafragment
                 };
-                MR.entities.push(entity);
+                var existsYet = MR.entities.some(function (ent) {
+                    if (ent.uri.value == this.uri.value) {
+                        if (this.nerdType && (!ent.nerdType || !ent.nerdType.match(/nerd.eurecom.fr/))) {
+                            ent.nerdType = this.nerdType;
+                        }
+                        return true;
+                    }
+                    return false;
+                }, entity);
+
+                if (!existsYet)
+                    MR.entities.push(entity);
             }
         });
 

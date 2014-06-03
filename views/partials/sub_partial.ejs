@@ -45,14 +45,14 @@
                             var mm = parseInt(subTime.substring(3, 5));
                             var ss = parseFloat(subTime.substring(6).replace(",", "."));
 
-                            return (((mm * 60) + (hh * 3600) + ss).toFixed(3));
+                            return parseFloat((mm * 60) + (hh * 3600) + ss);
                         }
 
                         //sorting JSON for end character desc and by length
                         entityList.sort(function SortByStartChar(x, y) {
-                            if (x.endChar == y.endChar) {
+                            if (x.endNPT == y.endNPT) {
                                 return ((x.label.length == y.label.length) ? 0 : (x.label.length < y.label.length) ? 1 : -1)
-                            } else if (x.endChar > y.endChar) return -1;
+                            } else if (parseFloat(x.endNPT) > parseFloat(y.endNPT)) return -1;
                             else return 1;
                         });
 
@@ -64,14 +64,12 @@
                                 if (!thisSub.id || thisSub.id == '') {
                                     subIndex--;
                                 } else {
+                                    var subStart = Math.round(calcTime(thisSub.time.substring(0, 12))*1000)/1000;
+                                    var subEnd = Math.round(calcTime(thisSub.time.substring(17, 30))*1000)/1000;
 
+                                    var entStart = parseFloat(entity.startNPT)
+                                    var entEnd = parseFloat(entity.endNPT);
 
-                                    var subStart = calcTime(thisSub.time.substring(0, 12));
-                                    var subEnd = calcTime(thisSub.time.substring(17, 30));
-
-
-                                    var entStart = (entity.startNPT).toFixed(3);
-                                    var entEnd = (entity.endNPT).toFixed(3);
                                     if (entStart >= subStart && entEnd <= subEnd) {
 
                                         var text = thisSub.text;
