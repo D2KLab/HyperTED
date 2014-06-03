@@ -420,7 +420,7 @@ function getMetadata(video, callback) {
                     console.log('[ERROR] on retrieving metadata from ' + json_url);
                     callback(true);
                 } else {
-                    video.videoLocator = data.talk.media.internal['320k'].uri;
+                    video.videoLocator = data.talk.media.internal['950k'].uri;
                     video.tedID = data.talk.id;
                     metadata.title = data.talk.name;
                     metadata.thumb = data.talk.images[1].image.url;

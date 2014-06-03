@@ -78,7 +78,7 @@
 
                                         var text = thisSub.text;
                                         var nerdType = entity.nerdType.split('#')[1].toLowerCase();
-
+                                        console.log(nerdType);
                                         var str = '<span class="entity ' + nerdType + '">' + entity.label + '</span>';
 
                                         thisSub.text = text.replace(entity.label, str);
