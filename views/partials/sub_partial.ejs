@@ -77,8 +77,9 @@
                                     if (entStart >= subStart && entEnd <= subEnd) {
 
                                         var text = thisSub.text;
-                                        var nerdType = entity.nerdType.split('#')[1].toLowerCase();
-                                        console.log(nerdType);
+                                        var nerdTypeSplit = entity.nerdType.split('#');
+                                        var nerdType = nerdTypeSplit.length > 1 ? nerdTypeSplit[1].toLowerCase() : "thing";
+
                                         var str = '<span class="entity ' + nerdType + '">' + entity.label + '</span>';
 
                                         thisSub.text = text.replace(entity.label, str);
