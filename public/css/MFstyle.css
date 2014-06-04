@@ -656,6 +656,19 @@ p span.entity.nesting:hover span {
     cursor: pointer; }
     .sub-text p:hover {
       font-weight: 700; }
+    .sub-text p:before {
+      content: "";
+      width: 8px;
+      display: inline-block; }
+    .sub-text p.now-playing {
+      font-style: italic; }
+      .sub-text p.now-playing:before {
+        content: '\2022';
+        font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+        font-size: larger;
+        font-weight: 700;
+        line-height: 1em;
+        color: #b11200; }
   .sub-text .subChapGroup {
     border-bottom: 1px solid #aaaaaa;
     margin-bottom: 5px; }

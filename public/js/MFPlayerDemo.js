@@ -1,6 +1,7 @@
 var uri = video.uri.replace(new RegExp('&amp;', 'g'), '&') + window.location.hash;
 var storageKey = 'fragmentenricher.';
 var videokey = storageKey + video.uuid + '.';
+
 $(document).ready(function () {
     var $navbar = $('.navbar').not('.navbar-placeholder');
     var navHeight = $navbar.height();
@@ -29,6 +30,20 @@ $(document).ready(function () {
         success: function (media, domObj) {
             $(media).one('loadedmetadata', function () {
                 displayChapters();
+                var $pop = Popcorn(media);
+                $('.sub-text p[data-time]').each(function () {
+                    var $this = $(this);
+                    var thisId = $this.attr('id');
+                    if (!thisId || !thisId.length) {
+                        return;
+                    }
+
+                    $pop.highlightSub({
+                        start: Math.round( $this.data('startss')),
+                        end: Math.round($this.data('endss')),
+                        subId: thisId
+                    });
+                });
 
             }).on('play', function () {
                 $('.info-on-player', $playerSect).hide();
@@ -185,10 +200,10 @@ $(document).ready(function () {
 
 
     $(document).on({
-        click: function(e){
+        click: function (e) {
             e.preventDefault();
             var chapId = $(this).data('chapter');
-            $('#'+chapId).click();
+            $('#' + chapId).click();
         }
     }, '.sub-text p[data-chapter]');
 
@@ -196,11 +211,12 @@ $(document).ready(function () {
         var srtTime = $(this).data('time');
         var hms = srtTime.replace(/,/g, '.').replace(' --> ', ',');
         $player.setmf('t=' + hms).playmf();
+        $('.chap-link').removeClass('selected-chap');
         updateMFurl();
     });
 
     $("#related-frags").hide();
-//////CHAPTERS
+
     function displayChapters() {
         $("#related-frags").fadeIn();
 
@@ -258,6 +274,7 @@ $(document).ready(function () {
         });
 
     }
+
 
     function updateMFurl() {
         if (Modernizr.history) {
@@ -457,3 +474,21 @@ String.prototype.parseURL = function () {
     };
 };
 
+(function (Popcorn) {
+
+    Popcorn.plugin("highlightSub", function (options) {
+
+        return {
+            _setup: function (options) {
+                options.$sub = $('#' + options.subId);
+            },
+            start: function (event, options) {
+                options.$sub.addClass('now-playing');
+            },
+            end: function (event, options) {
+                options.$sub.removeClass('now-playing');
+            }
+        };
+    });
+
+})(Popcorn);

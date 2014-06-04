@@ -12,6 +12,16 @@
             %>
             <div class="sub-text <% if (locals.enriched) { %>enriched<% } %>">
                 <%
+                    function calcTime(subTime) {
+                        var time = (subTime.split(":"));
+                        var hh = parseInt(time[0]);
+                        var mm = parseInt(time[1]);
+                        var ss = parseFloat(time[2].replace(",", "."));
+
+                        return ((mm * 60) + (hh * 3600) + ss);
+                    }
+
+
                     for (var index in strList) {
                         var sub = {text: '', lineNum: 0};
                         var lines = strList[index].split('\n');
@@ -21,6 +31,11 @@
                                 sub.id = lines[line];
                             } else if (!sub.time) {
                                 sub.time = lines[line].replace('\r', '');
+                                var timeSplit = sub.time.split(' --> ')
+                                var subStart = calcTime(timeSplit[0]);
+                                sub.startSS = Math.round(subStart * 1000) / 1000;
+                                var subEnd = calcTime(timeSplit[1]);
+                                sub.endSS = Math.round(subEnd * 1000) / 1000;
                             } else {
                                 var start = sub.lineNum > 0 ? '\n' : '';
                                 sub.text += start + lines[line];
@@ -38,15 +53,6 @@
                     var subIndex;
                     if (locals.enriched && locals.entities) {
                         var entityList = entities;
-
-                        function calcTime(subTime) {
-                            var time = (subTime.split(":"));
-                            var hh = parseInt(time[0]);
-                            var mm = parseInt(time[1]);
-                            var ss = parseFloat(time[2].replace(",", "."));
-
-                            return ((mm * 60) + (hh * 3600) + ss);
-                        }
 
                         //sorting JSON for end character desc and by length
                         entityList.sort(/**
@@ -67,15 +73,6 @@
                                 if (!thisSub.id || thisSub.id == '') {
                                     subIndex--;
                                 } else {
-                                    if (!thisSub.startSS) {
-                                        var subStart = calcTime(thisSub.time.split(' --> ')[0]);
-                                        thisSub.startSS = Math.round(subStart * 1000) / 1000;
-                                    }
-                                    if (!thisSub.endSS) {
-                                        var subEnd = calcTime(thisSub.time.split(' --> ')[1]);
-                                        thisSub.endSS = Math.round(subEnd * 1000) / 1000;
-                                    }
-
                                     var entStart = parseFloat(entity.startNPT)
                                     var entEnd = parseFloat(entity.endNPT);
 
@@ -109,15 +106,6 @@
                                 if (!thisSub.id || thisSub.id == '') {
                                     subIndex++;
                                 } else {
-                                    if (!thisSub.startSS) {
-                                        var subStart = calcTime(thisSub.time.split(' --> ')[0]);
-                                        thisSub.startSS = Math.round(subStart * 1000) / 1000;
-                                    }
-                                    if (!thisSub.endSS) {
-                                        var subEnd = calcTime(thisSub.time.split(' --> ')[1]);
-                                        thisSub.endSS = Math.round(subEnd * 1000) / 1000;
-                                    }
-
                                     var sStart = Math.round(thisSub.startSS), sEnd = Math.round(thisSub.endSS)
 
                                     if (chapStart > sEnd) {
@@ -148,7 +136,8 @@
                     <%
                     }
                     %>
-                    <p data-id="<%= sub.id %>" data-time="<%= sub.time %>" <%= sub.dataChap || "" %>><%- sub.text %></p>
+                    <p id="sub<%= sub.id %>" data-time="<%= sub.time %>" data-startSS="<%= sub.startSS %>"
+                       data-endSS="<%= sub.endSS %>" <%= sub.dataChap || "" %>><%- sub.text %></p>
                     <%
                     if(sub.endChap){
                         newChap = true;
