@@ -35,7 +35,7 @@ function viewVideo(req, res, videoInfo) {
     var areEntitiesUpdated = videoInfo.entities && !videoInfo.entitiesFromLTV && videoInfo.entTimestap
         && videoInfo.timestamp && videoInfo.entTimestap >= videoInfo.timestamp;
 
-    if (!enriched || (videoInfo.entities && areEntitiesUpdated)) {
+    if (!enriched || (videoInfo.entities && areEntitiesUpdated) || (!videoInfo.vendor)) {
         res.render('video.ejs', videoInfo);
     } else {
         getEntities(videoInfo, function (err, data) {

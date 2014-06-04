@@ -204,7 +204,12 @@ $navbarTransitionTime: 100ms;
     .entity-content {
       line-height: 200%;
       padding: 0 10px;
-
+      h3.title {
+        display: block;
+      }
+      .displayEntity {
+        @extend .clearfix;
+      }
     }
   }
 }
@@ -633,14 +638,22 @@ p {
   height: 200px;
   overflow: auto;
   resize: vertical;
+  font-weight: 400;
+
   p {
     font-size: 0.9em;
     line-height: 1.8em;
     margin: 0;
     padding: 0 10px;
-    font-weight: 400;
     @include transition(font-weight, 100ms);
     cursor: pointer;
+    &:hover {
+      font-weight: 700;
+    }
+  }
+  .subChapGroup {
+    border-bottom: 1px solid $medium_gray;
+    margin-bottom: 5px;
     &:hover {
       font-weight: 700;
     }

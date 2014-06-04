@@ -184,7 +184,15 @@ $(document).ready(function () {
     $('p > span.entity').has('span').addClass('nesting');
 
 
-    $(document).on('click', '.sub-text p[data-time]', function () {
+    $(document).on({
+        click: function(e){
+            e.preventDefault();
+            var chapId = $(this).data('chapter');
+            $('#'+chapId).click();
+        }
+    }, '.sub-text p[data-chapter]');
+
+    $(document).on('click', '.sub-text p[data-time]:not([data-chapter])', function () {
         var srtTime = $(this).data('time');
         var hms = srtTime.replace(/,/g, '.').replace(' --> ', ',');
         $player.setmf('t=' + hms).playmf();

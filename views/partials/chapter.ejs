@@ -11,11 +11,18 @@
     <div class="row">
         <% var chapterList = chapters; %>
         <% function labelTime(time) {
-            return (time < 60) ? "00:00:" + Math.floor(time) : (time == 60 || time > 60 && time < 3600) ? "00:" + Math.floor(time / 60) + ":" + Math.floor(time % 60) : Math.floor(time / 3600) + ":" + Math.floor((time % 3600) / 60) + ":" + Math.floor((time % 3600) % 60);
+            var hh = Math.floor(time / 3600);
+            hh = hh < 10 ? '0' + hh : hh;
+            var mm = Math.floor((time % 3600) / 60);
+            mm = mm < 10 ? '0' + mm : mm;
+            var ss = Math.floor((time % 3600) % 60);
+            ss = ss < 10 ? '0' + ss : ss;
+
+            return hh+':'+mm+':'+ss;
         } %>
         <div class="col-md-12">
 
-        <div class="chap-line">
+            <div class="chap-line">
                 <%
                 chapterList.forEach(function(chap){
                     var startTime = chap.tStart.value;
@@ -23,8 +30,8 @@
                     var tStart = labelTime(startTime);
                     var tEnd = labelTime(endTime);
                 %>
-                <div class="chap-link">
-                    <a data-start-time="<%= startTime %>" data-end-time="<%= endTime %>">
+                <div class="chap-link" id="<%= chap.chapter.value.replace("http://data.linkedtv.eu/chapter/", "") %>">
+                    <a  data-start-time="<%= startTime %>" data-end-time="<%= endTime %>">
 
                         <div class="chap-timing">
 
