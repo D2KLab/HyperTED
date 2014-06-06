@@ -39,7 +39,7 @@ $(document).ready(function () {
                     }
 
                     $pop.highlightSub({
-                        start: Math.round( $this.data('startss')),
+                        start: Math.round($this.data('startss')),
                         end: Math.round($this.data('endss')),
                         subId: thisId
                     });
@@ -62,6 +62,7 @@ $(document).ready(function () {
         var text = $target.hasClass('full') ? 'see less' : 'see more';
         $this.text(text)
     });
+
 
     if (Modernizr.history && Modernizr.localstorage) {
         var $nerdifyForm = $('form.nerdify');
@@ -204,6 +205,7 @@ $(document).ready(function () {
             e.preventDefault();
             var chapId = $(this).data('chapter');
             $('#' + chapId).click();
+
         }
     }, '.sub-text p[data-chapter]');
 
@@ -268,6 +270,7 @@ $(document).ready(function () {
                 $('.chap-link').removeClass('selected-chap');
                 $(this).addClass('selected-chap');
 
+
                 updateMFurl();
             });
 
@@ -282,6 +285,7 @@ $(document).ready(function () {
             var hash = parsedJSON.hash;
             var page_url = window.location.toString().parseURL();
 
+            console.log(hash);
             if (!$.isEmptyObject(hash)) {
                 for (var key in hash) {
                     page_url.hash[key] = hash[key][0].value;
@@ -297,6 +301,14 @@ $(document).ready(function () {
         }
     }
 
+    function calcSec(hms) {
+        var time = (hms.split(":"));
+        var hh = parseInt(time[0]);
+        var mm = parseInt(time[1]);
+        var ss = parseFloat(time[2].replace(",", "."));
+
+        return ((mm * 60) + (hh * 3600) + ss);
+    }
 
     $(window).off('popstate.changemf').on('popstate.changemf', function () {
         console.info("popstate.changemf");
@@ -313,6 +325,24 @@ $(document).ready(function () {
 
         if (frag) {
             $player.setmf(frag);
+
+            if (hasVideoSub) {
+                var mfTime = (t.split(","));
+                var sMF = calcSec(mfTime[0]);
+                var eMF = calcSec(mfTime[1]);
+
+                var sSub;
+                var eSub;
+                $('.sub-text p').removeClass("selected-frag");
+                $('.sub-text p').each(function () {
+                    sSub = $(this).data('startss');
+                    eSub = $(this).data('endss');
+
+                    if (sMF <= sSub && eMF >= eSub) {
+                        $(this).addClass("selected-frag");
+                    }
+                });
+            }
         }
     });
 

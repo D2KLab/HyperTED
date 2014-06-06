@@ -634,6 +634,7 @@ p {
 
 .sub-text {
   border: 1px solid $light_gray;
+  background-color: $light_gray;
   margin: 5px 0;
   height: 200px;
   overflow: auto;
@@ -650,16 +651,20 @@ p {
     &:hover {
       font-weight: 700;
     }
-    &:before{
-      content:"";
+    &:before {
+      content: "";
       width: 8px;
       display: inline-block;
     }
+    &.selected-frag {
+      background-color: #ffffff;
+    }
     &.now-playing {
       font-style: italic;
+
       &:before {
         content: '\2022';
-        font:{
+        font: {
           family: "Helvetica Neue", Arial, Helvetica, sans-serif;
           size: larger;
           weight: 700;
