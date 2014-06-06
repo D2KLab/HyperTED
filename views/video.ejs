@@ -2,7 +2,8 @@
 <html>
 <head lang="en">
     <meta charset="UTF8">
-    <% var pageTitle = (metadata && metadata.title) ? metadata.title + '|HyperTED' : 'HyperTED'; %>
+    <% var metadata = locals.metadata || false%>
+    <% var pageTitle = (metadata && locals.metadata.title) ? locals.metadata.title + '|HyperTED' : 'HyperTED'; %>
     <title><%= pageTitle %></title>
     <link rel="icon" type="image/png" href="/img/favicons/favicon_48.png">
     <!--[if IE]>
@@ -70,12 +71,12 @@
         <div id="video"></div>
     </div>
 
-    <% if (metadata && metadata.title) { %>
+    <% if (locals.metadata && metadata.title) { %>
     <div class="info-on-player">
 
         <h1 id="video-title" class="title"><%= metadata.title %></h1>
 
-        <% if (metadata) {
+        <% if (locals.metadata) {
             var leftVals = {
                 'Published': metadata.published,
                 'Event': metadata.event,
@@ -120,7 +121,7 @@
                     </div>
                 </div>
 
-                <% if(metadata && metadata.timedtext) { %>
+                <% if(locals.metadata && metadata.timedtext) { %>
                 <div id="sub-cont">
                     <% include partials/sub_partial.ejs %>
                 </div>
@@ -174,7 +175,7 @@
                 <% } %>
             </div>
 
-            <% if(metadata && metadata.descr && metadata.timedtext) { %>
+            <% if(locals.metadata && metadata.descr && metadata.timedtext) { %>
             <div class="descr-cont col-md-5 col-lg-5" id="descr-cont">
                 <div class="row">
                     <div class="col-md-7 col-lg-7 col-sm-7 col-xs-7">

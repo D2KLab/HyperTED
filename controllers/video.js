@@ -625,26 +625,22 @@ var vendors = [
     {
         code: 1,
         name: 'youtube',
-        url_pattern: /^https?:\/\/(?:www\.)?youtube\.com\/watch\?(?=.*v=((\w|-){11}))(?:\S+)?$/,
-        id_pattern: /v=(.{11})/
+        url_pattern: /(youtu.be\/|youtube.com\/(watch\?(.*&)?v=|(embed|v)\/))([^\?&\"\'>]+)/
     },
     {
         code: 2,
         name: 'dailymotion',
-        url_pattern: /^.+dailymotion.com\/(video|hub)\/([^_]+)[^#]*(#video=([^_&]+))?/,
-        id_pattern: /video\/([^_||^#]+)/
+        url_pattern: /dailymotion.com\/(video|hub)\/([^_]+)/
     },
     {
         code: 3,
         name: 'vimeo',
-        url_pattern: /(www.)?(player.)?vimeo.com\/([a-z]*\/)*([0-9]{6,11})[?]?.*/,
-        id_pattern: /\/([0-9]{6,11})$/
+        url_pattern: /(www.)?(player.)?vimeo.com\/([a-z]*\/)*([0-9]{6,11})[?]?.*/
     },
     {
         code: 4,
         name: 'ted',
-        url_pattern: /^https?:\/\/(?:www\.)?ted\.com\/talks\/*([^?]+)/,
-        id_pattern: /talks\/([^?]+)/
+        url_pattern: /^https?:\/\/(?:www\.)?ted\.com\/talks\/*([^?]+)/
     }
 ];
 
@@ -659,8 +655,10 @@ function detectVendor(url) {
 }
 
 function detectId(url, vendor) {
-    if (vendor && vendor.id_pattern)
-        return url.match(vendor.id_pattern)[1];
+    if (vendor && vendor.url_pattern) {
+        var matches = url.match(vendor.url_pattern);
+        return matches[matches.length-1];
+    }
     return undefined;
 }
 
