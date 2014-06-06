@@ -26,7 +26,7 @@ $(document).ready(function () {
         alwaysShowControls: true,
         preload: 'metadata',
         features: ['playpause', 'current', 'progress', 'duration', 'volume'],
-//        autoStart: false,  //TODO remove
+        autoStart: false,  //TODO remove
         success: function (media, domObj) {
             $(media).one('loadedmetadata', function () {
                 displayChapters();
@@ -327,21 +327,28 @@ $(document).ready(function () {
             $player.setmf(frag);
 
             if (hasVideoSub) {
+
+
                 var mfTime = (t.split(","));
                 var sMF = calcSec(mfTime[0]);
                 var eMF = calcSec(mfTime[1]);
 
                 var sSub;
                 var eSub;
-                $('.sub-text p').removeClass("selected-frag");
-                $('.sub-text p').each(function () {
+                $('.sub-text p').removeClass("selected-frag").each(function () {
                     sSub = $(this).data('startss');
                     eSub = $(this).data('endss');
 
                     if (sMF <= sSub && eMF >= eSub) {
                         $(this).addClass("selected-frag");
                     }
+
                 });
+                var scrollPos = $(".selected-frag:first").position().top + $('.sub-text').scrollTop();
+
+
+                $('.sub-text').scrollTop(scrollPos);
+                console.log($('.sub-text').scrollTop());
             }
         }
     });

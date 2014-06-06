@@ -655,8 +655,12 @@ p {
       width: 8px;
       display: inline-block;
     }
+
     &.selected-frag {
       background-color: #ffffff;
+    }
+    &:not(.selected-frag) ~ .selected-frag {
+      @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
     }
     &.now-playing {
       font-style: italic;

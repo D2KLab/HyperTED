@@ -920,6 +920,12 @@ p span.entity.nesting:hover span {
     background-color: #ffffff;
 }
 
+.sub-text p:not(.selected-frag) ~ .selected-frag {
+    -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
+    -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
+    box-shadow: 0 1px 8px -2px #5d5d5d;
+}
+
 .sub-text p.now-playing {
     font-style: italic;
 }
