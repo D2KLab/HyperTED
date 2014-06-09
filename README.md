@@ -15,5 +15,7 @@ Media Fragment Player Demo
   npm install sparql
 </pre>
 
-<p>You need a <a href="http://www.sqlite.org/">SQLite</a> database on your computer.</p>
+<p>You need a <a href="http://www.mongodb.org/">MongoDB</a> database on your computer.</p>
 <p>Also install <a href="https://github.com/giusepperizzo/nerd4node">Nerd4Node</a></p>
+<p>Also install <a href="https://github.com/LearnBoost/monk">Monk</a></p>
+
