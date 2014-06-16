@@ -26,10 +26,13 @@ $(document).ready(function () {
         alwaysShowControls: true,
         preload: 'metadata',
         features: ['playpause', 'current', 'progress', 'duration', 'volume'],
-        autoStart: false,  //TODO remove
+//        autoStart: false,  //TODO remove
         success: function (media, domObj) {
             $(media).one('loadedmetadata', function () {
                 displayChapters();
+                if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
+                    highlightMFSub($player.getMFJson().hash.t[0].value);
+                }
                 var $pop = Popcorn(media);
                 $('.sub-text p[data-time]').each(function () {
                     var $this = $(this);
@@ -37,7 +40,6 @@ $(document).ready(function () {
                     if (!thisId || !thisId.length) {
                         return;
                     }
-
                     $pop.highlightSub({
                         start: Math.round($this.data('startss')),
                         end: Math.round($this.data('endss')),
@@ -54,6 +56,7 @@ $(document).ready(function () {
     });
     video.player = $player;
     console.log($player);
+
 
     $('.see-all').click(function () {
         var $this = $(this);
@@ -270,7 +273,6 @@ $(document).ready(function () {
                 $('.chap-link').removeClass('selected-chap');
                 $(this).addClass('selected-chap');
 
-
                 updateMFurl();
             });
 
@@ -293,6 +295,8 @@ $(document).ready(function () {
             } else {
                 page_url.hash = {};
             }
+            highlightMFSub(hash.t[0].value);
+
 
             delete page_url.search.t;
             delete page_url.search.xywh;
@@ -305,9 +309,46 @@ $(document).ready(function () {
         var time = (hms.split(":"));
         var hh = parseInt(time[0]);
         var mm = parseInt(time[1]);
-        var ss = parseFloat(time[2].replace(",", "."));
+        var ss = parseInt(time[2]);
 
         return ((mm * 60) + (hh * 3600) + ss);
+    }
+
+    function highlightMFSub(t) {
+        console.log("ttttt");
+        console.log(t);
+
+        var mfTime = (t.split(","));
+        var sMF, eMF;
+        var sMFtest = mfTime[0];
+        var eMFtest = mfTime[1];
+
+        if (sMFtest.indexOf(":") == -1 && eMFtest.indexOf(":") == -1) {
+            sMF = sMFtest;
+            eMF = eMFtest;
+        } else {
+            sMF = calcSec(sMFtest);
+            eMF = calcSec(eMFtest);
+        }
+
+
+        var sSub;
+        var eSub;
+        $('.sub-text p').removeClass("selected-frag").each(function () {
+            sSub = $(this).data('startss');
+            eSub = $(this).data('endss');
+
+            if (sMF < eSub && eMF >= eSub) {
+                $(this).addClass("selected-frag");
+            }
+
+        });
+        var scrollPos = $(".selected-frag:first").position().top + $('.sub-text').scrollTop();
+
+
+        $('.sub-text').animate({
+            scrollTop: scrollPos
+        });
     }
 
     $(window).off('popstate.changemf').on('popstate.changemf', function () {
@@ -327,28 +368,7 @@ $(document).ready(function () {
             $player.setmf(frag);
 
             if (hasVideoSub) {
-
-
-                var mfTime = (t.split(","));
-                var sMF = calcSec(mfTime[0]);
-                var eMF = calcSec(mfTime[1]);
-
-                var sSub;
-                var eSub;
-                $('.sub-text p').removeClass("selected-frag").each(function () {
-                    sSub = $(this).data('startss');
-                    eSub = $(this).data('endss');
-
-                    if (sMF <= sSub && eMF >= eSub) {
-                        $(this).addClass("selected-frag");
-                    }
-
-                });
-                var scrollPos = $(".selected-frag:first").position().top + $('.sub-text').scrollTop();
-
-
-                $('.sub-text').scrollTop(scrollPos);
-                console.log($('.sub-text').scrollTop());
+                highlightMFSub(t);
             }
         }
     });

@@ -457,7 +457,7 @@ html, body {
     left: 0;
     top: 0;
     width: 47%;
-    overflow: auto;
+    overflow: visible;
 }
 
 #player-sect .info-on-player .title {
@@ -466,19 +466,42 @@ html, body {
     font-weight: bold;
 }
 
-#player-sect #player-container {
-    min-height: 360px;
-}
-
-@media (min-width: 768px) {
-    #video {
-        padding-left: 10em;
+@media (max-width: 767px) {
+    #player-sect .info-on-player .title {
+        font-size: 2em;
     }
 }
 
-#video .mejs-container {
-    position: static;
-    margin: auto;
+#player-sect .info-on-player .stat {
+    width: 100%;
+    overflow: visible;
+}
+
+@media (max-width: 892px) {
+    #player-sect .info-on-player .stat {
+        display: none;
+    }
+}
+
+#player-sect #player-container {
+    min-height: 20%;
+    overflow: hidden;
+    width: 100%;
+}
+
+#player-sect #player-container #video {
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    #player-sect #player-container #video {
+        padding-left: 10em;
+    }
+
+    #player-sect #player-container #video .mejs-container {
+        position: static;
+        margin: auto;
+    }
 }
 
 .chap-label {
@@ -565,6 +588,17 @@ html, body {
 
 .chap-line .chap-link .chap-timing h5 .glyphicon-chevron-left, .chap-line .chap-link .chap-timing h5 .glyphicon-chevron-right {
     font-size: 1em;
+}
+
+.chap-line .chap-link.selected-chap .chap-timing {
+    z-index: 1;
+}
+
+.chap-line .chap-link:hover .chap-timing {
+    z-index: 2;
+    -moz-box-shadow: 0 2px 8px 0 #5d5d5d;
+    -webkit-box-shadow: 0 2px 8px 0 #5d5d5d;
+    box-shadow: 0 2px 8px 0 #5d5d5d;
 }
 
 .chap-line .chap-link:hover, .chap-line .chap-link.selected-chap {
@@ -918,12 +952,6 @@ p span.entity.nesting:hover span {
 
 .sub-text p.selected-frag {
     background-color: #ffffff;
-}
-
-.sub-text p:not(.selected-frag) ~ .selected-frag {
-    -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
-    -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
-    box-shadow: 0 1px 8px -2px #5d5d5d;
 }
 
 .sub-text p.now-playing {
