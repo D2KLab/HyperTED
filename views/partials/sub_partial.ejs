@@ -28,7 +28,7 @@
 
                         for (var line in lines) {
                             if (!sub.id) {
-                                sub.id = lines[line];
+                                sub.id = lines[line].trim();
                             } else if (!sub.time) {
                                 sub.time = lines[line].replace('\r', '');
                                 var timeSplit = sub.time.split(' --> ')
