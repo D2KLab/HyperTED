@@ -251,7 +251,7 @@ $(document).ready(function () {
             $(this).hover(function () {
                     if ($(this).width() < 175) {
                         var opt = {
-                            bottom: "31px",
+                            top: "31px",
                             opacity: "1",
                             "background-color": "#f4f4f4",
                             cursor: "auto"
@@ -272,6 +272,10 @@ $(document).ready(function () {
 
                 $('.chap-link').removeClass('selected-chap');
                 $(this).addClass('selected-chap');
+                var chapNum = $(this).children('.chap-num')[0].innerText;
+                var chapNumLast = $('.chap-link').last('.chap-num')[0].innerText;
+                $('.total-chap-num').text("° chapter of " + chapNumLast);
+                $('.selected-chap-num').text(chapNum);
 
                 updateMFurl();
             });
@@ -287,7 +291,6 @@ $(document).ready(function () {
             var hash = parsedJSON.hash;
             var page_url = window.location.toString().parseURL();
 
-            console.log(hash);
             if (!$.isEmptyObject(hash)) {
                 for (var key in hash) {
                     page_url.hash[key] = hash[key][0].value;
@@ -315,8 +318,6 @@ $(document).ready(function () {
     }
 
     function highlightMFSub(t) {
-        console.log("ttttt");
-        console.log(t);
 
         var mfTime = (t.split(","));
         var sMF, eMF;

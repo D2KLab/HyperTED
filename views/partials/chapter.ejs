@@ -1,13 +1,6 @@
 <div class="container-fluid">
 
 
-    <div class="chap-label">
-        <span class="glyphicon glyphicon-chevron-left"></span>
-
-        <h1>chapters</h1>
-        <span class="glyphicon glyphicon-chevron-right"></span>
-    </div>
-
     <div class="row">
         <% var chapterList = chapters; %>
         <% function labelTime(time) {
@@ -24,13 +17,16 @@
 
             <div class="chap-line">
                 <%
+                var chapNum = 0;
                 chapterList.forEach(function(chap){
+                    chapNum++;
                     var startTime = chap.tStart.value;
                     var endTime = chap.tEnd.value;
                     var tStart = labelTime(startTime);
                     var tEnd = labelTime(endTime);
                 %>
                 <div class="chap-link" id="<%= chap.chapter.value.replace("http://data.linkedtv.eu/chapter/", "") %>">
+                    <h4 class="chap-num"><%= chapNum %></h4>
                     <a  data-start-time="<%= startTime %>" data-end-time="<%= endTime %>">
 
                         <div class="chap-timing">
@@ -49,5 +45,12 @@
             </div>
 
         </div>
+    </div>
+
+    <div class="chap-label">
+        <span class="glyphicon glyphicon-chevron-left"></span>
+        <span class="selected-chap-num"></span><span class="total-chap-num"><%= chapNum %> chapters</span>
+        <span class="glyphicon glyphicon-chevron-right"></span>
+
     </div>
 </div>

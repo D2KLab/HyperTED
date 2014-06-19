@@ -55,7 +55,7 @@ html, body {
 }
 
 .container {
-  min-height: 40%;
+  min-height: 50%;
 
 }
 
@@ -69,7 +69,10 @@ html, body {
     }
     .eurecomLogo, .mediamixerLogo {
       display: inline-block;
-      margin-top: 1.5em;
+      margin-top: 0.5em;
+      img {
+        width: 75%;
+      }
     }
     h1 {
       margin: 0;
@@ -81,7 +84,6 @@ html, body {
   background: white;
   position: absolute;
   bottom: 0;
-  height: 20%;
 }
 
 .video_footer {
@@ -289,11 +291,16 @@ $navbarTransitionTime: 100ms;
 .chap-label {
   color: $medium_gray;
   min-height: 20px;
-  margin-top: 35px;
-  margin-bottom: 0;
+  margin-top: 10px;
   text-align: center;
-  h1 {
+  span {
     display: inline-block;
+    &.selected-chap-num, &.total-chap-num {
+      font: {
+        family: CaviarDreams, Helvetica, sans-serif;
+        size: 2.6em;
+      }
+    }
   }
 
   @media(max-width: 768px) {
@@ -318,6 +325,7 @@ $navbarTransitionTime: 100ms;
     position: relative;
     height: 30px;
     background-color: $dark_red;
+    border-left: 4px solid $light_gray;
     &:nth-child(odd) {
       background-color: $ted_red;
     }
@@ -325,9 +333,16 @@ $navbarTransitionTime: 100ms;
 
     &:first-child {
       @include border-radius-left(8px);
+      border-left: none;
     }
     &:last-child {
       @include border-radius-right(8px);
+    }
+
+    .chap-num {
+      color: $light_gray;
+      font-weight: 700;
+      margin-bottom: 4px;
     }
 
     .chap-timing {
@@ -358,6 +373,9 @@ $navbarTransitionTime: 100ms;
       }
     }
     &:hover {
+      .chap-num {
+        opacity: 0.1;
+      }
       .chap-timing {
         z-index: 2;
         @include box-shadow(0, 2px, 8px, 0, $dark_gray);

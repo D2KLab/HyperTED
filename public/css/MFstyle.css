@@ -244,7 +244,7 @@ html, body {
 }
 
 .container {
-    min-height: 40%;
+    min-height: 50%;
 }
 
 .home_footer, .video_footer {
@@ -261,7 +261,11 @@ html, body {
 
 .home_footer .foo .eurecomLogo, .home_footer .foo .mediamixerLogo, .video_footer .foo .eurecomLogo, .video_footer .foo .mediamixerLogo {
     display: inline-block;
-    margin-top: 1.5em;
+    margin-top: 0.5em;
+}
+
+.home_footer .foo .eurecomLogo img, .home_footer .foo .mediamixerLogo img, .video_footer .foo .eurecomLogo img, .video_footer .foo .mediamixerLogo img {
+    width: 75%;
 }
 
 .home_footer .foo h1, .video_footer .foo h1 {
@@ -272,7 +276,6 @@ html, body {
     background: white;
     position: absolute;
     bottom: 0;
-    height: 20%;
 }
 
 .video_footer {
@@ -507,13 +510,17 @@ html, body {
 .chap-label {
     color: #aaaaaa;
     min-height: 20px;
-    margin-top: 35px;
-    margin-bottom: 0;
+    margin-top: 10px;
     text-align: center;
 }
 
-.chap-label h1 {
+.chap-label span {
     display: inline-block;
+}
+
+.chap-label span.selected-chap-num, .chap-label span.total-chap-num {
+    font-family: CaviarDreams, Helvetica, sans-serif;
+    font-size: 2.6em;
 }
 
 @media (max-width: 768px) {
@@ -543,6 +550,7 @@ html, body {
     position: relative;
     height: 30px;
     background-color: #b11200;
+    border-left: 4px solid #f4f4f4;
     float: left;
 }
 
@@ -556,6 +564,7 @@ html, body {
     -ms-border-radius: 8px 0 0 8px;
     -o-border-radius: 8px 0 0 8px;
     border-radius: 8px 0 0 8px;
+    border-left: none;
 }
 
 .chap-line .chap-link:last-child {
@@ -564,6 +573,12 @@ html, body {
     -ms-border-radius: 0 8px 8px 0;
     -o-border-radius: 0 8px 8px 0;
     border-radius: 0 8px 8px 0;
+}
+
+.chap-line .chap-link .chap-num {
+    color: #f4f4f4;
+    font-weight: 700;
+    margin-bottom: 4px;
 }
 
 .chap-line .chap-link .chap-timing {
@@ -592,6 +607,10 @@ html, body {
 
 .chap-line .chap-link.selected-chap .chap-timing {
     z-index: 1;
+}
+
+.chap-line .chap-link:hover .chap-num {
+    opacity: 0.1;
 }
 
 .chap-line .chap-link:hover .chap-timing {
