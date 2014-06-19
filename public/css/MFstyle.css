@@ -534,7 +534,6 @@ html, body {
     min-height: 32px;
     margin: 20px 50px 20px 50px;
     text-align: center;
-    border: 1px solid #b11200;
     -webkit-border-radius: 8px;
     -moz-border-radius: 8px;
     -ms-border-radius: 8px;
@@ -576,9 +575,11 @@ html, body {
 }
 
 .chap-line .chap-link .chap-num {
-    color: #f4f4f4;
+    color: #940000;
     font-weight: 700;
     margin-bottom: 4px;
+    text-shadow: 1px -1px 4px #f4f4f4;
+    border-radius: 10px;
 }
 
 .chap-line .chap-link .chap-timing {
