@@ -996,6 +996,11 @@ p span.entity.nesting:hover span {
     font-weight: 700;
 }
 
+.sub-text .subChapGroup .chap-title {
+    text-align: right;
+    font-weight: 700;
+}
+
 .errorcode {
     font-family: Arial Black, Arial, Verdana, sans-serif;
     font-weight: bold;

@@ -16,6 +16,8 @@
                 <%
                 var entityList = locals.entities;
                         if(entityList){
+
+
                     entityList.sort(/**
                      * @return {number}
                      */
@@ -24,6 +26,7 @@
                     });
 
                     var typeList = entityList.reduce(function (memo, ent) {
+
                         if (!memo[ent.nerdType]) {
                             memo[ent.nerdType] = [];
                         }
@@ -33,7 +36,8 @@
                 %>
 
                 <div class="entity-content">
-                    <p>In this video there are <%= entityList.length %> entities</p>
+                    <p>In this video there are <%= entityList.length %> entities extracted
+                        by <%= entityList[0].extractor %></p>
                     <%
                     for (type in typeList) {
                         var typeName = type.split('#')[1];

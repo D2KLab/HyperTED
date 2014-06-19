@@ -128,11 +128,18 @@
                     }
 
                     var newChap = true;
+                    var chapNum = 0;
                         subList.forEach(function(sub){
                         if (sub.dataChap && newChap) {
                     newChap = false;
+                    chapNum++;
                 %>
                 <div class="subChapGroup" <%= sub.dataChap %>>
+
+
+                    <p class="chap-title">chapter n&#176;
+
+                        <%= chapNum %></p>
                     <%
                     }
                     %>
