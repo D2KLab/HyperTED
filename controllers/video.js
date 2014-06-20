@@ -303,6 +303,7 @@ function getMetadata(video, callback) {
         case 'youtube':
             async.parallel([
                 function (async_callback) {
+                    //retrieve metadata
                     http.getJSON(metadata_url, function (err, data) {
                         if (err) {
                             onErrorMetadataJson(metadata_url, async_callback);
@@ -322,14 +323,15 @@ function getMetadata(video, callback) {
                     });
                 },
                 function (async_callback) {
-                    getYouTubeSub(video.vendor_id, function (err, data) {
+                    // retrieve sub
+                    var subUrl = vendor.sub_url.replace('<id>', video.vendor_id);
+                    http.getRemoteFile(subUrl, function (err, data) {
                         if (err) {
                             console.log('[ERROR] on retrieving sub for ' + video.locator);
-                            async_callback(true);
                         } else {
                             metadata.timedtext = data;
-                            async_callback(false);
                         }
+                        async_callback(false);
                     });
                 }
             ], function (err) {
@@ -359,13 +361,26 @@ function getMetadata(video, callback) {
                     })
                 },
                 function (async_callback) {
-                    getDailymotionSub(video.vendor_id, function (err, data) {
+                    //retrieve sub
+                    var subListUrl = vendor.sub_list_url.replace('<id>', video.vendor_id);
+                    console.log('retrieving sub list from ' + subListUrl);
+                    http.getJSON(subListUrl, function (err, data) {
                         if (err) {
                             console.log('[ERROR] on retrieving sub for ' + video.locator);
                             async_callback(false);
-                        } else {
-                            metadata.timedtext = data;
+                        } else if (data.total <= 0) {
+                            console.log('no sub available');
                             async_callback(false);
+                        } else {
+                            var subUrl = (data.list[0].url);
+                            http.getRemoteFile(subUrl, function (err, data) {
+                                if (err) {
+                                    console.log('[ERROR] on retrieving sub for ' + video.locator);
+                                } else {
+                                    metadata.timedtext = data;
+                                }
+                                async_callback(false);
+                            });
                         }
                     });
                 }
@@ -374,44 +389,26 @@ function getMetadata(video, callback) {
             });
             break;
         case 'vimeo':
-            async.parallel([
-                function (async_callback) {
-                    http.getJSON(metadata_url, function (err, data) {
-                        if (err) {
-                            onErrorMetadataJson(metadata_url, async_callback);
-                            return;
-                        }
-                        metadata.title = data.title;
-                        metadata.thumb = data.thumbnail_small;
-                        metadata.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
-                        metadata.views = data.stats_number_of_plays;
-                        metadata.favourites = "n.a.";
-                        metadata.comments = data.stats_number_of_comments;
-                        metadata.likes = data.stats_number_of_likes;
-                        metadata.avgRate = "n.a.";
-                        metadata.published = data.upload_date;
-                        metadata.category = data.tags;
-                        async_callback(false);
-
-                    });
-                },
-                function (async_callback) {
-                    getVimeoSub(video.vendor_id, function (err, data) {
-                        if (err) {
-                            console.log('[ERROR] on retrieving sub for ' + video.locator);
-                            async_callback(false);
-                        } else {
-                            metadata.timedtext = data;
-                            async_callback(false);
-                        }
-                    });
+            http.getJSON(metadata_url, function (err, data) {
+                if (err) {
+                    onErrorMetadataJson(metadata_url, callback);
+                    return;
                 }
-            ], function (err) {
+                metadata.title = data.title;
+                metadata.thumb = data.thumbnail_small;
+                metadata.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
+                metadata.views = data.stats_number_of_plays;
+                metadata.favourites = "n.a.";
+                metadata.comments = data.stats_number_of_comments;
+                metadata.likes = data.stats_number_of_likes;
+                metadata.avgRate = "n.a.";
+                metadata.published = data.upload_date;
+                metadata.category = data.tags;
                 callback(err, metadata);
             });
             break;
         case 'ted':
-            http.getJSON(json_url, function (err, data) {
+            http.getJSON(metadata_url, function (err, data) {
                 if (err) {
                     onErrorMetadataJson(metadata_url, callback);
                     return;
@@ -427,13 +424,16 @@ function getMetadata(video, callback) {
                 metadata.event = data.talk.event.name;
                 metadata.poster = data.talk.images[2].image.url;
 
-                getTedSub(video.vendor_id, function (err, data) {
-                    if (err) {
-                        console.log('[ERROR] on retrieving sub for ' + video.locator);
+                var subUrl = vendors['ted'].sub_url.replace('<id>', video.vendor_id);
+
+                console.log("retrieving subs from " + subUrl);
+                http.getJSON(subUrl, function (err, data) {
+                    if (!err && data) {
+                        metadata.timedtext = jsonToSrt(data);
                     } else {
-                        metadata.timedtext = data;
+                        console.log('[ERROR] on retrieving sub for ' + video.locator);
                     }
-                    callback(err, metadata);
+                    callback(false, metadata);
                 });
             });
             break;
@@ -465,77 +465,32 @@ exports.ajaxGetMetadata = function (req, res) {
 
 };
 
-function getVimeoSub(video_id, callback) {
-//    var subUrl = "http://www.youtube.com/api/timedtext?lang=en&format=srt&v=" + video_id;
-//    //TODO chiederli anche in altre lingue
-//    http.getRemoteFile(subUrl, callback);
-
-    callback(true, null);
-}
-
-function getDailymotionSub(video_id, callback) {
-    var subListUrl = 'https://api.dailymotion.com/video/' + video_id + '/subtitles?fields=id,language%2Curl';
-    console.log('retrieving sub list from ' + subListUrl);
-    http.getJSON(subListUrl, function (err, data) {
-        if (!err) {
-            if (data.total > 0) {
-                var subUrl = (data.list[0].url);
-                http.getRemoteFile(subUrl, callback);
-            } else {
-                console.log('no sub available');
-                callback(false, null);
-            }
-        } else {
-            callback(err, err.message);
-        }
-    });
-}
-
 function getSubtitlesTV2RDF(uuid, callback) {
     http.getRemoteFile('http://linkedtv.eurecom.fr/tv2rdf/api/mediaresource/' + uuid + '/metadata?metadataType=subtitle', callback);
 }
 
-function getYouTubeSub(video_id, callback) {
-    var subUrl = "http://www.youtube.com/api/timedtext?lang=en&format=srt&v=" + video_id;
-    //TODO chiederli anche in altre lingue
-    http.getRemoteFile(subUrl, callback);
-}
 
-function getTedSub(video_id, callback) {
-    var subListUrl = 'https://api.ted.com/v1/talks/' + video_id + '/subtitles.json?api-key=uzdyad5pnc2mv2dd8r8vd65c';
+/*
+ * This function translate subtitles from TED json to srt
+ * */
+function jsonToSrt(json) {
+    var mysrt = '';
+    var sub_offset = json._meta.preroll_offset;
 
-    jsonToSrt(subListUrl, callback);
+    for (var key in json) {
+        if (json.hasOwnProperty(key) && key != '_meta') {
+            var sub = json[key].caption;
+            var sub_startTime = sub.startTime;
+            var sub_duration = sub.duration;
+            var sub_content = sub.content;
 
-}
+            var newStart = (sub_offset + sub_startTime) / 1000;
+            var end = newStart + (sub_duration / 1000);
 
-
-function jsonToSrt(jsonUrl, callback) {
-    http.getJSON(jsonUrl, function (err, data) {
-        console.log("retrieving subs from " + jsonUrl);
-        if (err) {
-            console.log("SUB ERROR");
-            callback(err, err.message);
-        } else {
-            var mysrt = '';
-            var sub_offset = data._meta.preroll_offset;
-
-            for (key in data) {
-                if (key != '_meta') {
-                    var sub_startTime = data[key].caption.startTime;
-                    var sub_duration = data[key].caption.duration;
-                    var sub_content = data[key].caption.content;
-
-                    var newStart = (sub_offset + sub_startTime) / 1000;
-                    var end = newStart + (sub_duration / 1000);
-
-                    mysrt += ++key + '\n' + subTime(newStart) + ' --> ' + subTime(end) + '\n' + sub_content + '\n\n';
-                }
-            }
-            var myUTFsrt = encodeUTF(mysrt);
-            callback(false, myUTFsrt);
-
+            mysrt += ++key + '\n' + subTime(newStart) + ' --> ' + subTime(end) + '\n' + sub_content + '\n\n';
         }
-    });
+    }
+    return encodeUTF(mysrt);
 }
 
 function subTime(time) {
@@ -555,7 +510,6 @@ function subTime(time) {
 
     return fTime.replace(/\./g, ',');
 }
-
 
 // public method for url encoding
 function encodeUTF(string) {
@@ -615,17 +569,18 @@ function decodeUTF(utftext) {
     return string;
 }
 
-
 var vendors = {
     'youtube': {
         name: 'youtube',
         url_pattern: /(youtu.be\/|youtube.com\/(watch\?(.*&)?v=|(embed|v)\/))([^\?&\"\'>]+)/,
-        metadata_url: 'http://gdata.youtube.com/feeds/api/videos/<id>?v=2&alt=json-in-script'
+        metadata_url: 'http://gdata.youtube.com/feeds/api/videos/<id>?v=2&alt=json-in-script',
+        sub_url: 'http://www.youtube.com/api/timedtext?lang=en&format=srt&v=<id>'
     },
     'dailymotion': {
         name: 'dailymotion',
         url_pattern: /dailymotion.com\/(video|hub)\/([^_]+)/,
-        metadata_url: 'https://api.dailymotion.com/video/<id>?fields=title,thumbnail_60_url,description,views_total,bookmarks_total,comments_total,ratings_total,rating,created_time,genre'
+        metadata_url: 'https://api.dailymotion.com/video/<id>?fields=title,thumbnail_60_url,description,views_total,bookmarks_total,comments_total,ratings_total,rating,created_time,genre',
+        sub_list_url: 'https://api.dailymotion.com/video/<id>/subtitles?fields=id,language%2Curl'
     },
     'vimeo': {
         name: 'vimeo',
@@ -635,7 +590,8 @@ var vendors = {
     'ted': {
         name: 'ted',
         url_pattern: /^https?:\/\/(?:www\.)?ted\.com\/talks\/*([^?]+)/,
-        metadata_url: 'https://api.ted.com/v1/talks/<id>.json?api-key=uzdyad5pnc2mv2dd8r8vd65c'
+        metadata_url: 'https://api.ted.com/v1/talks/<id>.json?api-key=uzdyad5pnc2mv2dd8r8vd65c',
+        sub_url: 'https://api.ted.com/v1/talks/<id>/subtitles.json?api-key=uzdyad5pnc2mv2dd8r8vd65c'
     }
 };
 
