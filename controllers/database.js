@@ -30,7 +30,7 @@ exports.insert = function (video, callback) {
     video.uuid = UUID.v4();
     video.timestamp = Date.now();
     if (video.entities) {
-        video.entTimestap = Date.now();
+        video.entTimestamp = Date.now();
     }
 
     videos.insert(video, function (err, doc) {
@@ -68,7 +68,7 @@ exports.addEntities = function (uuid, entities, callback) {
             callback(err, video);
         }
         video.entities = entities;
-        video.entTimestap = Date.now();
+        video.entTimestamp = Date.now();
         update(uuid, video, callback);
     });
 

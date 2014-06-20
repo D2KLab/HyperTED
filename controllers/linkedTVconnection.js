@@ -27,7 +27,7 @@ exports.getFromUuid = function (uuid, callback) {
         }
         var bindings = data.results.bindings;
         if (bindings.length == 0) {
-            callback(true, 'No results');
+            callback(true, 'No results in sparql endpoint');
         }
 
         var locator = bindings[0].locator.value;
@@ -74,7 +74,6 @@ exports.getFromLocator = function (locator, callback) {
         }
         var bindings = data.results.bindings;
         if (bindings.length == 0) {
-            console.log("No results");
             callback(err, null);
             return;
         } else if (bindings.length == 1) {

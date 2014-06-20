@@ -32,10 +32,10 @@ function viewVideo(req, res, videoInfo) {
 
     videoInfo.videoURI = videoURI;
 
-    var areEntitiesUpdated = videoInfo.entities && !videoInfo.entitiesFromLTV && videoInfo.entTimestap
-        && videoInfo.timestamp && videoInfo.entTimestap >= videoInfo.timestamp;
+    var areEntitiesUpdated = videoInfo.entities && !videoInfo.entitiesFromLTV && videoInfo.entTimestamp
+        && videoInfo.timestamp && videoInfo.entTimestamp >= videoInfo.timestamp;
 
-    if (!enriched || (videoInfo.entities && areEntitiesUpdated) || (!videoInfo.vendor)) {
+    if (!enriched || areEntitiesUpdated || (!videoInfo.vendor)) {
         res.render('video.ejs', videoInfo);
     } else {
         getEntities(videoInfo, function (err, data) {
@@ -165,6 +165,10 @@ exports.search = function (req, resp) {
             //new video
             console.log(LOG_TAG + 'Preparing metadata for adding to db');
             var video = {locator: locator};
+            if (vendor && id) {
+                video.vendor = vendor;
+                video.vendor_id = id;
+            }
             if (locator.indexOf('http://stream17.noterik.com/') >= 0) {
                 video.videoLocator = locator + '/rawvideo/2/raw.mp4?ticket=77451bc0-e0bf-11e3-8b68-0800200c9a66';
             }
@@ -242,6 +246,7 @@ exports.nerdify = function (req, res) {
 };
 
 function getEntities(video_info, callback) {
+    console.log('nerdifing video ' + video_info.uuid);
     var doc_type, text;
     if (video_info.metadata.timedtext) {
         doc_type = 'timedtext';
@@ -281,47 +286,43 @@ function getMetadataFromSparql(video, callback) {
 }
 
 function getMetadata(video, callback) {
-    var vendor = video.vendor || detectVendor(video.locator);
-    if (!vendor) {
+    if (!video.vendor || !video.vendor_id) {
         callback(true);
         return;
     }
-    video.vendor = vendor;
-    var id = video.vendor_id || detectId(video.locator, vendor);
-    if (!id) {
-        callback(true);
-        return;
-    }
-    video.vendor_id = id;
-
     var metadata = {};
+    var vendor = vendors[video.vendor];
+    var metadata_url = vendor.metadata_url.replace('<id>', video.vendor_id);
+
+    function onErrorMetadataJson(metadata_url, callback) {
+        console.log('[ERROR] on retrieving metadata from ' + metadata_url);
+        callback(true);
+    }
 
     switch (vendor.name) {
         case 'youtube':
             async.parallel([
                 function (async_callback) {
-                    var json_url = 'http://gdata.youtube.com/feeds/api/videos/' + id + '?v=2&alt=json-in-script';
-                    http.getJSON(json_url, function (err, data) {
+                    http.getJSON(metadata_url, function (err, data) {
                         if (err) {
-                            console.log('[ERROR] on retrieving metadata from ' + json_url);
-                            async_callback(true);
-                        } else {
-                            metadata.title = data.entry.title.$t;
-                            metadata.thumb = data.entry.media$group.media$thumbnail[0].url;
-                            metadata.descr = data.entry.media$group.media$description.$t.replace(new RegExp('<br />', 'g'), '\n');
-                            metadata.views = data.entry.yt$statistics.viewCount;
-                            metadata.favourites = data.entry.yt$statistics.favoriteCount;
-                            metadata.comments = data.entry.gd$comments ? data.entry.gd$comments.gd$feedLink.countHint : 0;
-                            metadata.likes = data.entry.yt$rating ? data.entry.yt$rating.numLikes : 0;
-                            metadata.avgRate = data.entry.gd$rating ? data.entry.gd$rating.average : 0;
-                            metadata.published = data.entry.published.$t;
-                            metadata.category = data.entry.category[1].term;
-                            async_callback(false);
+                            onErrorMetadataJson(metadata_url, async_callback);
+                            return;
                         }
+                        metadata.title = data.entry.title.$t;
+                        metadata.thumb = data.entry.media$group.media$thumbnail[0].url;
+                        metadata.descr = data.entry.media$group.media$description.$t.replace(new RegExp('<br />', 'g'), '\n');
+                        metadata.views = data.entry.yt$statistics.viewCount;
+                        metadata.favourites = data.entry.yt$statistics.favoriteCount;
+                        metadata.comments = data.entry.gd$comments ? data.entry.gd$comments.gd$feedLink.countHint : 0;
+                        metadata.likes = data.entry.yt$rating ? data.entry.yt$rating.numLikes : 0;
+                        metadata.avgRate = data.entry.gd$rating ? data.entry.gd$rating.average : 0;
+                        metadata.published = data.entry.published.$t;
+                        metadata.category = data.entry.category[1].term;
+                        async_callback(false);
                     });
                 },
                 function (async_callback) {
-                    getYouTubeSub(id, function (err, data) {
+                    getYouTubeSub(video.vendor_id, function (err, data) {
                         if (err) {
                             console.log('[ERROR] on retrieving sub for ' + video.locator);
                             async_callback(true);
@@ -338,28 +339,27 @@ function getMetadata(video, callback) {
         case 'dailymotion':
             async.parallel([
                 function (async_callback) {
-                    var json_url = 'https://api.dailymotion.com/video/' + id + '?fields=title,thumbnail_60_url,description,views_total,bookmarks_total,comments_total,ratings_total,rating,created_time,genre';
-                    http.getJSON(json_url, function (err, data) {
+                    http.getJSON(metadata_url, function (err, data) {
                         if (err) {
-                            console.log('[ERROR] on retrieving metadata from ' + json_url);
-                            async_callback(true);
-                        } else {
-                            metadata.title = data.title;
-                            metadata.thumb = data.thumbnail_60_url;
-                            metadata.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
-                            metadata.views = data.views_total;
-                            metadata.favourites = data.bookmarks_total;
-                            metadata.comments = data.comments_total;
-                            metadata.likes = data.ratings_total;
-                            metadata.avgRate = data.rating;
-                            metadata.published = data.created_time;
-                            metadata.category = data.genre;
-                            async_callback(false);
+                            onErrorMetadataJson(metadata_url, async_callback);
+                            return;
                         }
+                        metadata.title = data.title;
+                        metadata.thumb = data.thumbnail_60_url;
+                        metadata.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
+                        metadata.views = data.views_total;
+                        metadata.favourites = data.bookmarks_total;
+                        metadata.comments = data.comments_total;
+                        metadata.likes = data.ratings_total;
+                        metadata.avgRate = data.rating;
+                        metadata.published = data.created_time;
+                        metadata.category = data.genre;
+                        async_callback(false);
+
                     })
                 },
                 function (async_callback) {
-                    getDailymotionSub(id, function (err, data) {
+                    getDailymotionSub(video.vendor_id, function (err, data) {
                         if (err) {
                             console.log('[ERROR] on retrieving sub for ' + video.locator);
                             async_callback(false);
@@ -376,29 +376,27 @@ function getMetadata(video, callback) {
         case 'vimeo':
             async.parallel([
                 function (async_callback) {
-                    var json_url = 'http://vimeo.com/api/v2/video/' + id + '.json';
-                    console.log('retrieving metadata from ' + json_url);
-                    http.getJSON(json_url, function (err, data) {
+                    http.getJSON(metadata_url, function (err, data) {
                         if (err) {
-                            console.log('[ERROR] on retrieving metadata from ' + json_url);
-                            async_callback(true);
-                        } else {
-                            metadata.title = data.title;
-                            metadata.thumb = data.thumbnail_small;
-                            metadata.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
-                            metadata.views = data.stats_number_of_plays;
-                            metadata.favourites = "n.a.";
-                            metadata.comments = data.stats_number_of_comments;
-                            metadata.likes = data.stats_number_of_likes;
-                            metadata.avgRate = "n.a.";
-                            metadata.published = data.upload_date;
-                            metadata.category = data.tags;
-                            async_callback(false);
+                            onErrorMetadataJson(metadata_url, async_callback);
+                            return;
                         }
+                        metadata.title = data.title;
+                        metadata.thumb = data.thumbnail_small;
+                        metadata.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
+                        metadata.views = data.stats_number_of_plays;
+                        metadata.favourites = "n.a.";
+                        metadata.comments = data.stats_number_of_comments;
+                        metadata.likes = data.stats_number_of_likes;
+                        metadata.avgRate = "n.a.";
+                        metadata.published = data.upload_date;
+                        metadata.category = data.tags;
+                        async_callback(false);
+
                     });
                 },
                 function (async_callback) {
-                    getVimeoSub(id, function (err, data) {
+                    getVimeoSub(video.vendor_id, function (err, data) {
                         if (err) {
                             console.log('[ERROR] on retrieving sub for ' + video.locator);
                             async_callback(false);
@@ -413,33 +411,30 @@ function getMetadata(video, callback) {
             });
             break;
         case 'ted':
-            var json_url = 'https://api.ted.com/v1/talks/' + id + '.json?api-key=uzdyad5pnc2mv2dd8r8vd65c';
-            console.log('retrieving metadata from ' + json_url);
             http.getJSON(json_url, function (err, data) {
                 if (err) {
-                    console.log('[ERROR] on retrieving metadata from ' + json_url);
-                    callback(true);
-                } else {
-                    video.videoLocator = data.talk.media.internal['950k'].uri;
-                    video.tedID = data.talk.id;
-                    metadata.title = data.talk.name;
-                    metadata.thumb = data.talk.images[1].image.url;
-                    metadata.descr = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
-                    metadata.views = data.talk.viewed_count;
-                    metadata.comments = data.talk.commented_count;
-                    metadata.published = data.talk.published_at;
-                    metadata.event = data.talk.event.name;
-                    metadata.poster = data.talk.images[2].image.url;
-
-                    getTedSub(video.tedID, function (err, data) {
-                        if (err) {
-                            console.log('[ERROR] on retrieving sub for ' + video.locator);
-                        } else {
-                            metadata.timedtext = data;
-                        }
-                        callback(err, metadata);
-                    });
+                    onErrorMetadataJson(metadata_url, callback);
+                    return;
                 }
+                video.videoLocator = data.talk.media.internal['950k'].uri;
+                video.vendor_id = data.talk.id;
+                metadata.title = data.talk.name;
+                metadata.thumb = data.talk.images[1].image.url;
+                metadata.descr = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
+                metadata.views = data.talk.viewed_count;
+                metadata.comments = data.talk.commented_count;
+                metadata.published = data.talk.published_at;
+                metadata.event = data.talk.event.name;
+                metadata.poster = data.talk.images[2].image.url;
+
+                getTedSub(video.vendor_id, function (err, data) {
+                    if (err) {
+                        console.log('[ERROR] on retrieving sub for ' + video.locator);
+                    } else {
+                        metadata.timedtext = data;
+                    }
+                    callback(err, metadata);
+                });
             });
             break;
         default :
@@ -621,45 +616,48 @@ function decodeUTF(utftext) {
 }
 
 
-var vendors = [
-    {
-        code: 1,
+var vendors = {
+    'youtube': {
         name: 'youtube',
-        url_pattern: /(youtu.be\/|youtube.com\/(watch\?(.*&)?v=|(embed|v)\/))([^\?&\"\'>]+)/
+        url_pattern: /(youtu.be\/|youtube.com\/(watch\?(.*&)?v=|(embed|v)\/))([^\?&\"\'>]+)/,
+        metadata_url: 'http://gdata.youtube.com/feeds/api/videos/<id>?v=2&alt=json-in-script'
     },
-    {
-        code: 2,
+    'dailymotion': {
         name: 'dailymotion',
-        url_pattern: /dailymotion.com\/(video|hub)\/([^_]+)/
+        url_pattern: /dailymotion.com\/(video|hub)\/([^_]+)/,
+        metadata_url: 'https://api.dailymotion.com/video/<id>?fields=title,thumbnail_60_url,description,views_total,bookmarks_total,comments_total,ratings_total,rating,created_time,genre'
     },
-    {
-        code: 3,
+    'vimeo': {
         name: 'vimeo',
-        url_pattern: /(www.)?(player.)?vimeo.com\/([a-z]*\/)*([0-9]{6,11})[?]?.*/
+        url_pattern: /(www.)?(player.)?vimeo.com\/([a-z]*\/)*([0-9]{6,11})[?]?.*/,
+        metadata_url: 'http://vimeo.com/api/v2/video/<id>.json'
     },
-    {
-        code: 4,
+    'ted': {
         name: 'ted',
-        url_pattern: /^https?:\/\/(?:www\.)?ted\.com\/talks\/*([^?]+)/
+        url_pattern: /^https?:\/\/(?:www\.)?ted\.com\/talks\/*([^?]+)/,
+        metadata_url: 'https://api.ted.com/v1/talks/<id>.json?api-key=uzdyad5pnc2mv2dd8r8vd65c'
     }
-];
+};
 
 function detectVendor(url) {
-    var v;
-    for (v in vendors) {
+    for (var v in vendors) {
+        if (!vendors.hasOwnProperty(v)) continue;
+
         var vend = vendors[v];
         if (url.match(vend.url_pattern))
-            return vend;
+            return v;
     }
     return undefined;
 }
 
-function detectId(url, vendor) {
-    if (vendor && vendor.url_pattern) {
-        var matches = url.match(vendor.url_pattern);
-        return matches[matches.length-1];
-    }
-    return undefined;
+function detectId(url, v) {
+    if (!v) return undefined;
+
+    var vendor = vendors[v];
+    if (!vendor.url_pattern) return undefined;
+
+    var matches = url.match(vendor.url_pattern);
+    return matches[matches.length - 1];
 }
 
 http.getJSON = function (url, callback) {
