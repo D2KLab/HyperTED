@@ -518,7 +518,7 @@ html, body {
     display: inline-block;
 }
 
-.chap-label span.selected-chap-num, .chap-label span.total-chap-num {
+.chap-label span.selected-chap-num, .chap-label span.first-part, .chap-label span.last-part {
     font-family: CaviarDreams, Helvetica, sans-serif;
     font-size: 2.6em;
 }
@@ -610,10 +610,6 @@ html, body {
     z-index: 1;
 }
 
-.chap-line .chap-link:hover .chap-num {
-    opacity: 0.1;
-}
-
 .chap-line .chap-link:hover .chap-timing {
     z-index: 2;
     -moz-box-shadow: 0 2px 8px 0 #5d5d5d;
@@ -623,6 +619,10 @@ html, body {
 
 .chap-line .chap-link:hover, .chap-line .chap-link.selected-chap {
     background-color: rgba(223, 175, 170, 0.82);
+}
+
+.chap-line .chap-link:hover .chap-num, .chap-line .chap-link.selected-chap .chap-num {
+    opacity: 0.1;
 }
 
 .chap-line .chap-link:hover .chap-timing, .chap-line .chap-link.selected-chap .chap-timing {

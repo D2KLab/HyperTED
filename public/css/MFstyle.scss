@@ -295,7 +295,7 @@ $navbarTransitionTime: 100ms;
   text-align: center;
   span {
     display: inline-block;
-    &.selected-chap-num, &.total-chap-num {
+    &.selected-chap-num, &.first-part, &.last-part {
       font: {
         family: CaviarDreams, Helvetica, sans-serif;
         size: 2.6em;
@@ -378,9 +378,6 @@ $navbarTransitionTime: 100ms;
       }
     }
     &:hover {
-      .chap-num {
-        opacity: 0.1;
-      }
       .chap-timing {
         z-index: 2;
         @include box-shadow(0, 2px, 8px, 0, $dark_gray);
@@ -389,7 +386,9 @@ $navbarTransitionTime: 100ms;
 
     &:hover, &.selected-chap {
       background-color: rgba(223, 175, 170, 0.82);
-
+      .chap-num {
+        opacity: 0.1;
+      }
       .chap-timing {
         cursor: pointer;
         width: 100%;
