@@ -99,10 +99,15 @@
                         var chapterList = chapters;
 
                         subIndex = 0;
+                        var chapNum = 0;
                         chapterList.forEach(function (chap) {
                             var chapStart = Math.round(chap.tStart.value), chapEnd = Math.round(chap.tEnd.value);
+                            ++chapNum;
+
                             while (subIndex < subList.length) {
                                 var thisSub = subList[subIndex];
+                                thisSub.chapNum = chapNum;
+
                                 if (!thisSub.id || thisSub.id == '') {
                                     subIndex++;
                                 } else {
@@ -128,18 +133,17 @@
                     }
 
                     var newChap = true;
-                    var chapNum = 0;
+
                         subList.forEach(function(sub){
                         if (sub.dataChap && newChap) {
                     newChap = false;
-                    chapNum++;
                 %>
                 <div class="subChapGroup" <%= sub.dataChap %>>
 
 
                     <p class="chap-title">chapter n&#176;
 
-                        <%= chapNum %></p>
+                        <%= sub.chapNum %></p>
                     <%
                     }
                     %>
