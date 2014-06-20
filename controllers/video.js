@@ -13,10 +13,8 @@ ts.prepare();
 
 
 function viewVideo(req, res, videoInfo) {
-    var videoURI = videoInfo.videoLocator || videoInfo.locator;
-
     var enriched = req.query.enriched;
-    videoInfo.enriched = enriched;
+    var videoURI = videoInfo.videoLocator || videoInfo.locator;
 
     var concSign = url.parse(videoURI).hash ? '&' : '#';
     var t = req.query.t;
@@ -30,24 +28,32 @@ function viewVideo(req, res, videoInfo) {
 //        concSign = '&';
     }
 
-    videoInfo.videoURI = videoURI;
+    var options = {
+        videoURI: videoURI,
+        enriched: enriched
+    };
 
     var areEntitiesUpdated = videoInfo.entities && !videoInfo.entitiesFromLTV && videoInfo.entTimestamp
         && videoInfo.timestamp && videoInfo.entTimestamp >= videoInfo.timestamp;
 
     if (!enriched || areEntitiesUpdated || (!videoInfo.vendor)) {
-        res.render('video.ejs', videoInfo);
+        renderVideo(res, videoInfo, options);
     } else {
         getEntities(videoInfo, function (err, data) {
             if (err) {
                 console.log(LOG_TAG + 'error in getEntity: ' + err.message);
-                videoInfo.error = "Sorry. We are not able to retrieving NERD entities now.";
+                options.error = "Sorry. We are not able to retrieving NERD entities now.";
             } else {
                 videoInfo.entities = data;
             }
-            res.render('video.ejs', videoInfo);
+            renderVideo(res, videoInfo, options);
         });
     }
+}
+
+function renderVideo(res, video, options){
+    var source = mergeObj(video, options);
+    res.render('video.ejs', source);
 }
 
 exports.view = function (req, res) {
