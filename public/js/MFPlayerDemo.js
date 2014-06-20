@@ -269,13 +269,17 @@ $(document).ready(function () {
 
             $(this).on('click', function () {
                 $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
+                var chapNumLast = $('.chap-link').last('.chap-num')[0].innerText;
+                var chapNum = $(this).children('.chap-num')[0].innerText;
 
                 $('.chap-link').removeClass('selected-chap');
+
+
+                console.log($('.chap-link').last('.chap-num'));
+                $('.first-part').text("chapter ");
+                $('.selected-chap-num').text(" " + chapNum + " ");
+                $('.last-part').text(" of " + chapNumLast);
                 $(this).addClass('selected-chap');
-                var chapNum = $(this).children('.chap-num')[0].innerText;
-                var chapNumLast = $('.chap-link').last('.chap-num')[0].innerText;
-                $('.total-chap-num').text("° chapter of " + chapNumLast);
-                $('.selected-chap-num').text(chapNum);
 
                 updateMFurl();
             });
