@@ -694,34 +694,42 @@ exports.buildDb = function (req, res) {
             var total = data.counts.total, current = data.counts.this;
             if (current != 0) {
                 var talksList = data.talks;
-                var i = 0;
-                var talk = talksList[i].talk;
-                index = talk.id;
+                var i = -1, index = 0;
+                talksLoop();
 
-                db.getFromVendorId('ted', index, function (err, data) {
-                    if (!err && data && data.entities)return; //video already in db
+                function talksLoop() {
+                    i++;
+                    if (i == current) {
+                        console.log("loaded video until " + index);
 
-                    var talksLoop = setInterval(function () {
-                        loadVideo(index);
-
-                        i++;
-                        if (i == current) {
-                            clearInterval(talksLoop);
-                            console.log("loaded video until " + index);
-
-                            if (total > current) {
-                                res.send('loaded video until' + index);
-                                setTimeout(function () {
-                                    //                loadList(index);
-                                }, limitQps);
-                            } else {
-                                res.send('Db builded successfully');
-                            }
+                        if (total > current) {
+                            res.send('loaded video until' + index);
+                            setTimeout(function () {
+                                loadList(index);
+                            }, limitQps);
+                        } else {
+                            res.send('Db builded successfully');
                         }
-                    }, limitQps);
-                });
+                    }
+
+                    var talk = talksList[i].talk;
+                    index = talk.id;
+
+                    db.getFromVendorId('ted', index, function (err, data) {
+                        if (!err && data && data.entities) { //video already in db
+                            talksLoop();
+                            return;
+                        }
+
+                        setTimeout(function () {
+                            loadVideo(index);
+                            talksLoop();
+                        }, limitQps);
+                    });
+                }
             }
         });
+
     }
 
     function loadVideo(index) {
