@@ -752,6 +752,8 @@ exports.buildDb = function (req, res) {
                 video.metadata = metadata;
             }
 
+            db.insert(video);
+
             //nerdify
             if (video.metadata.timedtext) {
                 nerd.getEntities('timedtext', video.metadata.timedtext, function (err, data) {
@@ -760,13 +762,8 @@ exports.buildDb = function (req, res) {
                         console.log(err);
                         return;
                     }
-                    video.entities = data;
-                    video.entTimestamp = Date.now();
-
-                    db.insert(video);
+                    db.addEntities(video.uuid, data, function(){});
                 });
-            } else {
-                db.insert(video);
             }
         });
     }
