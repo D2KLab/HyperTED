@@ -680,7 +680,7 @@ function mergeObj() {
 
 
 exports.buildDb = function (req, res) {
-    var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=10&filter=id:>';
+    var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=100&filter=id:>';
     var limitQps = 10200;
     loadList(0);
 
@@ -705,13 +705,14 @@ exports.buildDb = function (req, res) {
                         console.log("loaded video until " + index);
 
                         if (total > current) {
-                            res.send('loaded video until ' + index);
                             setTimeout(function () {
                                 loadList(index);
                             }, limitQps);
                         } else {
                             res.send('Db builded successfully');
                         }
+
+                        return;
                     }
 
                     var talk = talksList[i].talk;
