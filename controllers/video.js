@@ -51,7 +51,7 @@ function viewVideo(req, res, videoInfo) {
     }
 }
 
-function renderVideo(res, video, options){
+function renderVideo(res, video, options) {
     var source = mergeObj(video, options);
     res.render('video.ejs', source);
 }
@@ -300,9 +300,9 @@ function getMetadata(video, callback) {
     var vendor = vendors[video.vendor];
     var metadata_url = vendor.metadata_url.replace('<id>', video.vendor_id);
 
-    function onErrorMetadataJson(metadata_url, callback) {
+    function onErrorMetadataJson(err, metadata_url, callback) {
         console.log('[ERROR] on retrieving metadata from ' + metadata_url);
-        callback(true);
+        callback(err);
     }
 
     switch (vendor.name) {
@@ -312,7 +312,7 @@ function getMetadata(video, callback) {
                     //retrieve metadata
                     http.getJSON(metadata_url, function (err, data) {
                         if (err) {
-                            onErrorMetadataJson(metadata_url, async_callback);
+                            onErrorMetadataJson(err, metadata_url, async_callback);
                             return;
                         }
                         metadata.title = data.entry.title.$t;
@@ -349,7 +349,7 @@ function getMetadata(video, callback) {
                 function (async_callback) {
                     http.getJSON(metadata_url, function (err, data) {
                         if (err) {
-                            onErrorMetadataJson(metadata_url, async_callback);
+                            onErrorMetadataJson(err, metadata_url, async_callback);
                             return;
                         }
                         metadata.title = data.title;
@@ -397,7 +397,7 @@ function getMetadata(video, callback) {
         case 'vimeo':
             http.getJSON(metadata_url, function (err, data) {
                 if (err) {
-                    onErrorMetadataJson(metadata_url, callback);
+                    onErrorMetadataJson(err, metadata_url, callback);
                     return;
                 }
                 metadata.title = data.title;
@@ -416,28 +416,29 @@ function getMetadata(video, callback) {
         case 'ted':
             http.getJSON(metadata_url, function (err, data) {
                 if (err) {
-                    onErrorMetadataJson(metadata_url, callback);
+                    onErrorMetadataJson(err, metadata_url, callback);
                     return;
                 }
-                video.videoLocator = data.talk.media.internal['950k'].uri;
-                video.vendor_id = data.talk.id;
-                metadata.title = data.talk.name;
-                metadata.thumb = data.talk.images[1].image.url;
-                metadata.descr = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
-                metadata.views = data.talk.viewed_count;
-                metadata.comments = data.talk.commented_count;
-                metadata.published = data.talk.published_at;
-                metadata.event = data.talk.event.name;
-                metadata.poster = data.talk.images[2].image.url;
+                var datatalk = data.talk;
+                video.videoLocator = datatalk.media.internal ? datatalk.media.internal['950k'].uri : datatalk.media.external.uri;
+                video.vendor_id = datatalk.id;
+                metadata.title = datatalk.name;
+                metadata.thumb = datatalk.images[1].image.url;
+                metadata.descr = datatalk.description.replace(new RegExp('<br />', 'g'), '\n');
+                metadata.views = datatalk.viewed_count;
+                metadata.comments = datatalk.commented_count;
+                metadata.published = datatalk.published_at;
+                metadata.event = datatalk.event.name;
+                metadata.poster = datatalk.images[2].image.url;
 
                 var subUrl = vendors['ted'].sub_url.replace('<id>', video.vendor_id);
 
-                console.log("retrieving subs from " + subUrl);
+//                console.log("retrieving subs from " + subUrl);
                 http.getJSON(subUrl, function (err, data) {
                     if (!err && data) {
                         metadata.timedtext = jsonToSrt(data);
                     } else {
-                        console.log('[ERROR] on retrieving sub for ' + video.locator);
+                        console.log('[ERROR ' + err + '] on retrieving sub for ' + video.locator);
                     }
                     callback(false, metadata);
                 });
@@ -641,7 +642,7 @@ http.getRemoteFile = function (url, callback) {
 
     protocol.get(url, function (res) {
         if (res.statusCode != 200) {
-            callback(true, res.statusCode);
+            callback(res.statusCode, res.statusCode);
             return;
         }
 
@@ -677,3 +678,97 @@ function mergeObj() {
     }
     return mObj;
 }
+
+
+exports.buildDb = function (req, res) {
+    var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=100&filter=id:>';
+    var limitQps = 10200;
+    loadList(0);
+
+    function loadList(index) {
+        http.getJSON(TEDListQuery + index, function (err, data) {
+            if (err || !data) {
+                console.log(err.message);
+                res.send("A problem occurred", 500);
+                return;
+            }
+            var total = data.counts.total, current = data.counts.this;
+            if (current != 0) {
+                var talksList = data.talks;
+                var i = -1, index = 0;
+                talksLoop();
+
+                function talksLoop() {
+                    console.log("loaded video" + index);
+
+                    i++;
+                    if (i == current) {
+                        console.log("loaded video until " + index);
+
+                        if (total > current) {
+                            setTimeout(function () {
+                                loadList(index);
+                            }, limitQps);
+                        } else {
+                            res.send('Db builded successfully');
+                        }
+
+                        return;
+                    }
+
+                    var talk = talksList[i].talk;
+                    index = talk.id;
+
+                    db.getFromVendorId('ted', index, function (err, data) {
+                        if (!err && data && data.entities) { //video already in db
+                            talksLoop();
+                            return;
+                        }
+
+                        setTimeout(function () {
+                            loadVideo(index);
+                            talksLoop();
+                        }, limitQps);
+                    });
+                }
+            }
+        });
+
+    }
+
+    function loadVideo(index) {
+        var video = {
+            locator: 'www.ted.com/talks/' + index,
+            vendor: 'ted',
+            vendor_id: index
+        };
+
+        getMetadata(video, function (err, metadata) {
+            if (err) {
+                console.log(LOG_TAG + 'Metadata retrieved with errors.');
+                console.log(LOG_TAG + err);
+            }
+            if (!metadata) {
+                console.log(LOG_TAG + 'Metadata unavailable.');
+            } else {
+                video.metadata = metadata;
+            }
+
+            db.insert(video);
+
+            //nerdify
+            if (video.metadata.timedtext) {
+                nerd.getEntities('timedtext', video.metadata.timedtext, function (err, data) {
+                    if (err || !data) {
+                        console.log(LOG_TAG + 'Error in nerd retrieving for ' + video.locator);
+                        console.log(err);
+                        return;
+                    }
+                    db.addEntities(video.uuid, data, function () {
+                    });
+                });
+            }
+        });
+    }
+};
+

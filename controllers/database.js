@@ -32,6 +32,7 @@ exports.insert = function (video, callback) {
     if (video.entities) {
         video.entTimestamp = Date.now();
     }
+    callback = callback || function(){};
 
     videos.insert(video, function (err, doc) {
         if (err) {

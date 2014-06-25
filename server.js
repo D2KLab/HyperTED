@@ -16,6 +16,7 @@ app.get('/nerdify', video.nerdify);
 app.get('/video/:uuid', video.view);
 app.get('/metadata/:uuid', video.ajaxGetMetadata);
 app.get('/video?', video.search);
+app.get('/builddb', video.buildDb);
 app.get('/', function (req, res) {
     res.render('welcome.ejs')
 });
