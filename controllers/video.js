@@ -419,16 +419,17 @@ function getMetadata(video, callback) {
                     onErrorMetadataJson(err, metadata_url, callback);
                     return;
                 }
-                video.videoLocator = data.talk.media.internal['950k'].uri;
-                video.vendor_id = data.talk.id;
-                metadata.title = data.talk.name;
-                metadata.thumb = data.talk.images[1].image.url;
-                metadata.descr = data.talk.description.replace(new RegExp('<br />', 'g'), '\n');
-                metadata.views = data.talk.viewed_count;
-                metadata.comments = data.talk.commented_count;
-                metadata.published = data.talk.published_at;
-                metadata.event = data.talk.event.name;
-                metadata.poster = data.talk.images[2].image.url;
+                var datatalk = data.talk;
+                video.videoLocator = datatalk.media.internal ? datatalk.media.internal['950k'].uri : datatalk.media.external.uri;
+                video.vendor_id = datatalk.id;
+                metadata.title = datatalk.name;
+                metadata.thumb = datatalk.images[1].image.url;
+                metadata.descr = datatalk.description.replace(new RegExp('<br />', 'g'), '\n');
+                metadata.views = datatalk.viewed_count;
+                metadata.comments = datatalk.commented_count;
+                metadata.published = datatalk.published_at;
+                metadata.event = datatalk.event.name;
+                metadata.poster = datatalk.images[2].image.url;
 
                 var subUrl = vendors['ted'].sub_url.replace('<id>', video.vendor_id);
 
@@ -763,7 +764,8 @@ exports.buildDb = function (req, res) {
                         console.log(err);
                         return;
                     }
-                    db.addEntities(video.uuid, data, function(){});
+                    db.addEntities(video.uuid, data, function () {
+                    });
                 });
             }
         });
