@@ -698,12 +698,14 @@ exports.buildDb = function (req, res) {
                 talksLoop();
 
                 function talksLoop() {
+                    console.log("loaded video" + index);
+
                     i++;
                     if (i == current) {
                         console.log("loaded video until " + index);
 
                         if (total > current) {
-                            res.send('loaded video until' + index);
+                            res.send('loaded video until ' + index);
                             setTimeout(function () {
                                 loadList(index);
                             }, limitQps);
