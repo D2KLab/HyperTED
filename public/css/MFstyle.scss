@@ -45,22 +45,19 @@ html, body {
   background: white;
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
   margin: 0 0 30px;
-  min-height: 40%;
+  max-height: 40%;
   width: 100%;
 
   .HTlogo {
     text-align: center;
-    padding-top: 100px;
+    padding: 10% 0;
+    img {
+      max-width: 40%;
+    }
   }
 }
 
-.container {
-  min-height: 50%;
-
-}
-
 .home_footer, .video_footer {
-
   width: 100%;
   .foo {
     text-align: center;
@@ -69,18 +66,18 @@ html, body {
     }
     .eurecomLogo, .mediamixerLogo {
       display: inline-block;
-      margin-top: 0.5em;
       img {
-        width: 75%;
+        //        max-height: 74%;
+        //        width: auto;
+        padding-right: 20px;
       }
     }
-    h1 {
-      margin: 0;
-    }
+
   }
 }
 
 .home_footer {
+  max-height: 15%;
   background: white;
   position: absolute;
   bottom: 0;
@@ -90,8 +87,10 @@ html, body {
   margin-top: 50px;
   .eurecomLogo, .mediamixerLogo {
     img {
-      width: 55%;
-      height: auto;
+      padding: 4px 0;
+      height: 55px;
+      width: auto;
+
     }
   }
 }
@@ -103,26 +102,57 @@ $navbarTransitionTime: 100ms;
   margin-bottom: 0;
   position: fixed;
   z-index: 100;
-  @media (min-width: 768px) {
-    height: 96px;
-  }
   width: 100%;
 
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
   @include border-radius(0);
   @include transition(height, $navbarTransitionTime);
 
-  .navbar-brand {
-    position: relative;
+  @media (min-width: 768px) {
     height: 96px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+
+    .navbar-brand {
+      position: relative;
+      height: 96px;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      .top-brand {
+        img {
+
+          @media(min-width: 320px) {
+            padding-bottom: 8px;
+            height: auto;
+            width: auto;
+          }
+        }
+      }
+    }
+    .form-group {
+      padding-top: 23px;
+      max-width: 300px;
+      @include transition(padding, $navbarTransitionTime);
+    }
+
+  }
+
+  .navbar-brand {
+    top: -7px;
+    height: 40px;
+  }
+  .top-brand {
+    img {
+      height: 30px;
+    }
+    .logo-text {
+      width: 54px;
+    }
+    .left-mark, .right-mark {
+      width: 31px;
+    }
   }
   .form-group {
-    padding-top: 23px;
-    max-width: 300px;
-    @include transition(padding, $navbarTransitionTime);
+    padding-top: 0;
   }
 
   &.compact {
@@ -135,7 +165,7 @@ $navbarTransitionTime: 100ms;
     }
     .top-brand {
       img {
-        height: 30px;
+        height: auto;
       }
       .logo-text {
         width: 54px;
@@ -210,6 +240,11 @@ $navbarTransitionTime: 100ms;
       }
       .displayEntity {
         @extend .clearfix;
+        text-align: center;
+        li {
+
+          display: inline-block;
+        }
       }
     }
   }
@@ -234,6 +269,17 @@ $navbarTransitionTime: 100ms;
   text-align: left;
 }
 
+h1.title {
+  @media(max-width: 320px) {
+    font-size: 200%;
+    margin: 0;
+  }
+  @media(max-width: 240px) {
+    font-size: 150%;
+    margin: 0;
+  }
+}
+
 #player-sect {
   background: #000000;
   width: 100%;
@@ -256,13 +302,13 @@ $navbarTransitionTime: 100ms;
       font-weight: bold;
 
       @media (max-width: 767px) {
-        font-size: 2em;
+        display: none;
       }
     }
     .stat {
       width: 100%;
       overflow: visible;
-      @media(max-width: 892px) {
+      @media(max-width: 767px) {
         display: none;
       }
     }
@@ -507,9 +553,45 @@ div.chapterscontent {
 
 }
 
+span.wiki {
+  a {
+    color: #fff;
+  }
+}
+
 #related-frags {
   background: #fff;
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
+  width: 100%;
+  .play-video-info {
+    padding: 20px;
+    margin-top: 0;
+
+    .left {
+      float: left;
+      width: 48%;
+      display: inline-block;
+      h3 {
+        font-weight: 700;
+      }
+      @media(max-width: 860px) {
+        width: 100%;
+        text-align: center;
+      }
+    }
+    .right {
+      float: right;
+      display: inline-block;
+      width: 50%;
+      border-left: 1px solid $dark_red;
+      padding-left: 2%;
+      @media(max-width: 860px) {
+        width: 100%;
+        border-top: 1px solid $dark_red;
+        border-left: 0;
+      }
+    }
+  }
 }
 
 div.descr-cont {
@@ -586,7 +668,9 @@ p {
 }
 
 .entity {
-
+  &.list {
+    margin-left: 24px;
+  }
   cursor: pointer;
   @include border-radius(5px);
   @include border-box-sizing;
@@ -681,17 +765,20 @@ p {
 
 #sub-cont {
   clear: both;
-  margin-bottom: 50px;
+  margin-bottom: 40px;
 }
 
 .sub-text {
   border: 1px solid $light_gray;
   background-color: $light_gray;
   margin: 5px 0;
-  height: 200px;
+  height: 550px;
   overflow: auto;
   resize: vertical;
   font-weight: 400;
+  @media(max-height: 568px) {
+    height: 275px;
+  }
 
   p {
     font-size: 0.9em;

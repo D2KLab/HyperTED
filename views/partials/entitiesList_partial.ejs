@@ -43,28 +43,24 @@
                         var typeName = type.split('#')[1];
                         var entTypeList = typeList[type];
                     %>
-                    <h3 class="title"><%= entTypeList.length %> <%= typeName %></h3>
-                    <ul class="displayEntity">
-                        <% entTypeList.forEach(function (ent) {
-                            var href = ent.uri ? 'href=' + ent.uri + ' target="_blank"' : '';
-                            var href2 = ""; //FIXME is empty for debug purpose
-                        %>
-                        <div class="col-md-6">
-                            <li><span class="entity <%= typeName.toLowerCase() %>">
-                    <a <%= href2 %> data-start-time="<%= ent.startNPT %>" data-end-time="<%= ent.endNPT %>">
-                        #<%= ent.label %>
+                    <div class="entity-grouped-by-type">
+                        <h3 class="title"><%= entTypeList.length %> <%= typeName %></h3>
+                        <ul class="displayEntity">
+                            <% entTypeList.forEach(function (ent) {
+                                var href = ent.uri ? 'href=' + ent.uri + ' target="_blank"' : '';
+                            %>
+
+                            <li><span class="entity list <%= typeName.toLowerCase() %>">
+                    <a <%= href %> >
+                    #<%= ent.label %>
                     </a>
-                           </span></li>
-                        </div>
-                        <div class="col-md-6">
+                           </span>
 
-                            <a <%= href %> >
-                                #WIKI
-                            </a>
-                        </div>
+                            </li>
 
-                        <% }) %>
+                            <% }) %>
                     </ul>
+                    </div>
                     <% } %>
                 </div>
             </div>
