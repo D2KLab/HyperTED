@@ -24,14 +24,7 @@ exports.getFromVendorId = function (vendor, id, callback) {
         callback(true);
         return;
     }
-        console.log(vendor, id);
-
-    videos.findOne({'vendor': vendor, 'vendor_id': id}).on('success', function(err, data){
-        console.log(err);
-        console.log(data);
-                callback(err,data);
-
-    });
+    videos.findOne({'vendor': vendor, 'vendor_id': id}).on('complete', callback);
 };
 
 exports.insert = function (video, callback) {
@@ -69,14 +62,14 @@ function update(uuid, newVideo, callback) {
 }
 exports.update = update;
 
-exports.updateVideo = function(newVideo, callback) {
+exports.updateVideo = function (newVideo, callback) {
     videos.update({uuid: newVideo.uuid}, newVideo, function (err, doc) {
         if (err) {
             console.log('DB update fail. ' + JSON.stringify(err));
         }
         callback(err, doc);
     });
-}
+};
 
 
 exports.addEntities = function (uuid, entities, callback) {

@@ -95,7 +95,8 @@ exports.view = function (req, res) {
                     video.timestamp = Date.now();
                     db.update(uuid, video, function (err) {
                         if (err) {
-                            console.log("DATABASE ERROR" + JSON.stringify(err));
+                            console.log("DATABASE ERROR");
+                            console.log(err);
                             console.log("Can not update");
                         }
                     });
@@ -144,7 +145,8 @@ exports.search = function (req, resp) {
 
     db.getFromLocator(locator, function (err, data) {
         if (err) { //db error
-            console.log("DATABASE ERROR" + JSON.stringify(err));
+            console.log("DATABASE ERROR");
+            console.log(err);
             resp.render('error.ejs', errorMsg.e500);
             return;
         }
@@ -422,7 +424,7 @@ function getMetadata(video, callback) {
                 }
                 var datatalk = data.talk;
                 video.videoLocator = datatalk.media.internal ? datatalk.media.internal['950k'].uri : datatalk.media.external.uri;
-                video.vendor_id = datatalk.id;
+                video.vendor_id = String(datatalk.id);
                 metadata.title = datatalk.name;
                 metadata.thumb = datatalk.images[1].image.url;
                 metadata.descr = datatalk.description.replace(new RegExp('<br />', 'g'), '\n');
@@ -621,7 +623,7 @@ function detectId(url, v) {
     if (!vendor.url_pattern) return undefined;
 
     var matches = url.match(vendor.url_pattern);
-    return matches[matches.length - 1];
+    return String(matches[matches.length - 1]);
 }
 
 http.getJSON = function (url, callback) {
@@ -682,7 +684,7 @@ function mergeObj() {
 
 
 exports.buildDb = function (req, res) {
-    var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=100&filter=id:>';
+    var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=10&filter=id:>';
     var limitQps = 10200;
     loadList(936);
 
@@ -708,7 +710,7 @@ exports.buildDb = function (req, res) {
 
                         if (total > current) {
                             setTimeout(function () {
-                                loadList(index);
+                                //loadList(index);
                             }, limitQps);
                         } else {
                             res.send('Db builded successfully');
@@ -718,7 +720,7 @@ exports.buildDb = function (req, res) {
                     }
 
                     var talk = talksList[i].talk;
-                    index = talk.id;
+                    index = String(talk.id);
 
                     db.getFromVendorId('ted', index, function (err, data) {
                         if (!err && data && data.entities) { //video already in db
@@ -755,7 +757,7 @@ exports.buildDb = function (req, res) {
                 console.log(LOG_TAG + 'Metadata unavailable.');
             } else {
                 video.metadata = metadata;
-            }
+            }       
 
             var fun = uuid? db.updateVideo : db.insert;
 
