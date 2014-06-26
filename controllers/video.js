@@ -95,7 +95,8 @@ exports.view = function (req, res) {
                     video.timestamp = Date.now();
                     db.update(uuid, video, function (err) {
                         if (err) {
-                            console.log("DATABASE ERROR" + JSON.stringify(err));
+                            console.log("DATABASE ERROR");
+                            console.log(err);
                             console.log("Can not update");
                         }
                     });
@@ -144,7 +145,8 @@ exports.search = function (req, resp) {
 
     db.getFromLocator(locator, function (err, data) {
         if (err) { //db error
-            console.log("DATABASE ERROR" + JSON.stringify(err));
+            console.log("DATABASE ERROR");
+            console.log(err);
             resp.render('error.ejs', errorMsg.e500);
             return;
         }
@@ -621,7 +623,7 @@ function detectId(url, v) {
     if (!vendor.url_pattern) return undefined;
 
     var matches = url.match(vendor.url_pattern);
-    return matches[matches.length - 1];
+    return String(matches[matches.length - 1]);
 }
 
 http.getJSON = function (url, callback) {
