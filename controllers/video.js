@@ -95,7 +95,8 @@ exports.view = function (req, res) {
                     video.timestamp = Date.now();
                     db.update(uuid, video, function (err) {
                         if (err) {
-                            console.log("DATABASE ERROR" + JSON.stringify(err));
+                            console.log("DATABASE ERROR");
+                            console.log(err);
                             console.log("Can not update");
                         }
                     });
@@ -144,7 +145,8 @@ exports.search = function (req, resp) {
 
     db.getFromLocator(locator, function (err, data) {
         if (err) { //db error
-            console.log("DATABASE ERROR" + JSON.stringify(err));
+            console.log("DATABASE ERROR");
+            console.log(err);
             resp.render('error.ejs', errorMsg.e500);
             return;
         }
@@ -159,6 +161,7 @@ exports.search = function (req, resp) {
 
         var vendor = detectVendor(locator);
         var id = detectId(locator, vendor);
+
         db.getFromVendorId(vendor, id, function (err, data) {
             if (!err && data) {
                 var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
@@ -421,7 +424,7 @@ function getMetadata(video, callback) {
                 }
                 var datatalk = data.talk;
                 video.videoLocator = datatalk.media.internal ? datatalk.media.internal['950k'].uri : datatalk.media.external.uri;
-                video.vendor_id = datatalk.id;
+                video.vendor_id = String(datatalk.id);
                 metadata.title = datatalk.name;
                 metadata.thumb = datatalk.images[1].image.url;
                 metadata.descr = datatalk.description.replace(new RegExp('<br />', 'g'), '\n');
@@ -620,7 +623,7 @@ function detectId(url, v) {
     if (!vendor.url_pattern) return undefined;
 
     var matches = url.match(vendor.url_pattern);
-    return matches[matches.length - 1];
+    return String(matches[matches.length - 1]);
 }
 
 http.getJSON = function (url, callback) {
@@ -681,25 +684,25 @@ function mergeObj() {
 
 
 exports.buildDb = function (req, res) {
-    var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=100&filter=id:>';
+    var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=10&filter=id:>';
     var limitQps = 10200;
-    loadList(0);
+    loadList(936);
 
     function loadList(index) {
         http.getJSON(TEDListQuery + index, function (err, data) {
             if (err || !data) {
-                console.log(err.message);
+                console.log(err);
                 res.send("A problem occurred", 500);
                 return;
             }
             var total = data.counts.total, current = data.counts.this;
             if (current != 0) {
                 var talksList = data.talks;
-                var i = -1, index = 0;
+                var i = -1;
                 talksLoop();
 
                 function talksLoop() {
-                    console.log("loaded video" + index);
+                    console.log("loaded video " + index);
 
                     i++;
                     if (i == current) {
@@ -707,7 +710,7 @@ exports.buildDb = function (req, res) {
 
                         if (total > current) {
                             setTimeout(function () {
-                                loadList(index);
+                                //loadList(index);
                             }, limitQps);
                         } else {
                             res.send('Db builded successfully');
@@ -717,16 +720,18 @@ exports.buildDb = function (req, res) {
                     }
 
                     var talk = talksList[i].talk;
-                    index = talk.id;
+                    index = String(talk.id);
 
                     db.getFromVendorId('ted', index, function (err, data) {
                         if (!err && data && data.entities) { //video already in db
                             talksLoop();
                             return;
                         }
+                        var uuid;
+                        if(data) uuid = data.uuid;
 
                         setTimeout(function () {
-                            loadVideo(index);
+                            loadVideo(index, uuid);
                             talksLoop();
                         }, limitQps);
                     });
@@ -736,7 +741,7 @@ exports.buildDb = function (req, res) {
 
     }
 
-    function loadVideo(index) {
+    function loadVideo(index, uuid) {
         var video = {
             locator: 'www.ted.com/talks/' + index,
             vendor: 'ted',
@@ -752,22 +757,26 @@ exports.buildDb = function (req, res) {
                 console.log(LOG_TAG + 'Metadata unavailable.');
             } else {
                 video.metadata = metadata;
-            }
+            }       
 
-            db.insert(video);
+            var fun = uuid? db.updateVideo : db.insert;
 
-            //nerdify
-            if (video.metadata.timedtext) {
-                nerd.getEntities('timedtext', video.metadata.timedtext, function (err, data) {
-                    if (err || !data) {
-                        console.log(LOG_TAG + 'Error in nerd retrieving for ' + video.locator);
-                        console.log(err);
-                        return;
-                    }
-                    db.addEntities(video.uuid, data, function () {
+            fun(video, function(err, doc){
+                //nerdify
+                if (doc.metadata.timedtext) {
+                    nerd.getEntities('timedtext', doc.metadata.timedtext, function (err, data) {
+                        if (err || !data) {
+                            console.log(LOG_TAG + 'Error in nerd retrieving for ' + doc.locator);
+                            console.log(err);
+                            return;
+                        }
+                        db.addEntities(doc.uuid, data, function () {
+                        });
                     });
-                });
-            }
+                }
+
+            });
+
         });
     }
 };
