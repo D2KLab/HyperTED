@@ -1,12 +1,12 @@
 <div id="entity-sect">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-9 col-lg-9 col-sm-7 col-xs-7">
-                <hr class="red_rule">
+            <div class="col-lg-10 col-md-10 col-sm-9 col-xs-8">
+            <hr class="red_rule">
             </div>
 
-            <div class="col-md-3 col-lg-3 col-sm-5 col-xs-5">
-                <h1 class="title">entities</h1>
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4">
+            <h1 class="title">entities</h1>
             </div>
         </div>
 
@@ -36,30 +36,34 @@
                 %>
 
                 <div class="entity-content">
-                    <p>In this video there are <%= entityList.length %> entities extracted
-                        by <%= entityList[0].extractor %></p>
+                    <h4 class="extractor">In this video there are <%= entityList.length %> entities extracted
+                        by <%= entityList[0].extractor.toUpperCase() %></h4>
                     <%
                     for (type in typeList) {
                         var typeName = type.split('#')[1];
                         var entTypeList = typeList[type];
                     %>
-                    <div class="entity-grouped-by-type">
-                        <h3 class="title"><%= entTypeList.length %> <%= typeName %></h3>
-                        <ul class="displayEntity">
-                            <% entTypeList.forEach(function (ent) {
-                                var href = ent.uri ? 'href=' + ent.uri + ' target="_blank"' : '';
-                            %>
+                    <div class="row">
+                        <div class="col-md-3 col-sm-3 entityType">
+                            <h4 class="entTypeText"><%= entTypeList.length %> <%= typeName %></h4>
+                        </div>
+                        <div class="col-md-9 col-sm-9 entityList">
+                            <ul class="displayEntity">
+                                <% entTypeList.forEach(function (ent) {
+                                    var href = ent.uri ? 'href=' + ent.uri + ' target="_blank"' : '';
+                                %>
 
-                            <li><span class="entity list <%= typeName.toLowerCase() %>">
+                                <li><span class="entity list <%= typeName.toLowerCase() %>">
                     <a <%= href %> >
-                    #<%= ent.label %>
+                        #<%= ent.label %>
                     </a>
                            </span>
 
-                            </li>
+                                </li>
 
-                            <% }) %>
-                    </ul>
+                                <% }) %>
+                            </ul>
+                        </div>
                     </div>
                     <% } %>
                 </div>

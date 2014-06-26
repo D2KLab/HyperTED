@@ -203,12 +203,12 @@
 }
 
 /* colors */
-.clearfix:before, .nerdificable #entity-sect .entity-content .displayEntity:before, .clearfix:after, .nerdificable #entity-sect .entity-content .displayEntity:after {
+.clearfix:before, .nerdificable #entity-sect .entity-content div .entityList .displayEntity:before, .clearfix:after, .nerdificable #entity-sect .entity-content div .entityList .displayEntity:after {
     content: "";
     display: table;
 }
 
-.clearfix:after, .nerdificable #entity-sect .entity-content .displayEntity:after {
+.clearfix:after, .nerdificable #entity-sect .entity-content div .entityList .displayEntity:after {
     clear: both;
 }
 
@@ -458,11 +458,40 @@ html, body {
     display: block;
 }
 
-.nerdificable #entity-sect .entity-content .displayEntity {
+.nerdificable #entity-sect .entity-content div {
+    margin-top: 1.5em;
+}
+
+.nerdificable #entity-sect .entity-content div:first-of-type {
+    margin-top: 2em;
+}
+
+.nerdificable #entity-sect .entity-content div .entityType .entTypeText {
+    margin: 0;
+    color: #b11200;
+}
+
+@media (max-width: 768px) {
+    .nerdificable #entity-sect .entity-content div .entityType .entTypeText {
+        text-align: center;
+    }
+}
+
+.nerdificable #entity-sect .entity-content div .entityList {
+    border-left: 1px #b11200 solid;
+}
+
+@media (max-width: 768px) {
+    .nerdificable #entity-sect .entity-content div .entityList {
+        border-left: 0;
+    }
+}
+
+.nerdificable #entity-sect .entity-content div .entityList .displayEntity {
     text-align: center;
 }
 
-.nerdificable #entity-sect .entity-content .displayEntity li {
+.nerdificable #entity-sect .entity-content div .entityList .displayEntity li {
     display: inline-block;
 }
 
@@ -935,6 +964,10 @@ p span.entity.nesting span {
 p span.entity.nesting:hover span {
     -webkit-transform: translate(0px, -10px);
     /* Chrome, Safari, Opera */
+}
+
+.extractor {
+    font-weight: 700;
 }
 
 .entity {

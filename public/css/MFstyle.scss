@@ -238,14 +238,38 @@ $navbarTransitionTime: 100ms;
       h3.title {
         display: block;
       }
-      .displayEntity {
-        @extend .clearfix;
-        text-align: center;
-        li {
 
-          display: inline-block;
+      div {
+        margin-top: 1.5em;
+        &:first-of-type {
+          margin-top: 2em;
+        }
+        .entityType {
+          .entTypeText {
+            margin: 0;
+            color: $dark_red;
+            @media(max-width: 768px) {
+              text-align: center;
+            }
+          }
+        }
+
+        .entityList {
+          border-left: 1px $dark_red solid;
+          @media(max-width: 768px) {
+            border-left: 0;
+          }
+          .displayEntity {
+            @extend .clearfix;
+            text-align: center;
+            li {
+              display: inline-block;
+            }
+          }
+
         }
       }
+
     }
   }
 }
@@ -665,6 +689,10 @@ p {
       -webkit-transform: translate(0px, -10px); /* Chrome, Safari, Opera */
     }
   }
+}
+
+.extractor {
+  font-weight: 700;
 }
 
 .entity {
