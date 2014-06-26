@@ -858,6 +858,22 @@ p {
   }
 }
 
+.nerdFormContent {
+  width: 90%;
+  margin-top: 10px;
+  .nerdForm {
+    float: left;
+    &.nerdSelect {
+      width: 30%;
+      margin-left: 10%;
+    }
+    &.nerdBtn {
+      padding-left: 5%;
+      width: 55%;
+    }
+  }
+}
+
 .errorcode {
   font: {
     family: Arial Black, Arial, Verdana, sans-serif;

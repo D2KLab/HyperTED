@@ -1137,6 +1137,25 @@ p span.entity.nesting:hover span {
     font-weight: 700;
 }
 
+.nerdFormContent {
+    width: 90%;
+    margin-top: 10px;
+}
+
+.nerdFormContent .nerdForm {
+    float: left;
+}
+
+.nerdFormContent .nerdForm.nerdSelect {
+    width: 30%;
+    margin-left: 10%;
+}
+
+.nerdFormContent .nerdForm.nerdBtn {
+    padding-left: 5%;
+    width: 55%;
+}
+
 .errorcode {
     font-family: Arial Black, Arial, Verdana, sans-serif;
     font-weight: bold;
