@@ -859,13 +859,19 @@ p {
 }
 
 .nerdFormContent {
-  width: 90%;
-  margin-top: 10px;
+  width: 100%;
+  padding-top: 10px;
+  p {
+    text-align: left;
+  }
   .nerdForm {
     float: left;
     &.nerdSelect {
-      width: 30%;
-      margin-left: 10%;
+      width: 25%;
+      margin-left: 1%;
+      .nerdLabel {
+        font-weight: 200;
+      }
     }
     &.nerdBtn {
       padding-left: 5%;

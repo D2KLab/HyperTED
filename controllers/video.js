@@ -39,7 +39,7 @@ function viewVideo(req, res, videoInfo) {
     if (!enriched || areEntitiesUpdated || (!videoInfo.vendor)) {
         renderVideo(res, videoInfo, options);
     } else {
-        getEntities(videoInfo, function (err, data) {
+        getEntities(videoInfo, "textrazor", function (err, data) {
             if (err) {
                 console.log(LOG_TAG + 'error in getEntity: ' + err.message);
                 options.error = "Sorry. We are not able to retrieving NERD entities now.";
@@ -226,6 +226,7 @@ exports.search = function (req, resp) {
 
 exports.nerdify = function (req, res) {
     var uuid = req.query.uuid;
+    var ext = req.query.ext;
 
     db.getFromUuid(uuid, function (err, video_data) {
         if (!video_data) {
@@ -239,7 +240,7 @@ exports.nerdify = function (req, res) {
             res.render('nerdify_resp.ejs', video_data);
         } else {
             console.log(LOG_TAG + 'nerdifying ' + uuid);
-            getEntities(video_data, function (err, data) {
+            getEntities(video_data, ext, function (err, data) {
                 if (err) {
                     console.log(LOG_TAG + err.message);
                     res.json({error: "Error from NERD"});
@@ -254,7 +255,7 @@ exports.nerdify = function (req, res) {
     });
 };
 
-function getEntities(video_info, callback) {
+function getEntities(video_info, ext, callback) {
     console.log('nerdifing video ' + video_info.uuid);
     var doc_type, text;
     if (video_info.metadata.timedtext) {
@@ -264,7 +265,7 @@ function getEntities(video_info, callback) {
         doc_type = 'text';
         text = video_info.metadata.descr;
     }
-    nerd.getEntities(doc_type, text, function (err, data) {
+    nerd.getEntities(doc_type, text, ext, function (err, data) {
         if (!err && data) {
             db.addEntities(video_info.uuid, data, function () {
             });
@@ -728,7 +729,7 @@ exports.buildDb = function (req, res) {
                             return;
                         }
                         var uuid;
-                        if(data) uuid = data.uuid;
+                        if (data) uuid = data.uuid;
 
                         setTimeout(function () {
                             loadVideo(index, uuid);
@@ -757,11 +758,11 @@ exports.buildDb = function (req, res) {
                 console.log(LOG_TAG + 'Metadata unavailable.');
             } else {
                 video.metadata = metadata;
-            }       
+            }
 
-            var fun = uuid? db.updateVideo : db.insert;
+            var fun = uuid ? db.updateVideo : db.insert;
 
-            fun(video, function(err, doc){
+            fun(video, function (err, doc) {
                 //nerdify
                 if (doc.metadata.timedtext) {
                     nerd.getEntities('timedtext', doc.metadata.timedtext, function (err, data) {

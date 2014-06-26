@@ -149,20 +149,38 @@
                     <input type="hidden" name="enriched" value="true"/>
 
                     <div class="nerdFormContent clearfix">
+                        <p>choose your extractor</p>
+
                         <div class="nerdForm nerdSelect">
-                            <select class="form-control">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                                <option>5</option>
+                            <select class="form-control" name="ext">
+                                <option value="textrazor">Texrazor</option>
+                                <option value="dbspotlight">DBpedia Spotlight</option>
+                                <option value="datatxt">DataTXT</option>
+                                <option value="wikimeta">Wikimeta</option>
                             </select>
                         </div>
                         <div class="nerdForm nerdBtn">
                             <button type="submit" class="btn btn-danger btn-block">Nerdify</button>
+
                         </div>
+
                     </div>
                 </form>
+
+                <!--<div class="btn-danger dropdown-toggle">-->
+                <!--<button type="button" class="btn btn-default">nerdify</button>-->
+                <!--<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">-->
+                <!--<span class="caret"></span>-->
+                <!--<span class="sr-only">Toggle Dropdown</span>-->
+                <!--</button>-->
+                <!--<ul class="dropdown-menu">-->
+                <!--<li>Texrazor</li>-->
+                <!--<li>DBpedia Spotlight</li>-->
+                <!--<li>DataTXT</li>-->
+                <!--<li>Wikimeta</li>-->
+                <!--</ul>-->
+                <!--</div>-->
+
                 <% }else{ %>
 
                 <h1 class="noCont text-center">
