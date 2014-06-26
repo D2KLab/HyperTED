@@ -26,7 +26,7 @@ $(document).ready(function () {
         alwaysShowControls: true,
         preload: 'metadata',
         features: ['playpause', 'current', 'progress', 'duration', 'volume'],
-//        autoStart: false,  //TODO remove
+        autoStart: false,  //TODO remove
         success: function (media, domObj) {
             $(media).one('loadedmetadata', function () {
                 displayChapters();
@@ -51,6 +51,7 @@ $(document).ready(function () {
                 $('.info-on-player', $playerSect).hide();
             }).on('pause', function () {
                 $('.info-on-player', $playerSect).show();
+
             });
         }
     });
