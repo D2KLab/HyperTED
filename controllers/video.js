@@ -159,6 +159,7 @@ exports.search = function (req, resp) {
 
         var vendor = detectVendor(locator);
         var id = detectId(locator, vendor);
+
         db.getFromVendorId(vendor, id, function (err, data) {
             if (!err && data) {
                 var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
@@ -683,23 +684,23 @@ function mergeObj() {
 exports.buildDb = function (req, res) {
     var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=100&filter=id:>';
     var limitQps = 10200;
-    loadList(0);
+    loadList(936);
 
     function loadList(index) {
         http.getJSON(TEDListQuery + index, function (err, data) {
             if (err || !data) {
-                console.log(err.message);
+                console.log(err);
                 res.send("A problem occurred", 500);
                 return;
             }
             var total = data.counts.total, current = data.counts.this;
             if (current != 0) {
                 var talksList = data.talks;
-                var i = -1, index = 0;
+                var i = -1;
                 talksLoop();
 
                 function talksLoop() {
-                    console.log("loaded video" + index);
+                    console.log("loaded video " + index);
 
                     i++;
                     if (i == current) {
@@ -724,9 +725,11 @@ exports.buildDb = function (req, res) {
                             talksLoop();
                             return;
                         }
+                        var uuid;
+                        if(data) uuid = data.uuid;
 
                         setTimeout(function () {
-                            loadVideo(index);
+                            loadVideo(index, uuid);
                             talksLoop();
                         }, limitQps);
                     });
@@ -736,7 +739,7 @@ exports.buildDb = function (req, res) {
 
     }
 
-    function loadVideo(index) {
+    function loadVideo(index, uuid) {
         var video = {
             locator: 'www.ted.com/talks/' + index,
             vendor: 'ted',
@@ -754,20 +757,24 @@ exports.buildDb = function (req, res) {
                 video.metadata = metadata;
             }
 
-            db.insert(video);
+            var fun = uuid? db.updateVideo : db.insert;
 
-            //nerdify
-            if (video.metadata.timedtext) {
-                nerd.getEntities('timedtext', video.metadata.timedtext, function (err, data) {
-                    if (err || !data) {
-                        console.log(LOG_TAG + 'Error in nerd retrieving for ' + video.locator);
-                        console.log(err);
-                        return;
-                    }
-                    db.addEntities(video.uuid, data, function () {
+            fun(video, function(err, doc){
+                //nerdify
+                if (doc.metadata.timedtext) {
+                    nerd.getEntities('timedtext', doc.metadata.timedtext, function (err, data) {
+                        if (err || !data) {
+                            console.log(LOG_TAG + 'Error in nerd retrieving for ' + doc.locator);
+                            console.log(err);
+                            return;
+                        }
+                        db.addEntities(doc.uuid, data, function () {
+                        });
                     });
-                });
-            }
+                }
+
+            });
+
         });
     }
 };

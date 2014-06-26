@@ -8,6 +8,7 @@ exports.prepare = function () {
     videos = db.get('videos');
     videos.index('uuid', {unique: true});
     videos.index('locator', {unique: true});
+    videos.index('vendor vendor_id', {unique: true});
 };
 
 function getFromUuid(uuid, callback) {
@@ -23,7 +24,14 @@ exports.getFromVendorId = function (vendor, id, callback) {
         callback(true);
         return;
     }
-    videos.findOne({vendor: vendor, vendor_id: id}).on('complete', callback);
+        console.log(vendor, id);
+
+    videos.findOne({'vendor': vendor, 'vendor_id': id}).on('success', function(err, data){
+        console.log(err);
+        console.log(data);
+                callback(err,data);
+
+    });
 };
 
 exports.insert = function (video, callback) {
@@ -42,7 +50,7 @@ exports.insert = function (video, callback) {
                 if (!e && data) { //retry with another uuid
                     exports.insert(video, callback);
                 } else {
-                    callback(err, data);
+                    callback(e, data);
                 }
             });
         } else {
@@ -59,8 +67,17 @@ function update(uuid, newVideo, callback) {
         callback(err, doc);
     });
 }
-
 exports.update = update;
+
+exports.updateVideo = function(newVideo, callback) {
+    videos.update({uuid: newVideo.uuid}, newVideo, function (err, doc) {
+        if (err) {
+            console.log('DB update fail. ' + JSON.stringify(err));
+        }
+        callback(err, doc);
+    });
+}
+
 
 exports.addEntities = function (uuid, entities, callback) {
     getFromUuid(uuid, function (err, video) {
