@@ -685,9 +685,9 @@ function mergeObj() {
 
 
 exports.buildDb = function (req, res) {
-    var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=10&filter=id:>';
+    var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=100&filter=id:>';
     var limitQps = 10200;
-    loadList(936);
+    loadList(0);
 
     function loadList(index) {
         http.getJSON(TEDListQuery + index, function (err, data) {
@@ -703,6 +703,7 @@ exports.buildDb = function (req, res) {
                 talksLoop();
 
                 function talksLoop() {
+                    try{
                     console.log("loaded video " + index);
 
                     i++;
@@ -711,7 +712,7 @@ exports.buildDb = function (req, res) {
 
                         if (total > current) {
                             setTimeout(function () {
-                                //loadList(index);
+                                loadList(index);
                             }, limitQps);
                         } else {
                             res.send('Db builded successfully');
@@ -724,7 +725,7 @@ exports.buildDb = function (req, res) {
                     index = String(talk.id);
 
                     db.getFromVendorId('ted', index, function (err, data) {
-                        if (!err && data && data.entities) { //video already in db
+                        if (!err && data && (data.entities || !data.metadata.timedtext)) { //video already in db
                             talksLoop();
                             return;
                         }
@@ -736,7 +737,13 @@ exports.buildDb = function (req, res) {
                             talksLoop();
                         }, limitQps);
                     });
+                }catch(err){
+                    console.log('ERROR at video '+index);
+                    console.log(err);
+                    talksLoop();
+
                 }
+            }
             }
         });
 
