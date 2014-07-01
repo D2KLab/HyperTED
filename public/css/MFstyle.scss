@@ -867,15 +867,25 @@ p {
   .nerdForm {
     float: left;
     &.nerdSelect {
-      width: 25%;
+      width: 100%;
       margin-left: 1%;
       .nerdLabel {
         font-weight: 200;
       }
+      @media(min-width: 400px) {
+        width: 25%;
+      }
     }
     &.nerdBtn {
-      padding-left: 5%;
-      width: 55%;
+
+      padding-top: 5px;
+      width: 100%;
+      @media(min-width: 400px) {
+        width: 55%;
+        padding-left: 5%;
+        padding-top: 0;
+
+      }
     }
   }
 }

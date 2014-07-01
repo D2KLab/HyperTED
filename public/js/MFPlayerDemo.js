@@ -124,17 +124,17 @@ $(document).ready(function () {
                     $('#ent_append').append($entSect);
 
                     try {
-                        saveEnrichmentInLocalStorage(videokey + 'ent-sect', $entSect[0].outerHTML);
-                        saveEnrichmentInLocalStorage(videokey + 'nerd', $nerdified[0].outerHTML);
-                        saveEnrichmentInLocalStorage(videokey + 'plain', $plain[0].outerHTML);
+//                        saveEnrichmentInLocalStorage(videokey + 'ent-sect', $entSect[0].outerHTML);
+//                        saveEnrichmentInLocalStorage(videokey + 'nerd', $nerdified[0].outerHTML);
+//                        saveEnrichmentInLocalStorage(videokey + 'plain', $plain[0].outerHTML);
                     } catch (e) {
                         console.log(e);
                         if (e == DOMException.QUOTA_EXCEEDED_ERR) {
                             console.warn('Quota exceeded! Delete all and write');
                             localStorage.clear();
-                            saveEnrichmentInLocalStorage(videokey + 'ent-sect', $entSect[0].outerHTML);
-                            saveEnrichmentInLocalStorage(videokey + 'nerd', $nerdified[0].outerHTML);
-                            saveEnrichmentInLocalStorage(videokey + 'plain', $plain[0].outerHTML);
+//                            saveEnrichmentInLocalStorage(videokey + 'ent-sect', $entSect[0].outerHTML);
+//                            saveEnrichmentInLocalStorage(videokey + 'nerd', $nerdified[0].outerHTML);
+//                            saveEnrichmentInLocalStorage(videokey + 'plain', $plain[0].outerHTML);
                         }
                     }
 
@@ -157,9 +157,9 @@ $(document).ready(function () {
 
         function synchEnrichment() {
             var isEnriched = getParameterByName('enriched');
-            $entSect = $entSect || getEnrichmentFromLocalStorage(videokey + 'ent-sect');
-            $nerdified = $nerdified || getEnrichmentFromLocalStorage(videokey + 'nerd');
-            $plain = $plain || getEnrichmentFromLocalStorage(videokey + 'plain');
+            $entSect = $entSect;// || getEnrichmentFromLocalStorage(videokey + 'ent-sect');
+            $nerdified = $nerdified;// || getEnrichmentFromLocalStorage(videokey + 'nerd');
+            $plain = $plain;// || getEnrichmentFromLocalStorage(videokey + 'plain');
 
             if (isEnriched) {
                 if ($entSect && $nerdified) {
@@ -167,10 +167,12 @@ $(document).ready(function () {
                     $plain = $($plain);
                     $entSect = $($entSect);
 
+                    $entSect.hide();
                     $entSect.appendTo('#ent_append').fadeIn();
-                    $nerdifyForm.fadeOut();
+                    //$nerdifyForm.fadeOut();
                     $plain.filter('body *').replaceWith($nerdified);
                     $('p > span.entity').has('span').addClass('nesting');
+                    $nerdifyForm.submit();
                 } else {
                     // submit form
                     $nerdifyForm.submit();
@@ -458,10 +460,10 @@ function getEnrichmentFromLocalStorage(key) {
         return null;
     } else return data.value;
 }
-
-function saveEnrichmentInLocalStorage(key, value) {
-    localStorage[key] = JSON.stringify({timestamp: Date.now(), value: value});
-}
+//
+//function saveEnrichmentInLocalStorage(key, value) {
+//    localStorage[key] = JSON.stringify({timestamp: Date.now(), value: value});
+//}
 
 String.prototype.parseURL = function () {
     if (typeof this != "string" && !(this instanceof String))

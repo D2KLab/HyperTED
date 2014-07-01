@@ -141,10 +141,7 @@
                     <% include partials/sub_partial.ejs %>
                 </div>
 
-                <form method="get" action="/video" data-action="/nerdify" class="nerdify button-cont"
-                      <% if(locals.enriched) { %>style="display: none"
-                        <% } %>
-                        >
+                <form method="get" action="/video" data-action="/nerdify" class="nerdify button-cont">
                     <input type="hidden" name="uuid" value="<%= uuid %>"/>
                     <input type="hidden" name="enriched" value="true"/>
 
@@ -153,10 +150,20 @@
 
                         <div class="nerdForm nerdSelect">
                             <select class="form-control" name="ext">
-                                <option value="textrazor">Texrazor</option>
-                                <option value="dbspotlight">DBpedia Spotlight</option>
+
+
+                                <option value="alchemyapi">AlchemyAPI</option>
+                                <option value="combined">NERD</option>
                                 <option value="datatxt">DataTXT</option>
+                                <option value="dbspotlight">DBpedia Spotlight</option>
+                                <option value="lupedia">Lupedia</option>
+                                <option value="opencalais">OpenCalais</option>
+                                <option value="saplo">Saplo</option>
+                                <option value="textrazor">TextRazor</option>
+                                <option value="thd">THD</option>
                                 <option value="wikimeta">Wikimeta</option>
+                                <option value="yahoo">Yahoo!</option>
+                                <option value="zemanta">Zemanta</option>
                             </select>
                         </div>
                         <div class="nerdForm nerdBtn">
@@ -166,20 +173,6 @@
 
                     </div>
                 </form>
-
-                <!--<div class="btn-danger dropdown-toggle">-->
-                <!--<button type="button" class="btn btn-default">nerdify</button>-->
-                <!--<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">-->
-                <!--<span class="caret"></span>-->
-                <!--<span class="sr-only">Toggle Dropdown</span>-->
-                <!--</button>-->
-                <!--<ul class="dropdown-menu">-->
-                <!--<li>Texrazor</li>-->
-                <!--<li>DBpedia Spotlight</li>-->
-                <!--<li>DataTXT</li>-->
-                <!--<li>Wikimeta</li>-->
-                <!--</ul>-->
-                <!--</div>-->
 
                 <% }else{ %>
 

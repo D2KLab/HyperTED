@@ -235,7 +235,7 @@ exports.nerdify = function (req, res) {
             return;
         }
 
-        if (video_data.entities) {
+        if (video_data.entities && video_data.entities[0].extractor == ext) {
             video_data.enriched = true;
             res.render('nerdify_resp.ejs', video_data);
         } else {
@@ -257,6 +257,7 @@ exports.nerdify = function (req, res) {
 
 function getEntities(video_info, ext, callback) {
     console.log('nerdifing video ' + video_info.uuid);
+    console.log('extractor ' + ext);
     var doc_type, text;
     if (video_info.metadata.timedtext) {
         doc_type = 'timedtext';

@@ -1151,7 +1151,7 @@ p span.entity.nesting:hover span {
 }
 
 .nerdFormContent .nerdForm.nerdSelect {
-    width: 25%;
+    width: 100%;
     margin-left: 1%;
 }
 
@@ -1159,9 +1159,23 @@ p span.entity.nesting:hover span {
     font-weight: 200;
 }
 
+@media (min-width: 400px) {
+    .nerdFormContent .nerdForm.nerdSelect {
+        width: 25%;
+    }
+}
+
 .nerdFormContent .nerdForm.nerdBtn {
-    padding-left: 5%;
-    width: 55%;
+    padding-top: 5px;
+    width: 100%;
+}
+
+@media (min-width: 400px) {
+    .nerdFormContent .nerdForm.nerdBtn {
+        width: 55%;
+        padding-left: 5%;
+        padding-top: 0;
+    }
 }
 
 .errorcode {
