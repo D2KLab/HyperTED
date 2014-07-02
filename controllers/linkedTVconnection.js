@@ -138,6 +138,7 @@ function reduceSparqlJSON(bindings) {
                     uri: row.keyURL,
                     label: label,
                     extractor: source,
+                    source: "linkedtv",
                     startNPT: parseFloat(row.tStart.value).toFixed(3),
                     endNPT: parseFloat(row.tEnd.value).toFixed(3),
                     tUnit: row.tUnit.value,

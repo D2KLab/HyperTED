@@ -56,7 +56,7 @@ $(document).ready(function () {
         }
     });
     video.player = $player;
-    console.log($player);
+    console.debug($player);
 
 
     $('.see-all').click(function () {
@@ -67,10 +67,12 @@ $(document).ready(function () {
         $this.text(text)
     });
 
-
-    if (Modernizr.history && Modernizr.localstorage) {
+//disabled for now
+//    if (Modernizr.history && Modernizr.localstorage) {
+    if (false) {
         var $nerdifyForm = $('form.nerdify');
         var ajaxAction = $nerdifyForm.data('action');
+
         var $nerdified = $('.enriched').exists() ? $('.enriched') : undefined;
         var $plain = $nerdified ? undefined : (hasVideoSub ? $('.sub-text') : $('#descr'));
         var $entSect = $('#entity-sect').exists() ? $('#entity-sect') : undefined;
@@ -81,11 +83,7 @@ $(document).ready(function () {
             $submitButton.prop('disabled', true).addLoader('left');
 
             var page_url = window.location.toString().parseURL();
-            page_url.search.enriched = true;
-
-            $entSect = $entSect || getEnrichmentFromLocalStorage(videokey + 'ent-sect');
-            $nerdified = $nerdified || getEnrichmentFromLocalStorage(videokey + 'nerd');
-            $plain = $plain || getEnrichmentFromLocalStorage(videokey + 'plain');
+            page_url.search.enriched = $('.nerdSelect select', $nerdifyForm).val();
 
             if ($nerdified && $plain && $entSect) {
                 $submitButton.prop('disabled', false).removeLoader();
@@ -111,10 +109,8 @@ $(document).ready(function () {
                     var $data = $(data);
                     if (hasVideoSub) {
                         $nerdified = $data.find('.sub-text');
-                        $plain = $('.sub-text', $subCont);
                     } else {
                         $nerdified = $data.find('.descr');
-                        $plain = $('#descr');
                         if ($plain.hasClass('full')) {
                             $nerdified.addClass('full');
                         }
@@ -123,21 +119,21 @@ $(document).ready(function () {
                     $entSect = $data.find('#entity-sect').hide();
                     $('#ent_append').append($entSect);
 
-                    try {
-//                        saveEnrichmentInLocalStorage(videokey + 'ent-sect', $entSect[0].outerHTML);
-//                        saveEnrichmentInLocalStorage(videokey + 'nerd', $nerdified[0].outerHTML);
-//                        saveEnrichmentInLocalStorage(videokey + 'plain', $plain[0].outerHTML);
-                    } catch (e) {
-                        console.log(e);
-                        if (e == DOMException.QUOTA_EXCEEDED_ERR) {
-                            console.warn('Quota exceeded! Delete all and write');
-                            localStorage.clear();
-//                            saveEnrichmentInLocalStorage(videokey + 'ent-sect', $entSect[0].outerHTML);
-//                            saveEnrichmentInLocalStorage(videokey + 'nerd', $nerdified[0].outerHTML);
-//                            saveEnrichmentInLocalStorage(videokey + 'plain', $plain[0].outerHTML);
-                        }
-                    }
-
+//                    try {
+////                        saveEnrichmentInLocalStorage(videokey + 'ent-sect', $entSect[0].outerHTML);
+////                        saveEnrichmentInLocalStorage(videokey + 'nerd', $nerdified[0].outerHTML);
+////                        saveEnrichmentInLocalStorage(videokey + 'plain', $plain[0].outerHTML);
+//                    } catch (e) {
+//                        console.log(e);
+//                        if (e == DOMException.QUOTA_EXCEEDED_ERR) {
+//                            console.warn('Quota exceeded! Delete all and write');
+//                            localStorage.clear();
+////                            saveEnrichmentInLocalStorage(videokey + 'ent-sect', $entSect[0].outerHTML);
+////                            saveEnrichmentInLocalStorage(videokey + 'nerd', $nerdified[0].outerHTML);
+////                            saveEnrichmentInLocalStorage(videokey + 'plain', $plain[0].outerHTML);
+//                        }
+//                    }
+//
                     $submitButton.prop('disabled', false).removeLoader();
                     history.pushState(null, null, page_url.toString());
                     synchEnrichment();
@@ -157,10 +153,6 @@ $(document).ready(function () {
 
         function synchEnrichment() {
             var isEnriched = getParameterByName('enriched');
-            $entSect = $entSect;// || getEnrichmentFromLocalStorage(videokey + 'ent-sect');
-            $nerdified = $nerdified;// || getEnrichmentFromLocalStorage(videokey + 'nerd');
-            $plain = $plain;// || getEnrichmentFromLocalStorage(videokey + 'plain');
-
             if (isEnriched) {
                 if ($entSect && $nerdified) {
                     $nerdified = $($nerdified);
@@ -444,22 +436,23 @@ jQuery.fn.extend({
 
 function getParameterByName(name, url) {
     var URL = url || location.search;
+    console.log(URL);
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
         results = regex.exec(URL);
     return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
-function getEnrichmentFromLocalStorage(key) {
-    try {
-        var data = JSON.parse(localStorage[key]);
-    } catch (e) {
-        return null;
-    }
-    if (!data.timestamp || Date.now() - data.timestamp > 86400000) {
-        return null;
-    } else return data.value;
-}
+//function getEnrichmentFromLocalStorage(key) {
+//    try {
+//        var data = JSON.parse(localStorage[key]);
+//    } catch (e) {
+//        return null;
+//    }
+//    if (!data.timestamp || Date.now() - data.timestamp > 86400000) {
+//        return null;
+//    } else return data.value;
+//}
 //
 //function saveEnrichmentInLocalStorage(key, value) {
 //    localStorage[key] = JSON.stringify({timestamp: Date.now(), value: value});

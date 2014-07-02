@@ -37,9 +37,9 @@
 
                 <div class="entity-content">
                     <h4 class="extractor">In this video there are <%= entityList.length %> entities extracted
-                        by <%= entityList[0].extractor.toUpperCase() %></h4>
+                        by <%= locals.enriched.toUpperCase() %></h4>
                     <%
-                    for (type in typeList) {
+                    for (var type in typeList) {
                         var typeName = type.split('#')[1];
                         var entTypeList = typeList[type];
                     %>

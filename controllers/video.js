@@ -5,17 +5,23 @@ var http = require('http'),
     nerd = require('./nerdify'),
     db = require('./database'),
     ts = require('./linkedTVconnection'),
-    errorMsg = require('./error_msg');
+    errorMsg = require('./error_msg'),
+    utils = require('./utils');
 
 var LOG_TAG = '[VIDEO.JS]: ';
 var time1d = 86400000; //one day
 ts.prepare();
 
+var mergeObj = utils.mergeObj;
 
-function viewVideo(req, res, videoInfo) {
+/*
+ * Prepare and render a video already in db
+ */
+function viewVideo(req, res, video) {
     var enriched = req.query.enriched;
-    var videoURI = videoInfo.videoLocator || videoInfo.locator;
+    var videoURI = video.videoLocator || video.locator;
 
+    // Identify the media fragment part
     var concSign = url.parse(videoURI).hash ? '&' : '#';
     var t = req.query.t;
     if (t) {
@@ -25,7 +31,6 @@ function viewVideo(req, res, videoInfo) {
     var xywh = req.query.xywh;
     if (xywh) {
         videoURI += concSign + 'xywh=' + xywh;
-//        concSign = '&';
     }
 
     var options = {
@@ -33,20 +38,24 @@ function viewVideo(req, res, videoInfo) {
         enriched: enriched
     };
 
-    var areEntitiesUpdated = videoInfo.entities && !videoInfo.entitiesFromLTV && videoInfo.entTimestamp
-        && videoInfo.timestamp && videoInfo.entTimestamp >= videoInfo.timestamp;
-
-    if (!enriched || areEntitiesUpdated || (!videoInfo.vendor)) {
-        renderVideo(res, videoInfo, options);
+    // Prepare nerd entity part
+    if (!enriched || !video.metadata.timedtext) {
+        // enrichment is not requested or we can not enrich
+        renderVideo(res, video, options);
+    } else if (video.entities && video.entities.filter(hasExtractor, enriched).length) {
+        // we have already enriched with this extractor
+        video.entities = video.entities.filter(hasExtractor, enriched);
+        renderVideo(res, video, options);
     } else {
-        getEntities(videoInfo, "textrazor", function (err, data) {
+        // we have to retrive entities from NERD
+        getEntities(video, enriched, function (err, data) {
             if (err) {
                 console.log(LOG_TAG + 'error in getEntity: ' + err.message);
                 options.error = "Sorry. We are not able to retrieving NERD entities now.";
             } else {
-                videoInfo.entities = data;
+                video.entities = data;
             }
-            renderVideo(res, videoInfo, options);
+            renderVideo(res, video, options);
         });
     }
 }
@@ -224,51 +233,57 @@ exports.search = function (req, resp) {
     });
 };
 
+/*
+ * Called on click on "Nerdify" button
+ *
+ * Generate an html in response.
+ */
+
 exports.nerdify = function (req, res) {
     var uuid = req.query.uuid;
-    var ext = req.query.ext;
+    var ext = req.query.enriched;
 
-    db.getFromUuid(uuid, function (err, video_data) {
-        if (!video_data) {
+    db.getFromUuid(uuid, function (err, video) {
+        if (!video) {
             console.log("Error from DB");
             res.json({error: "Error from DB"});
             return;
         }
-
-        if (video_data.entities && video_data.entities[0].extractor == ext) {
-            video_data.enriched = true;
-            res.render('nerdify_resp.ejs', video_data);
+        if (video.entities && video.entities.filter(hasExtractor, ext).length) {
+            // we have already enriched with this extractor
+            video.entities = video.entities.filter(hasExtractor, ext);
+            video.enriched = ext;
+            res.render('nerdify_resp.ejs', video);
         } else {
             console.log(LOG_TAG + 'nerdifying ' + uuid);
-            getEntities(video_data, ext, function (err, data) {
+            getEntities(video, ext, function (err, data) {
                 if (err) {
                     console.log(LOG_TAG + err.message);
                     res.json({error: "Error from NERD"});
                     return;
                 }
 
-                video_data.entities = data;
-                video_data.enriched = true;
-                res.render('nerdify_resp.ejs', video_data);
+                video.entities = data;
+                video.enriched = ext;
+                res.render('nerdify_resp.ejs', video);
             });
         }
     });
 };
 
-function getEntities(video_info, ext, callback) {
-    console.log('nerdifing video ' + video_info.uuid);
-    console.log('extractor ' + ext);
+function getEntities(video, ext, callback) {
+    console.log('nerdifing video ' + video.uuid + ' with ' + ext);
     var doc_type, text;
-    if (video_info.metadata.timedtext) {
+    if (video.metadata.timedtext) {
         doc_type = 'timedtext';
-        text = video_info.metadata.timedtext;
+        text = video.metadata.timedtext;
     } else {
         doc_type = 'text';
-        text = video_info.metadata.descr;
+        text = video.metadata.descr;
     }
     nerd.getEntities(doc_type, text, ext, function (err, data) {
         if (!err && data) {
-            db.addEntities(video_info.uuid, data, function () {
+            db.addEntities(video.uuid, data, function () {
             });
         }
         callback(err, data);
@@ -672,19 +687,6 @@ if (typeof String.prototype.startsWith != 'function') {
     };
 }
 
-
-function mergeObj() {
-    var mObj = {};
-    for (var o in arguments) {
-        var obj = arguments[o];
-        for (var attrname in obj) {
-            mObj[attrname] = obj[attrname];
-        }
-    }
-    return mObj;
-}
-
-
 exports.buildDb = function (req, res) {
     var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=100&filter=id:>';
     var limitQps = 10200;
@@ -704,47 +706,47 @@ exports.buildDb = function (req, res) {
                 talksLoop();
 
                 function talksLoop() {
-                    try{
-                    console.log("loaded video " + index);
+                    try {
+                        console.log("loaded video " + index);
 
-                    i++;
-                    if (i == current) {
-                        console.log("loaded video until " + index);
+                        i++;
+                        if (i == current) {
+                            console.log("loaded video until " + index);
 
-                        if (total > current) {
-                            setTimeout(function () {
-                                loadList(index);
-                            }, limitQps);
-                        } else {
-                            res.send('Db builded successfully');
-                        }
+                            if (total > current) {
+                                setTimeout(function () {
+                                    loadList(index);
+                                }, limitQps);
+                            } else {
+                                res.send('Db builded successfully');
+                            }
 
-                        return;
-                    }
-
-                    var talk = talksList[i].talk;
-                    index = String(talk.id);
-
-                    db.getFromVendorId('ted', index, function (err, data) {
-                        if (!err && data && (data.entities || !data.metadata.timedtext)) { //video already in db
-                            talksLoop();
                             return;
                         }
-                        var uuid;
-                        if (data) uuid = data.uuid;
 
-                        setTimeout(function () {
-                            loadVideo(index, uuid);
-                            talksLoop();
-                        }, limitQps);
-                    });
-                }catch(err){
-                    console.log('ERROR at video '+index);
-                    console.log(err);
-                    talksLoop();
+                        var talk = talksList[i].talk;
+                        index = String(talk.id);
 
+                        db.getFromVendorId('ted', index, function (err, data) {
+                            if (!err && data && (data.entities || !data.metadata.timedtext)) { //video already in db
+                                talksLoop();
+                                return;
+                            }
+                            var uuid;
+                            if (data) uuid = data.uuid;
+
+                            setTimeout(function () {
+                                loadVideo(index, uuid);
+                                talksLoop();
+                            }, limitQps);
+                        });
+                    } catch (err) {
+                        console.log('ERROR at video ' + index);
+                        console.log(err);
+                        talksLoop();
+
+                    }
                 }
-            }
             }
         });
 
@@ -790,3 +792,9 @@ exports.buildDb = function (req, res) {
     }
 };
 
+/*
+ * Used to filter entities.
+ */
+function hasExtractor(ent) {
+    return ent.extractor == this;
+}
