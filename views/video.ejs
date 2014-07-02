@@ -143,17 +143,15 @@
                     <% include partials/sub_partial.ejs %>
                 </div>
 
-                <form method="get" action="/video" data-action="/nerdify" class="nerdify button-cont">
+                <form method="get" action="/video/<%= uuid %>" data-action="/nerdify" class="nerdify button-cont">
                     <input type="hidden" name="uuid" value="<%= uuid %>"/>
-                    <input type="hidden" name="enriched" value="true"/>
+                    <!--<input type="hidden" name="enriched" value="true"/>-->
 
                     <div class="nerdFormContent clearfix">
                         <p>choose your extractor</p>
 
                         <div class="nerdForm nerdSelect">
-                            <select class="form-control" name="ext">
-
-
+                            <select class="form-control" name="enriched">
                                 <option value="alchemyapi">AlchemyAPI</option>
                                 <option value="combined">NERD</option>
                                 <option value="datatxt">DataTXT</option>

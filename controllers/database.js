@@ -33,7 +33,8 @@ exports.insert = function (video, callback) {
     if (video.entities) {
         video.entTimestamp = Date.now();
     }
-    callback = callback || function(){};
+    callback = callback || function () {
+    };
 
     videos.insert(video, function (err, doc) {
         if (err) {
@@ -75,11 +76,16 @@ exports.updateVideo = function (newVideo, callback) {
 exports.addEntities = function (uuid, entities, callback) {
     getFromUuid(uuid, function (err, video) {
         if (err || !video) {
-            console.log('DB add entities fail. ' + JSON.stringify(err));
+            err = err || "Video not in db";
+            console.log('DB add entities fail. ' + err);
             callback(err, video);
         }
-        video.entities = entities;
-        video.entTimestamp = Date.now();
+        if (video.entities) {
+            video.entities = video.entities.concat(entities);
+            //TODO remove duplicates (in combined)
+        } else {
+            video.entities = entities;
+        }
         update(uuid, video, callback);
     });
 
