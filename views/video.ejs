@@ -99,19 +99,21 @@
 </section>
 
 
-<div id="related-frags">
+<div id="video-info-chapters">
     <% if (locals.chapters) { %>
     <% include partials/chapter.ejs %>
     <% }else if(locals.metadata && metadata.title) { %>
     <div class="play-video-info clearfix">
         <div class="left">
             <h5 class="video-info">published on <%= metadata.published.substring(0, 10) %>
+                <% if(metadata.event) { %>
                 <span> from <%= metadata.event %></span></h5>
-
+            <% } %>
             <h3 class="video-info"><%= metadata.title %></h3>
         </div>
         <% if(locals.metadata && metadata.descr) { %>
         <div class="right"><h5><%= metadata.descr %></h5></div>
+
         <% } %>
     </div>
     <% } %>

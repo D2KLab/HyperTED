@@ -28,6 +28,7 @@ $(document).ready(function () {
         features: ['playpause', 'current', 'progress', 'duration', 'volume'],
         autoStart: false,  //TODO remove
         success: function (media, domObj) {
+            $("#video-info-chapters").fadeIn();
             $(media).one('loadedmetadata', function () {
                 displayChapters();
                 if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
@@ -223,10 +224,10 @@ $(document).ready(function () {
         updateMFurl();
     });
 
-    $("#related-frags").hide();
+    $("#video-info-chapters").hide();
 
     function displayChapters() {
-        $("#related-frags").fadeIn();
+        $("#video-info-chapters").fadeIn();
 
         var oldChapStart = 0;
         var oldChapEnd = 0;

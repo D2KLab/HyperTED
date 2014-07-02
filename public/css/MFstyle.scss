@@ -583,7 +583,7 @@ span.wiki {
   }
 }
 
-#related-frags {
+#video-info-chapters {
   background: #fff;
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
   width: 100%;
@@ -609,11 +609,13 @@ span.wiki {
       width: 50%;
       border-left: 1px solid $dark_red;
       padding-left: 2%;
+
       @media(max-width: 860px) {
         width: 100%;
         border-top: 1px solid $dark_red;
         border-left: 0;
       }
+
     }
   }
 }
