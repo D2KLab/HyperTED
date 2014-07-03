@@ -3588,10 +3588,10 @@ if (typeof jQuery != 'undefined') {
                 percent = e.loaded / e.total;
             }
 
-            // finally update the progress bar
+            // finally updateVideoUuid the progress bar
             if (percent !== null) {
                 percent = Math.min(1, Math.max(0, percent));
-                // update loaded bar
+                // updateVideoUuid loaded bar
                 if (t.loaded && t.total) {
                     t.loaded.width(t.total.width() * percent);
                 }
@@ -3603,7 +3603,7 @@ if (typeof jQuery != 'undefined') {
 
             if (t.media.currentTime != undefined && t.media.duration) {
 
-                // update bar and handle
+                // updateVideoUuid bar and handle
                 if (t.total && t.handle) {
                     var
                         newWidth = Math.round(t.total.width() * t.media.currentTime / t.media.duration),

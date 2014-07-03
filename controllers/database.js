@@ -1,25 +1,44 @@
 var UUID = require("node-uuid"),
     monk = require('monk');
-var db, videos;
+var db, videos, ents;
 
 
 exports.prepare = function () {
     db = monk('localhost:27017/hyperted');
+
     videos = db.get('videos');
     videos.index('uuid', {unique: true});
     videos.index('locator', {unique: true});
     videos.index('vendor vendor_id', {unique: true});
+
+    ents = db.get('entities');
+    ents.index('uuid');
+    ents.index('extractor');
 };
 
-function getFromUuid(uuid, callback) {
-    videos.findOne({uuid: uuid}).on('complete', callback);
-}
-exports.getFromUuid = getFromUuid;
+function getVideoFromUuid(uuid, withEntities, callback) {
+    var cb = !withEntities ? callback : function (err, video) {
+        if (err || !video) {
+            callback(err, video);
+            return;
+        }
 
-exports.getFromLocator = function (locator, callback) {
+        ents.find({'uuid': uuid}, function (err, docs) {
+            if (!err && docs && docs.length > 0) {
+                video.entities = docs;
+            }
+            callback(false, video);
+        });
+    };
+
+    videos.findOne({uuid: uuid}).on('complete', cb);
+}
+exports.getVideoFromUuid = getVideoFromUuid;
+
+exports.getVideoFromLocator = function (locator, callback) {
     videos.findOne({locator: locator}).on('complete', callback);
 };
-exports.getFromVendorId = function (vendor, id, callback) {
+exports.getVideoFromVendorId = function (vendor, id, callback) {
     if (!vendor || !id) {
         callback(true);
         return;
@@ -27,14 +46,26 @@ exports.getFromVendorId = function (vendor, id, callback) {
     videos.findOne({'vendor': vendor, 'vendor_id': id}).on('complete', callback);
 };
 
-exports.insert = function (video, callback) {
+exports.insertVideo = function (video, callback) {
     video.uuid = UUID.v4();
     video.timestamp = Date.now();
-    if (video.entities) {
-        video.entTimestamp = Date.now();
-    }
-    callback = callback || function () {
+    var callback = callback || function () {
     };
+    var cb = callback;
+
+    var entities;
+    if (video.entities) {
+        entities = video.entities;
+        delete video.entities;
+
+        cb = function (err, video) {
+            if (err || !video) {
+                callback(err, video);
+                return;
+            }
+            addEntities(video.uuid, entities);
+        }
+    }
 
     videos.insert(video, function (err, doc) {
         if (err) {
@@ -44,49 +75,50 @@ exports.insert = function (video, callback) {
                 if (!e && data) { //retry with another uuid
                     exports.insert(video, callback);
                 } else {
-                    callback(e, data);
+                    cb(e, data);
                 }
             });
         } else {
-            callback(err, doc);
+            cb(err, doc);
         }
     });
 };
 
-function update(uuid, newVideo, callback) {
-    videos.update({uuid: uuid}, newVideo, function (err, doc) {
+function updateVideoUuid(uuid, newVideo, callback) {
+    videos.updateVideoUuid({uuid: uuid}, newVideo, function (err, doc) {
         if (err) {
-            console.log('DB update fail. ' + JSON.stringify(err));
+            console.log('DB updateVideoUuid fail. ' + JSON.stringify(err));
         }
         callback(err, doc);
     });
 }
-exports.update = update;
+exports.updateVideoUuid = updateVideoUuid;
 
 exports.updateVideo = function (newVideo, callback) {
-    videos.update({uuid: newVideo.uuid}, newVideo, function (err, doc) {
+    videos.updateVideoUuid({uuid: newVideo.uuid}, newVideo, function (err, doc) {
         if (err) {
-            console.log('DB update fail. ' + JSON.stringify(err));
+            console.log('DB updateVideoUuid fail. ' + JSON.stringify(err));
         }
         callback(err, doc);
     });
 };
 
 
-exports.addEntities = function (uuid, entities, callback) {
-    getFromUuid(uuid, function (err, video) {
-        if (err || !video) {
-            err = err || "Video not in db";
-            console.log('DB add entities fail. ' + err);
-            callback(err, video);
-        }
-        if (video.entities) {
-            video.entities = video.entities.concat(entities);
-            //TODO remove duplicates (in combined)
-        } else {
-            video.entities = entities;
-        }
-        update(uuid, video, callback);
-    });
+function addEntities(uuid, entities) {
+    entities.forEach(function (e) {
+        e.uuid = uuid;
 
-};
+        var eParams = {
+            'uuid': uuid,
+            'extractor': e.extractor,
+            'startNPT': e.startNPT,
+            'endNPT': e.endNPT
+        };
+        ents.findAndModify(eParams, {$set: e}, {upsert: true, new: true}, function (err, newDoc) {
+            if (err)
+                console.log(err);
+        });
+
+    });
+}
+exports.addEntities = addEntities;

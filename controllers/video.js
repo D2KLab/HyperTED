@@ -71,7 +71,7 @@ exports.view = function (req, res) {
         res.render('error.ejs', errorMsg.e400);
         return;
     }
-    db.getFromUuid(uuid, function (err, video) {
+    db.getVideoFromUuid(uuid, true, function (err, video) {
         if (err || !video) {
             res.render('error.ejs', errorMsg.e404);
             return;
@@ -102,11 +102,11 @@ exports.view = function (req, res) {
 
                     //3. write in db
                     video.timestamp = Date.now();
-                    db.update(uuid, video, function (err) {
+                    db.updateVideoUuid(uuid, video, function (err) {
                         if (err) {
                             console.log("DATABASE ERROR");
                             console.log(err);
-                            console.log("Can not update");
+                            console.log("Can not updateVideoUuid");
                         }
                     });
 
@@ -152,7 +152,7 @@ exports.search = function (req, resp) {
         locator = locator.replace(/\?ticket=.+/, '');
     }
 
-    db.getFromLocator(locator, function (err, data) {
+    db.getVideoFromLocator(locator, function (err, data) {
         if (err) { //db error
             console.log("DATABASE ERROR");
             console.log(err);
@@ -171,7 +171,7 @@ exports.search = function (req, resp) {
         var vendor = detectVendor(locator);
         var id = detectId(locator, vendor);
 
-        db.getFromVendorId(vendor, id, function (err, data) {
+        db.getVideoFromVendorId(vendor, id, function (err, data) {
             if (!err && data) {
                 var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
                 console.log('Video at ' + locator + ' already in db.');
@@ -213,7 +213,7 @@ exports.search = function (req, resp) {
                     }
 
                     //3. write in db
-                    db.insert(video, function (err, data) {
+                    db.insertVideo(video, function (err, data) {
                         if (err) {
                             console.log("DATABASE ERROR" + JSON.stringify(err));
                             resp.render('error.ejs', errorMsg.e500);
@@ -243,7 +243,7 @@ exports.nerdify = function (req, res) {
     var uuid = req.query.uuid;
     var ext = req.query.enriched;
 
-    db.getFromUuid(uuid, function (err, video) {
+    db.getVideoFromUuid(uuid, true, function (err, video) {
         if (!video) {
             console.log("Error from DB");
             res.json({error: "Error from DB"});
@@ -283,15 +283,21 @@ function getEntities(video, ext, callback) {
     }
     nerd.getEntities(doc_type, text, ext, function (err, data) {
         if (!err && data) {
-            db.addEntities(video.uuid, data, function () {
-            });
+            if (ext == 'combined') {
+                for(var i=0; i<data.length; i++){
+                    data[i].source = 'combined';
+                }
+            }
+
+            db.addEntities(video.uuid, data);
         }
+
         callback(err, data);
     });
 }
 
 function getMetadataFromSparql(video, callback) {
-    ts.getFromLocator(video.locator, function (err, data) {
+    ts.getVideoFromLocator(video.locator, function (err, data) {
         if (err || !data) {
             callback(err, data);
             return;
@@ -476,7 +482,7 @@ exports.ajaxGetMetadata = function (req, res) {
         return;
     }
 
-    db.getFromUuid(uuid, function (err, data) {
+    db.getVideoFromUuid(uuid, false, function (err, data) {
         if (err || !data) {
             res.json({error: 'video not found in db'});
             return;
@@ -727,7 +733,7 @@ exports.buildDb = function (req, res) {
                         var talk = talksList[i].talk;
                         index = String(talk.id);
 
-                        db.getFromVendorId('ted', index, function (err, data) {
+                        db.getVideoFromVendorId('ted', index, function (err, data) {
                             if (!err && data && (data.entities || !data.metadata.timedtext)) { //video already in db
                                 talksLoop();
                                 return;
@@ -770,19 +776,18 @@ exports.buildDb = function (req, res) {
                 video.metadata = metadata;
             }
 
-            var fun = uuid ? db.updateVideo : db.insert;
+            var fun = uuid ? db.updateVideo : db.insertVideo;
 
             fun(video, function (err, doc) {
                 //nerdify
                 if (doc.metadata.timedtext) {
-                    nerd.getEntities('timedtext', doc.metadata.timedtext, function (err, data) {
+                    nerd.getEntities('timedtext', doc.metadata.timedtext, 'textrazor', function (err, data) {
                         if (err || !data) {
                             console.log(LOG_TAG + 'Error in nerd retrieving for ' + doc.locator);
                             console.log(err);
                             return;
                         }
-                        db.addEntities(doc.uuid, data, function () {
-                        });
+                        db.addEntities(doc.uuid, data);
                     });
                 }
 
@@ -796,5 +801,7 @@ exports.buildDb = function (req, res) {
  * Used to filter entities.
  */
 function hasExtractor(ent) {
+    if (this == "combined")
+        return ent.source == "combined";
     return ent.extractor == this;
 }

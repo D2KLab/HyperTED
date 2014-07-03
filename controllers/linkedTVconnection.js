@@ -15,7 +15,7 @@ exports.prepare = function () {
     };
 };
 
-exports.getFromUuid = function (uuid, callback) {
+exports.getVideoFromUuid = function (uuid, callback) {
     var identifier = generateIdentifier(uuid);
     var q = new Query().select('?locator', true).where(identifier, 'a', 'ma:MediaResource').where(identifier, 'ma:locator', '?locator');
 
@@ -35,7 +35,7 @@ exports.getFromUuid = function (uuid, callback) {
     });
 };
 
-exports.getFromLocator = function (locator, callback) {
+exports.getVideoFromLocator = function (locator, callback) {
     var t = locator.indexOf('?ticket');
     if (t > 0) {
         locator = locator.substring(0, t);
