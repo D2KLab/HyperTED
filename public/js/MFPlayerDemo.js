@@ -3,6 +3,7 @@ var storageKey = 'fragmentenricher.';
 var videokey = storageKey + video.uuid + '.';
 
 $(document).ready(function () {
+
     var $navbar = $('.navbar').not('.navbar-placeholder');
     var navHeight = $navbar.height();
     $(window).scroll(function () {
@@ -28,6 +29,7 @@ $(document).ready(function () {
         features: ['playpause', 'current', 'progress', 'duration', 'volume'],
         autoStart: false,  //TODO remove
         success: function (media, domObj) {
+            $("#video-info-chapters").fadeIn();
             $(media).one('loadedmetadata', function () {
                 displayChapters();
                 if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
@@ -58,7 +60,6 @@ $(document).ready(function () {
     video.player = $player;
     console.debug($player);
 
-
     $('.see-all').click(function () {
         var $this = $(this);
         var $target = $('#' + $this.attr('for'));
@@ -67,9 +68,7 @@ $(document).ready(function () {
         $this.text(text)
     });
 
-//disabled for now
-//    if (Modernizr.history && Modernizr.localstorage) {
-    if (false) {
+    if (Modernizr.history && Modernizr.localstorage) {
         var $nerdifyForm = $('form.nerdify');
         var ajaxAction = $nerdifyForm.data('action');
 
@@ -105,19 +104,21 @@ $(document).ready(function () {
                     } catch (e) {
                         //DO NOTHING
                     }
+                    console.log(data);
+                    displayEntities(data);
 
-                    var $data = $(data);
-                    if (hasVideoSub) {
-                        $nerdified = $data.find('.sub-text');
-                    } else {
-                        $nerdified = $data.find('.descr');
-                        if ($plain.hasClass('full')) {
-                            $nerdified.addClass('full');
-                        }
-                    }
-
-                    $entSect = $data.find('#entity-sect').hide();
-                    $('#ent_append').append($entSect);
+//                    var $data = $(data);
+//                    if (hasVideoSub) {
+//                        $nerdified = $data.find('.sub-text');
+//                    } else {
+//                        $nerdified = $data.find('.descr');
+//                        if ($plain.hasClass('full')) {
+//                            $nerdified.addClass('full');
+//                        }
+//                    }
+//
+//                    $entSect = $data.find('#entity-sect').hide();
+//                    $('#ent_append').append($entSect);
 
 //                    try {
 ////                        saveEnrichmentInLocalStorage(videokey + 'ent-sect', $entSect[0].outerHTML);
@@ -135,8 +136,8 @@ $(document).ready(function () {
 //                    }
 //
                     $submitButton.prop('disabled', false).removeLoader();
-                    history.pushState(null, null, page_url.toString());
-                    synchEnrichment();
+//                    history.pushState(null, null, page_url.toString());
+//                    synchEnrichment();
                 },
                 error: function () {
                     var alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
@@ -187,6 +188,59 @@ $(document).ready(function () {
     }
 
 
+    var $plainCont = $('.sub-text');
+
+    function displayEntities(entJson) {
+        var $newSubCont = $plainCont.clone();
+        var $subList = $newSubCont.find('p');
+        var subIndex;
+        var entityList = entJson;
+
+
+        //sorting JSON for end character desc and by length
+        entityList.sort(
+            function SortByEndTime(x, y) {
+                if (x.endNPT == y.endNPT) {
+                    return ((x.label.length == y.label.length) ? 0 : (x.label.length < y.label.length) ? 1 : -1)
+                } else if (parseFloat(x.endNPT) > parseFloat(y.endNPT)) return -1;
+                else return 1;
+            });
+
+        subIndex = $subList.length - 1;
+        entityList.forEach(function (entity) {
+
+            while (subIndex >= 0) {
+                var $thisSub = $subList.get(subIndex);
+
+                if (!$thisSub.id || $thisSub.id == '') {
+                    subIndex--;
+                } else {
+                    var entStart = parseFloat(entity.startNPT);
+                    var entEnd = parseFloat(entity.endNPT);
+                    $thisSub = $($thisSub);
+                    if (entStart >= $thisSub.data('startss') && entEnd <= $thisSub.data('endss')) {
+
+                        var text = $thisSub.text();
+                        var nerdTypeSplit = entity.nerdType.split('#');
+                        var nerdType = nerdTypeSplit.length > 1 ? nerdTypeSplit[1].toLowerCase() : "thing";
+
+                        var str = '<span class="entity ' + nerdType + '">' + entity.label + '</span>';
+
+
+                        $thisSub.html(text.replace(entity.label, str));
+//                        console.log($thisSub);
+                        break;
+                    } else {
+                        subIndex--;
+                    }
+                }
+            }
+
+        });
+
+        $('.sub-text', document).replaceWith($newSubCont);
+    }
+
     $(document).on('click', '.entity', function () {
         var $entity = $(this).children('a');
         var startEntity = $entity.data('start-time');
@@ -215,10 +269,10 @@ $(document).ready(function () {
         updateMFurl();
     });
 
-    $("#related-frags").hide();
+    $("#video-info-chapters").hide();
 
     function displayChapters() {
-        $("#related-frags").fadeIn();
+        $("#video-info-chapters").fadeIn();
 
         var oldChapStart = 0;
         var oldChapEnd = 0;

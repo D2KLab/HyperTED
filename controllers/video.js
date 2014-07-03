@@ -251,9 +251,10 @@ exports.nerdify = function (req, res) {
         }
         if (video.entities && video.entities.filter(hasExtractor, ext).length) {
             // we have already enriched with this extractor
-            video.entities = video.entities.filter(hasExtractor, ext);
-            video.enriched = ext;
-            res.render('nerdify_resp.ejs', video);
+            var entities = video.entities.filter(hasExtractor, ext);
+            res.json(entities);
+//            video.enriched = ext;
+//            res.render('nerdify_resp.ejs', video);
         } else {
             console.log(LOG_TAG + 'nerdifying ' + uuid);
             getEntities(video, ext, function (err, data) {
@@ -263,9 +264,10 @@ exports.nerdify = function (req, res) {
                     return;
                 }
 
-                video.entities = data;
-                video.enriched = ext;
-                res.render('nerdify_resp.ejs', video);
+                res.json(data);
+//                video.entities = data;
+//                video.enriched = ext;
+//                res.render('nerdify_resp.ejs', video);
             });
         }
     });

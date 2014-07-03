@@ -836,7 +836,7 @@ span.wiki a {
     color: #fff;
 }
 
-#related-frags {
+#video-info-chapters {
     background: #fff;
     -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
     -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
@@ -844,29 +844,29 @@ span.wiki a {
     width: 100%;
 }
 
-#related-frags .play-video-info {
+#video-info-chapters .play-video-info {
     padding: 20px;
     margin-top: 0;
 }
 
-#related-frags .play-video-info .left {
+#video-info-chapters .play-video-info .left {
     float: left;
     width: 48%;
     display: inline-block;
 }
 
-#related-frags .play-video-info .left h3 {
+#video-info-chapters .play-video-info .left h3 {
     font-weight: 700;
 }
 
 @media (max-width: 860px) {
-    #related-frags .play-video-info .left {
+    #video-info-chapters .play-video-info .left {
         width: 100%;
         text-align: center;
     }
 }
 
-#related-frags .play-video-info .right {
+#video-info-chapters .play-video-info .right {
     float: right;
     display: inline-block;
     width: 50%;
@@ -875,7 +875,7 @@ span.wiki a {
 }
 
 @media (max-width: 860px) {
-    #related-frags .play-video-info .right {
+    #video-info-chapters .play-video-info .right {
         width: 100%;
         border-top: 1px solid #b11200;
         border-left: 0;
