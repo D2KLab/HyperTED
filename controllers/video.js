@@ -42,7 +42,7 @@ function viewVideo(req, res, video) {
     if (!enriched || !video.metadata.timedtext) {
         // enrichment is not requested or we can not enrich
         renderVideo(res, video, options);
-    } else if (video.entities && video.entities.filter(hasExtractor, enriched).length) {
+    } else if (video.entities && containsExtractor(video.entities, enriched)) {
         // we have already enriched with this extractor
         video.entities = video.entities.filter(hasExtractor, enriched);
         renderVideo(res, video, options);
@@ -249,7 +249,7 @@ exports.nerdify = function (req, res) {
             res.json({error: "Error from DB"});
             return;
         }
-        if (video.entities && video.entities.filter(hasExtractor, ext).length) {
+        if (video.entities && containsExtractor(video.entities, ext)) {
             // we have already enriched with this extractor
             var entities = video.entities.filter(hasExtractor, ext);
             res.json(entities);
@@ -286,7 +286,7 @@ function getEntities(video, ext, callback) {
     nerd.getEntities(doc_type, text, ext, function (err, data) {
         if (!err && data) {
             if (ext == 'combined') {
-                for(var i=0; i<data.length; i++){
+                for (var i = 0; i < data.length; i++) {
                     data[i].source = 'combined';
                 }
             }
@@ -806,4 +806,13 @@ function hasExtractor(ent) {
     if (this == "combined")
         return ent.source == "combined";
     return ent.extractor == this;
+}
+function containsExtractor(array, ext) {
+    var filtered = array.filter(hasExtractor,ext);
+    if (ext != "combined") {
+        filtered = filtered.filter(function (ent) {
+            return ent.source != "combined";
+        });
+    }
+    return filtered.length > 0;
 }

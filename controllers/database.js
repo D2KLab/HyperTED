@@ -85,7 +85,7 @@ exports.insertVideo = function (video, callback) {
 };
 
 function updateVideoUuid(uuid, newVideo, callback) {
-    videos.updateVideoUuid({uuid: uuid}, newVideo, function (err, doc) {
+    videos.update({uuid: uuid}, newVideo, function (err, doc) {
         if (err) {
             console.log('DB updateVideoUuid fail. ' + JSON.stringify(err));
         }
