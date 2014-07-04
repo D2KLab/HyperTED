@@ -59,6 +59,7 @@ $(document).ready(function () {
     });
     video.player = $player;
     console.debug($player);
+    $("#entity-sect").hide();
 
     $('.see-all').click(function () {
         var $this = $(this);
@@ -106,6 +107,8 @@ $(document).ready(function () {
                     }
                     console.log(data);
                     displayEntities(data);
+                    showEntityList(data);
+                    $("#entity-sect").fadeIn();
 
 //                    var $data = $(data);
 //                    if (hasVideoSub) {
@@ -136,7 +139,7 @@ $(document).ready(function () {
 //                    }
 //
                     $submitButton.prop('disabled', false).removeLoader();
-//                    history.pushState(null, null, page_url.toString());
+                    history.pushState(null, null, page_url.toString());
 //                    synchEnrichment();
                 },
                 error: function () {
@@ -228,7 +231,6 @@ $(document).ready(function () {
 
 
                         $thisSub.html(text.replace(entity.label, str));
-//                        console.log($thisSub);
                         break;
                     } else {
                         subIndex--;
@@ -239,6 +241,63 @@ $(document).ready(function () {
         });
 
         $('.sub-text', document).replaceWith($newSubCont);
+    }
+
+    function showEntityList(entityList) {
+        $(".template-list-rows").empty();
+
+        entityList.sort(
+            function SortByNerdType(x, y) {
+                return ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1 ));
+            });
+
+        var typeList = entityList.reduce(function (memo, ent) {
+
+            if (!memo[ent.nerdType]) {
+                memo[ent.nerdType] = [];
+            }
+            memo[ent.nerdType].push(ent);
+            return memo;
+        }, {});
+
+        $('.totEnt').html(entityList.length);
+        $('.extEnt').html(entityList[0].extractor.toUpperCase());
+
+
+        var count = 0;
+
+        for (var type in typeList) {
+            ++count;
+            var typeName = type.split('#')[1];
+            var entTypeList = typeList[type];
+
+
+            var $row = $("<div>").loadTemplate($("#templateType"), {
+                typeAndOccurrences: entTypeList.length + " " + typeName
+            }).appendTo(".template-list-rows");
+            console.log(typeName);
+            entTypeList.forEach(function (ent) {
+
+                var href = ent.uri ? 'href=' + ent.uri + ' target="_blank"' : '';
+
+                var $e = $("<li>").loadTemplate($("#templateEnt"), {
+                    entA: '#' + ent.label
+                });
+                console.log($e);
+
+                $(".displayEntity", $row).append($e);
+
+
+                $('.entity.list', $e).addClass((typeName.toLowerCase()));
+                $('span>a', $e).attr("href", href);
+
+
+//                console.log(ent.label);
+//                console.log($('.entity.list').attr('class').split(' '));
+            });
+
+
+        }
     }
 
     $(document).on('click', '.entity', function () {

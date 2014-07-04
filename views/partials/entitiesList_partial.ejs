@@ -13,62 +13,35 @@
         <div class="row">
             <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
 
-                <%
-                var entityList = locals.entities;
-                        if(entityList){
-
-
-                    entityList.sort(/**
-                     * @return {number}
-                     */
-                            function SortByNerdType(x, y) {
-                        return ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1 ));
-                    });
-
-                    var typeList = entityList.reduce(function (memo, ent) {
-
-                        if (!memo[ent.nerdType]) {
-                            memo[ent.nerdType] = [];
-                        }
-                        memo[ent.nerdType].push(ent);
-                        return memo;
-                    }, {});
-                %>
 
                 <div class="entity-content">
-                    <h4 class="extractor">In this video there are <%= entityList.length %> entities extracted
-                        by <%= locals.enriched.toUpperCase() %></h4>
-                    <%
-                    for (var type in typeList) {
-                        var typeName = type.split('#')[1];
-                        var entTypeList = typeList[type];
-                    %>
-                    <div class="row">
-                        <div class="col-md-3 col-sm-3 entityType">
-                            <h4 class="entTypeText"><%= entTypeList.length %> <%= typeName %></h4>
-                        </div>
-                        <div class="col-md-9 col-sm-9 entityList">
-                            <ul class="displayEntity">
-                                <% entTypeList.forEach(function (ent) {
-                                    var href = ent.uri ? 'href=' + ent.uri + ' target="_blank"' : '';
-                                %>
+                    <h4 class="extractor">In this video there are <span class="totEnt"></span> entities extracted
+                        by <span class="extEnt"></span></h4>
 
-                                <li><span class="entity list <%= typeName.toLowerCase() %>">
-                    <a <%= href %> >
-                        #<%= ent.label %>
-                    </a>
-                           </span>
-
-                                </li>
-                                <% }) %>
-                            </ul>
-                        </div>
-                    </div>
-                    <% } %>
+                    <div class="template-list-rows"></div>
                 </div>
             </div>
-            <% } %>
 
         </div>
     </div>
 </div>
+
+<script type="text/html" id="templateType">
+    <div class="row">
+        <div class="col-md-3 col-sm-3 entityType">
+
+            <h4 class="entTypeText" data-content="typeAndOccurrences"></h4>
+        </div>
+        <div class="col-md-9 col-sm-9 entityList">
+            <ul class="displayEntity">
+            </ul>
+        </div>
+    </div>
+</script>
+
+
+<script type="text/html" id="templateEnt">
+    <span class="entity list">
+            <a data-content="entA"></a>
+       </span>
+</script>
