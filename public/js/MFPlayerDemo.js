@@ -278,7 +278,7 @@ $(document).ready(function () {
             console.log(typeName);
             entTypeList.forEach(function (ent) {
 
-                var href = ent.uri ? 'href=' + ent.uri + ' target="_blank"' : '';
+                var href = ent.uri ? ent.uri : '';
 
                 var $e = $("<li>").loadTemplate($("#templateEnt"), {
                     entA: '#' + ent.label
@@ -290,6 +290,7 @@ $(document).ready(function () {
 
                 $('.entity.list', $e).addClass((typeName.toLowerCase()));
                 $('span>a', $e).attr("href", href);
+                $('span>a', $e).attr("target", "_blank");
 
 
 //                console.log(ent.label);
