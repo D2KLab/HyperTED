@@ -32,6 +32,7 @@ $(document).ready(function () {
             $("#video-info-chapters").fadeIn();
             $(media).one('loadedmetadata', function () {
                 displayChapters();
+                displayPins();
                 if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
                     highlightMFSub($player.getMFJson().hash.t[0].value);
                 }
@@ -331,17 +332,22 @@ $(document).ready(function () {
         updateMFurl();
     });
 
+    $('.pin').hide();
+    function displayPins() {
+        $('.pin').fadeIn();
     $('.pin').each(function () {
         var $hotSpot = $(this).children('a');
         var startHS = $hotSpot.data('start-time');
         var endHS = $hotSpot.data('end-time');
 
-        var totWidth = $player.getDuration();
+        var totWidth = $player.getDuration() / 1000;
+
         var rest = totWidth - startHS;
         var point = (startHS / totWidth) * 100;
         console.log(totWidth);
         $(this).css("right", rest + "px");
     });
+    }
 
     $("#video-info-chapters").hide();
     function displayChapters() {
