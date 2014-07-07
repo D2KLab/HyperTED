@@ -188,15 +188,13 @@
             <div class="col-md-5 col-lg-5">
                 <% include partials/playlist.ejs %>
             </div>
-
-
         </div>
-
 
         <div class="row">
             <div class="col-md-12 col-lg-12">
+                <% if(locals.enriched && locals.entities){ %>
                 <% include partials/entitiesList_partial.ejs %>
-
+                <% } %>
             </div>
         </div>
     </div>
@@ -214,10 +212,19 @@
 </footer>
 
 <script>
+    var entitiesL;
+    <%if(locals.enriched && locals.entities){ %>
+    entitiesL = <%- JSON.stringify(entities)%>
+
+            <%}else{%>
+            entitiesL = "";
+    <%}%>
     var video = {
         uri: "<%= videoURI %>",
-        uuid: "<%= uuid %>"
+        uuid: "<%= uuid %>",
+        entitiesL: entitiesL
     };
+
 </script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js"></script>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>

@@ -69,6 +69,7 @@ $(document).ready(function () {
         $this.text(text)
     });
 
+
     if (Modernizr.history && Modernizr.localstorage) {
         var $nerdifyForm = $('form.nerdify');
         var ajaxAction = $nerdifyForm.data('action');
@@ -105,10 +106,10 @@ $(document).ready(function () {
                     } catch (e) {
                         //DO NOTHING
                     }
-                    console.log(data);
                     displayEntities(data);
                     showEntityList(data);
                     $("#entity-sect").fadeIn();
+
 
 //                    var $data = $(data);
 //                    if (hasVideoSub) {
@@ -162,6 +163,7 @@ $(document).ready(function () {
                     $nerdified = $($nerdified);
                     $plain = $($plain);
                     $entSect = $($entSect);
+
 
                     $entSect.hide();
                     $entSect.appendTo('#ent_append').fadeIn();
@@ -243,8 +245,15 @@ $(document).ready(function () {
         $('.sub-text', document).replaceWith($newSubCont);
     }
 
+
+    if (video.entitiesL) {
+        $("#entity-sect").fadeIn();
+        showEntityList(video.entitiesL);
+    }
+
     function showEntityList(entityList) {
         $(".template-list-rows").empty();
+
 
         entityList.sort(
             function SortByNerdType(x, y) {
@@ -275,7 +284,6 @@ $(document).ready(function () {
             var $row = $("<div>").loadTemplate($("#templateType"), {
                 typeAndOccurrences: entTypeList.length + " " + typeName
             }).appendTo(".template-list-rows");
-            console.log(typeName);
             entTypeList.forEach(function (ent) {
 
                 var href = ent.uri ? ent.uri : '';
@@ -283,7 +291,6 @@ $(document).ready(function () {
                 var $e = $("<li>").loadTemplate($("#templateEnt"), {
                     entA: '#' + ent.label
                 });
-                console.log($e);
 
                 $(".displayEntity", $row).append($e);
 
@@ -292,9 +299,6 @@ $(document).ready(function () {
                 $('span>a', $e).attr("href", href);
                 $('span>a', $e).attr("target", "_blank");
 
-
-//                console.log(ent.label);
-//                console.log($('.entity.list').attr('class').split(' '));
             });
 
 

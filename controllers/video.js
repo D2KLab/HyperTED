@@ -253,7 +253,7 @@ exports.nerdify = function (req, res) {
             // we have already enriched with this extractor
             var entities = video.entities.filter(hasExtractor, ext);
             res.json(entities);
-//            video.enriched = ext;
+            video.enriched = ext;
 //            res.render('nerdify_resp.ejs', video);
         } else {
             console.log(LOG_TAG + 'nerdifying ' + uuid);
@@ -266,7 +266,7 @@ exports.nerdify = function (req, res) {
 
                 res.json(data);
 //                video.entities = data;
-//                video.enriched = ext;
+                video.enriched = ext;
 //                res.render('nerdify_resp.ejs', video);
             });
         }
