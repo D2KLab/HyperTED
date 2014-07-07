@@ -9,6 +9,11 @@ var http = require('http'),
     utils = require('./utils');
 
 var LOG_TAG = '[VIDEO.JS]: ';
+var hStatusValue = {
+    'IN_PROGRESS': 1,
+    'DONE': 2
+};
+
 var time1d = 86400000; //one day
 ts.prepare();
 
@@ -112,6 +117,17 @@ exports.view = function (req, res) {
 
                 });
             });
+        }
+
+        if (video.hotspotStatus == hStatusValue.IN_PROGRESS) {
+            checkHotspotResults(video.uuid, function (err, data) {
+                if (data) {
+                    video.hotspotStatus = hStatusValue.DONE;
+                    // add real data
+                }
+                viewVideo(req, res, video);
+            });
+            return;
         }
         viewVideo(req, res, video);
     });
@@ -808,11 +824,52 @@ function hasExtractor(ent) {
     return ent.extractor == this;
 }
 function containsExtractor(array, ext) {
-    var filtered = array.filter(hasExtractor,ext);
+    var filtered = array.filter(hasExtractor, ext);
     if (ext != "combined") {
         filtered = filtered.filter(function (ent) {
             return ent.source != "combined";
         });
     }
     return filtered.length > 0;
+}
+
+exports.runHotspot = function (req, res) {
+    var uuid = req.param('uuid');
+    db.getHotspotProcess(uuid, function (e, status) {
+        if (e) {
+            console.log("DB Error: " + e.message);
+            res.json({error: {code: 500, message: e.message}});
+            return;
+        }
+
+        if (!status) {
+            runHotspotProcess(uuid, function (err, data) {
+                if (err) {
+                    console.log("Error: " + err.message);
+                    res.json({error: {code: 500, message: err.message}});
+                    return;
+                }
+                res.json({done: true});
+            });
+        } else res.json({done: true});
+
+    });
+};
+
+function runHotspotProcess(uuid, callback) {
+    /* Call to service */
+    db.setHotspotProcess(uuid, hStatusValue.IN_PROGRESS, callback);
+}
+
+function checkHotspotResults(uuid, callback) {
+    console.log("check Hotspot Results");
+    /* Call to services */
+    var results; //fake undefined result
+
+    if (results) {
+        //save in db
+        db.setHotspotProcess(uuid, hStatusValue.DONE, callback);
+    } else {
+        callback(true, false);
+    }
 }

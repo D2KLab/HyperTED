@@ -122,3 +122,13 @@ function addEntities(uuid, entities) {
     });
 }
 exports.addEntities = addEntities;
+
+exports.setHotspotProcess = function (uuid, value, callback) {
+    videos.update({'uuid': uuid}, {$set:{'hotspotStatus': value}}, callback);
+};
+exports.getHotspotProcess = function (uuid, callback) {
+    videos.findOne({'uuid': uuid}).on('complete', function (e, data) {
+        if (data) callback(e, data.hotspotStatus);
+        else callback({message:"video not in db"});
+    });
+};
