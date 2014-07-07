@@ -106,7 +106,7 @@ $(document).ready(function () {
                     } catch (e) {
                         //DO NOTHING
                     }
-                    displayEntities(data);
+                    displayEntitiesSub(data);
                     showEntityList(data);
                     $("#entity-sect").fadeIn();
 
@@ -195,7 +195,7 @@ $(document).ready(function () {
 
     var $plainCont = $('.sub-text');
 
-    function displayEntities(entJson) {
+    function displayEntitiesSub(entJson) {
         var $newSubCont = $plainCont.clone();
         var $subList = $newSubCont.find('p');
         var subIndex;
@@ -248,6 +248,7 @@ $(document).ready(function () {
 
     if (video.entitiesL) {
         $("#entity-sect").fadeIn();
+        displayEntitiesSub(video.entitiesL);
         showEntityList(video.entitiesL);
     }
 

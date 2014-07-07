@@ -345,6 +345,7 @@ h1.title {
 
     #video {
       width: 100%;
+      min-height: 360px;
       @media (min-width: 768px) {
         padding-left: 10em;
 
