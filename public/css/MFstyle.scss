@@ -357,6 +357,15 @@ h1.title {
         }
       }
     }
+    #hotspots-cont {
+      padding: 0 15px 15px 15px;
+      position: relative;
+      min-height: 30px;
+      .pin {
+        display: inline-block;
+        position: absolute;
+      }
+    }
   }
 }
 

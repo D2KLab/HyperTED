@@ -331,8 +331,19 @@ $(document).ready(function () {
         updateMFurl();
     });
 
-    $("#video-info-chapters").hide();
+    $('.pin').each(function () {
+        var $hotSpot = $(this).children('a');
+        var startHS = $hotSpot.data('start-time');
+        var endHS = $hotSpot.data('end-time');
 
+        var totWidth = $player.getDuration();
+        var rest = totWidth - startHS;
+        var point = (startHS / totWidth) * 100;
+        console.log(totWidth);
+        $(this).css("right", rest + "px");
+    });
+
+    $("#video-info-chapters").hide();
     function displayChapters() {
         $("#video-info-chapters").fadeIn();
 

@@ -69,6 +69,9 @@
 <section id="player-sect">
     <div id="player-container" class="clearfix">
         <div id="video"></div>
+        <div id="hotspots-cont">
+            <% include partials/hotspots.ejs %>
+        </div>
     </div>
 
     <% if (locals.metadata && metadata.title) { %>
@@ -119,10 +122,6 @@
     <% } %>
 </div>
 
-<form method="get" action="video/runhotspot">
-    <input type="hidden" name="uuid" value="<%= locals.uuid %>">
-    <button class="btn btn-danger" type="submit">GENERATE HOTSPOTS</button>
-</form>
 <div class="nerdificable">
     <% if(locals.error){ %>
     <div class="alert alert-danger"><%= error %></div>
