@@ -59,7 +59,6 @@ $(document).ready(function () {
     });
     video.player = $player;
     console.debug($player);
-    $("#entity-sect").hide();
 
     $('.see-all').click(function () {
         var $this = $(this);
@@ -245,16 +244,14 @@ $(document).ready(function () {
         $('.sub-text', document).replaceWith($newSubCont);
     }
 
-
     if (video.entitiesL) {
-        $("#entity-sect").fadeIn();
         displayEntitiesSub(video.entitiesL);
         showEntityList(video.entitiesL);
     }
 
     function showEntityList(entityList) {
         $(".template-list-rows").empty();
-
+        $("#entity-sect").fadeIn();
 
         entityList.sort(
             function SortByNerdType(x, y) {
