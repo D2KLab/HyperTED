@@ -192,6 +192,11 @@ $(document).ready(function () {
     }
 
 
+    $('#myTab a').click(function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+    });
+
     var $plainCont = $('.sub-text');
 
     function displayEntitiesSub(entJson) {

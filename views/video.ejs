@@ -99,10 +99,37 @@
 </section>
 
 
-<div id="video-info-chapters">
-    <% if (locals.chapters) { %>
+<div id="video-info-chapters" class="tab-content">
+    <% if (locals.chapters && locals.metadata) { console.log("metadata"); console.log(metadata.title) %>
+    <ul class="nav nav-tabs" role="tablist" id="myTab">
+        <li class="active"><a href="#chapters" role="tab" data-toggle="tab">chapters</a></li>
+        <li><a href="#infos" role="tab" data-toggle="tab">infos</a></li>
+    </ul>
+
+    <div class="tab-pane active" id="chapters">
+
+    </div>
+
+    <div class="tab-pane" id="infos">
+        <div class="play-video-info clearfix">
+            <div class="left">
+                <% if(metadata.published && metadata.event) { %>
+                <h5 class="video-info">published on <%= metadata.published.substring(0, 10) %>
+                    <span> from <%= metadata.event %></span></h5>
+                <% } %>
+                <h3 class="video-info"><%= metadata.title %></h3>
+            </div>
+            <% if(metadata.descr) { %>
+            <div class="right"><h5><%= metadata.descr %></h5></div>
+
+            <% } %>
+        </div>
+    </div>
+
+    <% }else if (locals.chapters && !locals.metadata) { %>
     <% include partials/chapter.ejs %>
-    <% }else if(locals.metadata && metadata.title) { %>
+    <% }else if(!locals.chapters && locals.metadata && metadata.title != null && metadata.title != 'undefined') { %>
+
     <div class="play-video-info clearfix">
         <div class="left">
             <h5 class="video-info">published on <%= metadata.published.substring(0, 10) %>
@@ -116,7 +143,9 @@
 
         <% } %>
     </div>
+
     <% } %>
+</div>
 </div>
 
 
