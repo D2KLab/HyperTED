@@ -333,25 +333,15 @@ $(document).ready(function () {
         });
 
 
-        var oldStart = 0;
-        var oldEnd = 0;
-
         function calcDivWidth(startTime, endTime) {
-
-            var totWidth = $player.getDuration() / 1000;
-            var width = ((endTime - startTime) / totWidth) * 100;
-            return width;
+            var totWidth = ($player.getDuration() / 1000);
+            return((endTime - startTime) / totWidth) * 100;
         }
 
-
-//            oldStart = startTime;
-//
-//            if (oldpEnd < startTime) {
-//                var spaceWidth = ((startTime - oldEnd) / totWidth) * 100;
-//                $(this).css("margin-left", spaceWidth + "%");
-//            }
-//            oldEnd = endTime;
-//        }
+        function calcSpaceWidth(startTime, oldEndTime) {
+            var totWidth = ($player.getDuration() / 1000);
+            return ((startTime - oldEndTime) / totWidth) * 100;
+        }
 
         $('.pin').hide();
         function displayPins() {
@@ -365,29 +355,19 @@ $(document).ready(function () {
                 var startHS = $hotSpot.data('start-time');
                 var endHS = $hotSpot.data('end-time');
 
-
-                var totWidth = $player.getDuration() / 1000;
-
-                var width = ((endHS - startHS) * 100 / totWidth);
+                var width = calcDivWidth(startHS, endHS);
                 $(this).css("width", width + "%");
-
-
+//                console.log(totWidth);
 
                 if (oldEnd < startHS) {
-                    var spaceWidth = ((startHS - oldEnd) * 100 / totWidth);
+                    var spaceWidth = calcSpaceWidth(startHS, oldEnd);
                     $(this).css("margin-left", spaceWidth + "%");
                 }
-                console.log("******oldend******");
-                console.log(totWidth);
-                console.log(width);
-
-                console.log(spaceWidth);
                 oldEnd = endHS;
 
 
                 $(this).on('click', function () {
                     $player.setmf('t=' + startHS + ',' + endHS).playmf();
-
                     updateMFurl();
                 });
 
@@ -405,15 +385,13 @@ $(document).ready(function () {
                 var startChapter = $chapter.data('start-time');
                 var endChapter = $chapter.data('end-time');
 
-                var totWidth = $player.getDuration() / 1000;
-                var width = ((endChapter - startChapter) / totWidth) * 100;
-                $(this).css("width", width + "%");
-
+                var chapWidth = calcDivWidth(startChapter, endChapter);
+                $(this).css("width", chapWidth + "%");
 
 
                 if (oldChapEnd < startChapter) {
-                    var spaceWidth = ((startChapter - oldChapEnd) / totWidth) * 100;
-                    $(this).css("margin-left", spaceWidth + "%");
+                    var chapSpaceWidth = calcSpaceWidth(startChapter, oldChapEnd);
+                    $(this).css("margin-left", chapSpaceWidth + "%");
                 }
                 oldChapEnd = endChapter;
 
@@ -447,9 +425,9 @@ $(document).ready(function () {
 
 
                     console.log($('.chap-link').last('.chap-num'));
-                    $('.first-part').text("chapter ");
-                    $('.selected-chap-num').text(" " + chapNum + " ");
-                    $('.last-part').text(" of " + chapNumLast);
+                    $('.first-part').text("chapter   ");
+                    $('.selected-chap-num').text("   " + chapNum + "   ");
+                    $('.last-part').text("   of   " + chapNumLast);
                     $(this).addClass('selected-chap');
 
                     updateMFurl();

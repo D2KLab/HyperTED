@@ -592,12 +592,34 @@ html, body {
     padding-bottom: 15px;
 }
 
+#player-sect #player-container #hotspots-cont form, #player-sect #player-container #hotspots-cont .hsProgress {
+    text-align: center;
+}
+
+#player-sect #player-container #hotspots-cont form .btn-hotspot, #player-sect #player-container #hotspots-cont .hsProgress .btn-hotspot {
+    background: #000000;
+    border: 1px solid #f4f4f4;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    border-radius: 10px;
+    color: #f4f4f4;
+}
+
+#player-sect #player-container #hotspots-cont form .btn-hotspot:hover, #player-sect #player-container #hotspots-cont .hsProgress .btn-hotspot:hover {
+    background: #b11200;
+}
+
 #player-sect #player-container #hotspots-cont .hscont {
     margin-left: 65px;
     margin-right: 65px;
 }
 
 #player-sect #player-container #hotspots-cont .hscont .pin {
+    background: url(../img/pin.png) no-repeat center center;
+    text-align: center;
+    cursor: pointer;
     float: left;
     display: inline-block;
     border-bottom: 1px solid #f4f4f4;
@@ -613,8 +635,18 @@ html, body {
 }
 
 #player-sect #player-container #hotspots-cont .hscont .pin img {
+    display: none;
     position: absolute;
     left: -10px;
+}
+
+.btn-danger {
+    background: #b11200;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    border-radius: 10px;
 }
 
 .chap-label {
