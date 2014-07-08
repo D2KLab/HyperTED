@@ -589,10 +589,16 @@ html, body {
 }
 
 #player-sect #player-container #hotspots-cont {
-    padding: 0 0 15px 15px;
+    padding-bottom: 15px;
 }
 
-#player-sect #player-container #hotspots-cont .pin {
+#player-sect #player-container #hotspots-cont .hscont {
+    margin-left: 65px;
+    margin-right: 65px;
+}
+
+#player-sect #player-container #hotspots-cont .hscont .pin {
+    float: left;
     display: inline-block;
     border-bottom: 1px solid #f4f4f4;
     -webkit-border-radius: 0 0 10px 10px;
@@ -601,12 +607,14 @@ html, body {
     -o-border-radius: 0 0 10px 10px;
     border-radius: 0 0 10px 10px;
     position: relative;
-    background-image: url(../img/pin.png);
-    background-repeat: no-repeat;
-    background-position: left;
     top: -10px;
     z-index: 101;
     min-height: 26px;
+}
+
+#player-sect #player-container #hotspots-cont .hscont .pin img {
+    position: absolute;
+    left: -10px;
 }
 
 .chap-label {

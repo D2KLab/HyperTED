@@ -340,26 +340,27 @@ $(document).ready(function () {
 
             var totWidth = $player.getDuration() / 1000;
             var width = ((endTime - startTime) / totWidth) * 100;
-            $(this).css("width", width + "%");
-
-
-            oldStart = startTime;
-
-            if (oldpEnd < startTime) {
-                var spaceWidth = ((startTime - oldEnd) / totWidth) * 100;
-                $(this).css("margin-left", spaceWidth + "%");
-            }
-            oldEnd = endTime;
+            return width;
         }
+
+
+//            oldStart = startTime;
+//
+//            if (oldpEnd < startTime) {
+//                var spaceWidth = ((startTime - oldEnd) / totWidth) * 100;
+//                $(this).css("margin-left", spaceWidth + "%");
+//            }
+//            oldEnd = endTime;
+//        }
 
         $('.pin').hide();
         function displayPins() {
-            $('.pin').fadeIn();
+            var $pin = $('.pin');
+            $pin.fadeIn();
 
-            var oldStart = 0;
             var oldEnd = 0;
 
-            $('.pin').each(function () {
+            $pin.each(function () {
                 var $hotSpot = $(this).children('a');
                 var startHS = $hotSpot.data('start-time');
                 var endHS = $hotSpot.data('end-time');
@@ -367,16 +368,20 @@ $(document).ready(function () {
 
                 var totWidth = $player.getDuration() / 1000;
 
-                var width = ((endHS - startHS) / totWidth) * 100;
+                var width = ((endHS - startHS) * 100 / totWidth);
                 $(this).css("width", width + "%");
 
 
-                oldStart = startHS;
 
                 if (oldEnd < startHS) {
-                    var spaceWidth = ((startHS - oldEnd) / totWidth) * 100;
+                    var spaceWidth = ((startHS - oldEnd) * 100 / totWidth);
                     $(this).css("margin-left", spaceWidth + "%");
                 }
+                console.log("******oldend******");
+                console.log(totWidth);
+                console.log(width);
+
+                console.log(spaceWidth);
                 oldEnd = endHS;
 
 
@@ -393,7 +398,6 @@ $(document).ready(function () {
         function displayChapters() {
             $("#video-info-chapters").fadeIn();
 
-            var oldChapStart = 0;
             var oldChapEnd = 0;
             $('.chap-link').each(function () {
 
@@ -406,7 +410,6 @@ $(document).ready(function () {
                 $(this).css("width", width + "%");
 
 
-                oldChapStart = startChapter;
 
                 if (oldChapEnd < startChapter) {
                     var spaceWidth = ((startChapter - oldChapEnd) / totWidth) * 100;
