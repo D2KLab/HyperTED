@@ -358,12 +358,22 @@ h1.title {
       }
     }
     #hotspots-cont {
-      padding: 0 15px 15px 15px;
-      position: relative;
-      min-height: 30px;
+      padding: 0 0 15px 15px;
+
       .pin {
+
         display: inline-block;
-        position: absolute;
+        border-bottom: 1px solid $light_gray;
+        @include border-radius-bottom(10px);
+        position: relative;
+        background: {
+          image: url(../img/pin.png);
+          repeat: no-repeat;
+          position: left;
+        }
+        top: -10px;
+        z-index: 101;
+        min-height: 26px;
       }
     }
   }

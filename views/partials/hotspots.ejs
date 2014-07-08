@@ -1,7 +1,6 @@
 <div class="container-fluid">
 
-    <% var hotspotstatus = 2;
-
+    <%
     var hotSpotList = [
         {
             startNPT: 20,
@@ -59,25 +58,29 @@
         }
     ];
 
-
-            switch (hotspotstatus){
+            switch (locals.hotspotStatus){
     case 1:
     %>
-    <h2 class="title">we are working for you</h2>
+    <h2 class="title">Hotspot creation in progress</h2>
     <%
         break;
     case 2:
             hotSpotList.forEach(function(h){
     %>
     <div class="pin">
-        <a data-start-time="<%= h.startNPT %>" data-end-time="<%= h.endNPT %>"><img src="../img/pin.png"/></a></div>
+        <a data-start-time="<%= h.startNPT %>" data-end-time="<%= h.endNPT %>">
+
+            <img src="../img/pin.png"/>
+        </a>
+    </div>
     <% });
         break;
     default:
     %>
-    <form method="get" action="video/runhotspot">
-        <input type="hidden" name="uuid" value="<%= locals.uuid %>">
+    <form method="get" action="../runhotspot">
+    <input type="hidden" name="uuid" value="<%= locals.uuid %>">
         <button class="btn btn-danger" type="submit">GENERATE HOTSPOTS</button>
     </form>
     <% } %>
+
 </div>

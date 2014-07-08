@@ -589,14 +589,24 @@ html, body {
 }
 
 #player-sect #player-container #hotspots-cont {
-    padding: 0 15px 15px 15px;
-    position: relative;
-    min-height: 30px;
+    padding: 0 0 15px 15px;
 }
 
 #player-sect #player-container #hotspots-cont .pin {
     display: inline-block;
-    position: absolute;
+    border-bottom: 1px solid #f4f4f4;
+    -webkit-border-radius: 0 0 10px 10px;
+    -moz-border-radius: 0 0 10px 10px;
+    -ms-border-radius: 0 0 10px 10px;
+    -o-border-radius: 0 0 10px 10px;
+    border-radius: 0 0 10px 10px;
+    position: relative;
+    background-image: url(../img/pin.png);
+    background-repeat: no-repeat;
+    background-position: left;
+    top: -10px;
+    z-index: 101;
+    min-height: 26px;
 }
 
 .chap-label {

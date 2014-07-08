@@ -21,7 +21,7 @@ app.get('/builddb', video.buildDb);
 app.get('/', function (req, res) {
     res.render('welcome.ejs')
 });
-app.get('*', function(req,res){
+app.get('*', function (req, res) {
     res.render('error.ejs', err.e404);
 });
 app.listen(8080);

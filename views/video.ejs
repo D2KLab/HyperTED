@@ -122,14 +122,7 @@
     <% } %>
 </div>
 
-<% if(locals.hotspotStatus) { %>
-<p>Hotspot creation in progress</p>
-<% }else{ %>
-<form method="get" action="../runhotspot">
-    <input type="hidden" name="uuid" value="<%= locals.uuid %>">
-    <button class="btn btn-danger" type="submit">GENERATE HOTSPOTS</button>
-</form>
-<% } %>
+
 <div class="nerdificable">
     <% if(locals.error){ %>
     <div class="alert alert-danger"><%= error %></div>
