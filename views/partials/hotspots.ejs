@@ -1,71 +1,14 @@
 <div class="container-fluid">
 
     <%
-    var hotSpotList = [
-        {
-            startNPT: 20,
-            endNPT: 36,
-            mainEnt: [
-                {
-                    label: 'one',
-                    type: 'thing'
-                },
-                {
-                    label: 'two',
-                    type: 'thing'
-                },
-                {
-                    label: 'three',
-                    type: 'thing'
-                }
-            ]
-        },
-        {
-            startNPT: 120,
-            endNPT: 236,
-            mainEnt: [
-                {
-                    label: 'one',
-                    type: 'thing'
-                },
-                {
-                    label: 'two',
-                    type: 'thing'
-                },
-                {
-                    label: 'three',
-                    type: 'thing'
-                }
-            ]
-        },
-        {
-            startNPT: 300,
-            endNPT: 390,
-            mainEnt: [
-                {
-                    label: 'one',
-                    type: 'thing'
-                },
-                {
-                    label: 'two',
-                    type: 'thing'
-                },
-                {
-                    label: 'three',
-                    type: 'thing'
-                }
-            ]
-        }
-    ];
-
-            switch (locals.hotspotStatus){
+    switch (locals.hotspotStatus){
     case 1:
     %>
     <h2 class="title">Hotspot creation in progress</h2>
     <%
         break;
     case 2:
-            hotSpotList.forEach(function(h){
+            locals.hotspots.forEach(function(h){
     %>
     <div class="pin">
         <a data-start-time="<%= h.startNPT %>" data-end-time="<%= h.endNPT %>">
@@ -78,7 +21,7 @@
     default:
     %>
     <form method="get" action="../runhotspot">
-    <input type="hidden" name="uuid" value="<%= locals.uuid %>">
+        <input type="hidden" name="uuid" value="<%= locals.uuid %>">
         <button class="btn btn-danger" type="submit">GENERATE HOTSPOTS</button>
     </form>
     <% } %>

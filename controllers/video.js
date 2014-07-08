@@ -121,15 +121,17 @@ exports.view = function (req, res) {
 
         if (video.hotspotStatus == hStatusValue.IN_PROGRESS) {
             checkHotspotResults(video.uuid, function (err, data) {
+                console.log('1 inside')
+
                 if (data) {
                     video.hotspotStatus = hStatusValue.DONE;
-                    // add real data
+                    video.hotspots = data;
                 }
                 viewVideo(req, res, video);
             });
-            return;
+        } else {
+            viewVideo(req, res, video);
         }
-        viewVideo(req, res, video);
     });
 
 };
@@ -864,11 +866,76 @@ function runHotspotProcess(uuid, callback) {
 function checkHotspotResults(uuid, callback) {
     console.log("check Hotspot Results");
     /* Call to services */
-    var results; //fake undefined result
+    //fake results
+    var results = {
+        hotspots: [
+            {
+                startNPT: 20,
+                endNPT: 36,
+                mainEnt: [
+                    {
+                        label: 'one',
+                        type: 'thing'
+                    },
+                    {
+                        label: 'two',
+                        type: 'thing'
+                    },
+                    {
+                        label: 'three',
+                        type: 'thing'
+                    }
+                ]
+            },
+            {
+                startNPT: 120,
+                endNPT: 236,
+                mainEnt: [
+                    {
+                        label: 'one',
+                        type: 'thing'
+                    },
+                    {
+                        label: 'two',
+                        type: 'thing'
+                    },
+                    {
+                        label: 'three',
+                        type: 'thing'
+                    }
+                ]
+            },
+            {
+                startNPT: 300,
+                endNPT: 390,
+                mainEnt: [
+                    {
+                        label: 'one',
+                        type: 'thing'
+                    },
+                    {
+                        label: 'two',
+                        type: 'thing'
+                    },
+                    {
+                        label: 'three',
+                        type: 'thing'
+                    }
+                ]
+            }
+        ]
+    };
 
     if (results) {
-        //save in db
-        db.setHotspotProcess(uuid, hStatusValue.DONE, callback);
+        db.addHotspots(uuid, results.hotspots, function (err) {
+            if (err) {
+                callback(err);
+                return;
+            }
+            db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
+                callback(err, results.hotspots);
+            });
+        });
     } else {
         callback(true, false);
     }
