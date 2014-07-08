@@ -1,6 +1,7 @@
 var UUID = require("node-uuid"),
-    monk = require('monk');
-var db, videos, ents;
+    monk = require('monk'),
+    async = require('async');
+var db, videos, ents, hots;
 
 
 exports.prepare = function () {
@@ -14,25 +15,50 @@ exports.prepare = function () {
     ents = db.get('entities');
     ents.index('uuid');
     ents.index('extractor');
+
+    hots = db.get('hotspots');
+    ents.index('uuid');
 };
 
-function getVideoFromUuid(uuid, withEntities, callback) {
-    var cb = !withEntities ? callback : function (err, video) {
+function getVideoFromUuid(uuid, full, callback) {
+    var cb = !full ? callback : function (err, video) {
         if (err || !video) {
             callback(err, video);
             return;
         }
 
-        ents.find({'uuid': uuid}, function (err, docs) {
-            if (!err && docs && docs.length > 0) {
-                video.entities = docs;
+        async.parallel([
+            function (asyncCallback) {
+                getEntitiesFor(video, asyncCallback);
+            },
+            function (asyncCallback) {
+                getHotspotsFor(video, asyncCallback);
             }
+        ], function () {
             callback(false, video);
         });
     };
-
     videos.findOne({uuid: uuid}).on('complete', cb);
 }
+
+function getEntitiesFor(video, callback) {
+    ents.find({'uuid': video.uuid}, function (err, docs) {
+        if (!err && docs && docs.length > 0)
+            video.entities = docs;
+
+        callback(false, video);
+    });
+}
+
+function getHotspotsFor(video, callback) {
+    hots.find({'uuid': video.uuid}, function (err, docs) {
+        if (!err && docs && docs.length > 0) {
+            video.hotspots = docs;
+        }
+        callback(false, video);
+    });
+}
+
 exports.getVideoFromUuid = getVideoFromUuid;
 
 exports.getVideoFromLocator = function (locator, callback) {
@@ -131,4 +157,17 @@ exports.getHotspotProcess = function (uuid, callback) {
         if (data) callback(e, data.hotspotStatus);
         else callback({message: "video not in db"});
     });
+};
+exports.addHotspots = function (uuid, hotspots, callback) {
+    var e = false;
+    hotspots.forEach(function (h) {
+        h.uuid = uuid;
+        hots.insert(h, function (err, doc) {
+            if (err) {
+                console.log(err);
+                e = true;
+            }
+        });
+    });
+    callback(e);
 };
