@@ -61,7 +61,9 @@
             switch (locals.hotspotStatus){
     case 1:
     %>
-    <h2 class="title">Hotspot creation in progress</h2>
+    <div class="hsProgress">
+        <h3 class="title">hotspot creation in progress</h3>
+    </div>
     <%
         break;
     case 2:
@@ -79,7 +81,7 @@
     %>
     <form method="get" action="../runhotspot">
     <input type="hidden" name="uuid" value="<%= locals.uuid %>">
-        <button class="btn btn-danger" type="submit">GENERATE HOTSPOTS</button>
+        <button class="btn btn-hotspot" type="submit">GENERATE HOTSPOTS</button>
     </form>
     <% } %>
 

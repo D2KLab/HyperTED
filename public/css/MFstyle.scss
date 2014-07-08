@@ -359,11 +359,26 @@ h1.title {
     }
     #hotspots-cont {
       padding-bottom: 15px;
+      form, .hsProgress {
+        text-align: center;
+        .btn-hotspot {
+          background: #000000;
+          border: 1px solid $light_gray;
+          @include border-radius(10px);
+          color: $light_gray;
 
+          &:hover {
+            background: $dark_red;
+          }
+        }
+      }
       .hscont {
         margin-left: 65px;
         margin-right: 65px;
         .pin {
+          background: url(../img/pin.png) no-repeat center center;
+          text-align: center;
+          cursor: pointer;
           float: left;
           display: inline-block;
           border-bottom: 1px solid $light_gray;
@@ -374,6 +389,7 @@ h1.title {
           min-height: 26px;
 
           img {
+            display: none;
             position: absolute;
             left: -10px;
           }
@@ -381,6 +397,12 @@ h1.title {
       }
     }
   }
+}
+
+.btn-danger {
+  background: $dark_red;
+  @include border-radius(10px);
+
 }
 
 .chap-label {
