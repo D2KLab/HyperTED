@@ -905,6 +905,15 @@ span.wiki a {
     -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
     box-shadow: 0 1px 8px -2px #5d5d5d;
     width: 100%;
+    max-height: 121px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 860px) {
+    #video-info-chapters {
+        max-height: 243px;
+    }
 }
 
 #video-info-chapters .play-video-info {
@@ -935,6 +944,8 @@ span.wiki a {
     width: 50%;
     border-left: 1px solid #b11200;
     padding-left: 2%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 @media (max-width: 860px) {
