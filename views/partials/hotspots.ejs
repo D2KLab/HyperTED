@@ -1,7 +1,19 @@
-<div class="hscont">
+<div class="hscont clearfix">
 
     <%
-    switch (locals.hotspotStatus){
+    function labelTime(time) {
+        var hh = Math.floor(time / 3600);
+        hh = hh < 10 ? '0' + hh : hh;
+        var mm = Math.floor((time % 3600) / 60);
+        mm = mm < 10 ? '0' + mm : mm;
+        var ss = Math.floor((time % 3600) % 60);
+        ss = ss < 10 ? '0' + ss : ss;
+
+        return hh + ':' + mm + ':' + ss;
+    }
+
+
+            switch (locals.hotspotStatus){
     case 1:
     %>
     <div class="hsProgress">
@@ -10,14 +22,32 @@
     <%
         break;
     case 2:
+
             locals.hotspots.forEach(function(h){
     %>
+
     <div class="pin">
         <a data-start-time="<%= h.startNPT %>" data-end-time="<%= h.endNPT %>">
 
             <img src="../img/pin.png"/>
+            <span class="entity <%= h.mainEnt[0].type %>"><%= h.mainEnt[0].label %></span>
+
         </a>
+
+        <div class="qtipTitle">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+            <%= labelTime(h.startNPT) %> - <%= labelTime(h.endNPT) %>
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </div>
+
+
+        <div class="qtipEnt">
+            <% h.mainEnt.forEach(function(me){ %>
+            <span class=" entity <%= me.type %>"><%= me.label %></span>
+            <% }); %>
+        </div>
     </div>
+
     <% });
         break;
     default:

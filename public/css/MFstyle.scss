@@ -3,6 +3,7 @@
 @import "font";
 @import "mixins";
 @import "video_player";
+@import "jquery.qtip.min.css";
 
 /* colors */
 $light_gray: #f4f4f4;
@@ -375,8 +376,11 @@ h1.title {
       .hscont {
         margin-left: 65px;
         margin-right: 65px;
+        @media(max-width: 768px) {
+          width: 508px;
+          margin-right: 0;
+        }
         .pin {
-          background: url(../img/pin.png) no-repeat center center;
           text-align: center;
           cursor: pointer;
           float: left;
@@ -388,13 +392,30 @@ h1.title {
           z-index: 101;
           min-height: 26px;
 
-          img {
+          .qtipEnt {
             display: none;
+          }
+          img {
             position: absolute;
             left: -10px;
           }
         }
       }
+    }
+  }
+}
+
+.qtip-light {
+  padding-bottom: 15px;
+
+  .qtip-titlebar {
+    margin-bottom: 15px;
+    padding: 8px 15px;
+    background: $dark_red;
+    color: $light_gray;
+    .glyphicon {
+      color: $light_gray;
+      font-size: 0.9em;
     }
   }
 }

@@ -333,6 +333,31 @@ $(document).ready(function () {
         });
 
 
+        var $pin = $('.pin');
+        $('.qtipEnt').hide();
+        $('.qtipTitle').hide();
+
+        $pin.each(function () {
+            var $this = $(this);
+            $this.qtip({
+                content: {
+                    text: $('.qtipEnt', $this).html(),
+                    title: $('.qtipTitle', $this).html()
+                },
+                style: {
+                    classes: 'qtip-light qtip-rounded',
+                    padding: '15px',
+                    tip: 'bottom middle'
+                },
+                position: {
+                    my: 'bottom center',
+                    at: 'top center'
+                }
+            });
+
+
+        });
+
         function calcDivWidth(startTime, endTime) {
             var totWidth = ($player.getDuration() / 1000);
             return((endTime - startTime) / totWidth) * 100;
@@ -343,9 +368,9 @@ $(document).ready(function () {
             return ((startTime - oldEndTime) / totWidth) * 100;
         }
 
-        $('.pin').hide();
+        $pin.hide();
         function displayPins() {
-            var $pin = $('.pin');
+
             $pin.fadeIn();
 
             var oldEnd = 0;
@@ -357,7 +382,6 @@ $(document).ready(function () {
 
                 var width = calcDivWidth(startHS, endHS);
                 $(this).css("width", width + "%");
-//                console.log(totWidth);
 
                 if (oldEnd < startHS) {
                     var spaceWidth = calcSpaceWidth(startHS, oldEnd);
@@ -370,6 +394,7 @@ $(document).ready(function () {
                     $player.setmf('t=' + startHS + ',' + endHS).playmf();
                     updateMFurl();
                 });
+
 
             });
         }

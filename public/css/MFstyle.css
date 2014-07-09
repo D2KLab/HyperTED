@@ -1,5 +1,6 @@
 @import "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css";
 @import "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css";
+@import url(jquery.qtip.min.css);
 
 @font-face {
     font-family: "CaviarDreams";
@@ -616,8 +617,14 @@ html, body {
     margin-right: 65px;
 }
 
+@media (max-width: 768px) {
+    #player-sect #player-container #hotspots-cont .hscont {
+        width: 508px;
+        margin-right: 0;
+    }
+}
+
 #player-sect #player-container #hotspots-cont .hscont .pin {
-    background: url(../img/pin.png) no-repeat center center;
     text-align: center;
     cursor: pointer;
     float: left;
@@ -634,10 +641,29 @@ html, body {
     min-height: 26px;
 }
 
-#player-sect #player-container #hotspots-cont .hscont .pin img {
+#player-sect #player-container #hotspots-cont .hscont .pin .qtipEnt {
     display: none;
+}
+
+#player-sect #player-container #hotspots-cont .hscont .pin img {
     position: absolute;
     left: -10px;
+}
+
+.qtip-light {
+    padding-bottom: 15px;
+}
+
+.qtip-light .qtip-titlebar {
+    margin-bottom: 15px;
+    padding: 8px 15px;
+    background: #b11200;
+    color: #f4f4f4;
+}
+
+.qtip-light .qtip-titlebar .glyphicon {
+    color: #f4f4f4;
+    font-size: 0.9em;
 }
 
 .btn-danger {
