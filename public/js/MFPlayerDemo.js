@@ -471,38 +471,45 @@ $(document).ready(function () {
         }
 
         function highlightMFSub(t) {
+            var sMF, eMF, sMFtest, eMFtest;
 
-            var mfTime = (t.split(","));
-            var sMF, eMF;
-            var sMFtest = mfTime[0];
-            var eMFtest = mfTime[1];
+            t = t.replace('npt:', '');
 
-            if (sMFtest.indexOf(":") == -1 && eMFtest.indexOf(":") == -1) {
-                sMF = sMFtest;
-                eMF = eMFtest;
+            if (t.indexOf(",") != -1) {
+                var mfTime = (t.split(","));
+                sMFtest = mfTime[0];
+                sMFtest = sMFtest.length > 0 ? sMFtest : '0';
+                eMFtest = mfTime[1];
             } else {
-                sMF = calcSec(sMFtest);
-                eMF = calcSec(eMFtest);
+                sMFtest = t;
+                eMFtest = '86400';
             }
 
+            sMF = sMFtest.indexOf(":") == -1 ? sMFtest : calcSec(sMFtest);
+            eMF = eMFtest.indexOf(":") == -1 ? eMFtest : calcSec(eMFtest);
+            sMF = parseFloat(sMF);
+            eMF = parseFloat(eMF);
 
-            var sSub;
-            var eSub;
             $('.sub-text p').removeClass("selected-frag").each(function () {
-                sSub = $(this).data('startss');
-                eSub = $(this).data('endss');
+//                var sSub = $(this).data('startss');
+                var eSub = parseFloat($(this).data('endss'));
 
+//                console.log(sMF + '<' + eSub + ' && ' + eMF + '>=' + eSub);
                 if (sMF < eSub && eMF >= eSub) {
                     $(this).addClass("selected-frag");
                 }
-
             });
-            var scrollPos = $(".selected-frag:first").position().top + $('.sub-text').scrollTop();
+            var $firstSelFrag = $(".selected-frag:first");
+            if ($firstSelFrag.length > 0) {
+                var $subText = $('.sub-text');
+                var scrollPos = $firstSelFrag.position().top + $subText.scrollTop();
 
-
-            $('.sub-text').animate({
-                scrollTop: scrollPos
-            });
+                $subText.animate({
+                    scrollTop: scrollPos
+                });
+            } else {
+                console.warn("No subtitles in this fragment. Are you sure that fragment is inside video duration?")
+            }
         }
 
         $(window).off('popstate.changemf').on('popstate.changemf', function () {

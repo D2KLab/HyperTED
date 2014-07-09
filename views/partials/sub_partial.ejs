@@ -91,6 +91,9 @@
                     var newChap = true;
 
                         subList.forEach(function(sub){
+                    if (!sub.id) {
+                        return;
+                    }
                         if (sub.dataChap && newChap) {
                     newChap = false;
                 %>

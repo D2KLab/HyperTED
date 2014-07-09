@@ -45,14 +45,24 @@ html, body {
   background: white;
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
   margin: 0 0 30px;
+  height: 300px;
   max-height: 40%;
+  min-height: 120px;
   width: 100%;
-
+  @media screen and (max-width: 500px) {
+    max-height: 150px;
+  }
+  position: relative;
   .HTlogo {
+    position: absolute;
+    bottom: 0;
     text-align: center;
-    padding: 10% 0;
-    img {
-      max-width: 40%;
+    padding-bottom: 30px;
+    display: block;
+    width: 100%;
+    .top-brand {
+      margin: auto;
+      display: inline-block;
     }
   }
 }
@@ -72,15 +82,52 @@ html, body {
         padding-right: 20px;
       }
     }
-
+    .logos {
+      //      float: left;
+      img {
+        padding: 4px 20px 4px 0;
+        height: 55px;
+        width: auto;
+      }
+    }
   }
 }
 
+.page_cont {
+  min-height: 100%;
+  position: relative;
+}
+
 .home_footer {
-  max-height: 15%;
-  background: white;
   position: absolute;
   bottom: 0;
+  max-height: 15%;
+  background: white;
+}
+
+.form-switch-cont {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.home_cont {
+  padding-bottom: 90px;
+  form label{
+    color: $medium_gray;
+    font: {
+      weight: 100;
+      size: 1.2em;
+    }
+  }
+}
+
+#basic-form {
+  button {
+    margin-top: 1.3em;
+  }
+  > * {
+    display: block;
+  }
 }
 
 .video_footer {
@@ -195,6 +242,11 @@ $navbarTransitionTime: 100ms;
   }
   .logo-text {
     width: 119px;
+  }
+  &.long {
+    .logo-text {
+      width: auto;
+    }
   }
   .left-mark, .right-mark {
     width: 56px;
