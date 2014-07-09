@@ -181,7 +181,7 @@ html, body {
   min-height: 120px;
   width: 100%;
   position: relative; }
-  @media screen and (max-width: 500px) {
+  @media screen and (max-width: 767px) {
     .home_header {
       max-height: 150px; } }
   .home_header .HTlogo {
