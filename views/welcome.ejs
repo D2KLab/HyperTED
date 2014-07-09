@@ -29,40 +29,119 @@
 
 </head>
 <body>
-<header class="home_header">
-    <div class="HTlogo">
-    <img src="img/logos/hTedLogo_long.png"/>
-    </div>
-</header>
+<div class="page_cont">
+    <header class="home_header">
+        <div class="HTlogo">
+            <div class="top-brand long">
+                <img class="left-mark" src="/img/logos/left_mark.png">
+                <img class="logo-text hidden-xs" src="/img/logos/hTedLogo_long_text.png">
+                <img class="logo-text hidden-sm hidden-lg hidden-md" src="/img/logos/hTedLogo_big_text.png">
+                <img class="right-mark" src="/img/logos/right_mark.png">
+            </div>
+        </div>
+    </header>
 
-<div class="container">
-    <h1>
-        <small><em>let's start!</em></small>
-    </h1>
+    <div class="container home_cont">
+        <div class="form-switch-cont">
+            <div class="btn-group btn-goup-lg" id="form-switch" data-toggle="buttons">
+                <label class="btn btn-danger active">
+                    <input type="radio" name="options" id="basic" checked>Basic
+                </label>
+                <label class="btn btn-danger">
+                    <input type="radio" name="options" id="advanced">Advanced
+                </label>
+            </div>
+        </div>
+        <form id="basic-form" class="row" method="get" action="./video">
+            <label class="col-md-7 col-sm-12">
+                Insert the URL for a video
+                <input name="uri" type="url"
+                       placeholder="es. https://www.ted.com/talks/2008"
+                       class="form-control input-lg" required>
+            </label>
 
-    <form method="get" action="./video">
-        <div class="input-group">
-            <input name="uri" type="url" placeholder="Insert a Media Fragment URL" class="form-control input-lg" required>
+            <div class="timeFrag col-md-4 col-sm-12">
+                <div class="row">
+                    <label class="col-sm-6 col-xs-6">from
+                        <small><em>(opz)</em></small>
+                        <input name="start" type="time" class="form-control input-lg" step="1"
+                               placeholder="hh:mm:ss" pattern="[0-6](:[0-5][0-9]){2}">
+                    </label>
+                    <label class="col-sm-6 col-xs-6">
+                        to
+                        <small><em>(opz)</em></small>
+                        <input name="end" type="time" class="form-control input-lg" step="1"
+                               placeholder="hh:mm:ss" pattern="[0-6](:[0-5][0-9]){2}">
+                    </label>
+                </div>
+            </div>
+            <button class="btn btn-danger btn-lg col-md-1 col-sm-12 col-xs-12" type="submit">Go!</button>
+        </form>
+
+        <form id="advanced-form" class="hidden" method="get" action="./video">
+            <label>Insert a Media Fragment URL</label>
+
+            <div class="input-group">
+                <input name="uri" type="url" placeholder="es. https://www.ted.com/talks/2008#t=0:00:18,0:00:57"
+                       class="form-control input-lg" required>
              <span class="input-group-btn">
                     <button class="btn btn-danger btn-lg" type="submit">Go!</button>
              </span>
-        </div>
-        <!-- /input-group -->
-    </form>
-</div>
-
-<footer class="home_footer">
-    <div class="foo">
-        <div class="foo-line"><hr class="red_rule"></div>
-
-            <div class="eurecomLogo"><img src="img/logos/eurecom_logo.png"/></div>
-            <div class="mediamixerLogo"><img src="img/logos/mediamixer_logo.png"/></div>
+            </div>
+        </form>
     </div>
-</footer>
 
+    <footer class="home_footer">
+        <div class="foo">
+            <div class="foo-line">
+                <hr class="red_rule">
+            </div>
 
+            <div class="logos">
+                <a href="http://www.eurecom.fr/" title="Eurecom" class="eurecomLogo"><img
+                            src="img/logos/eurecom_logo.png"/></a>
+
+                <a href="http://www.mediamixer.eu/" title="Media Mixer" class="mediamixerLogo"><img
+                            src="img/logos/mediamixer_logo.png"/></a>
+            </div>
+        </div>
+    </footer>
+</div>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var $formSwitch = $('#form-switch');
+        var $advancedForm = $('#advanced-form'), $basicForm = $('#basic-form');
+
+        $('input', $formSwitch).change(function () {
+            $advancedForm.add($basicForm).toggleClass('hidden');
+        });
+
+
+        $basicForm.submit(function () {
+            var $form = $(this);
+            var $timefrag = $('.timeFrag', $form);
+            var $start = $('[name="start"]', $timefrag);
+            var $end = $('[name="end"]', $timefrag);
+
+            if ($start.val() || $end.val()) {
+                var $uriInput = $('input[name="uri"]', $form);
+                var startVal = $start.val();
+                var endVal = $end.val() ? ',' + $end.val() : '';
+                var uriInputOldVal = $uriInput.val();
+                var uriHashIndex = uriInputOldVal.indexOf('#')
+                if (uriHashIndex != -1) {
+                    uriInputOldVal = uriInputOldVal.substring(0, uriHashIndex);
+                }
+                $uriInput.val(uriInputOldVal + '#t=' + startVal + endVal);
+            }
+            $start.add($end).prop('disabled', true);
+            return true;
+        });
+
+    });
+</script>
 
 </body>
 </html>
