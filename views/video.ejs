@@ -156,18 +156,30 @@
 
                         <div class="nerdForm nerdSelect">
                             <select class="form-control" name="enriched">
-                                <option value="alchemyapi">AlchemyAPI</option>
-                                <option value="datatxt">DataTXT</option>
-                                <option value="dbspotlight">DBpedia Spotlight</option>
-                                <option value="lupedia">Lupedia</option>
-                                <option value="opencalais">OpenCalais</option>
-                                <option value="saplo">Saplo</option>
-                                <option value="textrazor">TextRazor</option>
-                                <option value="thd">THD</option>
-                                <option value="wikimeta">Wikimeta</option>
-                                <option value="yahoo">Yahoo!</option>
-                                <option value="zemanta">Zemanta</option>
-                                <option value="combined">NERD</option>
+                                <%
+                                    var sel = locals.enriched || "";
+
+                                    var exts = {
+                                        "alchemyapi": "AlchemyAPI",
+                                        "datatxt": "DataTXT",
+                                        "dbspotlight": "DBpedia Spotlight",
+                                        "lupedia": "Lupedia",
+                                        "opencalais": "OpenCalais",
+                                        "saplo": "Saplo",
+                                        "textrazor": "TextRazor",
+                                        "thd": "THD",
+                                        "wikimeta": "Wikimeta",
+                                        "yahoo": "Yahoo!",
+                                        "zemanta": "Zemanta",
+                                        "combined": "NERD"
+                                    }
+
+                                        for (var k in exts){
+                                        if (exts.hasOwnProperty(k)) {
+                                    var s = k == sel ? " selected" : "";
+                                %>
+                                <option value="<%= k %>"<%= s %>><%= exts[k] %></option>
+                                <% }} %>
                             </select>
                         </div>
                         <div class="nerdForm nerdBtn">
@@ -208,8 +220,10 @@
             <hr class="red_rule">
         </div>
 
-        <a href="http://www.eurecom.fr" title="Eurecom" class="eurecomLogo"><img src="../img/logos/eurecom_logo.png"/></a>
-        <a href="http://www.mediamixer.eu/" title="Media Mixer" class="mediamixerLogo"><img src="../img/logos/mediamixer_logo.png"/></a>
+        <a href="http://www.eurecom.fr" title="Eurecom" class="eurecomLogo"><img
+                    src="../img/logos/eurecom_logo.png"/></a>
+        <a href="http://www.mediamixer.eu/" title="Media Mixer" class="mediamixerLogo"><img
+                    src="../img/logos/mediamixer_logo.png"/></a>
     </div>
 </footer>
 
