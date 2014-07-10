@@ -203,7 +203,7 @@ $(document).ready(function () {
     }
 
     // TODO decide what to do with the following line
-//    $("#video-info-chapters").hide();
+    $("#video-info-chapters").hide();
     function displayChapters() {
         $("#video-info-chapters").fadeIn();
 
@@ -225,35 +225,33 @@ $(document).ready(function () {
             oldChapEnd = endChapter;
 
             var $totChapters = $('.chap-link').length;
-            var index = $('.chap-line .chap-link').index(this);
+            var index = $('.k-l .k-link').index(this);
             $(this).hover(function () {
-                    if ($(this).width() < 175) {
-                        var opt = {
-                            top: "31px",
-                            opacity: "1",
-                            "background-color": "#f4f4f4",
-                            cursor: "auto"
-                        };
+                if ($(this).width() < 175) {
+                    var opt = {
+                        top: "31px",
+                        opacity: "1",
+                        "background-color": "#f4f4f4",
+                        cursor: "auto"
+                    };
 
-                        if (index > Math.floor($totChapters / 2)) {
-                            opt.right = 0;
-                        }
-                        $chapter.children('.chap-timing').css(opt);
+                    if (index > Math.floor($totChapters / 2)) {
+                        opt.right = 0;
                     }
-                },
-                function () {
-                });
+                    $chapter.children('.k-timing').css(opt);
+                }
+            });
 
 
             $(this).on('click', function () {
                 $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
-                var chapNumLast = $('.chap-link').last('.chap-num')[0].innerText;
+                var chapNumLast = $('.chap-link').last('.k-num')[0].innerText;
                 var chapNum = $(this).children('.chap-num')[0].innerText;
 
                 $('.chap-link').removeClass('selected-chap');
 
 
-                console.log($('.chap-link').last('.chap-num'));
+                console.log($('.chap-link').last('.k-num'));
                 $('.first-part').text("chapter   ");
                 $('.selected-chap-num').text("   " + chapNum + "   ");
                 $('.last-part').text("   of   " + chapNumLast);

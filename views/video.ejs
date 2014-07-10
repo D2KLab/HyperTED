@@ -143,9 +143,9 @@
                 </div>
 
                 <% if(locals.metadata && metadata.timedtext) { %>
-                <div id="sub-cont">
+                <section id="sub-cont">
                     <% include partials/sub_partial.ejs %>
-                </div>
+                </section>
 
                 <form method="get" action="/video/<%= uuid %>" data-action="/nerdify" class="nerdify button-cont">
                     <input type="hidden" name="uuid" value="<%= uuid %>"/>

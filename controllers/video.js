@@ -66,6 +66,9 @@ function viewVideo(req, res, video) {
 }
 
 function renderVideo(res, video, options) {
+    if (video.metadata.timedtext) {
+        video.subtitles = srtToJson(video.metadata.timedtext, video.chapters);
+    }
     var source = mergeObj(video, options);
     res.render('video.ejs', source);
 }
@@ -270,7 +273,6 @@ exports.search = function (req, resp) {
  *
  * Generate an html in response.
  */
-
 exports.nerdify = function (req, res) {
     var uuid = req.query.uuid;
     var ext = req.query.enriched;
@@ -540,7 +542,7 @@ function getSubtitlesTV2RDF(uuid, callback) {
 }
 
 function getTedChapters(json) {
-    var cur_chap = {startNPT: 0}, cursub;
+    var cur_chap = {"startNPT": 0}, cursub;
     var chapters = [];
 
     var sub_offset = json._meta.preroll_offset;
@@ -560,10 +562,9 @@ function getTedChapters(json) {
             }
         }
     }
-    var lastsub_startTime = cursub.startTime;
-    var lastChapStart = (sub_offset + lastsub_startTime) / 1000;
-    var lastChapEnd = lastChapStart + (cursub.duration / 1000) + 6;
-    chapters.push({"startNPT": thisChapStart, "endNPT": lastChapEnd});
+    var lasSubStart = (sub_offset + cursub.startTime) / 1000;
+    cur_chap.endNPT = lasSubStart + (cursub.duration / 1000) + 6;
+    chapters.push(cur_chap);
     return chapters;
 }
 
@@ -589,6 +590,105 @@ function jsonToSrt(json) {
         }
     }
     return encodeUTF(mysrt);
+}
+
+
+/* from srt to a json ready to be used in render */
+function srtToJson(srt, chapters) {
+    var strList = srt.split('\n\n'), subList = [];
+    if (strList.length < 2) {
+        strList = srt.substr(1).split('\n\r');
+    }
+    var charIndex = -1;
+
+    function calcTime(subTime) {
+        var time = (subTime.split(":"));
+        var hh = parseInt(time[0]);
+        var mm = parseInt(time[1]);
+        var ss = parseFloat(time[2].replace(",", "."));
+
+        return ((mm * 60) + (hh * 3600) + ss);
+    }
+
+    for (var index in strList) {
+        if (!strList.hasOwnProperty(index))continue;
+
+        var sub = {text: '', lineNum: 0};
+        var lines = strList[index].split('\n');
+
+        for (var l in lines) {
+            if (!lines.hasOwnProperty(l))continue;
+            var line = lines[l];
+            if (!sub.id) {
+                sub.id = line.trim();
+            } else if (!sub.time) {
+                sub.time = line.replace('\r', '');
+                var timeSplit = sub.time.split(' --> ');
+                var subStart = calcTime(timeSplit[0]);
+                sub.startSS = Math.round(subStart * 1000) / 1000;
+                var subEnd = calcTime(timeSplit[1]);
+                sub.endSS = Math.round(subEnd * 1000) / 1000;
+            } else {
+                var start = sub.lineNum > 0 ? '\n' : '';
+                sub.text += start + line;
+                sub.lineNum++;
+            }
+        }
+
+        sub.startChar = charIndex + 1;
+        charIndex = sub.startChar + sub.text.length; //because of a '\n' is a fake double char
+        sub.endChar = charIndex;
+        if (sub.id)
+            subList.push(sub);
+    }
+
+    if (chapters) {
+        var subIndex = 0;
+
+        for (var k in chapters) {
+            if (!chapters.hasOwnProperty(k))continue;
+
+            var chap = chapters[k];
+            var chapStart, chapEnd;
+            if (chap.tStart) {
+                chapStart = Math.round(chap.tStart.value);
+                chapEnd = Math.round(chap.tEnd.value);
+            } else {
+                chapStart = chap.startNPT;
+                chapEnd = chap.endNPT;
+            }
+
+            while (subIndex < subList.length) {
+                var thisSub = subList[subIndex];
+                thisSub.chapNum = k;
+                if (!thisSub.id || thisSub.id == "") {
+                    ++subIndex;
+                } else {
+                    var sEnd = thisSub.endSS;
+                    if (chapStart > sEnd) {
+                        //chapter not yet started: go next sub
+                        subIndex++;
+                    } else if (chapStart <= sEnd && chapEnd >= sEnd) {
+                        //we are in a chapter: save this info and go next sub
+//                                        thisSub.dataChap = ' data-chapter=' + c.chapter.value.replace("http://data.linkedtv.eu/chapter/", "");
+                        thisSub.dataChap = ' data-chapter=' + k;
+                        subIndex++;
+                    } else {
+                        //chapter ends: go next chapter
+                        if (subIndex > 0) {
+                            subList[subIndex - 1].endChap = true;
+                        }
+                        break;
+                    }
+                }
+            }
+
+        }
+        subList[subList.length - 1].endChap = true;
+    }
+
+
+    return subList;
 }
 
 function subTime(time) {

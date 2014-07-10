@@ -736,7 +736,6 @@ span.wiki {
       padding-left: 2%;
       overflow: hidden;
       text-overflow: ellipsis;
-
       @media(max-width: 860px) {
         width: 100%;
         border-top: 1px solid $dark_red;
@@ -916,13 +915,11 @@ p {
 .button-cont {
   text-align: right;
   clear: both;
-  margin-top: -45px;
   margin-bottom: 15px;
 }
 
 #sub-cont {
   clear: both;
-  margin-bottom: 40px;
 }
 
 .sub-text {

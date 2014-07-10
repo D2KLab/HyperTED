@@ -1,139 +1,28 @@
-<div class="container-fluid">
-
-    <div class="row">
-        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
-            <%
-            if (metadata && metadata.timedtext) {
-                var strList = metadata.timedtext.split('\n\n'), subList = [];
-                if (strList.length < 2) {
-                    strList = metadata.timedtext.substr(1).split('\n\r');
-                }
-                var charIndex = -1;
-            %>
-            <div class="sub-text <% if (locals.enriched) { %>enriched<% } %>">
-                <%
-                    function calcTime(subTime) {
-                        var time = (subTime.split(":"));
-                        var hh = parseInt(time[0]);
-                        var mm = parseInt(time[1]);
-                        var ss = parseFloat(time[2].replace(",", "."));
-
-                        return ((mm * 60) + (hh * 3600) + ss);
-                    }
-
-
-                    for (var index in strList) {
-                        var sub = {text: '', lineNum: 0};
-                        var lines = strList[index].split('\n');
-
-                        for (var line in lines) {
-                            if (!sub.id) {
-                                sub.id = lines[line].trim();
-                            } else if (!sub.time) {
-                                sub.time = lines[line].replace('\r', '');
-                                var timeSplit = sub.time.split(' --> ')
-                                var subStart = calcTime(timeSplit[0]);
-                                sub.startSS = Math.round(subStart * 1000) / 1000;
-                                var subEnd = calcTime(timeSplit[1]);
-                                sub.endSS = Math.round(subEnd * 1000) / 1000;
-                            } else {
-                                var start = sub.lineNum > 0 ? '\n' : '';
-                                sub.text += start + lines[line];
-                                sub.lineNum++;
-                            }
-                        }
-
-                        sub.startChar = charIndex + 1;
-                        charIndex = sub.startChar + sub.text.length; //because of a '\n' is a fake double char
-                        sub.endChar = charIndex;
-                        subList.push(sub);
-                    }
-
-
-                    var subIndex;
-                    if (locals.chapters) {
-                        var chapterList = chapters;
-
-                        subIndex = 0;
-
-                        for (var chap in chapterList) {
-
-                            var chapStart, chapEnd;
-                            if (chapterList[chap].tStart) {
-                                chapStart = Math.round(chapterList[chap].tStart.value);
-                                chapEnd = Math.round(chapterList[chap].tEnd.value);
-                            } else {
-                                chapStart = Math.round(chapterList[chap].startNPT);
-                                chapEnd = Math.round(chapterList[chap].endNPT);
-                            }
-//
-//
-//                            while (subIndex < subList.length) {
-//                                var thisSub = subList[subIndex];
-//                                thisSub.chapNum = chap;
-////                                console.log(chap);
-//                                console.log(thisSub);
-//
-//                                if (!thisSub.id || thisSub.id == '') {
-//                                    console.log('a');
-//
-//                                    subIndex++;
-//                                }
-//                                if(false) {
-//                                    console.log('b');
-//
-//                                    var sEnd = Math.round(thisSub.endSS);
-//                                    if (chapStart > sEnd) {
-//                                        //chapter not yet started: go next sub
-//                                        subIndex++;
-//                                    } else if (chapStart <= sEnd && chapEnd >= sEnd) {
-//
-//                                        //we are in a chapter: save this info and go next sub
-////                                        thisSub.dataChap = ' data-chapter=' + chapterList[chap].chapter.value.replace("http://data.linkedtv.eu/chapter/", "");
-//                                        thisSub.dataChap = ' data-chapter=' + chapterList[chap].chapter;
-//                                        console.log(chapterList[chap]);
-//                                        subIndex++;
-//                                    } else {
-//                                        //chapter ends: go next chapter
-//                                        if (subIndex > 0)
-//                                            subList[subIndex - 1].endChap = true;
-//                                    }
-//                                }
-//                            }
-
-                        }
-                    }
-
-                    var newChap = true;
-
-                        subList.forEach(function(sub){
-                    if (!sub.id) {
-                        return;
-                    }
-                        if (sub.dataChap && newChap) {
-                    newChap = false;
-                %>
-                <div class="subChapGroup" <%= sub.dataChap %>>
-
-
-                    <p class="chap-title">chapter
-
-                        <%= sub.chapNum %></p>
-                    <%
-                    }
-                    %>
-                    <p id="sub<%= sub.id %>" data-time="<%= sub.time %>" data-startSS="<%= sub.startSS %>"
-                       data-endSS="<%= sub.endSS %>" <%= sub.dataChap || "" %>><%- sub.text %></p>
-                    <%
-                    if(sub.endChap){
-                        newChap = true;
-                    %>
-                </div>
-                <%
-                }
-                }); %>
-            </div>
-            <% } %>
-        </div>
+<div class="sub-text <% if (locals.enriched) { %>enriched<% } %>">
+    <%
+    var subList = locals.subtitles;
+console.log(subList);
+    var newChap = locals.chapters || false;
+            subList.forEach(function(sub){
+        if (!sub.id) {
+            return;
+        }
+            if (newChap) {
+        newChap = false;
+    %>
+    <div class="subChapGroup" <%= sub.dataChap %>>
+        <p class="chap-title">chapter <%= sub.chapNum %></p>
+        <%
+        }
+        %>
+        <p id="sub<%= sub.id %>" data-time="<%= sub.time %>" data-startSS="<%= sub.startSS %>"
+           data-endSS="<%= sub.endSS %>" <%= sub.dataChap || "" %>><%- sub.text %></p>
+        <%
+        if(sub.endChap){
+            newChap = true;
+        %>
     </div>
+    <%
+    }
+    }); %>
 </div>

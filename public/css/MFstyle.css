@@ -520,16 +520,21 @@ html, body {
   min-height: 32px;
   margin: 20px 50px 20px 50px;
   text-align: center;
+  border: 1px solid #b11200;
   -webkit-border-radius: 8px;
   -moz-border-radius: 8px;
   -ms-border-radius: 8px;
   -o-border-radius: 8px;
   border-radius: 8px; }
+  @media (max-width: 768px) {
+    .chap-line {
+      width: 508px;
+      margin-right: 0; } }
   .chap-line .chap-link {
-    -webkit-transition: background-color 300ms;
-    -moz-transition: background-color 300ms;
-    -ms-transition: background-color 300ms;
-    transition: background-color 300ms;
+    -webkit-transition: background-color 300ms ease-out;
+    -moz-transition: background-color 300ms ease-out;
+    -o-transition: background-color 300ms ease-out;
+    transition: background-color 300ms ease-out;
     position: relative;
     height: 30px;
     background-color: #b11200;
@@ -686,7 +691,7 @@ span.wiki a {
   box-shadow: 0 1px 8px -2px #5d5d5d;
   background: #fff;
   width: 100%;
-  max-height: 121px;
+  max-height: 133px;
   overflow: hidden;
   text-overflow: ellipsis; }
   @media (max-width: 860px) {
@@ -846,12 +851,10 @@ p span.entity.nesting:hover span {
 .button-cont {
   text-align: right;
   clear: both;
-  margin-top: -45px;
   margin-bottom: 15px; }
 
 #sub-cont {
-  clear: both;
-  margin-bottom: 40px; }
+  clear: both; }
 
 .sub-text {
   border: 1px solid #f4f4f4;
