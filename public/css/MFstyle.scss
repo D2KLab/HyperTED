@@ -502,14 +502,14 @@ h1.title {
   min-height: 32px;
   margin: 20px 50px 20px 50px;
   text-align: center;
-  //  border: 1px solid $dark_red;
+  border: 1px solid $dark_red;
   @include border-radius(8px);
-
+  @media(max-width: 768px) {
+    width: 508px;
+    margin-right: 0;
+  }
   .chap-link {
-    -webkit-transition: background-color 300ms;
-    -moz-transition: background-color 300ms;
-    -ms-transition: background-color 300ms;
-    transition: background-color 300ms;
+    @include transition(background-color, 300ms);
     position: relative;
     height: 30px;
     background-color: $dark_red;
@@ -705,7 +705,7 @@ span.wiki {
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
   background: #fff;
   width: 100%;
-  max-height: 121px;
+  max-height: 133px;
   overflow: hidden;
   text-overflow: ellipsis;
   @media(max-width: 860px) {

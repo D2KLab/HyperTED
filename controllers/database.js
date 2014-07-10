@@ -1,7 +1,7 @@
 var UUID = require("node-uuid"),
     monk = require('monk'),
     async = require('async');
-var db, videos, ents, hots;
+var db, videos, ents, hots, chaps;
 
 
 exports.prepare = function () {
@@ -17,7 +17,11 @@ exports.prepare = function () {
     ents.index('extractor');
 
     hots = db.get('hotspots');
-    ents.index('uuid');
+    hots.index('uuid');
+
+    chaps = db.get('chapters');
+    chaps.index('uuid');
+
 };
 
 function getVideoFromUuid(uuid, full, callback) {
@@ -33,6 +37,9 @@ function getVideoFromUuid(uuid, full, callback) {
             },
             function (asyncCallback) {
                 getHotspotsFor(video, asyncCallback);
+            },
+            function (asyncCallback) {
+                getChaptersFor(video, asyncCallback);
             }
         ], function () {
             callback(false, video);
@@ -54,6 +61,15 @@ function getHotspotsFor(video, callback) {
     hots.find({'uuid': video.uuid}, function (err, docs) {
         if (!err && docs && docs.length > 0) {
             video.hotspots = docs;
+        }
+        callback(false, video);
+    });
+}
+
+function getChaptersFor(video, callback) {
+    chaps.find({'uuid': video.uuid}, function (err, docs) {
+        if (!err && docs && docs.length > 0) {
+            video.chapters = docs;
         }
         callback(false, video);
     });
@@ -127,6 +143,20 @@ exports.updateVideo = function (newVideo, callback) {
         }
         callback(err, doc);
     });
+};
+
+exports.addChapters = function (uuid, chapters, callback) {
+    var e = false;
+    chapters.forEach(function (h) {
+        h.uuid = uuid;
+        chaps.insert(h, function (err, doc) {
+            if (err) {
+                console.log(err);
+                e = true;
+            }
+        });
+    });
+    callback(e);
 };
 
 

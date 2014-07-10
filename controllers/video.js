@@ -95,6 +95,7 @@ exports.view = function (req, res) {
 
                 //2. search metadata with vendor's api
                 getMetadata(video, function (err, metadata) {
+                    //TODO menage chapters
                     if (err) {
                         console.log(LOG_TAG + 'Metadata retrieved with errors.');
                     }
@@ -227,6 +228,11 @@ exports.search = function (req, resp) {
                         var oldmetadata = video.metadata || {};
                         video.metadata = mergeObj(oldmetadata, metadata);
                     }
+                    var chapters;
+                    if (metadata.chapters) {
+                        chapters = metadata.chapters;
+                        delete metadata.chapters;
+                    }
 
                     //3. write in db
                     db.insertVideo(video, function (err, data) {
@@ -236,16 +242,26 @@ exports.search = function (req, resp) {
                             return;
                         }
                         var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
-                        console.log('Video at ' + locator + ' successfully added to db.');
-                        console.log('Redirecting to ' + redirectUrl);
-                        resp.redirect(redirectUrl);
+
+                        if (chapters) {
+                            db.addChapters(data.uuid, chapters, function (err, data) {
+                                if (err) {
+                                    console.log("DATABASE ERROR" + JSON.stringify(err));
+                                }
+                                console.log('Video at ' + locator + ' successfully added to db.');
+                                console.log('Redirecting to ' + redirectUrl);
+                                resp.redirect(redirectUrl);
+                            });
+
+                        } else {
+                            console.log('Video at ' + locator + ' successfully added to db.');
+                            console.log('Redirecting to ' + redirectUrl);
+                            resp.redirect(redirectUrl);
+                        }
                     });
                 });
-
             });
         });
-
-
     });
 };
 
@@ -481,6 +497,9 @@ function getMetadata(video, callback) {
                 http.getJSON(subUrl, function (err, data) {
                     if (!err && data) {
                         metadata.timedtext = jsonToSrt(data);
+                        //obtain chapters from json
+                        metadata.chapters = getTedChapters(data);
+
                     } else {
                         console.log('[ERROR ' + err + '] on retrieving sub for ' + video.locator);
                     }
@@ -518,6 +537,34 @@ exports.ajaxGetMetadata = function (req, res) {
 
 function getSubtitlesTV2RDF(uuid, callback) {
     http.getRemoteFile('http://linkedtv.eurecom.fr/tv2rdf/api/mediaresource/' + uuid + '/metadata?metadataType=subtitle', callback);
+}
+
+function getTedChapters(json) {
+    var cur_chap = {startNPT: 0}, cursub;
+    var chapters = [];
+
+    var sub_offset = json._meta.preroll_offset;
+    for (var key in json) {
+
+        if (json.hasOwnProperty(key) && key != '_meta') {
+            cursub = json[key].caption;
+            var isStartOfChap = cursub.startOfParagraph;
+
+            if (isStartOfChap) {
+                var sub_startTime = cursub.startTime;
+                var thisChapStart = (sub_offset + sub_startTime) / 1000;
+
+                cur_chap.endNPT = thisChapStart;
+                chapters.push(cur_chap);
+                cur_chap = {"startNPT": thisChapStart};
+            }
+        }
+    }
+    var lastsub_startTime = cursub.startTime;
+    var lastChapStart = (sub_offset + lastsub_startTime) / 1000;
+    var lastChapEnd = lastChapStart + (cursub.duration / 1000) + 6;
+    chapters.push({"startNPT": thisChapStart, "endNPT": lastChapEnd});
+    return chapters;
 }
 
 
@@ -784,6 +831,7 @@ exports.buildDb = function (req, res) {
         };
 
         getMetadata(video, function (err, metadata) {
+            //TODO menage chapters
             if (err) {
                 console.log(LOG_TAG + 'Metadata retrieved with errors.');
                 console.log(LOG_TAG + err);
@@ -823,6 +871,7 @@ function hasExtractor(ent) {
         return ent.source == "combined";
     return ent.extractor == this;
 }
+
 function containsExtractor(array, ext) {
     var filtered = array.filter(hasExtractor, ext);
     if (ext != "combined") {

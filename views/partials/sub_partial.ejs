@@ -55,37 +55,53 @@
                         var chapterList = chapters;
 
                         subIndex = 0;
-                        var chapNum = 0;
-                        chapterList.forEach(function (chap) {
-                            var chapStart = Math.round(chap.tStart.value), chapEnd = Math.round(chap.tEnd.value);
-                            ++chapNum;
 
-                            while (subIndex < subList.length) {
-                                var thisSub = subList[subIndex];
-                                thisSub.chapNum = chapNum;
+                        for (var chap in chapterList) {
 
-                                if (!thisSub.id || thisSub.id == '') {
-                                    subIndex++;
-                                } else {
-                                    var sStart = Math.round(thisSub.startSS), sEnd = Math.round(thisSub.endSS)
-
-                                    if (chapStart > sEnd) {
-                                        //chapter not yet started: go next sub
-                                        subIndex++;
-                                    } else if (chapStart <= sEnd && chapEnd >= sEnd) {
-                                        //we are in a chapter: save this info and go next sub
-                                        thisSub.dataChap = ' data-chapter=' + chap.chapter.value.replace("http://data.linkedtv.eu/chapter/", "");
-                                        subIndex++;
-                                    } else {
-                                        //chapter ends: go next chapter
-                                        if (subIndex > 0)
-                                            subList[subIndex - 1].endChap = true;
-                                        return;
-                                    }
-                                }
+                            var chapStart, chapEnd;
+                            if (chapterList[chap].tStart) {
+                                chapStart = Math.round(chapterList[chap].tStart.value);
+                                chapEnd = Math.round(chapterList[chap].tEnd.value);
+                            } else {
+                                chapStart = Math.round(chapterList[chap].startNPT);
+                                chapEnd = Math.round(chapterList[chap].endNPT);
                             }
+//
+//
+//                            while (subIndex < subList.length) {
+//                                var thisSub = subList[subIndex];
+//                                thisSub.chapNum = chap;
+////                                console.log(chap);
+//                                console.log(thisSub);
+//
+//                                if (!thisSub.id || thisSub.id == '') {
+//                                    console.log('a');
+//
+//                                    subIndex++;
+//                                }
+//                                if(false) {
+//                                    console.log('b');
+//
+//                                    var sEnd = Math.round(thisSub.endSS);
+//                                    if (chapStart > sEnd) {
+//                                        //chapter not yet started: go next sub
+//                                        subIndex++;
+//                                    } else if (chapStart <= sEnd && chapEnd >= sEnd) {
+//
+//                                        //we are in a chapter: save this info and go next sub
+////                                        thisSub.dataChap = ' data-chapter=' + chapterList[chap].chapter.value.replace("http://data.linkedtv.eu/chapter/", "");
+//                                        thisSub.dataChap = ' data-chapter=' + chapterList[chap].chapter;
+//                                        console.log(chapterList[chap]);
+//                                        subIndex++;
+//                                    } else {
+//                                        //chapter ends: go next chapter
+//                                        if (subIndex > 0)
+//                                            subList[subIndex - 1].endChap = true;
+//                                    }
+//                                }
+//                            }
 
-                        });
+                        }
                     }
 
                     var newChap = true;
