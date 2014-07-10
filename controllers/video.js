@@ -122,8 +122,6 @@ exports.view = function (req, res) {
 
         if (video.hotspotStatus == hStatusValue.IN_PROGRESS) {
             checkHotspotResults(video.uuid, function (err, data) {
-                console.log('1 inside')
-
                 if (data) {
                     video.hotspotStatus = hStatusValue.DONE;
                     video.hotspots = data;
