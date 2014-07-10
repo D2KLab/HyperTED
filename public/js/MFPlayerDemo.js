@@ -417,7 +417,6 @@ $(document).ready(function () {
     function retrieveInfo(uuid, callback) {
         $.getJSON('/metadata/' + uuid, callback);
     }
-
 });
 
 jQuery.fn.extend({
@@ -649,7 +648,6 @@ function onEntitiesToShow(entJson) {
 
 (function (Popcorn) {
     Popcorn.plugin("highlightSub", function (options) {
-
         return {
             _setup: function (options) {
                 options.$sub = $('#' + options.subId);

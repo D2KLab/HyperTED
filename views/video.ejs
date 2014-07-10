@@ -116,7 +116,7 @@
             <h3 class="video-info"><%= metadata.title %></h3>
         </div>
         <% if(locals.metadata && metadata.descr) { %>
-        <div class="right"><h5><%= metadata.descr %></h5></div>
+        <div class="right"><p class="descr"><%= metadata.descr %></p></div>
 
         <% } %>
     </div>
@@ -194,7 +194,7 @@
 
                 <h1 class="noCont text-center">
                     <span class="glyphicon glyphicon-chevron-left"></span>
-                    no subtitles in this video
+                    no subtitles for this video
                     <span class="glyphicon glyphicon-chevron-right"></span>
                 </h1>
                 <% } %>
