@@ -60,6 +60,7 @@ $(document).ready(function () {
     console.debug($player);
 
     if (Modernizr.history && Modernizr.localstorage) {
+        // Nerdify form become an ajax form
         var $nerdifyForm = $('form.nerdify');
         var ajaxAction = $nerdifyForm.data('action');
 
@@ -72,6 +73,7 @@ $(document).ready(function () {
             var page_url = window.location.toString().parseURL();
             page_url.search.enriched = extractor;
 
+            // if entities are in LocalStorage, get them and go on
             var entitiesLS = getFromLocalStorage(videokey + extractor);
             if (entitiesLS) {
                 $submitButton.prop('disabled', false).removeLoader();
@@ -94,13 +96,12 @@ $(document).ready(function () {
                         console.error(e);
                         //DO NOTHING
                     }
-                    onEntitiesToShow(data);
-                    $("#entity-sect").fadeIn();
 
                     saveInLocalStorage(videokey + extractor, data);
 
                     $submitButton.prop('disabled', false).removeLoader();
                     history.pushState(null, null, page_url.toString());
+                    onEntitiesToShow(data);
                 },
                 error: function () {
                     var alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
@@ -118,26 +119,19 @@ $(document).ready(function () {
         onEntitiesToShow(video.entitiesL);
     }
 
-    $(document).on('click', '.entity', function () {
-        var $entity = $(this).children('a');
-        var startEntity = $entity.data('start-time');
-        var endEntity = $entity.data('end-time');
-        $player.setmf('t=' + startEntity + ',' + endEntity).playmf();
-        updateMFurl();
-    });
-
     $('p > span.entity').has('span').addClass('nesting');
 
-
+    // managing of click on a sub
+    // 1: in a chapter
     $(document).on({
         click: function (e) {
             e.preventDefault();
             var chapId = $(this).data('chapter');
             $('#' + chapId).click();
-
         }
     }, '.sub-text p[data-chapter]');
 
+    // 2: not in a chapter
     $(document).on('click', '.sub-text p[data-time]:not([data-chapter])', function () {
         var srtTime = $(this).data('time');
         var hms = srtTime.replace(/,/g, '.').replace(' --> ', ',');
@@ -146,11 +140,7 @@ $(document).ready(function () {
         updateMFurl();
     });
 
-
     var $pin = $('.pin');
-    $('.qtipEnt').hide();
-    $('.qtipTitle').hide();
-
     $pin.each(function () {
         var $this = $(this);
         $this.qtip({
@@ -182,7 +172,6 @@ $(document).ready(function () {
         return ((startTime - oldEndTime) / totWidth) * 100;
     }
 
-    $pin.hide();
     function displayPins() {
 
         $pin.fadeIn();
@@ -213,7 +202,8 @@ $(document).ready(function () {
         });
     }
 
-    $("#video-info-chapters").hide();
+    // TODO decide what to do with the following line
+//    $("#video-info-chapters").hide();
     function displayChapters() {
         $("#video-info-chapters").fadeIn();
 
@@ -275,7 +265,6 @@ $(document).ready(function () {
         });
 
     }
-
 
     function updateMFurl() {
         if (Modernizr.history) {
@@ -351,28 +340,31 @@ $(document).ready(function () {
         }
     }
 
-    $(window).off('popstate').on('popstate.changemf', function () {
+
+    // Browser back and forward
+    $(window).off('popstate').on('popstate', function () {
         var page_url = window.location.toString().parseURL();
+
+        // media fragment
         var frag;
         var t = page_url.search.t || page_url.hash.t;
-        if (t) {
+        if (t)
             frag = 't=' + t;
-        }
+
         var xywh = page_url.search.xywh || page_url.hash.xywh;
-        if (xywh) {
+        if (xywh)
             frag = frag ? frag + '&' + 'xywh=' + xywh : 'xywh=' + xywh;
-        }
 
         if (frag) {
             console.info("popstate! new fragment: " + frag);
 
             $player.setmf(frag);
-
             if (hasVideoSub) {
                 highlightMFSub(t);
             }
         }
 
+        // nerdification
         var extractor = page_url.search.enriched;
         if (extractor) {
             console.info("popstate! new extractor: " + extractor);
@@ -383,9 +375,15 @@ $(document).ready(function () {
             } else {
                 $('form.nerdify').submit();
             }
+        } else {
+            $('#entity-sect').fadeOut();
+            if ($('.sub-text').find('.entity').length > 0) {
+                displayEntitiesSub([]);
+            }
         }
     });
 
+    // retrieve info for playlist
     $('.video-list .video-link').each(function () {
         var $li = $(this);
         var video_uuid = $li.data('uuid');
@@ -447,20 +445,14 @@ jQuery.fn.extend({
     }
 });
 
-function getParameterByName(name, url) {
-    var URL = url || location.search;
-    console.log(URL);
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(URL);
-    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-}
-
 function getFromLocalStorage(key) {
     try {
-        var data = JSON.parse(localStorage[key]);
+        var dataLS = localStorage[key];
+        if (!dataLS)return null;
+        var data = JSON.parse(dataLS);
         return data.value;
     } catch (e) {
+        console.error(e);
         return null;
     }
 }
@@ -555,9 +547,7 @@ String.prototype.parseURL = function () {
 function displayEntitiesSub(entJson) {
     var $newSubCont = $plainSubCont.clone();
     var $subList = $newSubCont.find('p');
-    var subIndex;
     var entityList = entJson;
-
 
     //sorting JSON for end character desc and by length
     entityList.sort(
@@ -571,7 +561,7 @@ function displayEntitiesSub(entJson) {
             else return 1;
         });
 
-    subIndex = $subList.length - 1;
+    var subIndex = $subList.length - 1;
     entityList.forEach(function (entity) {
 
         while (subIndex >= 0) {
@@ -638,19 +628,16 @@ function showEntityList(entityList) {
             typeAndOccurrences: entTypeList.length + " " + typeName
         }).appendTo(".template-list-rows");
         entTypeList.forEach(function (ent) {
-
-            var href = ent.uri ? ent.uri : '';
-
             var $e = $("<li>").loadTemplate($("#templateEnt"), {
                 entA: '#' + ent.label
             });
 
             $(".displayEntity", $row).append($e);
 
-
             $('.entity.list', $e).addClass((typeName.toLowerCase()));
-            $('span>a', $e).attr("href", href);
-            $('span>a', $e).attr("target", "_blank");
+            if (ent.uri) {
+                $('span>a', $e).attr("href", ent.uri).attr("target", "_blank");
+            }
 
         });
     }
@@ -661,7 +648,6 @@ function onEntitiesToShow(entJson) {
 }
 
 (function (Popcorn) {
-
     Popcorn.plugin("highlightSub", function (options) {
 
         return {
@@ -676,5 +662,4 @@ function onEntitiesToShow(entJson) {
             }
         };
     });
-
 })(Popcorn);

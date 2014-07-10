@@ -464,22 +464,23 @@ html, body {
           text-align: center;
           cursor: pointer;
           float: left;
-          display: inline-block;
+          display: none;
           border-bottom: 1px solid #f4f4f4;
+          position: relative;
+          top: -10px;
+          z-index: 101;
+          min-height: 26px;
           -webkit-border-radius: 0 0 10px 10px;
           -moz-border-radius: 0 0 10px 10px;
           -ms-border-radius: 0 0 10px 10px;
           -o-border-radius: 0 0 10px 10px;
-          border-radius: 0 0 10px 10px;
-          position: relative;
-          top: -10px;
-          z-index: 101;
-          min-height: 26px; }
-          #player-sect #player-container #hotspots-cont .hscont .pin .qtipEnt {
-            display: none; }
+          border-radius: 0 0 10px 10px; }
           #player-sect #player-container #hotspots-cont .hscont .pin img {
             position: absolute;
             left: -10px; }
+
+.qtipEnt, .qtipTitle {
+  display: none; }
 
 .qtip-light {
   padding-bottom: 15px; }
@@ -680,10 +681,10 @@ span.wiki a {
   color: #fff; }
 
 #video-info-chapters {
-  background: #fff;
   -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
   -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
   box-shadow: 0 1px 8px -2px #5d5d5d;
+  background: #fff;
   width: 100%;
   max-height: 121px;
   overflow: hidden;
