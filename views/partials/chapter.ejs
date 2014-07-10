@@ -11,25 +11,29 @@
             var ss = Math.floor((time % 3600) % 60);
             ss = ss < 10 ? '0' + ss : ss;
 
-            return hh+':'+mm+':'+ss;
+            return hh + ':' + mm + ':' + ss;
         } %>
         <div class="col-md-12">
 
             <div class="chap-line">
                 <%
-                var chapNum = 0;
-                chapterList.forEach(function(chap){
-                    chapNum++;
-                    var startTime = chap.tStart.value;
-                    var endTime = chap.tEnd.value;
+                for(var chap in chapterList){
+                    var startTime, endTime;
+                    if (chapterList[chap].tStart) {
+                        startTime = chapterList[chap].tStart.value;
+                        endTime = chapterList[chap].tEnd.value;
+                    } else {
+                        startTime = chapterList[chap].startNPT;
+                        endTime = chapterList[chap].endNPT;
+                    }
                     var tStart = labelTime(startTime);
                     var tEnd = labelTime(endTime);
                 %>
-                <div class="chap-link" id="<%= chap.chapter.value.replace("http://data.linkedtv.eu/chapter/", "") %>">
-                    <h4 class="chap-num"><%= chapNum %></h4>
-                    <a  data-start-time="<%= startTime %>" data-end-time="<%= endTime %>">
+                <div class="chap-link">
+                    <h4 class="chap-num"><%= chap %></h4>
+                    <a data-start-time="<%= startTime %>" data-end-time="<%= endTime %>">
 
-                        <div class="chap-timing">
+                    <div class="chap-timing">
 
                             <h5><span class="glyphicon glyphicon-chevron-left"></span>
                                 <%= tStart %> - <%= tEnd %>
@@ -41,7 +45,7 @@
 
                     </a>
                 </div>
-                <% }) %>
+                <% } %>
             </div>
 
         </div>
@@ -49,7 +53,7 @@
 
     <div class="chap-label">
         <span class="glyphicon glyphicon-chevron-left"></span>
-        <span class="first-part"><%= chapNum %> chapters</span><span class="selected-chap-num"></span><span
+        <span class="first-part"><%= chap %> chapters</span><span class="selected-chap-num"></span><span
                 class="last-part"></span>
         <span class="glyphicon glyphicon-chevron-right"></span>
 

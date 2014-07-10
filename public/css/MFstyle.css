@@ -235,17 +235,31 @@ html, body {
     -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
     box-shadow: 0 1px 8px -2px #5d5d5d;
     margin: 0 0 30px;
+    height: 300px;
     max-height: 40%;
+    min-height: 120px;
     width: 100%;
+    position: relative;
+}
+
+@media screen and (max-width: 767px) {
+    .home_header {
+        max-height: 150px;
+    }
 }
 
 .home_header .HTlogo {
+    position: absolute;
+    bottom: 0;
     text-align: center;
-    padding: 10% 0;
+    padding-bottom: 30px;
+    display: block;
+    width: 100%;
 }
 
-.home_header .HTlogo img {
-    max-width: 40%;
+.home_header .HTlogo .top-brand {
+    margin: auto;
+    display: inline-block;
 }
 
 .home_footer, .video_footer {
@@ -268,11 +282,45 @@ html, body {
     padding-right: 20px;
 }
 
+.home_footer .foo .logos img, .video_footer .foo .logos img {
+    padding: 4px 20px 4px 0;
+    height: 55px;
+    width: auto;
+}
+
+.page_cont {
+    min-height: 100%;
+    position: relative;
+}
+
 .home_footer {
-    max-height: 15%;
-    background: white;
     position: absolute;
     bottom: 0;
+    max-height: 15%;
+    background: white;
+}
+
+.form-switch-cont {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.home_cont {
+    padding-bottom: 90px;
+}
+
+.home_cont form label {
+    color: #aaaaaa;
+    font-weight: 100;
+    font-size: 1.2em;
+}
+
+#basic-form button {
+    margin-top: 1.3em;
+}
+
+#basic-form > * {
+    display: block;
 }
 
 .video_footer {
@@ -403,6 +451,10 @@ html, body {
 
 .top-brand .logo-text {
     width: 119px;
+}
+
+.top-brand.long .logo-text {
+    width: auto;
 }
 
 .top-brand .left-mark, .top-brand .right-mark {
@@ -702,6 +754,7 @@ html, body {
     min-height: 32px;
     margin: 20px 50px 20px 50px;
     text-align: center;
+    border: 1px solid #b11200;
     -webkit-border-radius: 8px;
     -moz-border-radius: 8px;
     -ms-border-radius: 8px;
@@ -709,11 +762,18 @@ html, body {
     border-radius: 8px;
 }
 
+@media (max-width: 768px) {
+    .chap-line {
+        width: 508px;
+        margin-right: 0;
+    }
+}
+
 .chap-line .chap-link {
-    -webkit-transition: background-color 300ms;
-    -moz-transition: background-color 300ms;
-    -ms-transition: background-color 300ms;
-    transition: background-color 300ms;
+    -webkit-transition: background-color 300ms ease-out;
+    -moz-transition: background-color 300ms ease-out;
+    -o-transition: background-color 300ms ease-out;
+    transition: background-color 300ms ease-out;
     position: relative;
     height: 30px;
     background-color: #b11200;
@@ -931,7 +991,7 @@ span.wiki a {
     -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
     box-shadow: 0 1px 8px -2px #5d5d5d;
     width: 100%;
-    max-height: 121px;
+    max-height: 133px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
