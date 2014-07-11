@@ -206,7 +206,6 @@ $(document).ready(function () {
     function displayChapters() {
         $("#video-info-chapters").fadeIn();
 
-//        var oldChapEnd = 0;
         var $totChapters = $('.chap-link').length;
         $('.chap-link').each(function () {
 
@@ -223,13 +222,6 @@ $(document).ready(function () {
             } else chapWidth = calcDivWidth(startChapter, endChapter);
 
             $(this).css("width", chapWidth + "%");
-
-//            if (oldChapEnd < startChapter) {
-//                var chapSpaceWidth = calcSpaceWidth(startChapter, oldChapEnd);
-//                $(this).css("margin-left", chapSpaceWidth + "%");
-//            }
-//            oldChapEnd = endChapter;
-
 
             $(this).hover(function () {
                 if ($(this).width() < 175) {
