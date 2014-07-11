@@ -112,7 +112,7 @@ html, body {
 
 .home_cont {
   padding-bottom: 90px;
-  form label{
+  form label {
     color: $medium_gray;
     font: {
       weight: 100;
@@ -451,6 +451,7 @@ h1.title {
     }
   }
 }
+
 .qtipEnt, .qtipTitle {
   display: none;
 }
@@ -513,7 +514,7 @@ h1.title {
     position: relative;
     height: 30px;
     background-color: $dark_red;
-    border-left: 4px solid $light_gray;
+    border-left: 2px solid $light_gray;
     &:nth-child(odd) {
       background-color: $ted_red;
     }

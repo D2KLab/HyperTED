@@ -563,7 +563,7 @@ function getTedChapters(json) {
         }
     }
     var lasSubStart = (sub_offset + cursub.startTime) / 1000;
-    cur_chap.endNPT = lasSubStart + (cursub.duration / 1000) + 6;
+    cur_chap.endNPT = lasSubStart + (cursub.duration / 1000);
     chapters.push(cur_chap);
     return chapters;
 }

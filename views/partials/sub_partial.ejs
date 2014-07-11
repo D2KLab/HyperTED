@@ -1,7 +1,6 @@
 <div class="sub-text <% if (locals.enriched) { %>enriched<% } %>">
     <%
     var subList = locals.subtitles;
-console.log(subList);
     var newChap = locals.chapters || false;
             subList.forEach(function(sub){
         if (!sub.id) {

@@ -147,9 +147,9 @@ exports.updateVideo = function (newVideo, callback) {
 
 exports.addChapters = function (uuid, chapters, callback) {
     var e = false;
-    chapters.forEach(function (h) {
-        h.uuid = uuid;
-        chaps.insert(h, function (err, doc) {
+    chapters.forEach(function (c) {
+        c.uuid = uuid;
+        chaps.insert(c, function (err, doc) {
             if (err) {
                 console.log(err);
                 e = true;

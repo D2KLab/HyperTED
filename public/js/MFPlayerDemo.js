@@ -28,7 +28,6 @@ $(document).ready(function () {
         features: ['playpause', 'current', 'progress', 'duration', 'volume'],
         autoStart: false,  //TODO remove
         success: function (media, domObj) {
-            $("#video-info-chapters").fadeIn();
             $(media).one('loadedmetadata', function () {
                 displayChapters();
                 displayPins();
@@ -208,15 +207,22 @@ $(document).ready(function () {
         $("#video-info-chapters").fadeIn();
 
         var oldChapEnd = 0;
+        var $totChapters = $('.chap-link').length;
         $('.chap-link').each(function () {
+
+            var index = $('.chap-line .chap-link').index(this);
 
             var $chapter = $(this).children('a');
             var startChapter = $chapter.data('start-time');
             var endChapter = $chapter.data('end-time');
 
-            var chapWidth = calcDivWidth(startChapter, endChapter);
-            $(this).css("width", chapWidth + "%");
+            var chapWidth;
+            if (index === $totChapters - 1) {
+                //TODO fix this workaround that set the end of the last chapter to video duration
+                chapWidth = calcDivWidth(startChapter, ($player.getDuration() / 1000));
+            } else chapWidth = calcDivWidth(startChapter, endChapter);
 
+            $(this).css("width", chapWidth + "%");
 
             if (oldChapEnd < startChapter) {
                 var chapSpaceWidth = calcSpaceWidth(startChapter, oldChapEnd);
@@ -224,8 +230,7 @@ $(document).ready(function () {
             }
             oldChapEnd = endChapter;
 
-            var $totChapters = $('.chap-link').length;
-            var index = $('.k-l .k-link').index(this);
+
             $(this).hover(function () {
                 if ($(this).width() < 175) {
                     var opt = {
@@ -238,20 +243,20 @@ $(document).ready(function () {
                     if (index > Math.floor($totChapters / 2)) {
                         opt.right = 0;
                     }
-                    $chapter.children('.k-timing').css(opt);
+                    $chapter.children('.chap-timing').css(opt);
                 }
             });
 
 
             $(this).on('click', function () {
                 $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
-                var chapNumLast = $('.chap-link').last('.k-num')[0].innerText;
+                var chapNumLast = $('.chap-link').last('.chap-num')[0].innerText;
                 var chapNum = $(this).children('.chap-num')[0].innerText;
 
                 $('.chap-link').removeClass('selected-chap');
 
 
-                console.log($('.chap-link').last('.k-num'));
+                console.log($('.chap-link').last('.chap-num'));
                 $('.first-part').text("chapter   ");
                 $('.selected-chap-num').text("   " + chapNum + "   ");
                 $('.last-part').text("   of   " + chapNumLast);
