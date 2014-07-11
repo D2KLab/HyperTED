@@ -206,9 +206,11 @@ $(document).ready(function () {
     function displayChapters() {
         $("#video-info-chapters").fadeIn();
 
+
         var $totChapters = $('.chap-link').length;
         $('.chap-link').each(function () {
-
+            var $chapNum = $(this).find('.chap-num');
+            console.log($chapNum);
             var index = $('.chap-line .chap-link').index(this);
 
             var $chapter = $(this).children('a');
@@ -223,12 +225,16 @@ $(document).ready(function () {
 
             $(this).css("width", chapWidth + "%");
 
+            console.log($(this).width());
+            if ($(this).width() < 25) {
+                $chapNum.hide();
+            }
+
             $(this).hover(function () {
                 if ($(this).width() < 175) {
                     var opt = {
                         top: "16px",
                         opacity: "1",
-                        "background-color": "#f4f4f4",
                         cursor: "auto"
                     };
 
@@ -243,7 +249,7 @@ $(document).ready(function () {
             $(this).on('click', function () {
                 $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
                 var chapNumLast = $('.chap-link').last('.chap-num')[0].innerText;
-                var chapNum = $(this).find('.chap-num')[0].innerText;
+                var chapNum = $chapNum[0].innerText;
 
                 $('.chap-link').removeClass('selected-chap');
 
