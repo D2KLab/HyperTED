@@ -1025,7 +1025,7 @@ function checkHotspotResults(uuid, callback) {
         hotspots: [
             {
                 startNPT: 20,
-                endNPT: 36,
+                endNPT: 56,
                 mainEnt: [
                     {
                         label: 'one',

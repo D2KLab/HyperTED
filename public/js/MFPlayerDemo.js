@@ -226,7 +226,7 @@ $(document).ready(function () {
             $(this).hover(function () {
                 if ($(this).width() < 175) {
                     var opt = {
-                        top: "31px",
+                        top: "16px",
                         opacity: "1",
                         "background-color": "#f4f4f4",
                         cursor: "auto"

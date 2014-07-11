@@ -1,6 +1,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
+
             <div class="chap-line">
                 <%
                 function labelTime(time) {
@@ -14,7 +15,7 @@
                     return hh + ':' + mm + ':' + ss;
                 }
 
-                for(var c in locals.chapters){
+                        for(var c in locals.chapters){
                     if (!locals.chapters.hasOwnProperty(c))continue;
                     var chap = locals.chapters[c];
                     var startTime, endTime;
@@ -28,8 +29,11 @@
                     var tStart = labelTime(startTime);
                     var tEnd = labelTime(endTime);
                 %>
+
                 <div class="chap-link">
-                    <h4 class="chap-num"><%= c %></h4>
+                    <div class="chapNum-cont">
+                        <h6 class="chap-num"><%= c %></h6>
+                    </div>
                     <a data-start-time="<%= startTime %>" data-end-time="<%= endTime %>">
                         <div class="chap-timing">
                             <h5><span class="glyphicon glyphicon-chevron-left"></span>

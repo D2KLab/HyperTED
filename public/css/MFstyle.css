@@ -730,7 +730,6 @@ html, body {
 .chap-label {
     color: #aaaaaa;
     min-height: 20px;
-    margin-top: 10px;
     text-align: center;
 }
 
@@ -751,15 +750,9 @@ html, body {
 }
 
 .chap-line {
-    min-height: 32px;
+    min-height: 35px;
     margin: 20px 50px 20px 50px;
     text-align: center;
-    border: 1px solid #b11200;
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
-    -ms-border-radius: 8px;
-    -o-border-radius: 8px;
-    border-radius: 8px;
 }
 
 @media (max-width: 768px) {
@@ -775,43 +768,39 @@ html, body {
     -o-transition: background-color 300ms ease-out;
     transition: background-color 300ms ease-out;
     position: relative;
-    height: 30px;
+    height: 15px;
     background-color: #b11200;
     border-left: 2px solid #f4f4f4;
     float: left;
+    text-align: center;
 }
 
 .chap-line .chap-link:nth-child(odd) {
     background-color: #fe2a05;
 }
 
-.chap-line .chap-link:first-child {
-    -webkit-border-radius: 8px 0 0 8px;
-    -moz-border-radius: 8px 0 0 8px;
-    -ms-border-radius: 8px 0 0 8px;
-    -o-border-radius: 8px 0 0 8px;
-    border-radius: 8px 0 0 8px;
-    border-left: none;
-}
-
-.chap-line .chap-link:last-child {
-    -webkit-border-radius: 0 8px 8px 0;
-    -moz-border-radius: 0 8px 8px 0;
-    -ms-border-radius: 0 8px 8px 0;
-    -o-border-radius: 0 8px 8px 0;
-    border-radius: 0 8px 8px 0;
-}
-
-.chap-line .chap-link .chap-num {
-    color: #940000;
-    font-weight: 700;
-    margin-bottom: 4px;
-    text-shadow: 1px -1px 4px #f4f4f4;
+.chap-line .chap-link .chapNum-cont .chap-num {
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
     border-radius: 10px;
+    background-color: #ffffff;
+    padding: 4px;
+    display: inline-block;
+    color: #b11200;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .chap-line .chap-link .chapNum-cont .chap-num {
+        display: none;
+    }
 }
 
 .chap-line .chap-link .chap-timing {
     position: absolute;
+    min-height: 32px;
     height: 100%;
     bottom: 0;
     width: 0;
