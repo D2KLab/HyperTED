@@ -146,7 +146,7 @@ function reduceSparqlJSON(bindings) {
                     mediafragment: row.mediafragment
                 };
                 var existsYet = MR.entities.some(function (ent) {
-                    if (ent.uri.value == this.videoUri.value) {
+                    if (ent.uri.value == this.uri.value) {
                         if (this.nerdType && (!ent.nerdType || !ent.nerdType.match(/nerd.eurecom.fr/))) {
                             ent.nerdType = this.nerdType;
                         }

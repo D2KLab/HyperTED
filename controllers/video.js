@@ -100,13 +100,19 @@ exports.view = function (req, res) {
 
                 //2. search metadata with vendor's api
                 getMetadata(video, function (err, metadata) {
-                    //TODO menage chapters
+                    var chapters;
+
                     if (err) {
                         console.log(LOG_TAG + 'Metadata retrieved with errors.');
                     }
                     if (!metadata) {
                         console.log(LOG_TAG + 'Metadata unavailable.');
                     } else {
+                        if (metadata.chapters) {
+                            chapters = metadata.chapters;
+                            delete metadata.chapters;
+                        }
+
                         var oldmetadata = video.metadata || {};
                         video.metadata = mergeObj(oldmetadata, metadata);
                     }
@@ -118,6 +124,14 @@ exports.view = function (req, res) {
                             console.log("DATABASE ERROR");
                             console.log(err);
                             console.log("Can not updateVideoUuid");
+                        }
+
+                        if(chapters){
+                            db.addChapters(uuid, chapters, function (err) {
+                                if (err) {
+                                    console.log("DATABASE ERROR" + JSON.stringify(err));
+                                }
+                            });
                         }
                     });
 
@@ -963,20 +977,34 @@ exports.buildDb = function (req, res) {
         };
 
         getMetadata(video, function (err, metadata) {
-            //TODO menage chapters
             if (err) {
                 console.log(LOG_TAG + 'Metadata retrieved with errors.');
                 console.log(LOG_TAG + err);
             }
+
+            var chapters;
             if (!metadata) {
                 console.log(LOG_TAG + 'Metadata unavailable.');
             } else {
+                if (metadata.chapters) {
+                    chapters = metadata.chapters;
+                    delete metadata.chapters;
+                }
                 video.metadata = metadata;
             }
 
             var fun = uuid ? db.updateVideo : db.insertVideo;
 
             fun(video, function (err, doc) {
+               //chapters
+                if(chapters){
+                    db.addChapters(doc.uuid, chapters, function (err) {
+                        if (err) {
+                            console.log("DATABASE ERROR" + JSON.stringify(err));
+                        }
+                    });
+                }
+
                 //nerdify
                 if (doc.metadata.timedtext) {
                     nerd.getEntities('timedtext', doc.metadata.timedtext, 'textrazor', function (err, data) {
