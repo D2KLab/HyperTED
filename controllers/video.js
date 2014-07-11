@@ -1033,11 +1033,11 @@ function checkHotspotResults(uuid, callback) {
                     },
                     {
                         label: 'two',
-                        type: 'thing'
+                        type: 'animal'
                     },
                     {
                         label: 'three',
-                        type: 'thing'
+                        type: 'location'
                     }
                 ]
             },
@@ -1046,16 +1046,16 @@ function checkHotspotResults(uuid, callback) {
                 endNPT: 236,
                 mainEnt: [
                     {
-                        label: 'one',
-                        type: 'thing'
+                        label: 'five',
+                        type: 'product'
                     },
                     {
-                        label: 'two',
-                        type: 'thing'
+                        label: 'six',
+                        type: 'event'
                     },
                     {
-                        label: 'three',
-                        type: 'thing'
+                        label: 'seven',
+                        type: 'time'
                     }
                 ]
             },
@@ -1064,16 +1064,20 @@ function checkHotspotResults(uuid, callback) {
                 endNPT: 390,
                 mainEnt: [
                     {
-                        label: 'one',
-                        type: 'thing'
+                        label: 'eight',
+                        type: 'function'
                     },
                     {
-                        label: 'two',
-                        type: 'thing'
+                        label: 'nine',
+                        type: 'organization'
                     },
                     {
-                        label: 'three',
-                        type: 'thing'
+                        label: 'ten',
+                        type: 'person'
+                    },
+                    {
+                        label: 'eleven',
+                        type: 'amount'
                     }
                 ]
             }
