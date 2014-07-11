@@ -67,7 +67,7 @@ function getHotspotsFor(video, callback) {
 }
 
 function getChaptersFor(video, callback) {
-    chaps.find({'uuid': video.uuid}, function (err, docs) {
+    chaps.find({'uuid': video.uuid},{ sort : { chapNum : 1 } }, function (err, docs) {
         if (!err && docs && docs.length > 0) {
             video.chapters = docs;
         }

@@ -2,6 +2,8 @@ var http = require('http'),
     https = require('https'),
     url = require("url"),
     async = require('async'),
+    optional = require('optional'),
+    ffprobe = optional('node-ffprobe'),
     nerd = require('./nerdify'),
     db = require('./database'),
     ts = require('./linkedTVconnection'),
@@ -495,21 +497,44 @@ function getMetadata(video, callback) {
 
                 var subUrl = vendors['ted'].sub_url.replace('<id>', video.vendor_id);
 
-//                console.log("retrieving subs from " + subUrl);
-                http.getJSON(subUrl, function (err, data) {
-                    if (!err && data) {
-                        metadata.timedtext = jsonToSrt(data);
-                        //obtain chapters from json
-                        metadata.chapters = getTedChapters(data);
+                var jsonSub;
 
-                    } else {
-                        console.log('[ERROR ' + err + '] on retrieving sub for ' + video.locator);
-                    }
-                    callback(false, metadata);
-                });
+                async.parallel([
+                        function (async_callback) {
+                            http.getJSON(subUrl, function(err, data){
+                                jsonSub = data;
+                                if(err){
+                                    console.log('[ERROR ' + err + '] on retrieving sub for ' + video.locator);
+                                }
+                                async_callback(err,data);
+                            });
+                        },
+                        function (async_callback) {
+                            // get video duration
+                            if (ffprobe) {
+                                ffprobe(video.videoLocator, function (err, probeData) {
+                                    if (err) {
+                                        console.log(err);
+                                    }
+                                    if (probeData) {
+                                        video.duration = probeData.format.duration;
+                                    }
+                             async_callback(false)
+                                });
+                            }
+                        }
+                    ],
+                    function (err) {
+                        if (!err) {
+                            metadata.timedtext = jsonToSrt(jsonSub);
+                            //obtain chapters from json
+                            metadata.chapters = getTedChapters(jsonSub, video.duration);
+                        }
+                        callback(false, metadata);
+                    });
             });
             break;
-        default :
+        default:
             callback(true, 'Vendor undefined or not recognized');
     }
 }
@@ -541,7 +566,7 @@ function getSubtitlesTV2RDF(uuid, callback) {
     http.getRemoteFile('http://linkedtv.eurecom.fr/tv2rdf/api/mediaresource/' + uuid + '/metadata?metadataType=subtitle', callback);
 }
 
-function getTedChapters(json) {
+function getTedChapters(json, totDuration) {
     var cur_chap = {"startNPT": 0,
         "source": 'api.ted.com',
         "chapNum": 0}, cursub;
@@ -570,7 +595,7 @@ function getTedChapters(json) {
         }
     }
     var lasSubStart = (sub_offset + cursub.startTime) / 1000;
-    cur_chap.endNPT = lasSubStart + (cursub.duration / 1000);
+    cur_chap.endNPT = totDuration;
     chapters.push(cur_chap);
     return chapters;
 }
