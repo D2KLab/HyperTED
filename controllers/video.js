@@ -557,6 +557,7 @@ function getTedChapters(json) {
                 var thisChapStart = (sub_offset + sub_startTime) / 1000;
 
                 cur_chap.endNPT = thisChapStart;
+                cur_chap.source = 'api.ted.com';
                 chapters.push(cur_chap);
                 cur_chap = {"startNPT": thisChapStart};
             }
@@ -564,6 +565,7 @@ function getTedChapters(json) {
     }
     var lasSubStart = (sub_offset + cursub.startTime) / 1000;
     cur_chap.endNPT = lasSubStart + (cursub.duration / 1000);
+    cur_chap.source = 'api.ted.com';
     chapters.push(cur_chap);
     return chapters;
 }
