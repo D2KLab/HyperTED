@@ -542,9 +542,9 @@ h1.title {
       bottom: 0;
       width: 0;
       margin-left: 50%;
-      background-color: #dfafaa;
+      background-color: #f4f4f4;
       opacity: 0.8;
-      color: #dfafaa;
+      color: #f4f4f4;
       overflow: hidden;
       -webkit-transition: width 200ms, margin 200ms, color 1s;
       -moz-transition: width 200ms, margin 200ms, color 1s;
@@ -565,7 +565,6 @@ h1.title {
     }
     &:hover {
       .chap-timing {
-        background-color: #f4f4f4;
 
         z-index: 2;
         @include box-shadow(0, 2px, 8px, 0, $dark_gray);
