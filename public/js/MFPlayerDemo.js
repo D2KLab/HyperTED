@@ -243,7 +243,7 @@ $(document).ready(function () {
             $(this).on('click', function () {
                 $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
                 var chapNumLast = $('.chap-link').last('.chap-num')[0].innerText;
-                var chapNum = $(this).children('.chap-num')[0].innerText;
+                var chapNum = $(this).find('.chap-num')[0].innerText;
 
                 $('.chap-link').removeClass('selected-chap');
 

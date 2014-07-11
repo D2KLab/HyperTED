@@ -779,6 +779,10 @@ html, body {
     background-color: #fe2a05;
 }
 
+.chap-line .chap-link .chapNum-cont {
+    overflow: hidden;
+}
+
 .chap-line .chap-link .chapNum-cont .chap-num {
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;

@@ -521,7 +521,7 @@ h1.title {
     text-align: center;
 
     .chapNum-cont {
-
+      overflow: hidden;
       .chap-num {
         @include border-radius(10px);
         background-color: #ffffff;
