@@ -15,6 +15,11 @@
                     return hh + ':' + mm + ':' + ss;
                 }
 
+                function calcChapWidth(startTime, endTime) {
+                    var totWidth = (locals.duration);
+                    return((endTime - startTime) / totWidth) * 100;
+                }
+
                         for(var c in locals.chapters){
                     if (!locals.chapters.hasOwnProperty(c))continue;
                     var chap = locals.chapters[c];
@@ -30,29 +35,33 @@
                     var tEnd = labelTime(endTime);
                 %>
 
-                <div class="chap-link">
-                    <div class="chapNum-cont">
-                        <h6 class="chap-num"><%= c %></h6>
-                    </div>
-                    <a data-start-time="<%= startTime %>" data-end-time="<%= endTime %>">
-                        <div class="chap-timing">
-                            <h5><span class="glyphicon glyphicon-chevron-left"></span>
-                                <%= tStart %> - <%= tEnd %>
-                                <span class="glyphicon glyphicon-chevron-right"></span></h5>
-                        </div>
-                    </a>
+                <div class="chap-link"
+                        <% if(locals.duration){ %>
+                     style="width: <%= calcChapWidth(startTime, endTime) %>%"
+                        <% } %>
+                        />
+                <div class="chapNum-cont">
+                    <h6 class="chap-num"><%= c %></h6>
                 </div>
-                <% } %>
+                <a data-start-time="<%= startTime %>" data-end-time="<%= endTime %>">
+                    <div class="chap-timing">
+                        <h5><span class="glyphicon glyphicon-chevron-left"></span>
+                            <%= tStart %> - <%= tEnd %>
+                            <span class="glyphicon glyphicon-chevron-right"></span></h5>
+                    </div>
+                </a>
             </div>
-
+            <% } %>
         </div>
-    </div>
-
-    <div class="chap-label">
-        <span class="glyphicon glyphicon-chevron-left"></span>
-        <span class="first-part"><%= chapters.length %> chapters</span><span class="selected-chap-num"></span><span
-                class="last-part"></span>
-        <span class="glyphicon glyphicon-chevron-right"></span>
 
     </div>
+</div>
+
+<div class="chap-label">
+    <span class="glyphicon glyphicon-chevron-left"></span>
+    <span class="first-part"><%= chapters.length %> chapters</span><span class="selected-chap-num"></span><span
+            class="last-part"></span>
+    <span class="glyphicon glyphicon-chevron-right"></span>
+
+</div>
 </div>

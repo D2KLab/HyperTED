@@ -221,11 +221,11 @@ $(document).ready(function () {
             if (index === $totChapters - 1) {
                 //TODO fix this workaround that set the end of the last chapter to video duration
                 chapWidth = calcDivWidth(startChapter, ($player.getDuration() / 1000));
-            } else chapWidth = calcDivWidth(startChapter, endChapter);
+            } else
+                chapWidth = calcDivWidth(startChapter, endChapter);
 
             $(this).css("width", chapWidth + "%");
 
-            console.log($(this).width());
             if ($(this).width() < 25) {
                 $chapNum.hide();
             }
