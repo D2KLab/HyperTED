@@ -2,7 +2,7 @@ var http = require('http'),
     https = require('https'),
     url = require("url"),
     async = require('async'),
-    optional = require('optional'),
+    optional = require('optional'), domain = require('domain'),
     ffprobe = optional('node-ffprobe'),
     nerd = require('./nerdify'),
     db = require('./database'),
@@ -525,21 +525,25 @@ function getMetadata(video, callback) {
                         },
                         function (async_callback) {
                             // get video duration
-                            try {
-                                if (ffprobe) {
+                            if (ffprobe) {
+                                var d = domain.create();
+                                d.on('error', function (err) {
+                                    console.warn('' + err);
+                                    console.warn("Maybe you have not installed ffmpeg or ffmpeg is not in your \"Path\" Environment variable.");
+//                                    async_callback(false);
+                                });
+                                d.run(function () {
                                     ffprobe(video.videoLocator, function (err, probeData) {
                                         if (err) {
                                             console.log(err);
+                                            return;
                                         }
-                                        if (probeData) {
+                                        if (probeData && probeData.format) {
                                             video.duration = probeData.format.duration;
                                         }
                                         async_callback(false)
                                     });
-                                }
-                            } catch (e) {
-                                console.warn("Error with ffprobe. Maybe you have not installed ffmpeg.");
-                                console.warn(e);
+                                });
                             }
                         }
                     ],
