@@ -106,7 +106,8 @@
 <div id="video-info-chapters">
     <% if (locals.chapters) { %>
     <% include partials/chapter.ejs %>
-    <% }else if(locals.metadata && metadata.title) { %>
+    <% }
+            if(locals.metadata && metadata.title) { %>
     <div class="play-video-info clearfix">
         <div class="left">
             <h5 class="video-info">published on <%= metadata.published.substring(0, 10) %>

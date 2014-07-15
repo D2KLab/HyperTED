@@ -126,7 +126,7 @@ exports.view = function (req, res) {
                             console.log("Can not updateVideoUuid");
                         }
 
-                        if(chapters){
+                        if (chapters) {
                             db.addChapters(uuid, chapters, function (err) {
                                 if (err) {
                                     console.log("DATABASE ERROR" + JSON.stringify(err));
@@ -515,26 +515,31 @@ function getMetadata(video, callback) {
 
                 async.parallel([
                         function (async_callback) {
-                            http.getJSON(subUrl, function(err, data){
+                            http.getJSON(subUrl, function (err, data) {
                                 jsonSub = data;
-                                if(err){
+                                if (err) {
                                     console.log('[ERROR ' + err + '] on retrieving sub for ' + video.locator);
                                 }
-                                async_callback(err,data);
+                                async_callback(err, data);
                             });
                         },
                         function (async_callback) {
                             // get video duration
-                            if (ffprobe) {
-                                ffprobe(video.videoLocator, function (err, probeData) {
-                                    if (err) {
-                                        console.log(err);
-                                    }
-                                    if (probeData) {
-                                        video.duration = probeData.format.duration;
-                                    }
-                             async_callback(false)
-                                });
+                            try {
+                                if (ffprobe) {
+                                    ffprobe(video.videoLocator, function (err, probeData) {
+                                        if (err) {
+                                            console.log(err);
+                                        }
+                                        if (probeData) {
+                                            video.duration = probeData.format.duration;
+                                        }
+                                        async_callback(false)
+                                    });
+                                }
+                            } catch (e) {
+                                console.warn("Error with ffprobe. Maybe you have not installed ffmpeg.");
+                                console.warn(e);
                             }
                         }
                     ],
@@ -996,8 +1001,8 @@ exports.buildDb = function (req, res) {
             var fun = uuid ? db.updateVideo : db.insertVideo;
 
             fun(video, function (err, doc) {
-               //chapters
-                if(chapters){
+                //chapters
+                if (chapters) {
                     db.addChapters(doc.uuid, chapters, function (err) {
                         if (err) {
                             console.log("DATABASE ERROR" + JSON.stringify(err));
