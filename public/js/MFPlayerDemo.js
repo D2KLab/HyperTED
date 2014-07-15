@@ -202,7 +202,7 @@ $(document).ready(function () {
     }
 
     // TODO decide what to do with the following line
-    $("#video-info-chapters").hide();
+    //$("#video-info-chapters").hide();
     function displayChapters() {
         $("#video-info-chapters").fadeIn();
 

@@ -983,10 +983,8 @@ span.wiki a {
     -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
     -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
     box-shadow: 0 1px 8px -2px #5d5d5d;
-    display: none;
     background: #fff;
     width: 100%;
-    max-height: 265px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -1021,18 +1019,19 @@ span.wiki a {
 }
 
 #video-info-chapters .play-video-info .right {
+    max-height: 130px;
     float: right;
     display: inline-block;
     width: 50%;
     border-left: 1px solid #b11200;
     padding-left: 2%;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow-y: auto;
 }
 
 @media (max-width: 860px) {
     #video-info-chapters .play-video-info .right {
         width: 100%;
+        max-height: 90px;
         border-top: 1px solid #b11200;
         border-left: 0;
     }
