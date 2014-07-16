@@ -172,7 +172,6 @@ $(document).ready(function () {
     }
 
     function displayPins() {
-
         $pin.fadeIn();
 
         var oldEnd = 0;
@@ -201,16 +200,12 @@ $(document).ready(function () {
         });
     }
 
-    // TODO decide what to do with the following line
-    //$("#video-info-chapters").hide();
     function displayChapters() {
         $("#video-info-chapters").fadeIn();
-
 
         var $totChapters = $('.chap-link').length;
         $('.chap-link').each(function () {
             var $chapNum = $(this).find('.chap-num');
-            console.log($chapNum);
             var index = $('.chap-line .chap-link').index(this);
 
             var $chapter = $(this).children('a');
@@ -245,7 +240,6 @@ $(document).ready(function () {
                 }
             });
 
-
             $(this).on('click', function () {
                 $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
                 var chapNumLast = $('.chap-link').last('.chap-num')[0].innerText;
@@ -253,13 +247,10 @@ $(document).ready(function () {
 
                 $('.chap-link').removeClass('selected-chap');
 
-
-//                console.log($('.chap-link').last('.chap-num'));
                 $(this).addClass('selected-chap');
                 $('.first-part').text("chapter   ");
                 $('.selected-chap-num').text("   " + chapNum + "   ");
                 $('.last-part').text("   of   " + chapNumLast.substring(0, 2));
-
 
                 updateMFurl();
             });
@@ -283,7 +274,6 @@ $(document).ready(function () {
             }
             highlightMFSub(hash.t[0].value);
 
-
             delete page_url.search.t;
             delete page_url.search.xywh;
 
@@ -291,7 +281,7 @@ $(document).ready(function () {
         }
     }
 
-    function calcSec(hms) {
+    function timeToSec(hms) {
         var time = (hms.split(":"));
         var hh = parseInt(time[0]);
         var mm = parseInt(time[1]);
@@ -315,8 +305,8 @@ $(document).ready(function () {
             eMFtest = '86400';
         }
 
-        sMF = sMFtest.indexOf(":") == -1 ? sMFtest : calcSec(sMFtest);
-        eMF = eMFtest.indexOf(":") == -1 ? eMFtest : calcSec(eMFtest);
+        sMF = sMFtest.indexOf(":") == -1 ? sMFtest : timeToSec(sMFtest);
+        eMF = eMFtest.indexOf(":") == -1 ? eMFtest : timeToSec(eMFtest);
         sMF = parseFloat(sMF);
         eMF = parseFloat(eMF);
 

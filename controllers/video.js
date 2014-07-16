@@ -596,24 +596,30 @@ function getTedChapters(json, totDuration) {
     var chapters = [];
     var chapNum = 1;
     var sub_offset = json._meta.preroll_offset;
-    for (var key in json) {
 
+    var oldkey = 0;
+    for (var key in json) {
         if (json.hasOwnProperty(key) && key != '_meta') {
             cursub = json[key].caption;
-            var isStartOfChap = cursub.startOfParagraph;
 
+            var isStartOfChap = cursub.startOfParagraph;
             if (isStartOfChap) {
                 var sub_startTime = cursub.startTime;
                 var thisChapStart = (sub_offset + sub_startTime) / 1000;
-
                 cur_chap.endNPT = thisChapStart;
                 chapters.push(cur_chap);
-                cur_chap = {
-                    "startNPT": thisChapStart,
-                    "source": 'api.ted.com',
-                    "chapNum": chapNum
-                };
-                ++chapNum;
+
+                if (parseInt(key) == parseInt(oldkey) + 1) {
+                    chapters.pop();
+                } else {
+                    cur_chap = {
+                        "startNPT": thisChapStart,
+                        "source": 'api.ted.com',
+                        "chapNum": chapNum
+                    };
+                    ++chapNum;
+                }
+                oldkey = key;
             }
         }
     }
