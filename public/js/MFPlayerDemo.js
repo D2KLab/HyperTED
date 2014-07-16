@@ -254,11 +254,12 @@ $(document).ready(function () {
                 $('.chap-link').removeClass('selected-chap');
 
 
-                console.log($('.chap-link').last('.chap-num'));
+//                console.log($('.chap-link').last('.chap-num'));
+                $(this).addClass('selected-chap');
                 $('.first-part').text("chapter   ");
                 $('.selected-chap-num').text("   " + chapNum + "   ");
-                $('.last-part').text("   of   " + chapNumLast);
-                $(this).addClass('selected-chap');
+                $('.last-part').text("   of   " + chapNumLast.substring(0, 2));
+
 
                 updateMFurl();
             });

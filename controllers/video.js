@@ -1086,60 +1086,52 @@ function checkHotspotResults(uuid, callback) {
     var results = {
         hotspots: [
             {
-                startNPT: 20,
-                endNPT: 56,
+                startNPT: 41,
+                endNPT: 72,
                 mainEnt: [
                     {
-                        label: 'one',
-                        type: 'thing'
-                    },
-                    {
-                        label: 'two',
-                        type: 'animal'
-                    },
-                    {
-                        label: 'three',
-                        type: 'location'
-                    }
-                ]
-            },
-            {
-                startNPT: 120,
-                endNPT: 236,
-                mainEnt: [
-                    {
-                        label: 'five',
-                        type: 'product'
-                    },
-                    {
-                        label: 'six',
-                        type: 'event'
-                    },
-                    {
-                        label: 'seven',
-                        type: 'time'
-                    }
-                ]
-            },
-            {
-                startNPT: 300,
-                endNPT: 390,
-                mainEnt: [
-                    {
-                        label: 'eight',
-                        type: 'function'
-                    },
-                    {
-                        label: 'nine',
+                        label: 'FBI',
                         type: 'organization'
                     },
                     {
-                        label: 'ten',
+                        label: 'domestic terrorist',
+                        type: 'thing'
+                    }
+                ]
+            },
+            {
+                startNPT: 114,
+                endNPT: 146,
+                mainEnt: [
+                    {
+                        label: 'terrorism',
+                        type: 'thing'
+                    },
+                    {
+                        label: 'one percent',
+                        type: 'amount'
+                    },
+                    {
+                        label: 'animals',
+                        type: 'animal'
+                    }
+                ]
+            },
+            {
+                startNPT: 188,
+                endNPT: 225,
+                mainEnt: [
+                    {
+                        label: 'Amy Meyer',
                         type: 'person'
                     },
                     {
-                        label: 'eleven',
-                        type: 'amount'
+                        label: 'Freedom of Information',
+                        type: 'organization'
+                    },
+                    {
+                        label: 'persecutors',
+                        type: 'thing'
                     }
                 ]
             }
