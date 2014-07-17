@@ -139,6 +139,7 @@ $(document).ready(function () {
         updateMFurl();
     });
 
+
     var $pin = $('.pin');
     $pin.each(function () {
         var $this = $(this);
