@@ -126,7 +126,7 @@ $(document).ready(function () {
         click: function (e) {
             e.preventDefault();
             var chapId = $(this).data('chapter');
-            $('#' + chapId).click();
+            $('#ch' + chapId).click();
         }
     }, '.sub-text p[data-chapter]');
 

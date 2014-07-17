@@ -1,7 +1,7 @@
 <div class="sub-text <% if (locals.enriched) { %>enriched<% } %>">
     <%
     var subList = locals.subtitles;
-    var newChap = locals.chapters || false;
+    var newChap = locals.chapters || false; //boolean
             subList.forEach(function(sub){
         if (!sub.id) {
             return;
@@ -10,16 +10,17 @@
         newChap = false;
     %>
     <div class="subChapGroup" <%= sub.dataChap %>>
-        <p class="chap-title">chapter <%= sub.chapNum %></p>
+        <p class="chap-title"> chapter <%= sub.chapNum %></p>
         <%
         }
         %>
         <p id="sub<%= sub.id %>" data-time="<%= sub.time %>" data-startSS="<%= sub.startSS %>"
            data-endSS="<%= sub.endSS %>" <%= sub.dataChap || "" %>><%- sub.text %></p>
         <%
-        if(sub.endChap){
+        if(sub.endChap) {
             newChap = true;
         %>
+
     </div>
     <%
     }
