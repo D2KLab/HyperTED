@@ -58,6 +58,18 @@ $(document).ready(function () {
     video.player = $player;
     console.debug($player);
 
+    //play/pause clicking on the video
+    var playing = false;
+    $('.mejs-video').on("click", function () {
+        if (playing) {
+            $player.pause();
+            playing = false;
+        } else {
+            $player.play();
+            playing = true;
+        }
+    });
+
     if (Modernizr.history && Modernizr.localstorage) {
         // Nerdify form become an ajax form
         var $nerdifyForm = $('form.nerdify');
@@ -201,9 +213,9 @@ $(document).ready(function () {
         });
     }
 
+    $("#video-info-chapters").fadeIn();
     function displayChapters() {
         $("#video-info-chapters").fadeIn();
-
         var $totChapters = $('.chap-link').length;
         $('.chap-link').each(function () {
             var $chapNum = $(this).find('.chap-num');
@@ -222,8 +234,10 @@ $(document).ready(function () {
 
             $(this).css("width", chapWidth + "%");
 
-            if ($(this).width() < 25) {
-                $chapNum.hide();
+
+            if ($(this).width() >= 25) {
+                $chapNum.fadeIn();
+                $chapNum.css("display", "inline-block");
             }
 
             $(this).hover(function () {
@@ -243,7 +257,7 @@ $(document).ready(function () {
 
             $(this).on('click', function () {
                 $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
-                var chapNumLast = $('.chap-link').last('.chap-num')[0].innerText;
+                var chapNumLast = $('.chap-num:last')[0].innerText;
                 var chapNum = $chapNum[0].innerText;
 
                 $('.chap-link').removeClass('selected-chap');
@@ -251,7 +265,7 @@ $(document).ready(function () {
                 $(this).addClass('selected-chap');
                 $('.first-part').text("chapter   ");
                 $('.selected-chap-num').text("   " + chapNum + "   ");
-                $('.last-part').text("   of   " + chapNumLast.substring(0, 2));
+                $('.last-part').text("   of   " + chapNumLast);
 
                 updateMFurl();
             });

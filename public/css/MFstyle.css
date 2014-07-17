@@ -791,8 +791,8 @@ html, body {
     -o-border-radius: 10px;
     border-radius: 10px;
     background-color: #ffffff;
+    display: none;
     padding: 4px;
-    display: inline-block;
     color: #b11200;
     font-weight: 700;
 }
@@ -983,6 +983,7 @@ span.wiki a {
     -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
     -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
     box-shadow: 0 1px 8px -2px #5d5d5d;
+    display: none;
     background: #fff;
     width: 100%;
     overflow: hidden;
