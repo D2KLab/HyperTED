@@ -65,13 +65,13 @@
                     <label class="col-sm-6 col-xs-6">from
                         <small><em>(opz)</em></small>
                         <input name="start" type="time" class="form-control input-lg" step="1"
-                               placeholder="hh:mm:ss" pattern="[0-6](:[0-5][0-9]){2}">
+                               placeholder="hh:mm:ss" pattern="0?[0-6](:[0-5][0-9]){2}">
                     </label>
                     <label class="col-sm-6 col-xs-6">
                         to
                         <small><em>(opz)</em></small>
                         <input name="end" type="time" class="form-control input-lg" step="1"
-                               placeholder="hh:mm:ss" pattern="[0-6](:[0-5][0-9]){2}">
+                               placeholder="hh:mm:ss" pattern="0?[0-6](:[0-5][0-9]){2}">
                     </label>
                 </div>
             </div>
@@ -109,6 +109,8 @@
 </div>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js"></script>
+
 <script>
     $(document).ready(function () {
         var $formSwitch = $('#form-switch');
@@ -118,6 +120,10 @@
             $advancedForm.add($basicForm).toggleClass('hidden');
         });
 
+        if (!Modernizr.inputtypes.time) {
+            $('[name="start"]').attr("type", "text");
+            $('[name="end"]').attr("type", "text");
+        }
 
         $basicForm.submit(function () {
             var $form = $(this);
@@ -143,7 +149,17 @@
 
         $('input[name="start"]').on('change', function () {
             var minInputEnd = $(this).val();
-            $('input[name="end"]').attr("min", minInputEnd);
+            var realInputEnd = $('input[name="end"]').val();
+
+            if (Modernizr.inputtypes.time) {
+                $('input[name="end"]').attr("min", minInputEnd);
+            } else {
+                if (realInputEnd.localeCompare(minInputEnd) == -1) {
+                    $('input[name="end"]').attr("id", "inputEnd");
+                    var input = document.getElementById('inputEnd');
+                    input.setCustomValidity("This field must be greater then " + minInputEnd);
+                }
+            }
         });
 
     });

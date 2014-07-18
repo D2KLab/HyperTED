@@ -23,6 +23,12 @@ $dark_red: #b11200;
   }
 }
 
+.mejs-inner {
+  //height: 330px;
+  cursor: pointer;
+  //pointer-events: none;
+}
+
 h1, h2, h3, h4, h5, h6, .navbar-brand {
   font: {
     family: CaviarDreams, Helvetica, sans-serif;

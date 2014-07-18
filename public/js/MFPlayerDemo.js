@@ -59,14 +59,14 @@ $(document).ready(function () {
     console.debug($player);
 
     //play/pause clicking on the video
-    var playing = false;
-    $('.mejs-video').on("click", function () {
-        if (playing) {
+    var isPlaying = false;
+    $('.mejs-inner').on("click", function () {
+        if (isPlaying) {
             $player.pause();
-            playing = false;
+            isPlaying = false;
         } else {
             $player.play();
-            playing = true;
+            isPlaying = true;
         }
     });
 
@@ -326,10 +326,8 @@ $(document).ready(function () {
         eMF = parseFloat(eMF);
 
         $('.sub-text p').removeClass("selected-frag").each(function () {
-//                var sSub = $(this).data('startss');
             var eSub = parseFloat($(this).data('endss'));
 
-//                console.log(sMF + '<' + eSub + ' && ' + eMF + '>=' + eSub);
             if (sMF < eSub && eMF >= eSub) {
                 $(this).addClass("selected-frag");
             }
