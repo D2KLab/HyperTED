@@ -168,6 +168,10 @@ $(document).ready(function () {
             position: {
                 my: 'bottom center',
                 at: 'top center'
+            },
+            hide: {
+                fixed: true,
+                delay: 300
             }
         });
 

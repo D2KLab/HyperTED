@@ -120,11 +120,6 @@
             $advancedForm.add($basicForm).toggleClass('hidden');
         });
 
-        if (!Modernizr.inputtypes.time) {
-            $('[name="start"]').attr("type", "text");
-            $('[name="end"]').attr("type", "text");
-        }
-
         $basicForm.submit(function () {
             var $form = $(this);
             var $timefrag = $('.timeFrag', $form);
