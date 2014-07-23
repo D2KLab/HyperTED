@@ -142,8 +142,9 @@ $(document).ready(function () {
                         return;
                     }
                     text = 'The request was sent successfully. Came back later to see hotspots.'
+                    location.reload(true);
                 } catch (e) {
-                    text = 'Something went wrong. Try again later'
+                    text = 'Something went wrong. Try again later';
                     console.error(text);
                     console.log(e);
                 }

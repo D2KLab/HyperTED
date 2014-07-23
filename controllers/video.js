@@ -1088,18 +1088,21 @@ function runHotspotProcess(uuid, callback) {
             return;
         }
 
-        var srt = new Buffer(data.metadata.timedtext, 'base64');
-        var queryString = '', queryConnect = '?';
+        var srt = new Buffer(data.metadata.timedtext, 'utf-8');
+        var queryString = '?videoURL=' + data.locator + '&UUID=' + data.uuid + '&visualAnalysis=false&chapterList=';
+        var first = true;
         data.chapters.forEach(function (c) {
-            queryString += queryConnect;
-            queryString += 'chap=' + c.startNPT + ',' + c.endNPT;
-            queryConnect = '&';
+            if (first)
+                first = false;
+            else
+                queryString += '%23';
+            queryString += c.startNPT + ',' + c.endNPT;
         });
         console.log(queryString);
         var post_options = {
-            host: 'www.google.com',
-            port: '8080',
-            path: queryString,
+            host: 'linkedtv.eurecom.fr',
+            port: '80',
+            path: '/tedtalks/api/hotspots/generate' + queryString,
             method: 'POST',
             headers: {
                 'Content-Type': 'text/plain',
@@ -1110,27 +1113,46 @@ function runHotspotProcess(uuid, callback) {
         var d = domain.create();
         d.on('error', function (err) {
             console.warn('' + err);
-            callback({'message':'internal error'});
+            callback({'message': 'internal error'});
         });
         d.run(function () {
-//            // Set up the request
-//            var post_req = http.request(post_options, function (res) {
-//                res.setEncoding('utf8');
-//                res.on('data', function (chunk) {
-//                    console.log('Response: ' + chunk);
-//                });
-//                res.on('end', function (err) {
-//                    if (err) {
-//                        callback(err);
-//                        return;
-//                    }
-                    db.setHotspotProcess(uuid, hStatusValue.IN_PROGRESS, callback);
-//                });
-//            });
-//
-//            // post the data
-//            post_req.write(srt);
-//            post_req.end();
+            // Set up the request
+            var data = '';
+            var post_req = http.request(post_options, function (res) {
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    data += chunk;
+                    if (data.toLowerCase().indexOf('internal error')) {
+                        callback({'message': 'Internal error'});
+                    }
+                });
+                res.on('end', function (err) {
+                    if (err) {
+                        callback(err);
+                        return;
+                    }
+//                    db.setHotspotProcess(uuid, hStatusValue.IN_PROGRESS, callback);
+                    var results = JSON.parse(data);
+                    if (results && results.hp_list) {
+                        db.addHotspots(uuid, results.hp_list, function (err) {
+                            if (err) {
+                                callback(err);
+                                return;
+                            }
+                            db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
+                                callback(err, results.hp_list);
+                            });
+                        });
+                    } else {
+                        callback(true, false);
+                    }
+
+                });
+            });
+
+            // post the data
+            post_req.write(srt);
+            post_req.end();
         });
     });
 }
