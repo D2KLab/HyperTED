@@ -1113,24 +1113,24 @@ function runHotspotProcess(uuid, callback) {
             callback({'message':'internal error'});
         });
         d.run(function () {
-            // Set up the request
-            var post_req = http.request(post_options, function (res) {
-                res.setEncoding('utf8');
-                res.on('data', function (chunk) {
-                    console.log('Response: ' + chunk);
-                });
-                res.on('end', function (err) {
-                    if (err) {
-                        callback(err);
-                        return;
-                    }
+//            // Set up the request
+//            var post_req = http.request(post_options, function (res) {
+//                res.setEncoding('utf8');
+//                res.on('data', function (chunk) {
+//                    console.log('Response: ' + chunk);
+//                });
+//                res.on('end', function (err) {
+//                    if (err) {
+//                        callback(err);
+//                        return;
+//                    }
                     db.setHotspotProcess(uuid, hStatusValue.IN_PROGRESS, callback);
-                });
-            });
-
-            // post the data
-            post_req.write(srt);
-            post_req.end();
+//                });
+//            });
+//
+//            // post the data
+//            post_req.write(srt);
+//            post_req.end();
         });
     });
 }
