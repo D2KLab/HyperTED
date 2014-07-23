@@ -213,10 +213,6 @@
     clear: both;
 }
 
-.mejs-inner {
-    cursor: pointer;
-}
-
 h1, h2, h3, h4, h5, h6, .navbar-brand {
     font-family: CaviarDreams, Helvetica, sans-serif;
 }
@@ -626,7 +622,6 @@ html, body {
 #player-sect #player-container {
     min-height: 20%;
     overflow: hidden;
-    width: 100%;
 }
 
 #player-sect #player-container #video {
@@ -634,14 +629,16 @@ html, body {
     min-height: 360px;
 }
 
-@media (min-width: 768px) {
-    #player-sect #player-container #video {
-        padding-left: 10em;
-    }
+#player-sect #player-container #video .mejs-inner {
+    cursor: pointer;
+}
 
+@media (min-width: 768px) {
     #player-sect #player-container #video .mejs-container {
         position: static;
         margin: auto;
+        width: 100%;
+        height: auto;
     }
 }
 
@@ -715,11 +712,26 @@ html, body {
     padding: 8px 15px;
     background: #b11200;
     color: #f4f4f4;
+    text-align: center;
 }
 
 .qtip-light .qtip-titlebar .glyphicon {
     color: #f4f4f4;
     font-size: 0.9em;
+}
+
+.qtip-light .qtip-content {
+    text-align: center;
+    max-width: 190px;
+}
+
+.topic-cont .topic {
+    font-weight: 700;
+    display: block;
+}
+
+.topic-cont .topic a {
+    color: #444444;
 }
 
 .btn-danger {
@@ -1131,7 +1143,6 @@ p span.entity.nesting:hover span {
 }
 
 .entity {
-    cursor: pointer;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     -ms-border-radius: 5px;
@@ -1143,6 +1154,7 @@ p span.entity.nesting:hover span {
     /* Firefox, other Gecko */
     box-sizing: border-box;
     /* Opera/IE 8+ */
+    cursor: pointer;
     padding: 3px;
     color: #ffffff;
     background-color: #000000;
@@ -1150,6 +1162,14 @@ p span.entity.nesting:hover span {
 
 .entity.list {
     margin-left: 24px;
+}
+
+.entity.hotspotEnt {
+    line-height: 2em;
+    margin-top: 0.5em;
+    padding-top: 0;
+    padding-bottom: 0;
+    display: inline-block;
 }
 
 .entity a {

@@ -58,6 +58,7 @@ $(document).ready(function () {
     video.player = $player;
     console.debug($player);
 
+
     //play/pause clicking on the video
     var isPlaying = false;
     $('.mejs-inner').on("click", function () {

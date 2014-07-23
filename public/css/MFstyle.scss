@@ -23,12 +23,6 @@ $dark_red: #b11200;
   }
 }
 
-.mejs-inner {
-  //height: 330px;
-  cursor: pointer;
-  //pointer-events: none;
-}
-
 h1, h2, h3, h4, h5, h6, .navbar-brand {
   font: {
     family: CaviarDreams, Helvetica, sans-serif;
@@ -400,18 +394,21 @@ h1.title {
   #player-container {
     min-height: 20%;
     overflow: hidden;
-    width: 100%;
 
     #video {
       width: 100%;
       min-height: 360px;
-      @media (min-width: 768px) {
-        padding-left: 10em;
 
+      .mejs-inner {
+        cursor: pointer;
+
+      }
+      @media (min-width: 768px) {
         .mejs-container {
           position: static;
           margin: auto;
-
+          width: 100%;
+          height: auto;
         }
       }
     }
@@ -470,9 +467,27 @@ h1.title {
     padding: 8px 15px;
     background: $dark_red;
     color: $light_gray;
+    text-align: center;
     .glyphicon {
       color: $light_gray;
       font-size: 0.9em;
+
+    }
+
+  }
+  .qtip-content {
+    text-align: center;
+    max-width: 190px;
+  }
+}
+
+.topic-cont {
+
+  .topic {
+    font-weight: 700;
+    display: block;
+    a {
+      color: $darker_gray;
     }
   }
 }
@@ -833,14 +848,22 @@ p {
 }
 
 .entity {
+  @include border-radius(5px);
+  @include border-box-sizing;
+  cursor: pointer;
+  padding: 3px;
+  color: #ffffff;
+
   &.list {
     margin-left: 24px;
   }
-  cursor: pointer;
-  @include border-radius(5px);
-  @include border-box-sizing;
-  padding: 3px;
-  color: #ffffff;
+  &.hotspotEnt {
+    line-height: 2em;
+    margin-top: 0.5em;
+    padding-top: 0;
+    padding-bottom: 0;
+    display: inline-block;
+  }
 
   a {
     color: #ffffff;
