@@ -70,9 +70,11 @@
 <section id="player-sect">
     <div id="player-container" class="clearfix">
         <div id="video"></div>
+        <% if (locals.metadata.timedtext) { %>
         <div id="hotspots-cont">
             <% include partials/hotspots.ejs %>
         </div>
+        <% } %>
     </div>
 
     <% if (locals.metadata && metadata.title) { %>

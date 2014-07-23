@@ -417,13 +417,22 @@ h1.title {
       form, .hsProgress {
         text-align: center;
         .btn-hotspot {
+          text-align: center;
           background: #000000;
           border: 1px solid $light_gray;
-          @include border-radius(10px);
           color: $light_gray;
-
-          &:hover {
+          outline: 0;
+          opacity: 1;
+          height: 34px;
+          @include border-radius(10px);
+          @include transition(all, 500ms);
+          &:hover, &:active {
             background: $dark_red;
+          }
+          p{
+            display: inline-block;
+            opacity: 0;
+            @include transition(all, 500ms);
           }
         }
       }

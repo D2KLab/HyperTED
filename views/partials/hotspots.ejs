@@ -77,10 +77,9 @@
         break;
     default:
     %>
-    <form method="get" action="../runhotspot">
+    <form method="get" id="hotspot-form" action="../runhotspot">
         <input type="hidden" name="uuid" value="<%= locals.uuid %>">
         <button class="btn btn-hotspot" type="submit">GENERATE HOTSPOTS</button>
-        <input type="hidden" name="subSRT" value="<%= metadata.timedtext %>">
     </form>
     <% } %>
 

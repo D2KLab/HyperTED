@@ -125,6 +125,48 @@ $(document).ready(function () {
         });
     }
 
+    //ask for hotspots
+    $('#hotspot-form').submit(function (e) {
+        e.preventDefault();
+        var $form = $(this);
+        var $button = $('button', $form);
+        $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
+        $(this).ajaxSubmit({
+            success: function (data) {
+                var text;
+                try {
+                    if (data.error) {
+                        text = 'Something went wrong. Try again later';
+                        $button.text().css('width', 'auto');
+                        console.error(data.error);
+                        return;
+                    }
+                    text = 'The request was sent successfully. Came back later to see hotspots.'
+                } catch (e) {
+                    text = 'Something went wrong. Try again later'
+                    console.error(text);
+                    console.log(e);
+                }
+                var $p = $('<p>').text(text);
+                $button.children().fadeOut();
+                $button.append($p).width($p.width());
+                setTimeout(function () {
+                    $button.append($p);
+                    $p.css('opacity', 1);
+                }, 600);
+            },
+            error: function () {
+                var text = 'Something went wrong. Try again later';
+
+                var $p = $('<p>').text(text);
+                $button.children().fadeOut();
+                $button.append($p).width($p.width());
+                $p.css('opacity', 1);
+
+                console.error(data.error);
+            }
+        });
+    });
 
     $plainSubCont = $('.sub-text');
     if (video.entitiesL) {
