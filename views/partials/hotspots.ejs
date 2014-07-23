@@ -12,6 +12,12 @@
         return hh + ':' + mm + ':' + ss;
     }
 
+    function calcPinWidth(startT, endT) {
+        var totWidth = (locals.duration);
+        return((endT - startT) / totWidth) * 100;
+    }
+
+
 
             switch (locals.hotspotStatus){
     case 1:
@@ -25,8 +31,13 @@
             locals.hotspots.forEach(function(h){
     %>
 
-    <div class="pin">
-        <a data-start-time="<%= h.startNPT %>" data-end-time="<%= h.endNPT %>">
+    <div class="pin"
+            <% if(locals.duration){ %>
+         style="width: <%= calcPinWidth(h.startNPT, h.endNPT) %>%"
+            <% } %>
+            />
+
+    <a data-start-time="<%= h.startNPT %>" data-end-time="<%= h.endNPT %>">
 
             <img src="../img/pin.png"/>
             <%
