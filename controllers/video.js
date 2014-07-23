@@ -920,8 +920,9 @@ if (typeof String.prototype.startsWith != 'function') {
 }
 
 exports.buildDb = function (req, res) {
-    var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=100&filter=id:>';
-    var limitQps = 10200;
+    var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=100&externals=false&filter=id:>';
+    var retrieveNerd = false;
+    var limitQps = retrieveNerd ? 10200 : 2200;
     loadList(0);
 
     function loadList(index) {
@@ -1021,7 +1022,7 @@ exports.buildDb = function (req, res) {
                 }
 
                 //nerdify
-                if (doc.metadata.timedtext) {
+                if (retrieveNerd && doc.metadata.timedtext) {
                     nerd.getEntities('timedtext', doc.metadata.timedtext, 'textrazor', function (err, data) {
                         if (err || !data) {
                             console.log(LOG_TAG + 'Error in nerd retrieving for ' + doc.locator);
@@ -1106,22 +1107,28 @@ function runHotspotProcess(uuid, callback) {
             }
         };
 
-        // Set up the request
-        var post_req = http.request(post_options, function (res) {
-            res.setEncoding('utf8');
-            res.on('data', function (chunk) {
-                console.log('Response: ' + chunk);
+        try {
+            // Set up the request
+            var post_req = http.request(post_options, function (res) {
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    console.log('Response: ' + chunk);
+                });
+                res.on('end', function (err) {
+                    if (err) {
+                        callback(err);
+                        return;
+                    }
+                    db.setHotspotProcess(uuid, hStatusValue.IN_PROGRESS, callback);
+                });
             });
-            res.on('end', callback);
-        });
 
-        // post the data
-        post_req.write(srt);
-        post_req.end();
-
-
-        /* Call to service */
-//        db.setHotspotProcess(uuid, hStatusValue.IN_PROGRESS, callback);
+            // post the data
+            post_req.write(srt);
+            post_req.end();
+        } catch (e) {
+            callback(e);
+        }
     });
 }
 
