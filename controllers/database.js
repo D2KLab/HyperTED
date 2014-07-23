@@ -30,7 +30,6 @@ function getVideoFromUuid(uuid, full, callback) {
             callback(err, video);
             return;
         }
-
         async.parallel([
             function (asyncCallback) {
                 getEntitiesFor(video, asyncCallback);
@@ -137,7 +136,7 @@ function updateVideoUuid(uuid, newVideo, callback) {
 exports.updateVideoUuid = updateVideoUuid;
 
 exports.updateVideo = function (newVideo, callback) {
-    videos.updateVideoUuid({uuid: newVideo.uuid}, newVideo, function (err, doc) {
+    updateVideoUuid({uuid: newVideo.uuid}, newVideo, function (err, doc) {
         if (err) {
             console.log('DB updateVideoUuid fail. ' + JSON.stringify(err));
         }

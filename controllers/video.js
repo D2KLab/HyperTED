@@ -1107,7 +1107,12 @@ function runHotspotProcess(uuid, callback) {
             }
         };
 
-        try {
+        var d = domain.create();
+        d.on('error', function (err) {
+            console.warn('' + err);
+            callback({'message':'internal error'});
+        });
+        d.run(function () {
             // Set up the request
             var post_req = http.request(post_options, function (res) {
                 res.setEncoding('utf8');
@@ -1126,9 +1131,7 @@ function runHotspotProcess(uuid, callback) {
             // post the data
             post_req.write(srt);
             post_req.end();
-        } catch (e) {
-            callback(e);
-        }
+        });
     });
 }
 
