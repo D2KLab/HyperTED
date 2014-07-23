@@ -1122,7 +1122,7 @@ function runHotspotProcess(uuid, callback) {
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
                     data += chunk;
-                    if (data.toLowerCase().indexOf('internal error')) {
+                    if (data.toLowerCase().indexOf('internal error') != -1) {
                         callback({'message': 'Internal error'});
                     }
                 });
