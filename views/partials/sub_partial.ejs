@@ -9,11 +9,13 @@
             if (newChap) {
         newChap = false;
     %>
+
     <div class="subChapGroup" <%= sub.dataChap %>>
         <p class="chap-title"> chapter <%= sub.chapNum %></p>
         <%
         }
         %>
+
         <p id="sub<%= sub.id %>" data-time="<%= sub.time %>" data-startSS="<%= sub.startSS %>"
            data-endSS="<%= sub.endSS %>" <%= sub.dataChap || "" %>><%- sub.text %></p>
         <%
@@ -24,5 +26,7 @@
     </div>
     <%
     }
-    }); %>
+    });
+    %>
+
 </div>
