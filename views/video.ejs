@@ -106,11 +106,13 @@
 <div id="video-info-chapters">
     <% if (locals.chapters) { %>
     <% include partials/chapter.ejs %>
-    <% }else if(locals.metadata && metadata.title) { %>
+    <% }
+            if(locals.metadata && metadata.title) { %>
     <div class="play-video-info clearfix">
         <div class="left">
+            <% if(metadata.published) { %>
             <h5 class="video-info">published on <%= metadata.published.substring(0, 10) %>
-                <% if(metadata.event) { %>
+                <% }if(metadata.event) { %>
                 <span> from <%= metadata.event %></span></h5>
             <% } %>
             <h3 class="video-info"><%= metadata.title %></h3>
@@ -257,7 +259,6 @@
 <script src="/js/MFPlayerDemo.js"></script>
 <script src="/js/jquery.loadTemplate-1.4.4.min.js"></script>
 <script src="/js/jquery.qtip.min.js"></script>
-<script src="/js/imagesloaded.pkg.min.js"></script>
 
 
 </body>

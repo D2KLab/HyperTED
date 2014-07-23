@@ -58,6 +58,18 @@ $(document).ready(function () {
     video.player = $player;
     console.debug($player);
 
+    //play/pause clicking on the video
+    var isPlaying = false;
+    $('.mejs-inner').on("click", function () {
+        if (isPlaying) {
+            $player.pause();
+            isPlaying = false;
+        } else {
+            $player.play();
+            isPlaying = true;
+        }
+    });
+
     if (Modernizr.history && Modernizr.localstorage) {
         // Nerdify form become an ajax form
         var $nerdifyForm = $('form.nerdify');
@@ -126,7 +138,7 @@ $(document).ready(function () {
         click: function (e) {
             e.preventDefault();
             var chapId = $(this).data('chapter');
-            $('#' + chapId).click();
+            $('#ch' + chapId).click();
         }
     }, '.sub-text p[data-chapter]');
 
@@ -138,6 +150,7 @@ $(document).ready(function () {
         $('.chap-link').removeClass('selected-chap');
         updateMFurl();
     });
+
 
     var $pin = $('.pin');
     $pin.each(function () {
@@ -155,6 +168,10 @@ $(document).ready(function () {
             position: {
                 my: 'bottom center',
                 at: 'top center'
+            },
+            hide: {
+                fixed: true,
+                delay: 300
             }
         });
 
@@ -172,7 +189,6 @@ $(document).ready(function () {
     }
 
     function displayPins() {
-
         $pin.fadeIn();
 
         var oldEnd = 0;
@@ -201,16 +217,12 @@ $(document).ready(function () {
         });
     }
 
-    // TODO decide what to do with the following line
-    $("#video-info-chapters").hide();
+    $("#video-info-chapters").fadeIn();
     function displayChapters() {
         $("#video-info-chapters").fadeIn();
-
-
         var $totChapters = $('.chap-link').length;
         $('.chap-link').each(function () {
             var $chapNum = $(this).find('.chap-num');
-            console.log($chapNum);
             var index = $('.chap-line .chap-link').index(this);
 
             var $chapter = $(this).children('a');
@@ -221,13 +233,15 @@ $(document).ready(function () {
             if (index === $totChapters - 1) {
                 //TODO fix this workaround that set the end of the last chapter to video duration
                 chapWidth = calcDivWidth(startChapter, ($player.getDuration() / 1000));
-            } else chapWidth = calcDivWidth(startChapter, endChapter);
+            } else
+                chapWidth = calcDivWidth(startChapter, endChapter);
 
             $(this).css("width", chapWidth + "%");
 
-            console.log($(this).width());
-            if ($(this).width() < 25) {
-                $chapNum.hide();
+
+            if ($(this).width() >= 25) {
+                $chapNum.fadeIn();
+                $chapNum.css("display", "inline-block");
             }
 
             $(this).hover(function () {
@@ -245,20 +259,17 @@ $(document).ready(function () {
                 }
             });
 
-
             $(this).on('click', function () {
                 $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
-                var chapNumLast = $('.chap-link').last('.chap-num')[0].innerText;
+                var chapNumLast = $('.chap-num:last')[0].innerText;
                 var chapNum = $chapNum[0].innerText;
 
                 $('.chap-link').removeClass('selected-chap');
 
-
-                console.log($('.chap-link').last('.chap-num'));
+                $(this).addClass('selected-chap');
                 $('.first-part').text("chapter   ");
                 $('.selected-chap-num').text("   " + chapNum + "   ");
                 $('.last-part').text("   of   " + chapNumLast);
-                $(this).addClass('selected-chap');
 
                 updateMFurl();
             });
@@ -282,7 +293,6 @@ $(document).ready(function () {
             }
             highlightMFSub(hash.t[0].value);
 
-
             delete page_url.search.t;
             delete page_url.search.xywh;
 
@@ -290,7 +300,7 @@ $(document).ready(function () {
         }
     }
 
-    function calcSec(hms) {
+    function timeToSec(hms) {
         var time = (hms.split(":"));
         var hh = parseInt(time[0]);
         var mm = parseInt(time[1]);
@@ -314,16 +324,14 @@ $(document).ready(function () {
             eMFtest = '86400';
         }
 
-        sMF = sMFtest.indexOf(":") == -1 ? sMFtest : calcSec(sMFtest);
-        eMF = eMFtest.indexOf(":") == -1 ? eMFtest : calcSec(eMFtest);
+        sMF = sMFtest.indexOf(":") == -1 ? sMFtest : timeToSec(sMFtest);
+        eMF = eMFtest.indexOf(":") == -1 ? eMFtest : timeToSec(eMFtest);
         sMF = parseFloat(sMF);
         eMF = parseFloat(eMF);
 
         $('.sub-text p').removeClass("selected-frag").each(function () {
-//                var sSub = $(this).data('startss');
             var eSub = parseFloat($(this).data('endss'));
 
-//                console.log(sMF + '<' + eSub + ' && ' + eMF + '>=' + eSub);
             if (sMF < eSub && eMF >= eSub) {
                 $(this).addClass("selected-frag");
             }

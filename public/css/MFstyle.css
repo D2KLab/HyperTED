@@ -213,6 +213,10 @@
     clear: both;
 }
 
+.mejs-inner {
+    cursor: pointer;
+}
+
 h1, h2, h3, h4, h5, h6, .navbar-brand {
     font-family: CaviarDreams, Helvetica, sans-serif;
 }
@@ -728,6 +732,7 @@ html, body {
 }
 
 .chap-label {
+    margin-bottom: 10px;
     color: #aaaaaa;
     min-height: 20px;
     text-align: center;
@@ -790,8 +795,8 @@ html, body {
     -o-border-radius: 10px;
     border-radius: 10px;
     background-color: #ffffff;
+    display: none;
     padding: 4px;
-    display: inline-block;
     color: #b11200;
     font-weight: 700;
 }
@@ -985,20 +990,20 @@ span.wiki a {
     display: none;
     background: #fff;
     width: 100%;
-    max-height: 133px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 @media (max-width: 860px) {
     #video-info-chapters {
-        max-height: 243px;
+        max-height: 350px;
     }
 }
 
 #video-info-chapters .play-video-info {
     padding: 20px;
     margin-top: 0;
+    border-top: 1px solid #f4f4f4;
 }
 
 #video-info-chapters .play-video-info .left {
@@ -1019,18 +1024,19 @@ span.wiki a {
 }
 
 #video-info-chapters .play-video-info .right {
+    max-height: 130px;
     float: right;
     display: inline-block;
     width: 50%;
     border-left: 1px solid #b11200;
     padding-left: 2%;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow-y: auto;
 }
 
 @media (max-width: 860px) {
     #video-info-chapters .play-video-info .right {
         width: 100%;
+        max-height: 90px;
         border-top: 1px solid #b11200;
         border-left: 0;
     }
