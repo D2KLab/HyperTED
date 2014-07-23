@@ -154,6 +154,7 @@ $(document).ready(function () {
 
 
     var $pin = $('.pin');
+
     $pin.each(function () {
         var $this = $(this);
         $this.qtip({
@@ -175,8 +176,6 @@ $(document).ready(function () {
                 delay: 300
             }
         });
-
-
     });
 
     function calcDivWidth(startTime, endTime) {
@@ -193,6 +192,7 @@ $(document).ready(function () {
         $pin.fadeIn();
 
         var oldEnd = 0;
+
 
         $pin.each(function () {
             var $hotSpot = $(this).children('a');
