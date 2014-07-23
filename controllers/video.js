@@ -1075,8 +1075,48 @@ exports.runHotspot = function (req, res) {
 };
 
 function runHotspotProcess(uuid, callback) {
-    /* Call to service */
-    db.setHotspotProcess(uuid, hStatusValue.IN_PROGRESS, callback);
+    db.getVideoFromUuid(uuid, true, function (err, data) {
+        if (err || !data) {
+            callback(err, data);
+            return;
+        }
+
+        var srt = new Buffer(data.metadata.timedtext, 'base64');
+        var queryString = '', queryConnect = '?';
+        data.chapters.forEach(function (c) {
+            queryString += queryConnect;
+            queryString += 'chap=' + c.startNPT + ',' + c.endNPT;
+            queryConnect = '&';
+        });
+        console.log(queryString);
+        var post_options = {
+            host: 'www.google.com',
+            port: '8080',
+            path: queryString,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain',
+                'Content-Length': srt.length
+            }
+        };
+
+        // Set up the request
+        var post_req = http.request(post_options, function (res) {
+            res.setEncoding('utf8');
+            res.on('data', function (chunk) {
+                console.log('Response: ' + chunk);
+            });
+            res.on('end', callback);
+        });
+
+        // post the data
+        post_req.write(srt);
+        post_req.end();
+
+
+        /* Call to service */
+//        db.setHotspotProcess(uuid, hStatusValue.IN_PROGRESS, callback);
+    });
 }
 
 function checkHotspotResults(uuid, callback) {
