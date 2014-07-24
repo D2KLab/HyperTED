@@ -276,6 +276,7 @@ $(document).ready(function () {
         var $totChapters = $('.chap-link').length;
 
         $('.chap-link').each(function () {
+            var $chapNum = $(this).find('.chap-num');
 
             var index = $('.chap-line .chap-link').index(this);
 
