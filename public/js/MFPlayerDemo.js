@@ -277,7 +277,6 @@ $(document).ready(function () {
 
         $('.chap-link').each(function () {
             var $chapNum = $(this).find('.chap-num');
-
             var index = $('.chap-line .chap-link').index(this);
 
             var $chapter = $(this).children('a');
