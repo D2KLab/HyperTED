@@ -592,7 +592,8 @@ function getSubtitlesTV2RDF(uuid, callback) {
 function getTedChapters(json, totDuration) {
     var cur_chap = {"startNPT": 0,
         "source": 'api.ted.com',
-        "chapNum": 0}, cursub;
+        "chapNum": 0};
+    var cursub;
     var chapters = [];
     var chapNum = 1;
     var sub_offset = json._meta.preroll_offset;
@@ -623,8 +624,8 @@ function getTedChapters(json, totDuration) {
             }
         }
     }
-    var lasSubStart = (sub_offset + cursub.startTime) / 1000;
-    cur_chap.endNPT = totDuration;
+    var lasSubEnd = (sub_offset + cursub.startTime + cursub.duration) / 1000;
+    cur_chap.endNPT = totDuration ? totDuration : lasSubEnd;
     chapters.push(cur_chap);
     return chapters;
 }
