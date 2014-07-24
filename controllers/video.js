@@ -2,7 +2,8 @@ var http = require('http'),
     https = require('https'),
     url = require("url"),
     async = require('async'),
-    optional = require('optional'), domain = require('domain'),
+    optional = require('optional'),
+    domain = require('domain'),
     ffprobe = optional('node-ffprobe'),
     nerd = require('./nerdify'),
     db = require('./database'),
@@ -1075,7 +1076,8 @@ exports.runHotspot = function (req, res) {
                     res.json({error: {code: 500, message: err.message}});
                     return;
                 }
-                res.json({done: true});
+//                res.json({done: true});
+                res.render('hp_resp.ejs', data);
             });
         } else res.json({done: true});
 
@@ -1083,16 +1085,16 @@ exports.runHotspot = function (req, res) {
 };
 
 function runHotspotProcess(uuid, callback) {
-    db.getVideoFromUuid(uuid, true, function (err, data) {
-        if (err || !data) {
-            callback(err, data);
+    db.getVideoFromUuid(uuid, true, function (err, video) {
+        if (err || !video) {
+            callback(err, video);
             return;
         }
 
-        var srt = new Buffer(data.metadata.timedtext, 'utf-8');
-        var queryString = '?videoURL=' + data.locator + '&UUID=' + data.uuid + '&visualAnalysis=false&chapterList=';
+        var srt = new Buffer(video.metadata.timedtext, 'utf-8');
+        var queryString = '?videoURL=' + video.locator + '&UUID=' + video.uuid + '&visualAnalysis=false&chapterList=';
         var first = true;
-        data.chapters.forEach(function (c) {
+        video.chapters.forEach(function (c) {
             if (first)
                 first = false;
             else
@@ -1135,15 +1137,21 @@ function runHotspotProcess(uuid, callback) {
 //                    db.setHotspotProcess(uuid, hStatusValue.IN_PROGRESS, callback);
                     var results = JSON.parse(data);
                     if (results && results.hp_list) {
-                        db.addHotspots(uuid, results.hp_list, function (err) {
-                            if (err) {
-                                callback(err);
-                                return;
-                            }
-                            db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
-                                callback(err, results.hp_list);
-                            });
-                        });
+                        video.hotspots = results.hp_list;
+                        video.hotspotStatus = 2;
+
+                        callback(false, video);
+
+                        // we do not save nothing, so that hotspots are ever coming from server
+//                        db.addHotspots(uuid, results.hp_list, function (err) {
+//                            if (err) {
+//                                callback(err);
+//                                return;
+//                            }
+//                            db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
+//                                callback(err, results.hp_list);
+//                            });
+//                        });
                     } else {
                         callback(true, false);
                     }

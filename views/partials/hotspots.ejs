@@ -35,23 +35,20 @@
             locals.hotspots.forEach(function(h){
     %>
 
-    <div class="pin"
-            <% if(locals.duration){ %>
-         style="width: <%= calcPinWidth(h.startNPT, h.endNPT) %>%"
-            <% } %>
-            />
+    <div class="pin" <% if(locals.duration){ %> style="width:<%= calcPinWidth(h.startNPT, h.endNPT) %>%" <% } %>>
 
     <a data-start-time="<%= h.startNPT %>" data-end-time="<%= h.endNPT %>">
 
         <img src="../img/pin.png"/>
         <%
+        if(h.entity_list.length > 0){
             h.entity_list.sort(
                     function SortByRelevance(x, y) {
                         return ((x.relevance == y.relevance) ? 0 : ((x.relevance < y.relevance) ? 1 : -1 ));
                     });
         %>
         <span class="entity <%= h.entity_list[0].nerdType.toLowerCase().split("#").slice(1) %>"><%= h.entity_list[0].label %></span>
-
+        <% } %>
     </a>
 
     <div class="qtipTitle">
@@ -88,14 +85,14 @@
     </div>
 </div>
 
-    <% });
-        break;
-    default:
-    %>
-    <form method="get" id="hotspot-form" action="../runhotspot">
-        <input type="hidden" name="uuid" value="<%= locals.uuid %>">
-        <button class="btn btn-hotspot" type="submit">GENERATE HOTSPOTS</button>
-    </form>
-    <% } %>
+<% });
+    break;
+default:
+%>
+<form method="get" id="hotspot-form" action="../runhotspot">
+    <input type="hidden" name="uuid" value="<%= locals.uuid %>">
+    <button class="btn btn-hotspot" type="submit">GENERATE HOTSPOTS</button>
+</form>
+<% } %>
 
 </div>

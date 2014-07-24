@@ -141,8 +141,10 @@ $(document).ready(function () {
                         console.error(data.error);
                         return;
                     }
-                    text = 'The request was sent successfully. Came back later to see hotspots.'
-                    location.reload(true);
+//                    text = 'The request was sent successfully. Came back later to see hotspots.'
+//                    location.reload(true);
+                    $('#hotspots-cont').html(data);
+                    displayPins();
                 } catch (e) {
                     text = 'Something went wrong. Try again later';
                     console.error(text);
@@ -196,31 +198,6 @@ $(document).ready(function () {
     });
 
 
-    var $pin = $('.pin');
-
-    $pin.each(function () {
-        var $this = $(this);
-        $this.qtip({
-            content: {
-                text: $('.qtipEnt', $this).html(),
-                title: $('.qtipTitle', $this).html()
-            },
-            style: {
-                classes: 'qtip-light qtip-rounded',
-                padding: '15px',
-                tip: 'bottom middle'
-            },
-            position: {
-                my: 'bottom center',
-                at: 'top center'
-            },
-            hide: {
-                fixed: true,
-                delay: 300
-            }
-        });
-    });
-
     function calcDivWidth(startTime, endTime) {
         var totWidth = ($player.getDuration() / 1000);
         return((endTime - startTime) / totWidth) * 100;
@@ -232,6 +209,30 @@ $(document).ready(function () {
     }
 
     function displayPins() {
+        var $pin = $('.pin');
+        $pin.each(function () {
+            var $this = $(this);
+            $this.qtip({
+                content: {
+                    text: $('.qtipEnt', $this).html(),
+                    title: $('.qtipTitle', $this).html()
+                },
+                style: {
+                    classes: 'qtip-light qtip-rounded',
+                    padding: '15px',
+                    tip: 'bottom middle'
+                },
+                position: {
+                    my: 'bottom center',
+                    at: 'top center'
+                },
+                hide: {
+                    fixed: true,
+                    delay: 300
+                }
+            });
+        });
+
         $pin.fadeIn();
 
         var oldEnd = 0;

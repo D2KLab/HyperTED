@@ -425,7 +425,7 @@ h1.title {
           opacity: 1;
           height: 34px;
           @include border-radius(10px);
-          @include transition(all, 500ms);
+          @include transition(width, 500ms);
           &:hover, &:active {
             background: $dark_red;
           }
