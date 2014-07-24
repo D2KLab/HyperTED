@@ -37,6 +37,7 @@
 
                 <div class="chap-link"
                         <% if(locals.duration){ %>
+                     data-duration="true"
                      style="width: <%= calcChapWidth(startTime, endTime) %>%"
                         <% } %>
                         />
@@ -44,8 +45,8 @@
                     <h6 class="chap-num"><%= c %></h6>
                 </div>
                 <a data-start-time="<%= startTime %>" data-end-time="<%= endTime %>" id="ch<%= c %>">
-                <div class="chap-timing">
-                        <h5><span class="glyphicon glyphicon-chevron-left"></span>
+                    <div class="chap-timing">
+                    <h5><span class="glyphicon glyphicon-chevron-left"></span>
                             <%= tStart %> - <%= tEnd %>
                             <span class="glyphicon glyphicon-chevron-right"></span></h5>
                     </div>
@@ -59,8 +60,9 @@
 
 <div class="chap-label">
     <span class="glyphicon glyphicon-chevron-left"></span>
-    <span class="first-part"><%= chapters.length %> chapters</span><span class="selected-chap-num"></span><span
-            class="last-part"></span>
+    <span class="first-part"> <%= chapters.length %> chapters</span>
+    <span class="selected-chap-num">  </span>
+    <span class="last-part">  </span>
     <span class="glyphicon glyphicon-chevron-right"></span>
 
 </div>

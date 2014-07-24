@@ -47,7 +47,7 @@
                         return ((x.relevance == y.relevance) ? 0 : ((x.relevance < y.relevance) ? 1 : -1 ));
                     });
         %>
-        <span class="entity <%= h.entity_list[0].nerdType.toLowerCase().split("#").slice(1) %>"><%= h.entity_list[0].label %></span>
+        <span class="entity <%= h.entity_list[0].nerdType.toLowerCase().split("#").slice(1) %> pinEnt"><%= h.entity_list[0].label %></span>
         <% } %>
     </a>
 
@@ -58,7 +58,6 @@
                 <span class="glyphicon glyphicon-chevron-right"></span>
                 </span>
     </div>
-
 
     <div class="qtipEnt">
         <div class="topic-cont">

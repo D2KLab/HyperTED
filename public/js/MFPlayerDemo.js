@@ -197,7 +197,6 @@ $(document).ready(function () {
         updateMFurl();
     });
 
-
     function calcDivWidth(startTime, endTime) {
         var totWidth = ($player.getDuration() / 1000);
         return((endTime - startTime) / totWidth) * 100;
@@ -257,37 +256,43 @@ $(document).ready(function () {
                 $player.setmf('t=' + startHS + ',' + endHS).playmf();
                 updateMFurl();
             });
-
+            if ($(".pinEnt", $(this)).width >= $(this).width)
+                $(".pinEnt", $(this)).css("max-width", $(this).width - 15);
 
         });
     }
 
+
     $("#video-info-chapters").fadeIn();
+    if (!$('.chap-link').data("duration")) {
+        var $totChapters = $('.chap-link').length;
+        $('.chap-link').each(function () {
+            $(this).css("width", 100 / $totChapters + "%");
+        });
+    }
+
     function displayChapters() {
         $("#video-info-chapters").fadeIn();
         var $totChapters = $('.chap-link').length;
+
         $('.chap-link').each(function () {
-            var $chapNum = $(this).find('.chap-num');
+
             var index = $('.chap-line .chap-link').index(this);
 
             var $chapter = $(this).children('a');
             var startChapter = $chapter.data('start-time');
             var endChapter = $chapter.data('end-time');
 
-            var chapWidth;
-            if (index === $totChapters - 1) {
-                //TODO fix this workaround that set the end of the last chapter to video duration
-                chapWidth = calcDivWidth(startChapter, ($player.getDuration() / 1000));
-            } else
-                chapWidth = calcDivWidth(startChapter, endChapter);
+            if (!$('.chap-link').data("duration")) {
+                var chapWidth;
+                if (index === $totChapters - 1) {
+                    chapWidth = calcDivWidth(startChapter, ($player.getDuration() / 1000));
+                } else
+                    chapWidth = calcDivWidth(startChapter, endChapter);
 
-            $(this).css("width", chapWidth + "%");
-
-
-            if ($(this).width() >= 25) {
-                $chapNum.fadeIn();
-                $chapNum.css("display", "inline-block");
+                $(this).css("width", chapWidth + "%");
             }
+
 
             $(this).hover(function () {
                 if ($(this).width() < 175) {
@@ -313,13 +318,24 @@ $(document).ready(function () {
 
                 $(this).addClass('selected-chap');
                 $('.first-part').text("chapter   ");
-                $('.selected-chap-num').text("   " + chapNum + "   ");
+                $('.selected-chap-num').text(chapNum);
                 $('.last-part').text("   of   " + chapNumLast);
 
                 updateMFurl();
             });
 
         });
+
+
+        setTimeout(function () {
+            $('.chap-link').each(function () {
+                var $chapNum = $(this).find('.chap-num');
+                if ($(this).width() >= 25) {
+                    $chapNum.fadeIn();
+                    $chapNum.css("display", "inline-block");
+                }
+            });
+        }, 500);
 
     }
 

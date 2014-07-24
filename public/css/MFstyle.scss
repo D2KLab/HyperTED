@@ -429,7 +429,7 @@ h1.title {
           &:hover, &:active {
             background: $dark_red;
           }
-          p{
+          p {
             display: inline-block;
             opacity: 0;
             @include transition(all, 500ms);
@@ -444,6 +444,7 @@ h1.title {
           margin-right: 0;
         }
         .pin {
+          @include border-radius-bottom(10px);
           text-align: center;
           cursor: pointer;
           float: left;
@@ -453,7 +454,6 @@ h1.title {
           top: -10px;
           z-index: 101;
           min-height: 26px;
-          @include border-radius-bottom(10px);
           img {
             position: absolute;
             left: -10px;
@@ -533,7 +533,6 @@ h1.title {
   min-height: 35px;
   margin: 20px 50px 20px 50px;
   text-align: center;
-  //  @include border-radius(8px);
   @media(max-width: 768px) {
     width: 508px;
     margin-right: 0;
@@ -541,6 +540,7 @@ h1.title {
 
   .chap-link {
     @include transition(background-color, 300ms);
+    @include transition(width, 300ms);
     position: relative;
     height: 15px;
     background-color: $dark_red;
@@ -865,6 +865,14 @@ p {
 
   &.list {
     margin-left: 24px;
+  }
+
+  &.pinEnt {
+    display: inline-block;
+    max-width: 90%;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
   }
   &.hotspotEnt {
     line-height: 2em;
