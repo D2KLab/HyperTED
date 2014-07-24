@@ -56,7 +56,7 @@
             <label class="col-md-7 col-sm-12">
                 Insert the URL for a video
                 <input name="uri" type="url"
-                       placeholder="es. https://www.ted.com/talks/2008"
+                       placeholder="e.g. https://www.ted.com/talks/will_potter_the_shocking_move_to_criminalize_non_violent_protest"
                        class="form-control input-lg" required>
             </label>
 
@@ -76,18 +76,25 @@
                 </div>
             </div>
             <button class="btn btn-danger btn-lg col-md-1 col-sm-12 col-xs-12" type="submit">Go!</button>
+            <label class="col-md-12 col-sm-12">or try with <strong><em>https://www.ted.com/talks/2018</em></strong> or
+                <strong><em>https://www.ted.com/talks/sarah_lewis_embrace_the_near_win</em></strong>
+            </label>
         </form>
+
 
         <form id="advanced-form" class="hidden" method="get" action="./video">
             <label>Insert a Media Fragment URL</label>
 
             <div class="input-group">
-                <input name="uri" type="url" placeholder="es. https://www.ted.com/talks/2008#t=0:00:18,0:00:57"
+                <input name="uri" type="url"
+                       placeholder="e.g. https://www.ted.com/talks/will_potter_the_shocking_move_to_criminalize_non_violent_protest#t=0:00:18,0:00:57"
                        class="form-control input-lg" required>
              <span class="input-group-btn">
                     <button class="btn btn-danger btn-lg" type="submit">Go!</button>
              </span>
             </div>
+            <label>or try with <strong><em>https://www.ted.com/talks/2018</em></strong> or <strong><em>https://www.ted.com/talks/sarah_lewis_embrace_the_near_win</em></strong></label>
+
         </form>
     </div>
 
