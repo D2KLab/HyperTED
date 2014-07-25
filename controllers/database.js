@@ -167,7 +167,10 @@ function addEntities(uuid, entities) {
             'uuid': uuid,
             'extractor': e.extractor,
             'startNPT': e.startNPT,
-            'endNPT': e.endNPT
+            'endNPT': e.endNPT,
+            'uri': e.uri,
+            'label': e.label,
+            'nerdType': e.nerdType
         };
         ents.findAndModify(eParams, {$set: e}, {upsert: true, new: true}, function (err, newDoc) {
             if (err)

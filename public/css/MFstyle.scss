@@ -843,11 +843,11 @@ p {
       display: inline-block;
       @include transition(transform, 0.5s);
       -webkit-transition: -webkit-transform 0.5s; /* For Safari 3.1 to 6.0 */
-
     }
 
     &:hover span {
       -webkit-transform: translate(0px, -10px); /* Chrome, Safari, Opera */
+      @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
     }
   }
 }
@@ -866,10 +866,9 @@ p {
   &.list {
     margin-left: 24px;
   }
-
   &.pinEnt {
     display: inline-block;
-    max-width: 90%;
+    max-width: 80%;
     white-space: nowrap;
     overflow: hidden !important;
     text-overflow: ellipsis;

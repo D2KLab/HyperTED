@@ -1157,6 +1157,9 @@ p span.entity.nesting span {
 p span.entity.nesting:hover span {
     -webkit-transform: translate(0px, -10px);
     /* Chrome, Safari, Opera */
+    -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
+    -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
+    box-shadow: 0 1px 8px -2px #5d5d5d;
 }
 
 .extractor {
@@ -1187,7 +1190,7 @@ p span.entity.nesting:hover span {
 
 .entity.pinEnt {
     display: inline-block;
-    max-width: 90%;
+    max-width: 80%;
     white-space: nowrap;
     overflow: hidden !important;
     text-overflow: ellipsis;

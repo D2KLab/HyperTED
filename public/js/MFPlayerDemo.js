@@ -176,8 +176,6 @@ $(document).ready(function () {
         onEntitiesToShow(video.entitiesL);
     }
 
-    $('p > span.entity').has('span').addClass('nesting');
-
     // managing of click on a sub
     // 1: in a chapter
     $(document).on({
@@ -629,7 +627,6 @@ function displayEntitiesSub(entJson) {
             } else if (parseFloat(x.endNPT) > parseFloat(y.endNPT)) return -1;
             else return 1;
         });
-
     var subIndex = $subList.length - 1;
     entityList.forEach(function (entity) {
 
@@ -649,20 +646,23 @@ function displayEntitiesSub(entJson) {
                     var nerdType = nerdTypeSplit.length > 1 ? nerdTypeSplit[1].toLowerCase() : "thing";
 
                     var str = '<span class="entity ' + nerdType + '">' + entity.label + '</span>';
-
-
-                    $thisSub.html(text.replace(entity.label, str));
+                    var replace = $thisSub[0].innerHTML.replace(entity.label, str);
+                    $thisSub.html(replace);
+                    console.log($thisSub[0].innerHTML.replace(entity.label, str));
                     break;
                 } else {
                     subIndex--;
                 }
             }
         }
-
     });
 
     $('.sub-text', document).replaceWith($newSubCont);
+    $('p > span.entity').has('span').addClass('nesting');
+
 }
+
+
 function showEntityList(entityList) {
     $(".template-list-rows").empty();
     $("#entity-sect").fadeIn();
@@ -692,11 +692,11 @@ function showEntityList(entityList) {
         var typeName = type.split('#')[1];
         var entTypeList = typeList[type];
 
-
         var $row = $("<div>").loadTemplate($("#templateType"), {
             typeAndOccurrences: entTypeList.length + " " + typeName
         }).appendTo(".template-list-rows");
         entTypeList.forEach(function (ent) {
+
             var $e = $("<li>").loadTemplate($("#templateEnt"), {
                 entA: '#' + ent.label
             });
@@ -704,6 +704,7 @@ function showEntityList(entityList) {
             $(".displayEntity", $row).append($e);
 
             $('.entity.list', $e).addClass((typeName.toLowerCase()));
+
             if (ent.uri) {
                 $('span>a', $e).attr("href", ent.uri).attr("target", "_blank");
             }
