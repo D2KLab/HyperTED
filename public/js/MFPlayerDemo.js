@@ -648,7 +648,6 @@ function displayEntitiesSub(entJson) {
                     var str = '<span class="entity ' + nerdType + '">' + entity.label + '</span>';
                     var replace = $thisSub[0].innerHTML.replace(entity.label, str);
                     $thisSub.html(replace);
-                    console.log($thisSub[0].innerHTML.replace(entity.label, str));
                     break;
                 } else {
                     subIndex--;
@@ -700,7 +699,6 @@ function showEntityList(entityList) {
             var $e = $("<li>").loadTemplate($("#templateEnt"), {
                 entA: '#' + ent.label
             });
-
             $(".displayEntity", $row).append($e);
 
             $('.entity.list', $e).addClass((typeName.toLowerCase()));

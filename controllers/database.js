@@ -21,6 +21,7 @@ exports.prepare = function () {
 
     chaps = db.get('chapters');
     chaps.index('uuid');
+    chaps.index('uuid chapNum', {unique: true});
 
 };
 

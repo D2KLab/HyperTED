@@ -110,7 +110,7 @@ exports.view = function (req, res) {
                         console.log(LOG_TAG + 'Metadata unavailable.');
                     } else {
                         if (metadata.chapters) {
-                            chapters = metadata.chapters;
+//                            chapters = metadata.chapters;
                             delete metadata.chapters;
                         }
 
