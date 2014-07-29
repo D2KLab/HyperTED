@@ -67,7 +67,7 @@ function getHotspotsFor(video, callback) {
 }
 
 function getChaptersFor(video, callback) {
-    chaps.find({'uuid': video.uuid},{ sort : { chapNum : 1 } }, function (err, docs) {
+    chaps.find({'uuid': video.uuid}, { sort: { chapNum: 1 } }, function (err, docs) {
         if (!err && docs && docs.length > 0) {
             video.chapters = docs;
         }
@@ -91,21 +91,36 @@ exports.getVideoFromVendorId = function (vendor, id, callback) {
 exports.insertVideo = function (video, callback) {
     video.uuid = UUID.v4();
     video.timestamp = Date.now();
-    var callback = callback || function () {
+    callback = callback || function () {
     };
-    var cb = callback;
+    var cb = callback, cbs = [];
 
-    var entities;
     if (video.entities) {
-        entities = video.entities;
+        var entities = video.entities;
         delete video.entities;
 
+        cbs.push(function (async_callback) {
+            addEntities(video.uuid, entities, async_callback);
+        });
+    }
+    if (video.chapters) {
+        var chapters = video.chapters;
+        delete video.chapters;
+
+        cbs.push(function (async_callback) {
+            addChapters(video.uuid, chapters, async_callback);
+        });
+    }
+
+    if (cbs.length) {
         cb = function (err, video) {
             if (err || !video) {
                 callback(err, video);
                 return;
             }
-            addEntities(video.uuid, entities);
+            async.parallel(cbs, function () {
+                callback(err, video);
+            });
         }
     }
 
@@ -127,12 +142,41 @@ exports.insertVideo = function (video, callback) {
 };
 
 function updateVideoUuid(uuid, newVideo, callback) {
-    videos.update({uuid: uuid}, newVideo, function (err, doc) {
-        if (err) {
-            console.log('DB updateVideoUuid fail. ' + JSON.stringify(err));
+    callback = callback || function () {
+    };
+    var cb = callback, cbs = [];
+
+    if (newVideo.entities) {
+        var entities = newVideo.entities;
+        delete newVideo.entities;
+
+        cbs.push(function (async_callback) {
+            addEntities(newVideo.uuid, entities, async_callback);
+        });
+    }
+    if (newVideo.chapters) {
+        var chapters = newVideo.chapters;
+        delete newVideo.chapters;
+
+        cbs.push(function (async_callback) {
+            addChapters(newVideo.uuid, chapters, async_callback);
+        });
+    }
+
+    if (cbs.length) {
+        cb = function (err, video) {
+            if (err || !video) {
+                console.log('DB updateVideoUuid fail. ' + JSON.stringify(err));
+                callback(err, video);
+                return;
+            }
+            async.parallel(cbs, function () {
+                callback(err, video);
+            });
         }
-        callback(err, doc);
-    });
+    }
+
+    videos.update({uuid: uuid}, newVideo, cb);
 }
 exports.updateVideoUuid = updateVideoUuid;
 
@@ -145,22 +189,24 @@ exports.updateVideo = function (newVideo, callback) {
     });
 };
 
-exports.addChapters = function (uuid, chapters, callback) {
-    var e = false;
+function addChapters(uuid, chapters, callback) {
+    callback = callback || function () {
+    };
+    var funcArray = [];
     chapters.forEach(function (c) {
         c.uuid = uuid;
-        chaps.insert(c, function (err, doc) {
-            if (err) {
-                console.log(err);
-                e = true;
-            }
-        });
+        var f = function (async_callback) {
+            chaps.insert(c, async_callback);
+        };
+        funcArray.push(f)
     });
-    callback(e);
-};
+    async.parallel(funcArray, callback);
+}
 
-
-function addEntities(uuid, entities) {
+function addEntities(uuid, entities, callback) {
+    callback = callback || function () {
+    };
+    var funcArray = [];
     entities.forEach(function (e) {
         e.uuid = uuid;
 
@@ -173,12 +219,12 @@ function addEntities(uuid, entities) {
             'label': e.label,
             'nerdType': e.nerdType
         };
-        ents.findAndModify(eParams, {$set: e}, {upsert: true, new: true}, function (err, newDoc) {
-            if (err)
-                console.log(err);
-        });
-
+        var f = function (async_callback) {
+            ents.findAndModify(eParams, {$set: e}, {upsert: true, new: true}, async_callback);
+        };
+        funcArray.push(f)
     });
+    async.parallel(funcArray, callback);
 }
 exports.addEntities = addEntities;
 

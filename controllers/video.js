@@ -47,7 +47,7 @@ function viewVideo(req, res, video) {
     };
 
     // Prepare nerd entity part
-    if (!enriched || !video.metadata.timedtext) {
+    if (!enriched || !video.timedtext) {
         // enrichment is not requested or we can not enrich
         renderVideo(res, video, options);
     } else if (video.entities && containsExtractor(video.entities, enriched)) {
@@ -69,8 +69,8 @@ function viewVideo(req, res, video) {
 }
 
 function renderVideo(res, video, options) {
-    if (video.metadata.timedtext) {
-        video.subtitles = srtToJson(video.metadata.timedtext, video.chapters);
+    if (video.timedtext) {
+        video.subtitles = srtToJson(video.timedtext, video.chapters);
     }
     var source = mergeObj(video, options);
     res.render('video.ejs', source);
@@ -109,13 +109,8 @@ exports.view = function (req, res) {
                     if (!metadata) {
                         console.log(LOG_TAG + 'Metadata unavailable.');
                     } else {
-                        if (metadata.chapters) {
-//                            chapters = metadata.chapters;
-                            delete metadata.chapters;
-                        }
+                        video.metadata = metadata;
 
-                        var oldmetadata = video.metadata || {};
-                        video.metadata = mergeObj(oldmetadata, metadata);
                     }
 
                     //3. write in db
@@ -125,14 +120,6 @@ exports.view = function (req, res) {
                             console.log("DATABASE ERROR");
                             console.log(err);
                             console.log("Can not updateVideoUuid");
-                        }
-
-                        if (chapters) {
-                            db.addChapters(uuid, chapters, function (err) {
-                                if (err) {
-                                    console.log("DATABASE ERROR" + JSON.stringify(err));
-                                }
-                            });
                         }
                     });
 
@@ -245,15 +232,29 @@ exports.search = function (req, resp) {
                     if (!metadata) {
                         console.log(LOG_TAG + 'Metadata unavailable.');
                     } else {
-                        var oldmetadata = video.metadata || {};
-                        video.metadata = mergeObj(oldmetadata, metadata);
+                        video.metadata = metadata;
                     }
-                    var chapters;
-                    if (metadata.chapters) {
-                        chapters = metadata.chapters;
-                        delete metadata.chapters;
+                    var ltv_chapters;
+                    if (video.ltv_uuid && video.chapters) {
+                        var chapters = [];
+                        for (var c in ltv_chapters) {
+                            if (!ltv_chapters.hasOwnProperty(c))
+                                continue;
+                            var cur_chap = ltv_chapters[c];
+                            // ipotesys: chapter timing is in seconds
+                            var chap = {
+                                source: 'data.linkedtv.eu',
+                                startNPT: cur_chap.tStart.value,
+                                endNPT: cur_chap.tEnd.value,
+                                chapNum: c,
+                                uuid: data.uuid,
+                                chapterUri: cur_chap.chapter.value,
+                                mediaFragmentUri: cur_chap.mediafragment.value
+                            };
+                            chapters.push(chap);
+                        }
+                        video.chapters = chapters;
                     }
-
                     //3. write in db
                     db.insertVideo(video, function (err, data) {
                         if (err) {
@@ -262,22 +263,9 @@ exports.search = function (req, resp) {
                             return;
                         }
                         var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
-
-                        if (chapters) {
-                            db.addChapters(data.uuid, chapters, function (err, data) {
-                                if (err) {
-                                    console.log("DATABASE ERROR" + JSON.stringify(err));
-                                }
-                                console.log('Video at ' + locator + ' successfully added to db.');
-                                console.log('Redirecting to ' + redirectUrl);
-                                resp.redirect(redirectUrl);
-                            });
-
-                        } else {
-                            console.log('Video at ' + locator + ' successfully added to db.');
-                            console.log('Redirecting to ' + redirectUrl);
-                            resp.redirect(redirectUrl);
-                        }
+                        console.log('Video at ' + locator + ' successfully added to db.');
+                        console.log('Redirecting to ' + redirectUrl);
+                        resp.redirect(redirectUrl);
                     });
                 });
             });
@@ -327,9 +315,9 @@ exports.nerdify = function (req, res) {
 function getEntities(video, ext, callback) {
     console.log('nerdifing video ' + video.uuid + ' with ' + ext);
     var doc_type, text;
-    if (video.metadata.timedtext) {
+    if (video.timedtext) {
         doc_type = 'timedtext';
-        text = video.metadata.timedtext;
+        text = video.timedtext;
     } else {
         doc_type = 'text';
         text = video.metadata.descr;
@@ -362,9 +350,7 @@ function getMetadataFromSparql(video, callback) {
                 callback(false, sparql_data);
                 return;
             }
-            sparql_data.metadata = {
-                timedtext: data
-            };
+            sparql_data.timedtext = data;
             callback(err, sparql_data);
         });
     });
@@ -372,10 +358,10 @@ function getMetadataFromSparql(video, callback) {
 
 function getMetadata(video, callback) {
     if (!video.vendor || !video.vendor_id) {
-        callback(true);
+        callback({'message': 'Not vendor or id available'});
         return;
     }
-    var metadata = {};
+    var metadata = video.metadata || {};
     var vendor = vendors[video.vendor];
     var metadata_url = vendor.metadata_url.replace('<id>', video.vendor_id);
 
@@ -414,7 +400,7 @@ function getMetadata(video, callback) {
                         if (err) {
                             console.log('[ERROR] on retrieving sub for ' + video.locator);
                         } else {
-                            metadata.timedtext = data;
+                            video.timedtext = data;
                         }
                         async_callback(false);
                     });
@@ -462,7 +448,7 @@ function getMetadata(video, callback) {
                                 if (err) {
                                     console.log('[ERROR] on retrieving sub for ' + video.locator);
                                 } else {
-                                    metadata.timedtext = data;
+                                    video.timedtext = data;
                                 }
                                 async_callback(false);
                             });
@@ -512,12 +498,10 @@ function getMetadata(video, callback) {
 
                 var subUrl = vendors['ted'].sub_url.replace('<id>', video.vendor_id);
 
-                var jsonSub;
-
                 async.parallel([
                         function (async_callback) {
                             http.getJSON(subUrl, function (err, data) {
-                                jsonSub = data;
+                                video.jsonSub = data;
                                 if (err) {
                                     console.log('[ERROR ' + err + '] on retrieving sub for ' + video.locator);
                                 }
@@ -550,9 +534,8 @@ function getMetadata(video, callback) {
                     ],
                     function (err) {
                         if (!err) {
-                            metadata.timedtext = jsonToSrt(jsonSub);
-                            //obtain chapters from json
-                            metadata.chapters = getTedChapters(jsonSub, video.duration);
+                            video.chapters = getTedChapters(video.jsonSub, video.duration)
+                            video.timedtext = jsonToSrt(video.jsonSub);
                         }
                         callback(false, metadata);
                     });
@@ -631,7 +614,6 @@ function getTedChapters(json, totDuration) {
     return chapters;
 }
 
-
 /*
  * This function translate subtitles from TED json to srt
  * */
@@ -654,7 +636,6 @@ function jsonToSrt(json) {
     }
     return encodeUTF(mysrt);
 }
-
 
 /* from srt to a json ready to be used in render */
 function srtToJson(srt, chapters) {
@@ -963,7 +944,7 @@ exports.buildDb = function (req, res) {
                         index = String(talk.id);
 
                         db.getVideoFromVendorId('ted', index, function (err, data) {
-                            if (!err && data && (data.entities || !data.metadata.timedtext)) { //video already in db
+                            if (!err && data && (data.entities || !data.timedtext)) { //video already in db
                                 talksLoop();
                                 return;
                             }
@@ -1000,32 +981,16 @@ exports.buildDb = function (req, res) {
                 console.log(LOG_TAG + err);
             }
 
-            var chapters;
             if (!metadata) {
                 console.log(LOG_TAG + 'Metadata unavailable.');
-            } else {
-                if (metadata.chapters) {
-                    chapters = metadata.chapters;
-                    delete metadata.chapters;
-                }
-                video.metadata = metadata;
             }
 
             var fun = uuid ? db.updateVideo : db.insertVideo;
 
             fun(video, function (err, doc) {
-                //chapters
-                if (chapters) {
-                    db.addChapters(doc.uuid, chapters, function (err) {
-                        if (err) {
-                            console.log("DATABASE ERROR" + JSON.stringify(err));
-                        }
-                    });
-                }
-
                 //nerdify
-                if (retrieveNerd && doc.metadata.timedtext) {
-                    nerd.getEntities('timedtext', doc.metadata.timedtext, 'textrazor', function (err, data) {
+                if (retrieveNerd && doc.timedtext) {
+                    nerd.getEntities('timedtext', doc.timedtext, 'textrazor', function (err, data) {
                         if (err || !data) {
                             console.log(LOG_TAG + 'Error in nerd retrieving for ' + doc.locator);
                             console.log(err);
@@ -1091,7 +1056,7 @@ function runHotspotProcess(uuid, callback) {
             return;
         }
 
-        var srt = new Buffer(video.metadata.timedtext, 'utf-8');
+        var srt = new Buffer(video.timedtext, 'utf-8');
         var queryString = '?videoURL=' + video.locator + '&UUID=' + video.uuid + '&visualAnalysis=false&chapterList=';
         var first = true;
         video.chapters.forEach(function (c) {
