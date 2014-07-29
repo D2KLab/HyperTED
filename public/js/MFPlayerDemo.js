@@ -526,7 +526,7 @@ function getFromLocalStorage(key) {
 
 function saveInLocalStorage(key, value) {
     try {
-        localStorage[key] = JSON.stringify({timestamp: Date.now(), value: value});
+        localStorage[key] = JSON.stringify({value: value});
     } catch (e) {
         console.log(e);
         if (e == DOMException.QUOTA_EXCEEDED_ERR) {

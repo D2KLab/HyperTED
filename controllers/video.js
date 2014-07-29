@@ -88,7 +88,7 @@ exports.view = function (req, res) {
             return;
         }
 
-        if (!video.timestamp || Date.now() - video.timestamp > time1d) {
+        if (false) {
             //UPDATE METADATA
             console.log("updating metadata for video " + uuid);
             // 1. search for metadata in sparql
@@ -119,7 +119,6 @@ exports.view = function (req, res) {
                     }
 
                     //3. write in db
-                    video.timestamp = Date.now();
                     db.updateVideoUuid(uuid, video, function (err) {
                         if (err) {
                             console.log("DATABASE ERROR");

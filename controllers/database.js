@@ -67,7 +67,7 @@ function getHotspotsFor(video, callback) {
 }
 
 function getChaptersFor(video, callback) {
-    chaps.find({'uuid': video.uuid},{ sort : { chapNum : 1 } }, function (err, docs) {
+    chaps.find({'uuid': video.uuid}, { sort: { chapNum: 1 } }, function (err, docs) {
         if (!err && docs && docs.length > 0) {
             video.chapters = docs;
         }
@@ -90,7 +90,6 @@ exports.getVideoFromVendorId = function (vendor, id, callback) {
 
 exports.insertVideo = function (video, callback) {
     video.uuid = UUID.v4();
-    video.timestamp = Date.now();
     var callback = callback || function () {
     };
     var cb = callback;
