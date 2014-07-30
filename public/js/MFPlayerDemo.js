@@ -130,7 +130,7 @@ $(document).ready(function () {
         e.preventDefault();
         var $form = $(this);
         var $button = $('button', $form);
-        $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
+        $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-greyRed.gif"><img src="../img/ajax-loader-greyRed.gif"><img src="../img/ajax-loader-greyRed.gif">');
         $(this).ajaxSubmit({
             success: function (data) {
                 var text;
