@@ -79,7 +79,7 @@ $(document).ready(function () {
         $nerdifyForm.attr('action', ajaxAction).submit(function (e) {
             e.preventDefault();
             var $submitButton = $('button[type="submit"]', $nerdifyForm);
-            $submitButton.prop('disabled', true).addLoader('left');
+            $submitButton.width($submitButton.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
 
             var extractor = $('.nerdSelect select', $nerdifyForm).val();
             var page_url = window.location.toString().parseURL();
@@ -88,7 +88,7 @@ $(document).ready(function () {
             // if entities are in LocalStorage, get them and go on
             var entitiesLS = getFromLocalStorage(videokey + extractor);
             if (entitiesLS) {
-                $submitButton.prop('disabled', false).removeLoader();
+                $submitButton.prop('disabled', false).html('Nerdify');
                 history.pushState(null, null, page_url.toString());
                 onEntitiesToShow(entitiesLS);
                 return false;
@@ -100,7 +100,7 @@ $(document).ready(function () {
                         if (data.error) {
                             var alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
                             alert.appendTo($nerdifyForm).alert();
-                            $submitButton.removeLoader();
+                            $submitButton.prop('disabled', false).html('Nerdify');
                             console.error(data.error);
                             return;
                         }
@@ -111,7 +111,7 @@ $(document).ready(function () {
 
                     saveInLocalStorage(videokey + extractor, data);
 
-                    $submitButton.prop('disabled', false).removeLoader();
+                    $submitButton.prop('disabled', false).html('Nerdify');
                     history.pushState(null, null, page_url.toString());
                     onEntitiesToShow(data);
                 },
@@ -680,7 +680,7 @@ function showEntityList(entityList) {
         return memo;
     }, {});
 
-    var extr = $('select[name=enriched]').val();
+    var extr = $('select[name=enriched] option:selected').text();
     $('.totEnt').html(entityList.length);
     $('.extEnt').html(extr.toUpperCase());
 
