@@ -47,6 +47,7 @@ function getVideoFromUuid(uuid, full, callback) {
     };
     videos.findOne({uuid: uuid}).on('complete', cb);
 }
+exports.getVideoFromUuid = getVideoFromUuid;
 
 function getEntitiesFor(video, callback) {
     ents.find({'uuid': video.uuid}, function (err, docs) {
@@ -74,8 +75,6 @@ function getChaptersFor(video, callback) {
         callback(false, video);
     });
 }
-
-exports.getVideoFromUuid = getVideoFromUuid;
 
 exports.getVideoFromLocator = function (locator, callback) {
     videos.findOne({locator: locator}).on('complete', callback);
@@ -146,16 +145,18 @@ function updateVideoUuid(uuid, newVideo, callback) {
     };
     var cb = callback, cbs = [];
 
+    var entities;
     if (newVideo.entities) {
-        var entities = newVideo.entities;
+        entities = newVideo.entities;
         delete newVideo.entities;
 
         cbs.push(function (async_callback) {
             addEntities(newVideo.uuid, entities, async_callback);
         });
     }
+    var chapters;
     if (newVideo.chapters) {
-        var chapters = newVideo.chapters;
+        chapters = newVideo.chapters;
         delete newVideo.chapters;
 
         cbs.push(function (async_callback) {
@@ -164,14 +165,17 @@ function updateVideoUuid(uuid, newVideo, callback) {
     }
 
     if (cbs.length) {
-        cb = function (err, video) {
-            if (err || !video) {
+        cb = function (err, data) {
+            if (entities)newVideo.entities = entities;
+            if (chapters) newVideo.chapters = chapters;
+
+            if (err || !data) {
                 console.log('DB updateVideoUuid fail. ' + JSON.stringify(err));
-                callback(err, video);
+                callback(err, newVideo);
                 return;
             }
             async.parallel(cbs, function () {
-                callback(err, video);
+                callback(err, data);
             });
         }
     }
