@@ -577,6 +577,7 @@ html, body {
 }
 
 #player-sect .info-on-player {
+    width: 100%;
     position: absolute;
     left: 0;
     top: 0;
