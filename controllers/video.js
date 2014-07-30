@@ -89,44 +89,43 @@ exports.view = function (req, res) {
             return;
         }
 
-        if (video.vendor)
-            getFickleMetadata(video, function (err, metadata) {
-                video.metadata = metadata;
+        var updateFun = function (video, callback) {
+            // fake function
+            callback(false, video);
+        };
+
+        if (!video.timestamp || Date.now() - video.timestamp > time1w) {
+            //UPDATE ALL METADATA
+            console.log("updating metadata for video " + uuid);
+            video.timestamp = Date.now();
+            updateFun = collectMetadata;
+        } else if (video.vendor) {
+            updateFun = getFickleMetadata;
+        }
+
+        updateFun(video, function (err, video) {
+            db.updateVideoUuid(uuid, video, function (err, data) {
+                if (err) {
+                    console.log("DATABASE ERROR");
+                    console.log(err);
+                    console.log("Can not updateVideoUuid");
+                }
+
                 if (video.hotspotStatus == hStatusValue.IN_PROGRESS) {
                     checkHotspotResults(video.uuid, function (err, data) {
                         if (data) {
                             video.hotspotStatus = hStatusValue.DONE;
                             video.hotspots = data;
                         }
+
                         viewVideo(req, res, video);
                     });
                 } else {
                     viewVideo(req, res, video);
                 }
-                db.updateVideoUuid(uuid, video, function (err) {
-                    if (err) {
-                        console.log("DATABASE ERROR");
-                        console.log(err);
-                        console.log("Can not updateVideoUuid");
-                    }
-                });
             });
+        });
 
-        if (!video.timestamp || Date.now() - video.timestamp > time1w) {
-            //UPDATE ALL METADATA
-            console.log("updating metadata for video " + uuid);
-
-            collectMetadata(video, function (err, video) {
-                //write in db
-                db.updateVideoUuid(uuid, video, function (err) {
-                    if (err) {
-                        console.log("DATABASE ERROR");
-                        console.log(err);
-                        console.log("Can not updateVideoUuid");
-                    }
-                });
-            });
-        }
     });
 };
 
@@ -556,16 +555,22 @@ function getFickleMetadata(video, callback) {
     var vendor = vendors[video.vendor];
     var metadata_url = vendor.metadata_url.replace('<id>', video.vendor_id);
 
-    function onErrorMetadataJson(err, metadata_url, callback) {
+    function onErrorMetadataJson(err, metadata_url) {
         console.log('[ERROR] on retrieving metadata from ' + metadata_url);
-        callback(err);
+        callback(err, video);
+    }
+
+    function onSuccessMetadataJson(err, metadata) {
+        if (metadata)
+            video.metadata = metadata;
+        callback(err, video);
     }
 
     switch (vendor.name) {
         case 'youtube':
             http.getJSON(metadata_url, function (err, data) {
                 if (err) {
-                    onErrorMetadataJson(err, metadata_url, async_callback);
+                    onErrorMetadataJson(err, metadata_url);
                     return;
                 }
                 metadata.title = data.entry.title.$t;
@@ -579,13 +584,13 @@ function getFickleMetadata(video, callback) {
                 metadata.published = data.entry.published.$t;
                 metadata.category = data.entry.category[1].term;
 
-                callback(err, metadata);
+                onSuccessMetadataJson(err, metadata);
             });
             break;
         case 'dailymotion':
             http.getJSON(metadata_url, function (err, data) {
                 if (err) {
-                    onErrorMetadataJson(err, metadata_url, async_callback);
+                    onErrorMetadataJson(err, metadata_url);
                     return;
                 }
                 metadata.title = data.title;
@@ -599,13 +604,13 @@ function getFickleMetadata(video, callback) {
                 metadata.published = data.created_time;
                 metadata.category = data.genre;
 
-                callback(err, metadata);
+                onSuccessMetadataJson(err, metadata);
             });
             break;
         case 'vimeo':
             http.getJSON(metadata_url, function (err, data) {
                 if (err) {
-                    onErrorMetadataJson(err, metadata_url, callback);
+                    onErrorMetadataJson(err, metadata_url);
                     return;
                 }
                 metadata.title = data.title;
@@ -618,13 +623,13 @@ function getFickleMetadata(video, callback) {
                 metadata.avgRate = "n.a.";
                 metadata.published = data.upload_date;
                 metadata.category = data.tags;
-                callback(err, metadata);
+                onSuccessMetadataJson(err, metadata);
             });
             break;
         case 'ted':
             http.getJSON(metadata_url, function (err, data) {
                 if (err) {
-                    onErrorMetadataJson(err, metadata_url, callback);
+                    onErrorMetadataJson(err, metadata_url);
                     return;
                 }
                 var datatalk = data.talk;
@@ -639,7 +644,7 @@ function getFickleMetadata(video, callback) {
                 metadata.event = datatalk.event.name;
                 metadata.poster = datatalk.images[2].image.url;
 
-                callback(err, metadata);
+                onSuccessMetadataJson(err, metadata);
             });
             break;
         default:
@@ -662,9 +667,7 @@ exports.ajaxGetMetadata = function (req, res) {
         if (data.metadata) {
             res.json(data.metadata)
         } else {
-            getMetadata(data, function (err, data) {
-                res.json(data);
-            });
+            res.json({});
         }
     });
 

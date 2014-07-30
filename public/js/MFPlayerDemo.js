@@ -321,9 +321,7 @@ $(document).ready(function () {
 
                 updateMFurl();
             });
-
         });
-
 
         setTimeout(function () {
             $('.chap-link').each(function () {
@@ -458,6 +456,7 @@ $(document).ready(function () {
 
         if (typeof video_uuid != 'undefined' && video_uuid != "") {
             retrieveInfo(video_uuid, function (metadata) {
+                metadata = metadata || {};
                 if (metadata.error) {
                     console.error(metadata.error);
                     return;
