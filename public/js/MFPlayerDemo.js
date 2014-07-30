@@ -681,7 +681,8 @@ function showEntityList(entityList) {
     }, {});
 
     $('.totEnt').html(entityList.length);
-    $('.extEnt').html(entityList[0].extractor.toUpperCase());
+    if (!(entityList[0].source) || (entityList[0].source) == 'NULL') $('.extEnt').html(entityList[0].extractor.toUpperCase());
+    else $('.extEnt').html(entityList[0].source.toUpperCase());
 
 
     var count = 0;
@@ -702,7 +703,7 @@ function showEntityList(entityList) {
             $(".displayEntity", $row).append($e);
 
             $('.entity.list', $e).addClass((typeName.toLowerCase()));
-
+            //console.log(ent);
             if (ent.uri) {
                 $('span>a', $e).attr("href", ent.uri).attr("target", "_blank");
             }
