@@ -176,6 +176,7 @@ function updateVideoUuid(uuid, newVideo, callback) {
         }
     }
 
+    newVideo.timestamp = Date.now();
     videos.update({uuid: uuid}, newVideo, cb);
 }
 exports.updateVideoUuid = updateVideoUuid;

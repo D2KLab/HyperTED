@@ -18,6 +18,7 @@ var hStatusValue = {
 };
 
 var time1d = 86400000; //one day
+var time1w = 7 * time1d; //one week
 ts.prepare();
 
 var mergeObj = utils.mergeObj;
@@ -88,58 +89,45 @@ exports.view = function (req, res) {
             return;
         }
 
-        if (!video.timestamp || Date.now() - video.timestamp > time1d) {
-            //UPDATE METADATA
-            console.log("updating metadata for video " + uuid);
-            // 1. search for metadata in sparql
-            getMetadataFromSparql(video, function (err, data) {
-                if (err || !data) {
-                    console.log("No data obtained from sparql");
-                } else {
-                    video = mergeObj(video, data);
-                }
-
-                //2. search metadata with vendor's api
-                getMetadata(video, function (err, metadata) {
-                    var chapters;
-
-                    if (err) {
-                        console.log(LOG_TAG + 'Metadata retrieved with errors.');
-                    }
-                    if (!metadata) {
-                        console.log(LOG_TAG + 'Metadata unavailable.');
-                    } else {
-                        video.metadata = metadata;
-
-                    }
-
-                    //3. write in db
-                    video.timestamp = Date.now();
-                    db.updateVideoUuid(uuid, video, function (err) {
-                        if (err) {
-                            console.log("DATABASE ERROR");
-                            console.log(err);
-                            console.log("Can not updateVideoUuid");
+        if (video.vendor)
+            getFickleMetadata(video, function (err, metadata) {
+                video.metadata = metadata;
+                if (video.hotspotStatus == hStatusValue.IN_PROGRESS) {
+                    checkHotspotResults(video.uuid, function (err, data) {
+                        if (data) {
+                            video.hotspotStatus = hStatusValue.DONE;
+                            video.hotspots = data;
                         }
+                        viewVideo(req, res, video);
                     });
+                } else {
+                    viewVideo(req, res, video);
+                }
+                db.updateVideoUuid(uuid, video, function (err) {
+                    if (err) {
+                        console.log("DATABASE ERROR");
+                        console.log(err);
+                        console.log("Can not updateVideoUuid");
+                    }
+                });
+            });
 
+        if (!video.timestamp || Date.now() - video.timestamp > time1w) {
+            //UPDATE ALL METADATA
+            console.log("updating metadata for video " + uuid);
+
+            collectMetadata(video, function (err, video) {
+                //write in db
+                db.updateVideoUuid(uuid, video, function (err) {
+                    if (err) {
+                        console.log("DATABASE ERROR");
+                        console.log(err);
+                        console.log("Can not updateVideoUuid");
+                    }
                 });
             });
         }
-
-        if (video.hotspotStatus == hStatusValue.IN_PROGRESS) {
-            checkHotspotResults(video.uuid, function (err, data) {
-                if (data) {
-                    video.hotspotStatus = hStatusValue.DONE;
-                    video.hotspots = data;
-                }
-                viewVideo(req, res, video);
-            });
-        } else {
-            viewVideo(req, res, video);
-        }
     });
-
 };
 
 exports.search = function (req, resp) {
@@ -215,58 +203,18 @@ exports.search = function (req, resp) {
                 video.videoLocator = locator + '/rawvideo/2/raw.mp4?ticket=77451bc0-e0bf-11e3-8b68-0800200c9a66';
             }
 
-            // 1. search for metadata in sparql
-            getMetadataFromSparql(video, function (err, data) {
-
-                if (err || !data) {
-                    console.log("No data obtained from sparql");
-                } else {
-                    video = mergeObj(video, data);
-                }
-
-                //2. search metadata with vendor's api
-                getMetadata(video, function (err, metadata) {
+            collectMetadata(video, function (err, video) {
+                // write in db
+                db.insertVideo(video, function (err, data) {
                     if (err) {
-                        console.log(LOG_TAG + 'Metadata retrieved with errors.');
+                        console.log("DATABASE ERROR" + JSON.stringify(err));
+                        resp.render('error.ejs', errorMsg.e500);
+                        return;
                     }
-                    if (!metadata) {
-                        console.log(LOG_TAG + 'Metadata unavailable.');
-                    } else {
-                        video.metadata = metadata;
-                    }
-
-                    if (video.ltv_uuid && video.chapters) {
-                        var chapters = [];
-                        for (var c in video.chapters) {
-                            if (!video.chapters.hasOwnProperty(c))
-                                continue;
-                            var cur_chap = video.chapters[c];
-                            // ipotesys: chapter timing is in seconds
-                            var chap = {
-                                source: 'data.linkedtv.eu',
-                                startNPT: cur_chap.tStart.value,
-                                endNPT: cur_chap.tEnd.value,
-                                chapNum: c,
-                                uuid: data.uuid,
-                                chapterUri: cur_chap.chapter.value,
-                                mediaFragmentUri: cur_chap.mediafragment.value
-                            };
-                            chapters.push(chap);
-                        }
-                        video.chapters = chapters;
-                    }
-                    //3. write in db
-                    db.insertVideo(video, function (err, data) {
-                        if (err) {
-                            console.log("DATABASE ERROR" + JSON.stringify(err));
-                            resp.render('error.ejs', errorMsg.e500);
-                            return;
-                        }
-                        var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
-                        console.log('Video at ' + locator + ' successfully added to db.');
-                        console.log('Redirecting to ' + redirectUrl);
-                        resp.redirect(redirectUrl);
-                    });
+                    var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
+                    console.log('Video at ' + locator + ' successfully added to db.');
+                    console.log('Redirecting to ' + redirectUrl);
+                    resp.redirect(redirectUrl);
                 });
             });
         });
@@ -311,6 +259,55 @@ exports.nerdify = function (req, res) {
         }
     });
 };
+
+/*
+ * Collect metadata form all sources.
+ * Used for new video (search)
+ */
+function collectMetadata(video, callback) {
+    // 1. search for metadata in sparql
+    getMetadataFromSparql(video, function (err, data) {
+        if (err || !data) {
+            console.log("No data obtained from sparql");
+        } else {
+            video = mergeObj(video, data);
+            if (data.chapters) {
+                var chapters = [];
+                for (var c in video.chapters) {
+                    if (!video.chapters.hasOwnProperty(c))
+                        continue;
+                    var cur_chap = video.chapters[c];
+                    // hypothesis: chapter timing is in seconds
+                    var chap = {
+                        source: 'data.linkedtv.eu',
+                        startNPT: cur_chap.tStart.value,
+                        endNPT: cur_chap.tEnd.value,
+                        chapNum: c,
+                        uuid: data.uuid,
+                        chapterUri: cur_chap.chapter.value,
+                        mediaFragmentUri: cur_chap.mediafragment.value
+                    };
+                    chapters.push(chap);
+                }
+                video.chapters = chapters;
+            }
+        }
+
+        //2. search metadata with vendor's api
+        getMetadata(video, function (err, metadata) {
+            if (err) {
+                console.log(LOG_TAG + 'Metadata retrieved with errors.');
+            }
+            if (!metadata) {
+                console.log(LOG_TAG + 'Metadata unavailable.');
+            } else {
+                video.metadata = metadata;
+            }
+
+            callback(err, video);
+        });
+    });
+}
 
 function getEntities(video, ext, callback) {
     console.log('nerdifing video ' + video.uuid + ' with ' + ext);
@@ -546,6 +543,110 @@ function getMetadata(video, callback) {
     }
 }
 
+/*
+ * Retrieve the part of metadata that change constantly
+ * (i.e. #views, #likes,...)
+ */
+function getFickleMetadata(video, callback) {
+    if (!video.vendor || !video.vendor_id) {
+        callback({'message': 'Not vendor or id available'});
+        return;
+    }
+    var metadata = video.metadata || {};
+    var vendor = vendors[video.vendor];
+    var metadata_url = vendor.metadata_url.replace('<id>', video.vendor_id);
+
+    function onErrorMetadataJson(err, metadata_url, callback) {
+        console.log('[ERROR] on retrieving metadata from ' + metadata_url);
+        callback(err);
+    }
+
+    switch (vendor.name) {
+        case 'youtube':
+            http.getJSON(metadata_url, function (err, data) {
+                if (err) {
+                    onErrorMetadataJson(err, metadata_url, async_callback);
+                    return;
+                }
+                metadata.title = data.entry.title.$t;
+                metadata.thumb = data.entry.media$group.media$thumbnail[0].url;
+                metadata.descr = data.entry.media$group.media$description.$t.replace(new RegExp('<br />', 'g'), '\n');
+                metadata.views = data.entry.yt$statistics.viewCount;
+                metadata.favourites = data.entry.yt$statistics.favoriteCount;
+                metadata.comments = data.entry.gd$comments ? data.entry.gd$comments.gd$feedLink.countHint : 0;
+                metadata.likes = data.entry.yt$rating ? data.entry.yt$rating.numLikes : 0;
+                metadata.avgRate = data.entry.gd$rating ? data.entry.gd$rating.average : 0;
+                metadata.published = data.entry.published.$t;
+                metadata.category = data.entry.category[1].term;
+
+                callback(err, metadata);
+            });
+            break;
+        case 'dailymotion':
+            http.getJSON(metadata_url, function (err, data) {
+                if (err) {
+                    onErrorMetadataJson(err, metadata_url, async_callback);
+                    return;
+                }
+                metadata.title = data.title;
+                metadata.thumb = data.thumbnail_60_url;
+                metadata.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
+                metadata.views = data.views_total;
+                metadata.favourites = data.bookmarks_total;
+                metadata.comments = data.comments_total;
+                metadata.likes = data.ratings_total;
+                metadata.avgRate = data.rating;
+                metadata.published = data.created_time;
+                metadata.category = data.genre;
+
+                callback(err, metadata);
+            });
+            break;
+        case 'vimeo':
+            http.getJSON(metadata_url, function (err, data) {
+                if (err) {
+                    onErrorMetadataJson(err, metadata_url, callback);
+                    return;
+                }
+                metadata.title = data.title;
+                metadata.thumb = data.thumbnail_small;
+                metadata.descr = data.description.replace(new RegExp('<br />', 'g'), '\n');
+                metadata.views = data.stats_number_of_plays;
+                metadata.favourites = "n.a.";
+                metadata.comments = data.stats_number_of_comments;
+                metadata.likes = data.stats_number_of_likes;
+                metadata.avgRate = "n.a.";
+                metadata.published = data.upload_date;
+                metadata.category = data.tags;
+                callback(err, metadata);
+            });
+            break;
+        case 'ted':
+            http.getJSON(metadata_url, function (err, data) {
+                if (err) {
+                    onErrorMetadataJson(err, metadata_url, callback);
+                    return;
+                }
+                var datatalk = data.talk;
+                video.videoLocator = datatalk.media.internal ? datatalk.media.internal['950k'].uri : datatalk.media.external.uri;
+                video.vendor_id = String(datatalk.id);
+                metadata.title = datatalk.name;
+                metadata.thumb = datatalk.images[1].image.url;
+                metadata.descr = datatalk.description.replace(new RegExp('<br />', 'g'), '\n');
+                metadata.views = datatalk.viewed_count;
+                metadata.comments = datatalk.commented_count;
+                metadata.published = datatalk.published_at;
+                metadata.event = datatalk.event.name;
+                metadata.poster = datatalk.images[2].image.url;
+
+                callback(err, metadata);
+            });
+            break;
+        default:
+            callback(true, 'Vendor undefined or not recognized');
+    }
+}
+
 exports.ajaxGetMetadata = function (req, res) {
     var uuid = req.param('uuid');
     if (!uuid) {
@@ -735,12 +836,12 @@ function srtToJson(srt, chapters) {
     return subList;
 }
 
+// TODO sistemare
 function subTime(time) {
     var fTime;
     if (time < 60) {
         fTime = (time > 9) ? "00:00:" + time.toFixed(3) : "00:00:0" + time.toFixed(3);
-    }
-    else if (time == 60 || time > 60 && time < 3600) {
+    } else if (time == 60 || time > 60 && time < 3600) {
         var min = Math.floor(time / 60);
         var sec = (time % 60).toFixed(3);
         fTime = (min > 9 && sec > 9) ? "00:" + min + ":" + sec : (min < 9 && sec > 9) ? "00:0" + Math.floor(time / 60) + ":" + sec : (min > 9 && sec < 9) ? "00:" + Math.floor(time / 60) + ":0" + sec : "00:0" + min + ":0" + sec;
