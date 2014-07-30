@@ -79,7 +79,7 @@ $(document).ready(function () {
         $nerdifyForm.attr('action', ajaxAction).submit(function (e) {
             e.preventDefault();
             var $submitButton = $('button[type="submit"]', $nerdifyForm);
-            $submitButton.width($submitButton.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
+            $submitButton.width($submitButton.width()).prop('disabled', true).html('<img src="../img/ajax-loader-greyRed.gif"><img src="../img/ajax-loader-greyRed.gif"><img src="../img/ajax-loader-greyRed.gif">');
 
             var extractor = $('.nerdSelect select', $nerdifyForm).val();
             var page_url = window.location.toString().parseURL();
@@ -130,7 +130,7 @@ $(document).ready(function () {
         e.preventDefault();
         var $form = $(this);
         var $button = $('button', $form);
-        $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-greyRed.gif"><img src="../img/ajax-loader-greyRed.gif"><img src="../img/ajax-loader-greyRed.gif">');
+        $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
         $(this).ajaxSubmit({
             success: function (data) {
                 var text;

@@ -72,36 +72,57 @@
         <div id="video"></div>
         <% if (locals.timedtext) { %>
         <div id="hotspots-cont">
-            <% include partials/hotspots.ejs %>
+
         </div>
         <% } %>
     </div>
 
     <% if (locals.metadata && metadata.title) { %>
     <div class="info-on-player">
+        <div class="info-sx">
+            <div>
+                <h1 id="video-title" class="title"><%= metadata.title %></h1>
+            </div>
+            <% if (locals.metadata) {
+                var leftVals = {
+                    'Published': metadata.published.substring(0, 10),
+                    'Event': metadata.event,
+                    'Category': metadata.category
+                };
 
-        <h1 id="video-title" class="title"><%= metadata.title %></h1>
+                var rightVals = {
+                    'Views': metadata.views,
+                    'Likes': metadata.likes,
+                    'Comments': metadata.comments
+                };
 
-        <% if (locals.metadata) {
-            var leftVals = {
-                'Published': metadata.published.substring(0, 10),
-                'Event': metadata.event,
-                'Category': metadata.category
-            };
+                    for(key in leftVals) {
+                var value = leftVals [key];
+                if (value == undefined || value == null) continue;
+            %>
+            <div class="stat sx">
+                <label class="key"><%= key %></label>
+                <h5 class="value" class="title"><%= value %></h5>
 
-                for(key in leftVals) {
-            var value = leftVals [key];
-            if (value == undefined || value == null) continue;
-        %>
-        <div class="stat">
-            <label class="key"><%= key %></label>
-            <h5 class="value" class="title"><%= value %></h5>
-
+            </div>
+            <% } %>
         </div>
-        <% } } %>
+        <div class="info-dx">
+            <%
+            for(key in rightVals) {
+                var value = rightVals [key];
+                if (value == undefined || value == null) continue;
+            %>
+            <div class="stat dx">
+                <label class="key"><%= key %></label>
+                <h5 class="value" class="title"><%= value %></h5>
+
+            </div>
+            <% } } %>
+        </div>
+
     </div>
     <% } %>
-
 </section>
 
 
@@ -207,13 +228,13 @@
             </div>
 
             <div class="col-md-5 col-lg-5">
-                <% include partials/playlist.ejs %>
+
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-12 col-lg-12">
-                <% include partials/entitiesList_partial.ejs %>
+
             </div>
         </div>
     </div>
