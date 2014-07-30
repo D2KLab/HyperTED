@@ -234,13 +234,13 @@ exports.search = function (req, resp) {
                     } else {
                         video.metadata = metadata;
                     }
-                    var ltv_chapters;
+
                     if (video.ltv_uuid && video.chapters) {
                         var chapters = [];
-                        for (var c in ltv_chapters) {
-                            if (!ltv_chapters.hasOwnProperty(c))
+                        for (var c in video.chapters) {
+                            if (!video.chapters.hasOwnProperty(c))
                                 continue;
-                            var cur_chap = ltv_chapters[c];
+                            var cur_chap = video.chapters[c];
                             // ipotesys: chapter timing is in seconds
                             var chap = {
                                 source: 'data.linkedtv.eu',
