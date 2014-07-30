@@ -640,7 +640,7 @@ mejs.PluginMediaElement.prototype = {
     },
     setCurrentTime: function (time) {
         if (this.pluginApi != null) {
-            if (this.pluginType == 'youtube' || this.pluginType == 'vimeo'|| this.pluginType == 'dailymotion') {
+            if (this.pluginType == 'youtube' || this.pluginType == 'vimeo' || this.pluginType == 'dailymotion') {
                 this.pluginApi.seekTo(time);
             } else {
                 this.pluginApi.setCurrentTime(time);
@@ -653,7 +653,7 @@ mejs.PluginMediaElement.prototype = {
     setVolume: function (volume) {
         if (this.pluginApi != null) {
             // same on YouTube and MEjs
-            if (this.pluginType == 'youtube' || this.pluginType == 'vimeo'|| this.pluginType == 'dailymotion') {
+            if (this.pluginType == 'youtube' || this.pluginType == 'vimeo' || this.pluginType == 'dailymotion') {
                 this.pluginApi.setVolume(volume * 100);
             } else {
                 this.pluginApi.setVolume(volume);
@@ -867,7 +867,7 @@ mejs.MediaElementDefaults = {
     // none: forces fallback view
     mode: 'auto',
     // remove or reorder to change plugin priority and availability
-	plugins: ['flash','silverlight','youtube','vimeo', 'dailymotion'],
+    plugins: ['flash', 'silverlight', 'youtube', 'vimeo', 'dailymotion'],
     // shows debug errors on screen
     enablePluginDebug: false,
     // use plugin for browsers that have trouble with Basic Authentication on HTTPS sites
@@ -1446,7 +1446,7 @@ mejs.HtmlMediaElementShim = {
             case 'dailymotion':
 
                 var
-                    videoId = playback.url.substr(playback.url.lastIndexOf('/')+1);
+                    videoId = playback.url.substr(playback.url.lastIndexOf('/') + 1);
                 dailymotionSettings = {
                     container: container,
                     containerId: container.id,
@@ -1746,12 +1746,12 @@ function onYouTubePlayerReady(id) {
 // Dailymotion API
 mejs.DailymotionApi = {
     flashPlayers: {},
-    createFlash: function(settings) {
+    createFlash: function (settings) {
 
         this.flashPlayers[settings.pluginId] = settings;
 
         var specialIEContainer,
-            dailymotionUrl = 'http://www.dailymotion.com/swf/' + settings.videoId  + '?chromeless=1&amp;enableApi=1&amp;playerapiid=' + settings.pluginId;
+            dailymotionUrl = 'http://www.dailymotion.com/swf/' + settings.videoId + '?chromeless=1&amp;enableApi=1&amp;playerapiid=' + settings.pluginId;
 
         if (mejs.MediaFeatures.isIE) {
 
@@ -1775,7 +1775,7 @@ mejs.DailymotionApi = {
         }
 
     },
-    flashReady: function(id) {
+    flashReady: function (id) {
         var
             settings = this.flashPlayers[id],
             player = document.getElementById(id),
@@ -1788,17 +1788,17 @@ mejs.DailymotionApi = {
 
         var callbackName = settings.containerId + '_callback';
 
-        window[callbackName] = function(e) {
+        window[callbackName] = function (e) {
             mejs.DailymotionApi.handleStateChange(e, player, pluginMediaElement);
         }
 
         player.addEventListener('onStateChange', callbackName);
 
-        setInterval(function() {
+        setInterval(function () {
             mejs.DailymotionApi.createEvent(player, pluginMediaElement, 'timeupdate');
         }, 250);
     },
-    handleStateChange: function(dailymotionState, player, pluginMediaElement) {
+    handleStateChange: function (dailymotionState, player, pluginMediaElement) {
 
         switch (dailymotionState) {
             case -1: // not started
@@ -1861,7 +1861,7 @@ mejs.DailymotionApi = {
             var bufferedTime = obj.bufferedBytes / obj.bytesTotal * obj.duration;
 
             obj.target.buffered = obj.buffered = {
-                start: function(index) {
+                start: function (index) {
                     return 0;
                 },
                 end: function (index) {
@@ -1877,7 +1877,7 @@ mejs.DailymotionApi = {
     }
 }
 
-function onDailymotionPlayerReady(playerId){
+function onDailymotionPlayerReady(playerId) {
     mejs.DailymotionApi.flashReady(playerId);
 }
 
@@ -2677,8 +2677,8 @@ if (typeof jQuery != 'undefined') {
                         // click controls
                         var clickElement = (t.media.pluginType == 'native') ? t.$media : $(t.media.pluginElement);
 
-                        if(t.media.pluginType != 'dailymotion') { // fires an exception on IE with dailymotion
-                            clickElement.click(function() {
+                        if (t.media.pluginType != 'dailymotion') { // fires an exception on IE with dailymotion
+                            clickElement.click(function () {
                                 if (media.paused) {
                                     media.play();
                                 } else {
