@@ -680,8 +680,9 @@ function showEntityList(entityList) {
         return memo;
     }, {});
 
+    var extr = $('select[name=enriched]').val();
     $('.totEnt').html(entityList.length);
-    $('.extEnt').html(entityList[0].extractor.toUpperCase());
+    $('.extEnt').html(extr.toUpperCase());
 
 
     var count = 0;
