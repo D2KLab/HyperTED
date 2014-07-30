@@ -327,18 +327,6 @@ $navbarTransitionTime: 100ms;
   }
 }
 
-.stat {
-  label.key {
-    color: $dark_red;
-  }
-  .value {
-    color: $light_gray;
-  }
-  .value, label.key {
-    display: inline-block;
-  }
-}
-
 .red_rule {
   background-color: $dark_red;
   height: 5px;
@@ -363,15 +351,17 @@ h1.title {
   position: relative;
 
   .info-on-player {
+    width: 100%;
     position: absolute;
     left: 0;
     top: 0;
-
-    width: 47%;
     overflow: visible;
-    //    @media (max-width: 767px) {
-    //      width: 60%;
-    //    }
+    .info-sx, .info-dx {
+      position: relative;
+      float: left;
+    }
+    .info-sx {
+      width: 48%;
 
     .title {
       margin: 30px;
@@ -382,9 +372,28 @@ h1.title {
         display: none;
       }
     }
+    }
+    .info-dx {
+      idth: 8%;
+      height: 100%;
+      margin-top: 14%;
+      margin-left: 36%;
+    }
     .stat {
+      margin-left: 30px;
       width: 100%;
       overflow: visible;
+
+      label.key {
+        color: $ted_red;
+      }
+      .value {
+        color: $light_gray;
+      }
+      .value, label.key {
+        display: inline-block;
+      }
+
       @media(max-width: 767px) {
         display: none;
       }

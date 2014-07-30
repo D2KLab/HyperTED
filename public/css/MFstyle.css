@@ -549,18 +549,6 @@ html, body {
     display: inline-block;
 }
 
-.stat label.key {
-    color: #b11200;
-}
-
-.stat .value {
-    color: #f4f4f4;
-}
-
-.stat .value, .stat label.key {
-    display: inline-block;
-}
-
 .red_rule {
     background-color: #b11200;
     height: 5px;
@@ -589,28 +577,57 @@ html, body {
 }
 
 #player-sect .info-on-player {
+    width: 100%;
     position: absolute;
     left: 0;
     top: 0;
-    width: 47%;
     overflow: visible;
 }
 
-#player-sect .info-on-player .title {
+#player-sect .info-on-player .info-sx, #player-sect .info-on-player .info-dx {
+    position: relative;
+    float: left;
+}
+
+#player-sect .info-on-player .info-sx {
+    width: 48%;
+}
+
+#player-sect .info-on-player .info-sx .title {
     margin: 30px;
     color: #fff;
     font-weight: bold;
 }
 
 @media (max-width: 767px) {
-    #player-sect .info-on-player .title {
+    #player-sect .info-on-player .info-sx .title {
         display: none;
     }
 }
 
+#player-sect .info-on-player .info-dx {
+    idth: 8%;
+    height: 100%;
+    margin-top: 14%;
+    margin-left: 36%;
+}
+
 #player-sect .info-on-player .stat {
+    margin-left: 30px;
     width: 100%;
     overflow: visible;
+}
+
+#player-sect .info-on-player .stat label.key {
+    color: #fe2a05;
+}
+
+#player-sect .info-on-player .stat .value {
+    color: #f4f4f4;
+}
+
+#player-sect .info-on-player .stat .value, #player-sect .info-on-player .stat label.key {
+    display: inline-block;
 }
 
 @media (max-width: 767px) {
