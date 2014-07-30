@@ -13,14 +13,15 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/nerdify', video.nerdify);
+app.get('/runhotspot', video.runHotspot);
 app.get('/video/:uuid', video.view);
-app.get('/metadata/:uuid', video.ajaxGetMetadata);
 app.get('/video?', video.search);
+app.get('/metadata/:uuid', video.ajaxGetMetadata);
 app.get('/builddb', video.buildDb);
 app.get('/', function (req, res) {
     res.render('welcome.ejs')
 });
-app.get('*', function(req,res){
+app.get('*', function (req, res) {
     res.render('error.ejs', err.e404);
 });
 app.listen(8080);

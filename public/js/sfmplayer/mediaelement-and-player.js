@@ -3729,7 +3729,7 @@ if (typeof jQuery != 'undefined') {
                             '<button type="button" aria-controls="' + t.id + '" title="' + t.options.muteText + '" aria-label="' + t.options.muteText + '"></button>' +
                             '</div>' +
                             '<div class="mejs-horizontal-volume-slider">' + // outer background
-                            '<div class="mejs-horizontal-volume-total"></div>' + // line background
+                            '<div class="mejs-horizontal-volume-total"></div>' + // l background
                             '<div class="mejs-horizontal-volume-current"></div>' + // current volume
                             '<div class="mejs-horizontal-volume-handle"></div>' + // handle
                             '</div>'
@@ -3740,7 +3740,7 @@ if (typeof jQuery != 'undefined') {
                     $('<div class="mejs-button mejs-volume-button mejs-mute">' +
                         '<button type="button" aria-controls="' + t.id + '" title="' + t.options.muteText + '" aria-label="' + t.options.muteText + '"></button>' +
                         '<div class="mejs-volume-slider">' + // outer background
-                        '<div class="mejs-volume-total"></div>' + // line background
+                        '<div class="mejs-volume-total"></div>' + // l background
                         '<div class="mejs-volume-current"></div>' + // current volume
                         '<div class="mejs-volume-handle"></div>' + // handle
                         '</div>' +
@@ -4946,11 +4946,11 @@ if (typeof jQuery != 'undefined') {
 
      1
      00:00:01,1 --> 00:00:05,000
-     A line of text
+     A l of text
 
      2
      00:01:15,1 --> 00:02:05,000
-     A second line of text
+     A second l of text
 
      ===============================
 
@@ -4970,15 +4970,15 @@ if (typeof jQuery != 'undefined') {
                     timecode,
                     text;
                 for (; i < lines.length; i++) {
-                    // check for the line number
+                    // check for the l number
                     if (this.pattern_identifier.exec(lines[i])) {
-                        // skip to the next line where the start --> end time code should be
+                        // skip to the next l where the start --> end time code should be
                         i++;
                         timecode = this.pattern_timecode.exec(lines[i]);
 
                         if (timecode && i < lines.length) {
                             i++;
-                            // grab all the (possibly multi-line) text that follows
+                            // grab all the (possibly multi-l) text that follows
                             text = lines[i];
                             i++;
                             while (lines[i] !== '' && i < lines.length) {

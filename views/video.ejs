@@ -19,6 +19,7 @@
 
     <link rel="stylesheet" type="text/css" href="/js/sfmplayer/mediaelementplayer.min.css"/>
     <link rel="stylesheet" type="text/css" href="/js/sfmplayer/smfplayer.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/jquery.qtip.min.css"/>
     <link rel="stylesheet" type="text/css" href="/css/MFstyle.css"/>
 </head>
 <body>
@@ -69,6 +70,11 @@
 <section id="player-sect">
     <div id="player-container" class="clearfix">
         <div id="video"></div>
+        <% if (locals.timedtext) { %>
+        <div id="hotspots-cont">
+            <% include partials/hotspots.ejs %>
+        </div>
+        <% } %>
     </div>
 
     <% if (locals.metadata && metadata.title) { %>
@@ -99,53 +105,26 @@
 </section>
 
 
-<div id="video-info-chapters" class="tab-content">
-    <% if (locals.chapters && locals.metadata) { console.log("metadata"); console.log(metadata.title) %>
-    <ul class="nav nav-tabs" role="tablist" id="myTab">
-        <li class="active"><a href="#chapters" role="tab" data-toggle="tab">chapters</a></li>
-        <li><a href="#infos" role="tab" data-toggle="tab">infos</a></li>
-    </ul>
-
-    <div class="tab-pane active" id="chapters">
-
-    </div>
-
-    <div class="tab-pane" id="infos">
-        <div class="play-video-info clearfix">
-            <div class="left">
-                <% if(metadata.published && metadata.event) { %>
-                <h5 class="video-info">published on <%= metadata.published.substring(0, 10) %>
-                    <span> from <%= metadata.event %></span></h5>
-                <% } %>
-                <h3 class="video-info"><%= metadata.title %></h3>
-            </div>
-            <% if(metadata.descr) { %>
-            <div class="right"><h5><%= metadata.descr %></h5></div>
-
-            <% } %>
-        </div>
-    </div>
-
-    <% }else if (locals.chapters && !locals.metadata) { %>
+<div id="video-info-chapters">
+    <% if (locals.chapters) { %>
     <% include partials/chapter.ejs %>
-    <% }else if(!locals.chapters && locals.metadata && metadata.title != null && metadata.title != 'undefined') { %>
-
+    <% }
+            if(locals.metadata && metadata.title) { %>
     <div class="play-video-info clearfix">
         <div class="left">
+            <% if(metadata.published) { %>
             <h5 class="video-info">published on <%= metadata.published.substring(0, 10) %>
-                <% if(metadata.event) { %>
+                <% }if(metadata.event) { %>
                 <span> from <%= metadata.event %></span></h5>
             <% } %>
             <h3 class="video-info"><%= metadata.title %></h3>
         </div>
         <% if(locals.metadata && metadata.descr) { %>
-        <div class="right"><h5><%= metadata.descr %></h5></div>
+        <div class="right"><p class="descr"><%= metadata.descr %></p></div>
 
         <% } %>
     </div>
-
     <% } %>
-</div>
 </div>
 
 
@@ -167,10 +146,11 @@
                     </div>
                 </div>
 
-                <% if(locals.metadata && metadata.timedtext) { %>
-                <div id="sub-cont">
+                <% if(locals.subtitles) { %>
+                <section id="sub-cont">
                     <% include partials/sub_partial.ejs %>
-                </div>
+                </section>
+
 
                 <form method="get" action="/video/<%= uuid %>" data-action="/nerdify" class="nerdify button-cont">
                     <input type="hidden" name="uuid" value="<%= uuid %>"/>
@@ -181,18 +161,30 @@
 
                         <div class="nerdForm nerdSelect">
                             <select class="form-control" name="enriched">
-                                <option value="alchemyapi">AlchemyAPI</option>
-                                <option value="datatxt">DataTXT</option>
-                                <option value="dbspotlight">DBpedia Spotlight</option>
-                                <option value="lupedia">Lupedia</option>
-                                <option value="opencalais">OpenCalais</option>
-                                <option value="saplo">Saplo</option>
-                                <option value="textrazor">TextRazor</option>
-                                <option value="thd">THD</option>
-                                <option value="wikimeta">Wikimeta</option>
-                                <option value="yahoo">Yahoo!</option>
-                                <option value="zemanta">Zemanta</option>
-                                <option value="combined">NERD</option>
+                                <%
+                                    var sel = locals.enriched || "";
+
+                                    var exts = {
+                                        "alchemyapi": "AlchemyAPI",
+                                        "datatxt": "DataTXT",
+                                        "dbspotlight": "DBpedia Spotlight",
+                                        "lupedia": "Lupedia",
+                                        "opencalais": "OpenCalais",
+                                        "saplo": "Saplo",
+                                        "textrazor": "TextRazor",
+                                        "thd": "THD",
+                                        "wikimeta": "Wikimeta",
+                                        "yahoo": "Yahoo!",
+                                        "zemanta": "Zemanta",
+                                        "combined": "NERD"
+                                    }
+
+                                        for (var k in exts){
+                                        if (exts.hasOwnProperty(k)) {
+                                    var s = k == sel ? " selected" : "";
+                                %>
+                                <option value="<%= k %>"<%= s %>><%= exts[k] %></option>
+                                <% }} %>
                             </select>
                         </div>
                         <div class="nerdForm nerdBtn">
@@ -207,7 +199,7 @@
 
                 <h1 class="noCont text-center">
                     <span class="glyphicon glyphicon-chevron-left"></span>
-                    no subtitles in this video
+                    no subtitles for this video
                     <span class="glyphicon glyphicon-chevron-right"></span>
                 </h1>
                 <% } %>
@@ -233,8 +225,10 @@
             <hr class="red_rule">
         </div>
 
-        <div class="eurecomLogo"><img src="../img/logos/eurecom_logo.png"/></div>
-        <div class="mediamixerLogo"><img src="../img/logos/mediamixer_logo.png"/></div>
+        <a href="http://www.eurecom.fr" title="Eurecom" class="eurecomLogo"><img
+                    src="../img/logos/eurecom_logo.png"/></a>
+        <a href="http://www.mediamixer.eu/" title="Media Mixer" class="mediamixerLogo"><img
+                    src="../img/logos/mediamixer_logo.png"/></a>
     </div>
 </footer>
 
@@ -258,6 +252,7 @@
 <script src="http://malsup.github.com/jquery.form.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 <script src="http://popcornjs.org/code/dist/popcorn-complete.min.js"></script>
+<script src="http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"></script>
 
 <script src="/js/sfmplayer/mediaelement-and-player.js"></script>
 <script src="/js/sfmplayer/dep/jquery.url.js"></script>
@@ -265,8 +260,8 @@
 <script src="/js/sfmplayer/synote.multimedia.namespace.js"></script>
 <script src="/js/sfmplayer/synote.multimedia.utils.js"></script>
 <script src="/js/sfmplayer/synotemfplayer.js"></script>
-<script src="/js/MFPlayerDemo.js"></script>
 <script src="/js/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="/js/MFPlayerDemo.js"></script>
 
 
 </body>

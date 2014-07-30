@@ -2,6 +2,9 @@ var http = require('http'),
     https = require('https'),
     url = require("url"),
     async = require('async'),
+    optional = require('optional'),
+    domain = require('domain'),
+    ffprobe = optional('node-ffprobe'),
     nerd = require('./nerdify'),
     db = require('./database'),
     ts = require('./linkedTVconnection'),
@@ -9,6 +12,11 @@ var http = require('http'),
     utils = require('./utils');
 
 var LOG_TAG = '[VIDEO.JS]: ';
+var hStatusValue = {
+    'IN_PROGRESS': 1,
+    'DONE': 2
+};
+
 var time1d = 86400000; //one day
 ts.prepare();
 
@@ -39,7 +47,7 @@ function viewVideo(req, res, video) {
     };
 
     // Prepare nerd entity part
-    if (!enriched || !video.metadata.timedtext) {
+    if (!enriched || !video.timedtext) {
         // enrichment is not requested or we can not enrich
         renderVideo(res, video, options);
     } else if (video.entities && containsExtractor(video.entities, enriched)) {
@@ -61,6 +69,9 @@ function viewVideo(req, res, video) {
 }
 
 function renderVideo(res, video, options) {
+    if (video.timedtext) {
+        video.subtitles = srtToJson(video.timedtext, video.chapters);
+    }
     var source = mergeObj(video, options);
     res.render('video.ejs', source);
 }
@@ -90,14 +101,16 @@ exports.view = function (req, res) {
 
                 //2. search metadata with vendor's api
                 getMetadata(video, function (err, metadata) {
+                    var chapters;
+
                     if (err) {
                         console.log(LOG_TAG + 'Metadata retrieved with errors.');
                     }
                     if (!metadata) {
                         console.log(LOG_TAG + 'Metadata unavailable.');
                     } else {
-                        var oldmetadata = video.metadata || {};
-                        video.metadata = mergeObj(oldmetadata, metadata);
+                        video.metadata = metadata;
+
                     }
 
                     //3. write in db
@@ -113,7 +126,18 @@ exports.view = function (req, res) {
                 });
             });
         }
-        viewVideo(req, res, video);
+
+        if (video.hotspotStatus == hStatusValue.IN_PROGRESS) {
+            checkHotspotResults(video.uuid, function (err, data) {
+                if (data) {
+                    video.hotspotStatus = hStatusValue.DONE;
+                    video.hotspots = data;
+                }
+                viewVideo(req, res, video);
+            });
+        } else {
+            viewVideo(req, res, video);
+        }
     });
 
 };
@@ -208,10 +232,29 @@ exports.search = function (req, resp) {
                     if (!metadata) {
                         console.log(LOG_TAG + 'Metadata unavailable.');
                     } else {
-                        var oldmetadata = video.metadata || {};
-                        video.metadata = mergeObj(oldmetadata, metadata);
+                        video.metadata = metadata;
                     }
 
+                    if (video.ltv_uuid && video.chapters) {
+                        var chapters = [];
+                        for (var c in video.chapters) {
+                            if (!video.chapters.hasOwnProperty(c))
+                                continue;
+                            var cur_chap = video.chapters[c];
+                            // ipotesys: chapter timing is in seconds
+                            var chap = {
+                                source: 'data.linkedtv.eu',
+                                startNPT: cur_chap.tStart.value,
+                                endNPT: cur_chap.tEnd.value,
+                                chapNum: c,
+                                uuid: data.uuid,
+                                chapterUri: cur_chap.chapter.value,
+                                mediaFragmentUri: cur_chap.mediafragment.value
+                            };
+                            chapters.push(chap);
+                        }
+                        video.chapters = chapters;
+                    }
                     //3. write in db
                     db.insertVideo(video, function (err, data) {
                         if (err) {
@@ -225,11 +268,8 @@ exports.search = function (req, resp) {
                         resp.redirect(redirectUrl);
                     });
                 });
-
             });
         });
-
-
     });
 };
 
@@ -238,7 +278,6 @@ exports.search = function (req, resp) {
  *
  * Generate an html in response.
  */
-
 exports.nerdify = function (req, res) {
     var uuid = req.query.uuid;
     var ext = req.query.enriched;
@@ -276,9 +315,9 @@ exports.nerdify = function (req, res) {
 function getEntities(video, ext, callback) {
     console.log('nerdifing video ' + video.uuid + ' with ' + ext);
     var doc_type, text;
-    if (video.metadata.timedtext) {
+    if (video.timedtext) {
         doc_type = 'timedtext';
-        text = video.metadata.timedtext;
+        text = video.timedtext;
     } else {
         doc_type = 'text';
         text = video.metadata.descr;
@@ -311,9 +350,7 @@ function getMetadataFromSparql(video, callback) {
                 callback(false, sparql_data);
                 return;
             }
-            sparql_data.metadata = {
-                timedtext: data
-            };
+            sparql_data.timedtext = data;
             callback(err, sparql_data);
         });
     });
@@ -321,10 +358,10 @@ function getMetadataFromSparql(video, callback) {
 
 function getMetadata(video, callback) {
     if (!video.vendor || !video.vendor_id) {
-        callback(true);
+        callback({'message': 'Not vendor or id available'});
         return;
     }
-    var metadata = {};
+    var metadata = video.metadata || {};
     var vendor = vendors[video.vendor];
     var metadata_url = vendor.metadata_url.replace('<id>', video.vendor_id);
 
@@ -363,7 +400,7 @@ function getMetadata(video, callback) {
                         if (err) {
                             console.log('[ERROR] on retrieving sub for ' + video.locator);
                         } else {
-                            metadata.timedtext = data;
+                            video.timedtext = data;
                         }
                         async_callback(false);
                     });
@@ -411,7 +448,7 @@ function getMetadata(video, callback) {
                                 if (err) {
                                     console.log('[ERROR] on retrieving sub for ' + video.locator);
                                 } else {
-                                    metadata.timedtext = data;
+                                    video.timedtext = data;
                                 }
                                 async_callback(false);
                             });
@@ -461,18 +498,50 @@ function getMetadata(video, callback) {
 
                 var subUrl = vendors['ted'].sub_url.replace('<id>', video.vendor_id);
 
-//                console.log("retrieving subs from " + subUrl);
-                http.getJSON(subUrl, function (err, data) {
-                    if (!err && data) {
-                        metadata.timedtext = jsonToSrt(data);
-                    } else {
-                        console.log('[ERROR ' + err + '] on retrieving sub for ' + video.locator);
-                    }
-                    callback(false, metadata);
-                });
+                async.parallel([
+                        function (async_callback) {
+                            http.getJSON(subUrl, function (err, data) {
+                                video.jsonSub = data;
+                                if (err) {
+                                    console.log('[ERROR ' + err + '] on retrieving sub for ' + video.locator);
+                                }
+                                async_callback(err, data);
+                            });
+                        },
+                        function (async_callback) {
+                            // get video duration
+                            if (ffprobe) {
+                                var d = domain.create();
+                                d.on('error', function (err) {
+                                    console.warn('' + err);
+                                    console.warn("Maybe you have not installed ffmpeg or ffmpeg is not in your \"Path\" Environment variable.");
+//                                    async_callback(false);
+                                });
+                                d.run(function () {
+                                    ffprobe(video.videoLocator, function (err, probeData) {
+                                        if (err) {
+                                            console.log(err);
+                                            return;
+                                        }
+                                        if (probeData && probeData.format) {
+                                            video.duration = probeData.format.duration;
+                                        }
+                                        async_callback(false)
+                                    });
+                                });
+                            }
+                        }
+                    ],
+                    function (err) {
+                        if (!err) {
+                            video.chapters = getTedChapters(video.jsonSub, video.duration)
+                            video.timedtext = jsonToSrt(video.jsonSub);
+                        }
+                        callback(false, metadata);
+                    });
             });
             break;
-        default :
+        default:
             callback(true, 'Vendor undefined or not recognized');
     }
 }
@@ -504,6 +573,46 @@ function getSubtitlesTV2RDF(uuid, callback) {
     http.getRemoteFile('http://linkedtv.eurecom.fr/tv2rdf/api/mediaresource/' + uuid + '/metadata?metadataType=subtitle', callback);
 }
 
+function getTedChapters(json, totDuration) {
+    var cur_chap = {"startNPT": 0,
+        "source": 'api.ted.com',
+        "chapNum": 0};
+    var cursub;
+    var chapters = [];
+    var chapNum = 1;
+    var sub_offset = json._meta.preroll_offset;
+
+    var oldkey = 0;
+    for (var key in json) {
+        if (json.hasOwnProperty(key) && key != '_meta') {
+            cursub = json[key].caption;
+
+            var isStartOfChap = cursub.startOfParagraph;
+            if (isStartOfChap) {
+                var sub_startTime = cursub.startTime;
+                var thisChapStart = (sub_offset + sub_startTime) / 1000;
+                cur_chap.endNPT = thisChapStart;
+                chapters.push(cur_chap);
+
+                if (parseInt(key) == parseInt(oldkey) + 1) {
+                    chapters.pop();
+                } else {
+                    cur_chap = {
+                        "startNPT": thisChapStart,
+                        "source": 'api.ted.com',
+                        "chapNum": chapNum
+                    };
+                    ++chapNum;
+                }
+                oldkey = key;
+            }
+        }
+    }
+    var lasSubEnd = (sub_offset + cursub.startTime + cursub.duration) / 1000;
+    cur_chap.endNPT = totDuration ? totDuration : lasSubEnd;
+    chapters.push(cur_chap);
+    return chapters;
+}
 
 /*
  * This function translate subtitles from TED json to srt
@@ -526,6 +635,104 @@ function jsonToSrt(json) {
         }
     }
     return encodeUTF(mysrt);
+}
+
+/* from srt to a json ready to be used in render */
+function srtToJson(srt, chapters) {
+    var strList = srt.split('\n\n'), subList = [];
+    if (strList.length < 2) {
+        strList = srt.substr(1).split('\n\r');
+    }
+    var charIndex = -1;
+
+    function calcTime(subTime) {
+        var time = (subTime.split(":"));
+        var hh = parseInt(time[0]);
+        var mm = parseInt(time[1]);
+        var ss = parseFloat(time[2].replace(",", "."));
+
+        return ((mm * 60) + (hh * 3600) + ss);
+    }
+
+    for (var index in strList) {
+        if (!strList.hasOwnProperty(index))continue;
+
+        var sub = {text: '', lineNum: 0};
+        var lines = strList[index].split('\n');
+
+        for (var l in lines) {
+            if (!lines.hasOwnProperty(l))continue;
+            var line = lines[l];
+            if (!sub.id) {
+                sub.id = line.trim();
+            } else if (!sub.time) {
+                sub.time = line.replace('\r', '');
+                var timeSplit = sub.time.split(' --> ');
+                var subStart = calcTime(timeSplit[0]);
+                sub.startSS = Math.round(subStart * 1000) / 1000;
+                var subEnd = calcTime(timeSplit[1]);
+                sub.endSS = Math.round(subEnd * 1000) / 1000;
+            } else {
+                var start = sub.lineNum > 0 ? '\n' : '';
+                sub.text += start + line;
+                sub.lineNum++;
+            }
+        }
+
+        sub.startChar = charIndex + 1;
+        charIndex = sub.startChar + sub.text.length; //because of a '\n' is a fake double char
+        sub.endChar = charIndex;
+        if (sub.id)
+            subList.push(sub);
+    }
+
+    if (chapters) {
+        var subIndex = 0;
+
+        for (var k in chapters) {
+            if (!chapters.hasOwnProperty(k))continue;
+
+            var chap = chapters[k];
+            var chapStart, chapEnd;
+            if (chap.tStart) {
+                chapStart = Math.round(chap.tStart.value);
+                chapEnd = Math.round(chap.tEnd.value);
+            } else {
+                chapStart = chap.startNPT;
+                chapEnd = chap.endNPT;
+            }
+
+            while (subIndex < subList.length) {
+                var thisSub = subList[subIndex];
+                thisSub.chapNum = k;
+                if (!thisSub.id || thisSub.id == "") {
+                    ++subIndex;
+                } else {
+                    var sEnd = thisSub.endSS;
+                    if (chapStart > sEnd) {
+                        //chapter not yet started: go next sub
+                        subIndex++;
+                    } else if (chapStart <= sEnd && chapEnd >= sEnd) {
+                        //we are in a chapter: save this info and go next sub
+//                                        thisSub.dataChap = ' data-chapter=' + c.chapter.value.replace("http://data.linkedtv.eu/chapter/", "");
+                        thisSub.dataChap = ' data-chapter=' + k;
+                        subIndex++;
+                    } else {
+                        //chapter ends: go next chapter
+                        if (subIndex > 0) {
+                            subList[subIndex - 1].endChap = true;
+                        }
+                        break;
+                    }
+                }
+            }
+
+        }
+        subList[subList.length - 1].endChap = true;
+    }
+
+
+    return subList;
 }
 
 function subTime(time) {
@@ -696,8 +903,9 @@ if (typeof String.prototype.startsWith != 'function') {
 }
 
 exports.buildDb = function (req, res) {
-    var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=100&filter=id:>';
-    var limitQps = 10200;
+    var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=100&externals=false&filter=id:>';
+    var retrieveNerd = false;
+    var limitQps = retrieveNerd ? 10200 : 2200;
     loadList(0);
 
     function loadList(index) {
@@ -736,7 +944,7 @@ exports.buildDb = function (req, res) {
                         index = String(talk.id);
 
                         db.getVideoFromVendorId('ted', index, function (err, data) {
-                            if (!err && data && (data.entities || !data.metadata.timedtext)) { //video already in db
+                            if (!err && data && (data.entities || !data.timedtext)) { //video already in db
                                 talksLoop();
                                 return;
                             }
@@ -772,18 +980,17 @@ exports.buildDb = function (req, res) {
                 console.log(LOG_TAG + 'Metadata retrieved with errors.');
                 console.log(LOG_TAG + err);
             }
+
             if (!metadata) {
                 console.log(LOG_TAG + 'Metadata unavailable.');
-            } else {
-                video.metadata = metadata;
             }
 
             var fun = uuid ? db.updateVideo : db.insertVideo;
 
             fun(video, function (err, doc) {
                 //nerdify
-                if (doc.metadata.timedtext) {
-                    nerd.getEntities('timedtext', doc.metadata.timedtext, 'textrazor', function (err, data) {
+                if (retrieveNerd && doc.timedtext) {
+                    nerd.getEntities('timedtext', doc.timedtext, 'textrazor', function (err, data) {
                         if (err || !data) {
                             console.log(LOG_TAG + 'Error in nerd retrieving for ' + doc.locator);
                             console.log(err);
@@ -807,12 +1014,452 @@ function hasExtractor(ent) {
         return ent.source == "combined";
     return ent.extractor == this;
 }
+
 function containsExtractor(array, ext) {
-    var filtered = array.filter(hasExtractor,ext);
+    var filtered = array.filter(hasExtractor, ext);
     if (ext != "combined") {
         filtered = filtered.filter(function (ent) {
             return ent.source != "combined";
         });
     }
     return filtered.length > 0;
+}
+
+exports.runHotspot = function (req, res) {
+    var uuid = req.param('uuid');
+    db.getHotspotProcess(uuid, function (e, status) {
+        if (e) {
+            console.log("DB Error: " + e.message);
+            res.json({error: {code: 500, message: e.message}});
+            return;
+        }
+
+        if (!status) {
+            runHotspotProcess(uuid, function (err, data) {
+                if (err) {
+                    console.log("Error: " + err.message);
+                    res.json({error: {code: 500, message: err.message}});
+                    return;
+                }
+//                res.json({done: true});
+                res.render('hp_resp.ejs', data);
+            });
+        } else res.json({done: true});
+
+    });
+};
+
+function runHotspotProcess(uuid, callback) {
+    db.getVideoFromUuid(uuid, true, function (err, video) {
+        if (err || !video) {
+            callback(err, video);
+            return;
+        }
+
+        var srt = new Buffer(video.timedtext, 'utf-8');
+        var queryString = '?videoURL=' + video.locator + '&UUID=' + video.uuid + '&visualAnalysis=false&chapterList=';
+        var first = true;
+        video.chapters.forEach(function (c) {
+            if (first)
+                first = false;
+            else
+                queryString += '%23';
+            queryString += c.startNPT + ',' + c.endNPT;
+        });
+        console.log(queryString);
+        var post_options = {
+            host: 'linkedtv.eurecom.fr',
+            port: '80',
+            path: '/tedtalks/api/hotspots/generate' + queryString,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain',
+                'Content-Length': srt.length
+            }
+        };
+
+        var d = domain.create();
+        d.on('error', function (err) {
+            console.warn('' + err);
+            callback({'message': 'internal error'});
+        });
+        d.run(function () {
+            // Set up the request
+            var data = '';
+            var post_req = http.request(post_options, function (res) {
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    data += chunk;
+                    if (data.toLowerCase().indexOf('internal error') != -1) {
+                        callback({'message': 'Internal error'});
+                    }
+                });
+                res.on('end', function (err) {
+                    if (err) {
+                        callback(err);
+                        return;
+                    }
+//                    db.setHotspotProcess(uuid, hStatusValue.IN_PROGRESS, callback);
+                    var results = JSON.parse(data);
+                    if (results && results.hp_list) {
+                        video.hotspots = results.hp_list;
+                        video.hotspotStatus = 2;
+
+                        callback(false, video);
+
+                        // we do not save nothing, so that hotspots are ever coming from server
+//                        db.addHotspots(uuid, results.hp_list, function (err) {
+//                            if (err) {
+//                                callback(err);
+//                                return;
+//                            }
+//                            db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
+//                                callback(err, results.hp_list);
+//                            });
+//                        });
+                    } else {
+                        callback(true, false);
+                    }
+
+                });
+            });
+
+            // post the data
+            post_req.write(srt);
+            post_req.end();
+        });
+    });
+}
+
+function checkHotspotResults(uuid, callback) {
+    console.log("check Hotspot Results");
+    /* Call to services */
+    //fake results
+    var results = {
+        //"UUID":"c1851285-972f-4c30-a7fd-1d6b704bb471",
+//        "hp_list"
+        "hotspots": [
+            {
+                "startNPT": 41.375999450683594,
+                "endNPT": 72.91999816894531,
+                "topic_list": [
+                    {
+                        "label": "Terrorism",
+                        "relevance": 0.9563,
+                        "url": "http://en.wikipedia.org/Terrorism",
+                        "frequency": 1,
+                        "inverseFrequency": 0,
+                        "finalScore": 1.9126
+                    },
+                    {
+                        "label": "Federal Bureau of Investigation",
+                        "relevance": 1.0,
+                        "url": "http://en.wikipedia.org/Federal_Bureau_of_Investigation",
+                        "frequency": 0,
+                        "inverseFrequency": 0,
+                        "finalScore": 1.0
+                    },
+                    {
+                        "label": "Homegrown terrorism",
+                        "relevance": 0.660215,
+                        "url": "http://en.wikipedia.org/Homegrown_terrorism",
+                        "frequency": 0,
+                        "inverseFrequency": 0,
+                        "finalScore": 0.660215
+                    },
+                    {
+                        "label": "Fear",
+                        "relevance": 0.2867,
+                        "url": "http://en.wikipedia.org/Fear",
+                        "frequency": 1,
+                        "inverseFrequency": 0,
+                        "finalScore": 0.5734
+                    }
+                ],
+                "entity_list": [
+                    {
+                        "idEntity": 0,
+                        "label": "FBI",
+                        "startChar": 542,
+                        "endChar": 545,
+                        "extractorType": "DBpedia:Agent,Organisation;Freebase:/book/book_subject,/government/government_agency,/business/employer,/projects/project_participant,/fictional_universe/fictional_employer,/dataworld/data_provider,/fictional_universe/fictional_organization,/government/governmental_body,/organization/organization",
+                        "nerdType": "http://nerd.eurecom.fr/ontology#Organization",
+                        "confidence": 5.38761,
+                        "relevance": 0.497684,
+                        "startNPT": 44.376,
+                        "endNPT": 46.413,
+                        "uri": "http://en.wikipedia.org/wiki/Federal_Bureau_of_Investigation",
+                        "inverseFrequency": 1,
+                        "finalScore": 0.497684
+                    },
+                    {
+                        "idEntity": 0,
+                        "label": "FBI",
+                        "startChar": 931,
+                        "endChar": 934,
+                        "extractorType": "DBpedia:Agent,Organisation;Freebase:/book/book_subject,/government/government_agency,/business/employer,/projects/project_participant,/fictional_universe/fictional_employer,/dataworld/data_provider,/fictional_universe/fictional_organization,/government/governmental_body,/organization/organization",
+                        "nerdType": "http://nerd.eurecom.fr/ontology#Organization",
+                        "confidence": 5.38761,
+                        "relevance": 0.497684,
+                        "startNPT": 67.429,
+                        "endNPT": 69.342,
+                        "uri": "http://en.wikipedia.org/wiki/Federal_Bureau_of_Investigation",
+                        "inverseFrequency": 1,
+                        "finalScore": 0.497684
+                    },
+                    {
+                        "idEntity": 0,
+                        "label": "FBI\u0027s",
+                        "startChar": 931,
+                        "endChar": 936,
+                        "extractorType": "DBpedia:Agent,Organisation;Freebase:/book/book_subject,/government/government_agency,/business/employer,/projects/project_participant,/fictional_universe/fictional_employer,/dataworld/data_provider,/fictional_universe/fictional_organization,/government/governmental_body,/organization/organization",
+                        "nerdType": "http://nerd.eurecom.fr/ontology#Organization",
+                        "confidence": 1.2213,
+                        "relevance": 0.497684,
+                        "startNPT": 67.429,
+                        "endNPT": 69.342,
+                        "uri": "http://en.wikipedia.org/wiki/Federal_Bureau_of_Investigation",
+                        "inverseFrequency": 0,
+                        "finalScore": 0.497684
+                    },
+                    {
+                        "idEntity": 0,
+                        "label": "FBI agents",
+                        "startChar": 542,
+                        "endChar": 552,
+                        "extractorType": "DBpedia:Agent,Organisation;Freebase:/book/book_subject,/government/government_agency,/business/employer,/projects/project_participant,/fictional_universe/fictional_employer,/dataworld/data_provider,/fictional_universe/fictional_organization,/government/governmental_body,/organization/organization",
+                        "nerdType": "http://nerd.eurecom.fr/ontology#Organization",
+                        "confidence": 4.70778,
+                        "relevance": 0.452969,
+                        "startNPT": 44.376,
+                        "endNPT": 46.413,
+                        "uri": "http://en.wikipedia.org/wiki/Federal_Bureau_of_Investigation",
+                        "inverseFrequency": 1,
+                        "finalScore": 0.452969
+                    }
+                ],
+                "visualConcept_list": [  ]
+            },
+            {
+                "startNPT": 146.2760009765625,
+                "endNPT": 188.3470001220703,
+                "topic_list": [
+                    {
+                        "label": "Law",
+                        "relevance": 0.396366,
+                        "url": "http://en.wikipedia.org/Category:Law",
+                        "frequency": 3,
+                        "inverseFrequency": 0,
+                        "finalScore": 1.585464
+                    },
+                    {
+                        "label": "Eco-terrorism",
+                        "relevance": 0.712097,
+                        "url": "http://en.wikipedia.org/Eco-terrorism",
+                        "frequency": 1,
+                        "inverseFrequency": 0,
+                        "finalScore": 1.424194
+                    },
+                    {
+                        "label": "Criminal law",
+                        "relevance": 0.680863,
+                        "url": "http://en.wikipedia.org/Category:Criminal_law",
+                        "frequency": 0,
+                        "inverseFrequency": 0,
+                        "finalScore": 0.680863
+                    },
+                    {
+                        "label": "Terrorism",
+                        "relevance": 0.300221,
+                        "url": "http://en.wikipedia.org/Terrorism",
+                        "frequency": 1,
+                        "inverseFrequency": 0,
+                        "finalScore": 0.600442
+                    },
+                    {
+                        "label": "Violence",
+                        "relevance": 0.231538,
+                        "url": "http://en.wikipedia.org/Violence",
+                        "frequency": 1,
+                        "inverseFrequency": 0,
+                        "finalScore": 0.463076
+                    }
+                ],
+                "entity_list": [
+                    {
+                        "idEntity": 0,
+                        "label": "terrorists",
+                        "startChar": 2340,
+                        "endChar": 2350,
+                        "extractorType": "Freebase:/film/film_subject,/organization/organization_type,/media_common/quotation_subject,/fictional_universe/fictional_organization_type,/book/book_subject,/education/field_of_study",
+                        "nerdType": "http://nerd.eurecom.fr/ontology#Organization",
+                        "confidence": 1.74152,
+                        "relevance": 0.518995,
+                        "startNPT": 161.287,
+                        "endNPT": 163.425,
+                        "uri": "http://en.wikipedia.org/wiki/Terrorism",
+                        "inverseFrequency": 1,
+                        "finalScore": 0.518995
+                    },
+                    {
+                        "idEntity": 0,
+                        "label": "animal cruelty",
+                        "startChar": 2553,
+                        "endChar": 2567,
+                        "extractorType": "null",
+                        "nerdType": "http://nerd.eurecom.fr/ontology#Thing",
+                        "confidence": 3.64763,
+                        "relevance": 0.340285,
+                        "startNPT": 176.487,
+                        "endNPT": 179.747,
+                        "uri": "http://en.wikipedia.org/wiki/Cruelty_to_animals",
+                        "inverseFrequency": 0,
+                        "finalScore": 0.340285
+                    },
+                    {
+                        "idEntity": 0,
+                        "label": "nonviolent",
+                        "startChar": 2315,
+                        "endChar": 2325,
+                        "extractorType": "Freebase:/film/film_subject,/organization/organization_sector,/media_common/quotation_subject,/book/book_subject",
+                        "nerdType": "http://nerd.eurecom.fr/ontology#Organization",
+                        "confidence": 3.39831,
+                        "relevance": 0.337412,
+                        "startNPT": 158.598,
+                        "endNPT": 161.287,
+                        "uri": "http://en.wikipedia.org/wiki/Nonviolence",
+                        "inverseFrequency": 0,
+                        "finalScore": 0.337412
+                    },
+                    {
+                        "idEntity": 0,
+                        "label": "police",
+                        "startChar": 2254,
+                        "endChar": 2260,
+                        "extractorType": "Freebase:/film/film_subject,/organization/organization_sector,/tv/tv_genre,/book/book_subject,/film/film_genre,/media_common/media_genre,/interests/collection_category,/organization/organization_type,/media_common/quotation_subject,/fictional_universe/fictional_organization_type",
+                        "nerdType": "http://nerd.eurecom.fr/ontology#Organization",
+                        "confidence": 1.13486,
+                        "relevance": 0.313671,
+                        "startNPT": 155.273,
+                        "endNPT": 158.598,
+                        "uri": "http://en.wikipedia.org/wiki/Police",
+                        "inverseFrequency": 1,
+                        "finalScore": 0.313671
+                    },
+                    {
+                        "idEntity": 0,
+                        "label": "eco-terrorism",
+                        "startChar": 2384,
+                        "endChar": 2397,
+                        "extractorType": "null",
+                        "nerdType": "http://nerd.eurecom.fr/ontology#Thing",
+                        "confidence": 6.85926,
+                        "relevance": 0.830181,
+                        "startNPT": 163.425,
+                        "endNPT": 167.048,
+                        "uri": "http://en.wikipedia.org/wiki/Eco-terrorism",
+                        "inverseFrequency": 3,
+                        "finalScore": 0.276727
+                    }
+                ],
+                "visualConcept_list": [
+
+                ]
+            },
+            {
+                "startNPT": 188.2899932861328,
+                "endNPT": 217.6300048828125,
+                "topic_list": [
+                    {
+                        "label": "Ag-gag",
+                        "relevance": 0.508107,
+                        "url": "http://en.wikipedia.org/Ag-gag",
+                        "frequency": 1,
+                        "inverseFrequency": 0,
+                        "finalScore": 1.016214
+                    },
+                    {
+                        "label": "Prosecutor",
+                        "relevance": 0.30489,
+                        "url": "http://en.wikipedia.org/Prosecutor",
+                        "frequency": 1,
+                        "inverseFrequency": 0,
+                        "finalScore": 0.60978
+                    },
+                    {
+                        "label": "Slaughterhouse",
+                        "relevance": 0.198223,
+                        "url": "http://en.wikipedia.org/Slaughterhouse",
+                        "frequency": 1,
+                        "inverseFrequency": 0,
+                        "finalScore": 0.396446
+                    }
+                ],
+                "entity_list": [
+                    {
+                        "idEntity": 0,
+                        "label": "ag-gag",
+                        "startChar": 2741,
+                        "endChar": 2747,
+                        "extractorType": "null",
+                        "nerdType": "http://nerd.eurecom.fr/ontology#Thing",
+                        "confidence": 4.38494,
+                        "relevance": 0.826092,
+                        "startNPT": 188.347,
+                        "endNPT": 190.685,
+                        "uri": "http://en.wikipedia.org/wiki/Ag-gag",
+                        "inverseFrequency": 0,
+                        "finalScore": 0.826092
+                    },
+                    {
+                        "idEntity": 0,
+                        "label": "Amy Meyer",
+                        "startChar": 2805,
+                        "endChar": 2814,
+                        "extractorType": "DBpedia:Person;Freebase:/people/person",
+                        "nerdType": "http://nerd.eurecom.fr/ontology#Person",
+                        "confidence": 0.5,
+                        "relevance": 0.5,
+                        "startNPT": 192.12,
+                        "endNPT": 193.772,
+                        "uri": "",
+                        "inverseFrequency": 0,
+                        "finalScore": 0.5
+                    },
+                    {
+                        "idEntity": 0,
+                        "label": "Amy",
+                        "startChar": 2820,
+                        "endChar": 2823,
+                        "extractorType": "DBpedia:Person;Freebase:/people/person",
+                        "nerdType": "http://nerd.eurecom.fr/ontology#Person",
+                        "confidence": 0.5,
+                        "relevance": 0.5,
+                        "startNPT": 193.772,
+                        "endNPT": 195.385,
+                        "uri": "",
+                        "inverseFrequency": 0,
+                        "finalScore": 0.5
+                    }
+                ],
+                "visualConcept_list": [
+
+                ]
+            }
+        ]
+    };
+
+    if (results) {
+        db.addHotspots(uuid, results.hotspots, function (err) {
+            if (err) {
+                callback(err);
+                return;
+            }
+            db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
+                callback(err, results.hotspots);
+            });
+        });
+    } else {
+        callback(true, false);
+    }
 }

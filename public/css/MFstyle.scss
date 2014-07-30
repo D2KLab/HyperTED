@@ -1,8 +1,8 @@
 @import "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css";
-//@import "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css";
 @import "font";
 @import "mixins";
 @import "video_player";
+@import "jquery.qtip.min.css";
 
 /* colors */
 $light_gray: #f4f4f4;
@@ -45,14 +45,24 @@ html, body {
   background: white;
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
   margin: 0 0 30px;
+  height: 300px;
   max-height: 40%;
+  min-height: 120px;
   width: 100%;
-
+  @media screen and (max-width: 767px) {
+    max-height: 150px;
+  }
+  position: relative;
   .HTlogo {
+    position: absolute;
+    bottom: 0;
     text-align: center;
-    padding: 10% 0;
-    img {
-      max-width: 40%;
+    padding-bottom: 30px;
+    display: block;
+    width: 100%;
+    .top-brand {
+      margin: auto;
+      display: inline-block;
     }
   }
 }
@@ -72,15 +82,52 @@ html, body {
         padding-right: 20px;
       }
     }
-
+    .logos {
+      //      float: left;
+      img {
+        padding: 4px 20px 4px 0;
+        height: 55px;
+        width: auto;
+      }
+    }
   }
 }
 
+.page_cont {
+  min-height: 100%;
+  position: relative;
+}
+
 .home_footer {
-  max-height: 15%;
-  background: white;
   position: absolute;
   bottom: 0;
+  max-height: 15%;
+  background: white;
+}
+
+.form-switch-cont {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.home_cont {
+  padding-bottom: 90px;
+  form label {
+    color: $medium_gray;
+    font: {
+      weight: 100;
+      size: 1.2em;
+    }
+  }
+}
+
+#basic-form {
+  button {
+    margin-top: 1.3em;
+  }
+  > * {
+    display: block;
+  }
 }
 
 .video_footer {
@@ -195,6 +242,11 @@ $navbarTransitionTime: 100ms;
   }
   .logo-text {
     width: 119px;
+  }
+  &.long {
+    .logo-text {
+      width: auto;
+    }
   }
   .left-mark, .right-mark {
     width: 56px;
@@ -342,28 +394,123 @@ h1.title {
   #player-container {
     min-height: 20%;
     overflow: hidden;
-    width: 100%;
 
     #video {
       width: 100%;
       min-height: 360px;
-      @media (min-width: 768px) {
-        padding-left: 10em;
 
+      .mejs-inner {
+        cursor: pointer;
+
+      }
+      @media (min-width: 768px) {
         .mejs-container {
           position: static;
           margin: auto;
-
+          width: 100%;
+          height: auto;
+        }
+      }
+    }
+    #hotspots-cont {
+      padding-bottom: 15px;
+      form, .hsProgress {
+        text-align: center;
+        .btn-hotspot {
+          text-align: center;
+          background: #000000;
+          border: 1px solid $light_gray;
+          color: $light_gray;
+          outline: 0;
+          opacity: 1;
+          height: 34px;
+          @include border-radius(10px);
+          @include transition(width, 500ms);
+          &:hover, &:active {
+            background: $dark_red;
+          }
+          p {
+            display: inline-block;
+            opacity: 0;
+            @include transition(all, 500ms);
+          }
+        }
+      }
+      .hscont {
+        margin-left: 65px;
+        margin-right: 65px;
+        @media(max-width: 768px) {
+          width: 508px;
+          margin-right: 0;
+        }
+        .pin {
+          @include border-radius-bottom(10px);
+          text-align: center;
+          cursor: pointer;
+          float: left;
+          display: none;
+          border-bottom: 1px solid $light_gray;
+          position: relative;
+          top: -10px;
+          z-index: 101;
+          min-height: 26px;
+          img {
+            position: absolute;
+            left: -10px;
+          }
         }
       }
     }
   }
 }
 
+.qtipEnt, .qtipTitle {
+  display: none;
+}
+
+.qtip-light {
+  padding-bottom: 15px;
+
+  .qtip-titlebar {
+    margin-bottom: 15px;
+    padding: 8px 15px;
+    background: $dark_red;
+    color: $light_gray;
+    text-align: center;
+    .glyphicon {
+      color: $light_gray;
+      font-size: 0.9em;
+
+    }
+
+  }
+  .qtip-content {
+    text-align: center;
+    max-width: 190px;
+  }
+}
+
+.topic-cont {
+
+  .topic {
+    font-weight: 700;
+    display: block;
+    a {
+      color: $darker_gray;
+    }
+  }
+}
+
+.btn-danger {
+  background: $dark_red;
+  @include border-radius(10px);
+
+}
+
 .chap-label {
+  margin-bottom: 10px;
   color: $medium_gray;
   min-height: 20px;
-  margin-top: 10px;
   text-align: center;
   span {
     display: inline-block;
@@ -383,54 +530,52 @@ h1.title {
 }
 
 .chap-line {
-  min-height: 32px;
+  min-height: 35px;
   margin: 20px 50px 20px 50px;
   text-align: center;
-  //  border: 1px solid $dark_red;
-  @include border-radius(8px);
+  @media(max-width: 768px) {
+    width: 508px;
+    margin-right: 0;
+  }
 
   .chap-link {
-    -webkit-transition: background-color 300ms;
-    -moz-transition: background-color 300ms;
-    -ms-transition: background-color 300ms;
-    transition: background-color 300ms;
+    @include transition(background-color, 300ms);
+    @include transition(width, 300ms);
     position: relative;
-    height: 30px;
+    height: 15px;
     background-color: $dark_red;
-    border-left: 4px solid $light_gray;
+    border-left: 2px solid $light_gray;
     &:nth-child(odd) {
       background-color: $ted_red;
     }
     float: left;
+    text-align: center;
 
-    &:first-child {
-      @include border-radius-left(8px);
-      border-left: none;
-    }
-    &:last-child {
-      @include border-radius-right(8px);
-    }
-
-    .chap-num {
-      color: #940000;
-      font-weight: 700;
-      margin-bottom: 4px;
-      text-shadow: 1px -1px 4px $light_gray;
-      border-radius: 10px;
-      //      width: 20px;
-      //      background-color: white;
-      //      text-align: center;
+    .chapNum-cont {
+      overflow: hidden;
+      .chap-num {
+        @include border-radius(10px);
+        background-color: #ffffff;
+        display: none;
+        padding: 4px;
+        color: $dark_red;
+        font-weight: 700;
+        @media (max-width: 768px) {
+          display: none;
+        }
+      }
     }
 
     .chap-timing {
       position: absolute;
+      min-height: 32px;
       height: 100%;
       bottom: 0;
       width: 0;
       margin-left: 50%;
-      background-color: #dfafaa;
+      background-color: #f4f4f4;
       opacity: 0.8;
-      color: #dfafaa;
+      color: #f4f4f4;
       overflow: hidden;
       -webkit-transition: width 200ms, margin 200ms, color 1s;
       -moz-transition: width 200ms, margin 200ms, color 1s;
@@ -451,6 +596,7 @@ h1.title {
     }
     &:hover {
       .chap-timing {
+
         z-index: 2;
         @include box-shadow(0, 2px, 8px, 0, $dark_gray);
       }
@@ -586,12 +732,21 @@ span.wiki {
 }
 
 #video-info-chapters {
-  background: #fff;
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
+  display: none;
+  background: #fff;
   width: 100%;
+  //max-height: 265px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  @media(max-width: 860px) {
+    max-height: 350px;
+  }
+
   .play-video-info {
     padding: 20px;
     margin-top: 0;
+    border-top: 1px solid $light_gray;
 
     .left {
       float: left;
@@ -606,14 +761,16 @@ span.wiki {
       }
     }
     .right {
+      max-height: 130px;
       float: right;
       display: inline-block;
       width: 50%;
       border-left: 1px solid $dark_red;
       padding-left: 2%;
-
+      overflow-y: auto;
       @media(max-width: 860px) {
         width: 100%;
+        max-height: 90px;
         border-top: 1px solid $dark_red;
         border-left: 0;
       }
@@ -686,11 +843,11 @@ p {
       display: inline-block;
       @include transition(transform, 0.5s);
       -webkit-transition: -webkit-transform 0.5s; /* For Safari 3.1 to 6.0 */
-
     }
 
     &:hover span {
       -webkit-transform: translate(0px, -10px); /* Chrome, Safari, Opera */
+      @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
     }
   }
 }
@@ -700,14 +857,29 @@ p {
 }
 
 .entity {
+  @include border-radius(5px);
+  @include border-box-sizing;
+  cursor: pointer;
+  padding: 3px;
+  color: #ffffff;
+
   &.list {
     margin-left: 24px;
   }
-  cursor: pointer;
-  @include border-radius(5px);
-  @include border-box-sizing;
-  padding: 3px;
-  color: #ffffff;
+  &.pinEnt {
+    display: inline-block;
+    max-width: 80%;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+  }
+  &.hotspotEnt {
+    line-height: 2em;
+    margin-top: 0.5em;
+    padding-top: 0;
+    padding-bottom: 0;
+    display: inline-block;
+  }
 
   a {
     color: #ffffff;
@@ -791,13 +963,11 @@ p {
 .button-cont {
   text-align: right;
   clear: both;
-  margin-top: -45px;
   margin-bottom: 15px;
 }
 
 #sub-cont {
   clear: both;
-  margin-bottom: 40px;
 }
 
 .sub-text {

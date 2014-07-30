@@ -1,0 +1,97 @@
+<div class="hscont clearfix">
+
+    <%
+    function labelTime(time) {
+        var hh = Math.floor(time / 3600);
+        hh = hh < 10 ? '0' + hh : hh;
+        var mm = Math.floor((time % 3600) / 60);
+        mm = mm < 10 ? '0' + mm : mm;
+        var ss = Math.floor((time % 3600) % 60);
+        ss = ss < 10 ? '0' + ss : ss;
+
+        return hh + ':' + mm + ':' + ss;
+    }
+
+    function calcPinWidth(startT, endT) {
+        var totWidth = (locals.duration);
+        return((endT - startT) / totWidth) * 100;
+    }
+
+
+
+            switch (locals.hotspotStatus){
+    case 1:
+    %>
+    <div class="hsProgress">
+        <h3 class="title">hotspot creation in progress</h3>
+    </div>
+    <%
+        break;
+    case 2:
+        locals.hotspots.sort(
+                function SortByStart(x, y) {
+                    return ((x.startNPT == y.startNPT) ? 0 : ((x.startNPT > y.startNPT) ? 1 : -1 ));
+                });
+            locals.hotspots.forEach(function(h){
+    %>
+
+    <div class="pin" <% if(locals.duration){ %> style="width:<%= calcPinWidth(h.startNPT, h.endNPT) %>%" <% } %>>
+
+    <a data-start-time="<%= h.startNPT %>" data-end-time="<%= h.endNPT %>">
+
+        <img src="../img/pin.png"/>
+        <%
+        if(h.entity_list.length > 0){
+            h.entity_list.sort(
+                    function SortByRelevance(x, y) {
+                        return ((x.relevance == y.relevance) ? 0 : ((x.relevance < y.relevance) ? 1 : -1 ));
+                    });
+        %>
+        <span class="entity <%= h.entity_list[0].nerdType.toLowerCase().split("#").slice(1) %> pinEnt"><%= h.entity_list[0].label %></span>
+        <% } %>
+    </a>
+
+    <div class="qtipTitle">
+            <span class="toolTipTitle">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                <%= labelTime(h.startNPT) %> - <%= labelTime(h.endNPT) %>
+                <span class="glyphicon glyphicon-chevron-right"></span>
+                </span>
+    </div>
+
+    <div class="qtipEnt">
+        <div class="topic-cont">
+            <%
+                h.topic_list.sort(
+                        function SortByRelevance(x, y) {
+                            return ((x.relevance == y.relevance) ? 0 : ((x.relevance < y.relevance) ? 1 : -1 ));
+                        });
+
+                    h.topic_list.forEach(function(tl){ %>
+
+            <span class="topic"><a href="<%= tl.url %>" target="_blank"><%= tl.label %></a></span>
+            <% }); %>
+        </div>
+
+        <hr class="red_rule">
+
+        <%
+        h.entity_list.forEach(function(el){ %>
+
+        <span class="entity hotspotEnt <%= el.nerdType.toLowerCase().split("#").slice(1) %>"><a href="<%= el.uri %>"
+                                                                                                target="_blank"><%= el.label %></a></span>
+        <% }); %>
+    </div>
+</div>
+
+<% });
+    break;
+default:
+%>
+<form method="get" id="hotspot-form" action="../runhotspot">
+    <input type="hidden" name="uuid" value="<%= locals.uuid %>">
+    <button class="btn btn-hotspot" type="submit">GENERATE HOTSPOTS</button>
+</form>
+<% } %>
+
+</div>
