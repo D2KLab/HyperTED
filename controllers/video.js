@@ -602,7 +602,7 @@ function getFickleMetadata(video, callback) {
                 metadata.comments = data.comments_total;
                 metadata.likes = data.ratings_total;
                 metadata.avgRate = data.rating;
-                metadata.published = '' + moment.unix(data.created_time).format("DD/MM/YYYY");
+                metadata.published = '' + moment.unix(data.created_time).format("YYYY-MM-DD");
                 metadata.category = data.genre;
                 onSuccessMetadataJson(err, metadata);
             });
