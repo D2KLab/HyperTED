@@ -4,6 +4,7 @@ var http = require('http'),
     async = require('async'),
     optional = require('optional'),
     domain = require('domain'),
+    moment = require('moment'),
     ffprobe = optional('node-ffprobe'),
     nerd = require('./nerdify'),
     db = require('./database'),
@@ -421,7 +422,7 @@ function getMetadata(video, callback) {
                         metadata.comments = data.comments_total;
                         metadata.likes = data.ratings_total;
                         metadata.avgRate = data.rating;
-                        metadata.published = data.created_time;
+                        metadata.published = data.created_time + '';
                         metadata.category = data.genre;
                         async_callback(false);
 
@@ -601,9 +602,8 @@ function getFickleMetadata(video, callback) {
                 metadata.comments = data.comments_total;
                 metadata.likes = data.ratings_total;
                 metadata.avgRate = data.rating;
-                metadata.published = data.created_time;
+                metadata.published = '' + moment.unix(data.created_time).format("DD/MM/YYYY");
                 metadata.category = data.genre;
-
                 onSuccessMetadataJson(err, metadata);
             });
             break;
@@ -621,7 +621,7 @@ function getFickleMetadata(video, callback) {
                 metadata.comments = data.stats_number_of_comments;
                 metadata.likes = data.stats_number_of_likes;
                 metadata.avgRate = "n.a.";
-                metadata.published = data.upload_date;
+                metadata.published = '' + data.upload_date;
                 metadata.category = data.tags;
                 onSuccessMetadataJson(err, metadata);
             });

@@ -702,7 +702,7 @@ function showEntityList(entityList) {
             $(".displayEntity", $row).append($e);
 
             $('.entity.list', $e).addClass((typeName.toLowerCase()));
-
+            console.log(ent.relevance);
             if (ent.uri) {
                 $('span>a', $e).attr("href", ent.uri).attr("target", "_blank");
             }
