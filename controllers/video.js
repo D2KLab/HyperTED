@@ -482,7 +482,7 @@ function getMetadata(video, callback) {
                     return;
                 }
                 var datatalk = data.talk;
-                video.videoLocator = datatalk.media.internal ? datatalk.media.internal['950k'].uri : datatalk.media.external.uri;
+                video.videoLocator = (datatalk.media.internal ? datatalk.media.internal['950k']||datatalk.media.internal['600k'] : datatalk.media.external).uri;
                 video.vendor_id = String(datatalk.id);
                 metadata.title = datatalk.name;
                 metadata.thumb = datatalk.images[1].image.url;
@@ -498,10 +498,10 @@ function getMetadata(video, callback) {
                 async.parallel([
                         function (async_callback) {
                             http.getJSON(subUrl, function (err, data) {
-                                video.jsonSub = data;
                                 if (err) {
                                     console.log('[ERROR ' + err + '] on retrieving sub for ' + video.locator);
-                                }
+                                }else video.jsonSub = data;
+
                                 async_callback(err, data);
                             });
                         },
@@ -633,7 +633,7 @@ function getFickleMetadata(video, callback) {
                     return;
                 }
                 var datatalk = data.talk;
-                video.videoLocator = datatalk.media.internal ? datatalk.media.internal['950k'].uri : datatalk.media.external.uri;
+                video.videoLocator = (datatalk.media.internal ? datatalk.media.internal['950k']||datatalk.media.internal['600k'] : datatalk.media.external).uri;
                 video.vendor_id = String(datatalk.id);
                 metadata.title = datatalk.name;
                 metadata.thumb = datatalk.images[1].image.url;
@@ -1008,7 +1008,7 @@ if (typeof String.prototype.startsWith != 'function') {
 
 exports.buildDb = function (req, res) {
     var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=100&externals=false&filter=id:>';
-    var retrieveNerd = false;
+    var retrieveNerd = true;
     var limitQps = retrieveNerd ? 10200 : 2200;
     loadList(0);
 

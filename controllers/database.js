@@ -169,8 +169,8 @@ function updateVideoUuid(uuid, newVideo, callback) {
             if (entities)newVideo.entities = entities;
             if (chapters) newVideo.chapters = chapters;
 
-            if (err || !data) {
-                console.log('DB updateVideoUuid fail. ' + JSON.stringify(err));
+            if (err) {
+                console.log('DB updateVideoUuid fail. ' + err);
                 callback(err, newVideo);
                 return;
             }
