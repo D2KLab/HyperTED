@@ -587,6 +587,7 @@ html, body {
 #player-sect .info-on-player .info-sx, #player-sect .info-on-player .info-dx {
     position: relative;
     float: left;
+    z-index: 2;
 }
 
 #player-sect .info-on-player .info-sx {

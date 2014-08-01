@@ -422,7 +422,7 @@ function getMetadata(video, callback) {
                         metadata.comments = data.comments_total;
                         metadata.likes = data.ratings_total;
                         metadata.avgRate = data.rating;
-                        metadata.published = data.created_time + '';
+                        metadata.published = '' + moment.unix(data.created_time).format("YYYY-MM-DD");
                         metadata.category = data.genre;
                         async_callback(false);
 
