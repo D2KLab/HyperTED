@@ -359,6 +359,7 @@ h1.title {
     .info-sx, .info-dx {
       position: relative;
       float: left;
+      z-index:2;
     }
     .info-sx {
       width: 48%;
