@@ -6,6 +6,7 @@ var http = require('http'),
     domain = require('domain'),
     moment = require('moment'),
     ffprobe = optional('node-ffprobe'),
+    mfParser = require('mediafragment'),
     nerd = require('./nerdify'),
     db = require('./database'),
     ts = require('./linkedTVconnection'),
@@ -32,15 +33,10 @@ function viewVideo(req, res, video) {
     var videoURI = video.videoLocator || video.locator;
 
     // Identify the media fragment part
-    var concSign = url.parse(videoURI).hash ? '&' : '#';
-    var t = req.query.t;
-    if (t) {
-        videoURI += concSign + 't=' + t;
-        concSign = '&';
-    }
-    var xywh = req.query.xywh;
-    if (xywh) {
-        videoURI += concSign + 'xywh=' + xywh;
+    var mf = mfParser.parse(req.url);
+    if (mf.toUrlString()) {
+        var concSign = url.parse(videoURI).hash ? '&' : '#';
+        videoURI += concSign + mf.toUrlString().substr(1);
     }
 
     var options = {
