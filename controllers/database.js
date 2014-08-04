@@ -1,29 +1,24 @@
 var UUID = require("node-uuid"),
     monk = require('monk'),
     async = require('async');
-var db, videos, ents, hots, chaps;
 
+var db = monk('localhost:27017/hyperted');
 
-exports.prepare = function () {
-    db = monk('localhost:27017/hyperted');
+var videos = db.get('videos');
+videos.index('uuid', {unique: true});
+videos.index('locator', {unique: true});
+videos.index('vendor vendor_id', {unique: true});
 
-    videos = db.get('videos');
-    videos.index('uuid', {unique: true});
-    videos.index('locator', {unique: true});
-    videos.index('vendor vendor_id', {unique: true});
+var ents = db.get('entities');
+ents.index('uuid');
+ents.index('extractor');
 
-    ents = db.get('entities');
-    ents.index('uuid');
-    ents.index('extractor');
+var hots = db.get('hotspots');
+hots.index('uuid');
 
-    hots = db.get('hotspots');
-    hots.index('uuid');
-
-    chaps = db.get('chapters');
-    chaps.index('uuid');
-    chaps.index('uuid chapNum', {unique: true});
-
-};
+var chaps = db.get('chapters');
+chaps.index('uuid');
+chaps.index('uuid chapNum', {unique: true});
 
 function getVideoFromUuid(uuid, full, callback) {
     var cb = !full ? callback : function (err, video) {
@@ -47,7 +42,6 @@ function getVideoFromUuid(uuid, full, callback) {
     };
     videos.findOne({uuid: uuid}).on('complete', cb);
 }
-exports.getVideoFromUuid = getVideoFromUuid;
 
 function getEntitiesFor(video, callback) {
     ents.find({'uuid': video.uuid}, function (err, docs) {
@@ -76,20 +70,19 @@ function getChaptersFor(video, callback) {
     });
 }
 
-exports.getVideoFromLocator = function (locator, callback) {
-    videos.findOne({locator: locator}).on('complete', callback);
-};
-
 function getVideoFromVendorId(vendor, id, callback) {
     if (!vendor || !id) {
         callback(true);
         return;
     }
     videos.findOne({'vendor': vendor, 'vendor_id': id}).on('complete', callback);
-};
-exports.getVideoFromVendorId = getVideoFromVendorId;
+}
+function getVideoFromLocator(locator, callback) {
+    videos.findOne({locator: locator}).on('complete', callback);
+}
 
-exports.insertVideo = function (video, callback) {
+
+function insertVideo(video, callback) {
     video.uuid = UUID.v4();
     video.timestamp = Date.now();
     callback = callback || function () {
@@ -157,7 +150,7 @@ exports.insertVideo = function (video, callback) {
             }
         });
     });
-};
+}
 
 function updateVideoUuid(uuid, newVideo, callback) {
     callback = callback || function () {
@@ -201,16 +194,6 @@ function updateVideoUuid(uuid, newVideo, callback) {
 
     videos.update({uuid: uuid}, newVideo, cb);
 }
-exports.updateVideoUuid = updateVideoUuid;
-
-exports.updateVideo = function (newVideo, callback) {
-    updateVideoUuid({uuid: newVideo.uuid}, newVideo, function (err, doc) {
-        if (err) {
-            console.log('DB updateVideoUuid fail. ' + JSON.stringify(err));
-        }
-        callback(err, doc);
-    });
-};
 
 function addChapters(uuid, chapters, callback) {
     callback = callback || function () {
@@ -249,18 +232,29 @@ function addEntities(uuid, entities, callback) {
     });
     async.parallel(funcArray, callback);
 }
-exports.addEntities = addEntities;
 
-exports.setHotspotProcess = function (uuid, value, callback) {
+module.exports = {
+    getVideoFromUuid: getVideoFromUuid,
+    getVideoFromLocator: getVideoFromLocator,
+    getVideoFromVendorId: getVideoFromVendorId,
+    insertVideo: insertVideo,
+    updateVideoUuid: updateVideoUuid,
+    updateVideo: function (newVideo, callback) {
+        updateVideoUuid({uuid: newVideo.uuid}, newVideo, callback);
+    },
+    addEntities: addEntities
+};
+
+module.exports.setHotspotProcess = function (uuid, value, callback) {
     videos.update({'uuid': uuid}, {$set: {'hotspotStatus': value}}, callback);
 };
-exports.getHotspotProcess = function (uuid, callback) {
+module.exports.getHotspotProcess = function (uuid, callback) {
     videos.findOne({'uuid': uuid}).on('complete', function (e, data) {
         if (data) callback(e, data.hotspotStatus);
         else callback({message: "video not in db"});
     });
 };
-exports.addHotspots = function (uuid, hotspots, callback) {
+module.exports.addHotspots = function (uuid, hotspots, callback) {
     var e = false;
     hotspots.forEach(function (h) {
         h.uuid = uuid;
