@@ -112,8 +112,8 @@ exports.insertVideo = function (video, callback) {
     }
 
     if (cbs.length) {
-        cb = function (err, video) {
-            if (err || !video) {
+        cb = function (err, data) {
+            if (err) {
                 callback(err, video);
                 return;
             }
@@ -131,11 +131,11 @@ exports.insertVideo = function (video, callback) {
                 if (!e && data) { //retry with another uuid
                     exports.insert(video, callback);
                 } else {
-                    cb(e, data);
+                    cb(e, video);
                 }
             });
         } else {
-            cb(err, doc);
+            cb(err, video);
         }
     });
 };
@@ -175,7 +175,7 @@ function updateVideoUuid(uuid, newVideo, callback) {
                 return;
             }
             async.parallel(cbs, function () {
-                callback(err, data);
+                callback(err, newVideo);
             });
         }
     }
