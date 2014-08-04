@@ -204,9 +204,10 @@ exports.search = function (req, resp) {
             }
 
             collectMetadata(video, function (err, video) {
+
                 // write in db
                 db.insertVideo(video, function (err, data) {
-                    if (err) {
+                    if (err || !data) {
                         console.log("DATABASE ERROR" + JSON.stringify(err));
                         resp.render('error.ejs', errorMsg.e500);
                         return;
@@ -1092,6 +1093,12 @@ exports.buildDb = function (req, res) {
             var fun = uuid ? db.updateVideo : db.insertVideo;
 
             fun(video, function (err, doc) {
+                if (err || !doc) {
+                    console.log(LOG_TAG + 'Error in inserting in db ');
+                    console.log(err);
+                    return;
+                }
+
                 //nerdify
                 if (retrieveNerd && doc.timedtext) {
                     nerd.getEntities('timedtext', doc.timedtext, 'textrazor', function (err, data) {

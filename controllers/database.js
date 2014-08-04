@@ -79,13 +79,15 @@ function getChaptersFor(video, callback) {
 exports.getVideoFromLocator = function (locator, callback) {
     videos.findOne({locator: locator}).on('complete', callback);
 };
-exports.getVideoFromVendorId = function (vendor, id, callback) {
+
+function getVideoFromVendorId(vendor, id, callback) {
     if (!vendor || !id) {
         callback(true);
         return;
     }
     videos.findOne({'vendor': vendor, 'vendor_id': id}).on('complete', callback);
 };
+exports.getVideoFromVendorId = getVideoFromVendorId;
 
 exports.insertVideo = function (video, callback) {
     video.uuid = UUID.v4();
@@ -94,49 +96,66 @@ exports.insertVideo = function (video, callback) {
     };
     var cb = callback, cbs = [];
 
-    if (video.entities) {
-        var entities = video.entities;
-        delete video.entities;
-
-        cbs.push(function (async_callback) {
-            addEntities(video.uuid, entities, async_callback);
-        });
-    }
-    if (video.chapters) {
-        var chapters = video.chapters;
-        delete video.chapters;
-
-        cbs.push(function (async_callback) {
-            addChapters(video.uuid, chapters, async_callback);
-        });
-    }
-
-    if (cbs.length) {
-        cb = function (err, data) {
-            if (err) {
-                callback(err, video);
-                return;
-            }
-            async.parallel(cbs, function () {
-                callback(err, video);
-            });
-        }
-    }
-
-    videos.insert(video, function (err, doc) {
-        if (err) {
-            console.log('DB insert fail. ' + JSON.stringify(err));
-            console.log('Check for existent uuid.');
-            videos.findOne({uuid: video.uuid}).on('complete', function (e, data) {
-                if (!e && data) { //retry with another uuid
-                    exports.insert(video, callback);
+    var previousCheck = function (next) {
+        next()
+    };
+    if (video.vendor) {
+        console.log('Check for existent vendor/id.');
+        previousCheck = function (next) {
+            getVideoFromVendorId(video.vendor, video.vendor_id, function (e, data) {
+                if (e || !data) {
+                    next();
                 } else {
-                    cb(e, video);
+                    console.log('Video already in db.');
+                    callback(e, data);
                 }
             });
-        } else {
-            cb(err, video);
         }
+    }
+    previousCheck(function () {
+        if (video.entities) {
+            var entities = video.entities;
+            delete video.entities;
+
+            cbs.push(function (async_callback) {
+                addEntities(video.uuid, entities, async_callback);
+            });
+        }
+        if (video.chapters) {
+            var chapters = video.chapters;
+            delete video.chapters;
+
+            cbs.push(function (async_callback) {
+                addChapters(video.uuid, chapters, async_callback);
+            });
+        }
+
+        if (cbs.length) {
+            cb = function (err, data) {
+                if (err) {
+                    callback(err, video);
+                    return;
+                }
+                async.parallel(cbs, function () {
+                    callback(err, video);
+                });
+            }
+        }
+
+        videos.insert(video, function (err, doc) {
+            if (err) {
+                console.log('DB insert fail. ' + JSON.stringify(err));
+                videos.findOne({uuid: video.uuid}).on('complete', function (e, data) {
+                    if (!e && data) { //retry with another uuid
+                        exports.insert(video, callback);
+                    } else {
+                        cb(e, video);
+                    }
+                });
+            } else {
+                cb(err, video);
+            }
+        });
     });
 };
 
