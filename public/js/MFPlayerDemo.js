@@ -630,22 +630,28 @@ function displayEntitiesSub(entJson) {
     entityList.forEach(function (entity) {
 
         while (subIndex >= 0) {
-            var $thisSub = $subList.get(subIndex);
 
+            var $thisSub = $subList.get(subIndex);
             if (!$thisSub.id || $thisSub.id == '') {
+
                 subIndex--;
             } else {
-                var entStart = parseFloat(entity.startNPT);
-                var entEnd = parseFloat(entity.endNPT);
+                var entStart = parseFloat(entity.startNPT).toFixed(2);
+                var entEnd = parseFloat(entity.endNPT).toFixed(2);
                 $thisSub = $($thisSub);
-                if (entStart >= $thisSub.data('startss') && entEnd <= $thisSub.data('endss')) {
-
-                    var text = $thisSub.text();
+                var subStart = parseFloat($thisSub.data('startss')).toFixed(2);
+                var subEnd = parseFloat($thisSub.data('endss')).toFixed(2);
+                console.log(entStart + " >= " + subStart + " && " + entEnd + " <= " + subEnd);
+                if (entStart >= subStart && entEnd <= subEnd) {
+                    console.log(entity.label);
+                    var text = $thisSub[0].innerHTML;
                     var nerdTypeSplit = entity.nerdType.split('#');
                     var nerdType = nerdTypeSplit.length > 1 ? nerdTypeSplit[1].toLowerCase() : "thing";
 
                     var str = '<span class="entity ' + nerdType + '">' + entity.label + '</span>';
-                    var replace = $thisSub[0].innerHTML.replace(entity.label, str);
+
+                    var replace = text.replace(entity.label, str);
+                    console.log(replace);
                     $thisSub.html(replace);
                     break;
                 } else {
@@ -702,7 +708,6 @@ function showEntityList(entityList) {
             $(".displayEntity", $row).append($e);
 
             $('.entity.list', $e).addClass((typeName.toLowerCase()));
-            console.log(ent.relevance);
             if (ent.uri) {
                 $('span>a', $e).attr("href", ent.uri).attr("target", "_blank");
             }
