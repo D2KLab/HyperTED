@@ -33,6 +33,21 @@ $(document).ready(function () {
                 displayPins();
                 if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
                     highlightMFSub($player.getMFJson().hash.t[0].value);
+
+                    if (window.location.toString().parseURL().search.enriched) {
+                        video.entitiesL.forEach(function (ent) {
+                            var sT = $player.getMFJson().hash.t[0].value.split(',');
+
+                            var es = parseFloat(ent.startNPT.toFixed(2));
+                            var ss = parseFloat(sT[0]).toFixed(2);
+                            var ee = parseFloat(ent.endNPT.toFixed(2));
+                            var se = parseFloat(sT[1]).toFixed(2);
+
+                            if (es >= ss && ee <= se)
+                                console.log(ent.label);
+
+                        });
+                    }
                 }
                 var $pop = Popcorn(media);
                 $('.sub-text p[data-time]').each(function () {
@@ -633,7 +648,6 @@ function displayEntitiesSub(entJson) {
 
             var $thisSub = $subList.get(subIndex);
             if (!$thisSub.id || $thisSub.id == '') {
-
                 subIndex--;
             } else {
                 var entStart = parseFloat(entity.startNPT).toFixed(2);
@@ -641,9 +655,7 @@ function displayEntitiesSub(entJson) {
                 $thisSub = $($thisSub);
                 var subStart = parseFloat($thisSub.data('startss')).toFixed(2);
                 var subEnd = parseFloat($thisSub.data('endss')).toFixed(2);
-                console.log(entStart + " >= " + subStart + " && " + entEnd + " <= " + subEnd);
                 if (entStart >= subStart && entEnd <= subEnd) {
-                    console.log(entity.label);
                     var text = $thisSub[0].innerHTML;
                     var nerdTypeSplit = entity.nerdType.split('#');
                     var nerdType = nerdTypeSplit.length > 1 ? nerdTypeSplit[1].toLowerCase() : "thing";
@@ -651,7 +663,6 @@ function displayEntitiesSub(entJson) {
                     var str = '<span class="entity ' + nerdType + '">' + entity.label + '</span>';
 
                     var replace = text.replace(entity.label, str);
-                    console.log(replace);
                     $thisSub.html(replace);
                     break;
                 } else {
@@ -663,7 +674,6 @@ function displayEntitiesSub(entJson) {
 
     $('.sub-text', document).replaceWith($newSubCont);
     $('p > span.entity').has('span').addClass('nesting');
-
 }
 
 

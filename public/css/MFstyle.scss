@@ -166,7 +166,6 @@ $navbarTransitionTime: 100ms;
       box-sizing: border-box;
       .top-brand {
         img {
-
           @media(min-width: 320px) {
             padding-bottom: 8px;
             height: auto;
@@ -216,6 +215,7 @@ $navbarTransitionTime: 100ms;
       }
       .logo-text {
         width: 54px;
+
       }
       .left-mark, .right-mark {
         width: 31px;
