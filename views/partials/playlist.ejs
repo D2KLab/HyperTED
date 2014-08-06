@@ -87,7 +87,7 @@
                             <ul class="frag-list">
                                 <% v.frags.forEach(function(frag){ %>
                                 <li class="frag-link">
-                                    <a href='/video/<%= v.uuid %> <%= frag.hash %>'><%= frag.title %>
+                                    <a href='/video/<%= v.uuid %><%= frag.hash %>'><%= frag.title %>
                                         <br/>(<%= frag.timing %>)</a>
                                 </li>
                                 <% }) %>

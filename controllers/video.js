@@ -6,6 +6,7 @@ var http = require('http'),
     domain = require('domain'),
     moment = require('moment'),
     ffprobe = optional('node-ffprobe'),
+    mfParser = require('mediafragment'),
     nerd = require('./nerdify'),
     db = require('./database'),
     ts = require('./linkedTVconnection'),
@@ -32,15 +33,10 @@ function viewVideo(req, res, video) {
     var videoURI = video.videoLocator || video.locator;
 
     // Identify the media fragment part
-    var concSign = url.parse(videoURI).hash ? '&' : '#';
-    var t = req.query.t;
-    if (t) {
-        videoURI += concSign + 't=' + t;
-        concSign = '&';
-    }
-    var xywh = req.query.xywh;
-    if (xywh) {
-        videoURI += concSign + 'xywh=' + xywh;
+    var mf = mfParser.parse(req.url);
+    if (mf.toUrlString()) {
+        var concSign = url.parse(videoURI).hash ? '&' : '#';
+        videoURI += concSign + mf.toUrlString().substr(1);
     }
 
     var options = {
@@ -204,9 +200,10 @@ exports.search = function (req, resp) {
             }
 
             collectMetadata(video, function (err, video) {
+
                 // write in db
                 db.insertVideo(video, function (err, data) {
-                    if (err) {
+                    if (err || !data) {
                         console.log("DATABASE ERROR" + JSON.stringify(err));
                         resp.render('error.ejs', errorMsg.e500);
                         return;
@@ -1092,6 +1089,12 @@ exports.buildDb = function (req, res) {
             var fun = uuid ? db.updateVideo : db.insertVideo;
 
             fun(video, function (err, doc) {
+                if (err || !doc) {
+                    console.log(LOG_TAG + 'Error in inserting in db ');
+                    console.log(err);
+                    return;
+                }
+
                 //nerdify
                 if (retrieveNerd && doc.timedtext) {
                     nerd.getEntities('timedtext', doc.timedtext, 'textrazor', function (err, data) {
