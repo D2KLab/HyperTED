@@ -179,7 +179,6 @@ $navbarTransitionTime: 100ms;
       max-width: 300px;
       @include transition(padding, $navbarTransitionTime);
     }
-
   }
 
   .navbar-brand {
