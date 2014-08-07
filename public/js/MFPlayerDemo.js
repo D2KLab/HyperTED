@@ -33,21 +33,6 @@ $(document).ready(function () {
                 displayPins();
                 if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
                     highlightMFSub($player.getMFJson().hash.t[0].value);
-
-                    if (window.location.toString().parseURL().search.enriched) {
-                        video.entitiesL.forEach(function (ent) {
-                            var sT = $player.getMFJson().hash.t[0].value.split(',');
-
-                            var es = parseFloat(ent.startNPT.toFixed(2));
-                            var ss = parseFloat(sT[0]).toFixed(2);
-                            var ee = parseFloat(ent.endNPT.toFixed(2));
-                            var se = parseFloat(sT[1]).toFixed(2);
-
-                            if (es >= ss && ee <= se)
-                                console.log(ent.label);
-
-                        });
-                    }
                 }
                 var $pop = Popcorn(media);
                 $('.sub-text p[data-time]').each(function () {
@@ -139,6 +124,45 @@ $(document).ready(function () {
             });
         });
     }
+
+    //filter entities for MF
+    var $nerdFilterForm = $('#nerd-filter-form');
+    $nerdFilterForm.submit(function (e) {
+        e.preventDefault();
+        var $form = $(this);
+
+        $form.ajaxSubmit({
+            success: function (data) {
+                var text;
+                try {
+                    if (data.error) {
+                        text = 'Something went wrong. Try again later';
+                        console.error(data.error);
+                        return;
+                    }
+                    if (window.location.toString().parseURL().search.enriched) {
+                        video.entitiesL.forEach(function (ent) {
+                            var sT = $player.getMFJson().hash.t[0].value.split(',');
+
+                            var es = parseFloat(ent.startNPT.toFixed(2));
+                            var ss = parseFloat(sT[0]).toFixed(2);
+                            var se = parseFloat(sT[1]).toFixed(2);
+                            $('input[name=startMF]', $form).val(ss);
+                            $('input[name=endMF]', $form).val(se);
+
+                            if (es >= ss && es <= se)
+                                console.log(ent.label);
+
+                        });
+                    }
+                } catch (e) {
+                    text = 'Something went wrong. Try again later';
+                    console.error(text);
+                    console.log(e);
+                }
+            }});
+    });
+
 
     //ask for hotspots
     $('#hotspot-form').submit(function (e) {
