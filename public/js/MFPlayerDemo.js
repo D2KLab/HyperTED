@@ -130,8 +130,13 @@ $(document).ready(function () {
     $nerdFilterForm.submit(function (e) {
         e.preventDefault();
         var $form = $(this);
-
+        var extractor = window.location.toString().parseURL().search.enriched;
         $form.ajaxSubmit({
+            data: {
+                extractor: extractor,
+                startTest: ($player.getMFJson().hash.t[0].startNormalized) || 0,
+                endTest: ($player.getMFJson().hash.t[0].endNormalized) || null
+            },
             success: function (data) {
                 var text;
                 try {
@@ -139,21 +144,8 @@ $(document).ready(function () {
                         text = 'Something went wrong. Try again later';
                         console.error(data.error);
                         return;
-                    }
-                    if (window.location.toString().parseURL().search.enriched) {
-                        video.entitiesL.forEach(function (ent) {
-                            var sT = $player.getMFJson().hash.t[0].value.split(',');
-
-                            var es = parseFloat(ent.startNPT.toFixed(2));
-                            var ss = parseFloat(sT[0]).toFixed(2);
-                            var se = parseFloat(sT[1]).toFixed(2);
-                            $('input[name=startMF]', $form).val(ss);
-                            $('input[name=endMF]', $form).val(se);
-
-                            if (es >= ss && es <= se)
-                                console.log(ent.label);
-
-                        });
+                    } else {
+                        console.log(data);
                     }
                 } catch (e) {
                     text = 'Something went wrong. Try again later';

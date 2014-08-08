@@ -479,7 +479,7 @@ function getMetadata(video, callback) {
                     return;
                 }
                 var datatalk = data.talk;
-                video.videoLocator = (datatalk.media.internal ? datatalk.media.internal['950k']||datatalk.media.internal['600k'] : datatalk.media.external).uri;
+                video.videoLocator = (datatalk.media.internal ? datatalk.media.internal['950k'] || datatalk.media.internal['600k'] : datatalk.media.external).uri;
                 video.vendor_id = String(datatalk.id);
                 metadata.title = datatalk.name;
                 metadata.thumb = datatalk.images[1].image.url;
@@ -497,7 +497,7 @@ function getMetadata(video, callback) {
                             http.getJSON(subUrl, function (err, data) {
                                 if (err) {
                                     console.log('[ERROR ' + err + '] on retrieving sub for ' + video.locator);
-                                }else video.jsonSub = data;
+                                } else video.jsonSub = data;
 
                                 async_callback(err, data);
                             });
@@ -630,7 +630,7 @@ function getFickleMetadata(video, callback) {
                     return;
                 }
                 var datatalk = data.talk;
-                video.videoLocator = (datatalk.media.internal ? datatalk.media.internal['950k']||datatalk.media.internal['600k'] : datatalk.media.external).uri;
+                video.videoLocator = (datatalk.media.internal ? datatalk.media.internal['950k'] || datatalk.media.internal['600k'] : datatalk.media.external).uri;
                 video.vendor_id = String(datatalk.id);
                 metadata.title = datatalk.name;
                 metadata.thumb = datatalk.images[1].image.url;
@@ -668,6 +668,21 @@ exports.ajaxGetMetadata = function (req, res) {
         }
     });
 
+};
+
+exports.filterEntities = function (req, res) {
+    var uuid = req.param('uuid');
+    if (!uuid) {
+        res.json({error: 'empty uuid'});
+        return;
+    }
+
+    db.getFilterEntities(uuid, req.param('extractor'), req.param('startTest'), req.param('endTest'), function (err, doc) {
+        if (err)
+            res.json({error: 'db error'});
+        else res.json({"results": doc});
+
+    })
 };
 
 function getSubtitlesTV2RDF(uuid, callback) {

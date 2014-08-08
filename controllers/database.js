@@ -52,6 +52,19 @@ function getEntitiesFor(video, callback) {
     });
 }
 
+function getFilterEntities(uuid, extractor, start, end, callback) {
+    var timeFiltering = {'$gte': parseFloat(start)};
+    var ext = extractor;
+
+    if (end)
+        timeFiltering.$lte = parseFloat(end);
+
+    if (ext == "combined")
+        ents.find({'uuid': uuid, 'startNPT': timeFiltering, 'source': ext}, callback);
+    else ents.find({'uuid': uuid, 'startNPT': timeFiltering, 'extractor': ext}, callback);
+
+}
+
 function getHotspotsFor(video, callback) {
     hots.find({'uuid': video.uuid}, function (err, docs) {
         if (!err && docs && docs.length > 0) {
@@ -237,6 +250,7 @@ module.exports = {
     getVideoFromUuid: getVideoFromUuid,
     getVideoFromLocator: getVideoFromLocator,
     getVideoFromVendorId: getVideoFromVendorId,
+    getFilterEntities: getFilterEntities,
     insertVideo: insertVideo,
     updateVideoUuid: updateVideoUuid,
     updateVideo: function (newVideo, callback) {
