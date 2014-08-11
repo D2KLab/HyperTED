@@ -114,6 +114,7 @@ function insertVideo(video, callback) {
             addEntities(video.uuid, entities, async_callback);
         });
     }
+
     if (video.chapters) {
         var chapters = video.chapters;
         delete video.chapters;
