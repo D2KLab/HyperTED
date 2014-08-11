@@ -151,7 +151,7 @@ function updateVideoUuid(uuid, newVideo, callback) {
         delete newVideo.entities;
 
         cbs.push(function (async_callback) {
-            addEntities(newVideo.uuid, entities, async_callback);
+            addEntities(uuid, entities, async_callback);
         });
     }
     var chapters;
@@ -160,7 +160,7 @@ function updateVideoUuid(uuid, newVideo, callback) {
         delete newVideo.chapters;
 
         cbs.push(function (async_callback) {
-            addChapters(newVideo.uuid, chapters, async_callback);
+            addChapters(uuid, chapters, async_callback);
         });
     }
 
@@ -180,12 +180,12 @@ function updateVideoUuid(uuid, newVideo, callback) {
         }
     }
 
-    videos.update({uuid: uuid}, newVideo, cb);
+    videos.findAndModify({uuid: uuid}, {$set:newVideo}, {upsert :true,new:true}, cb);
 }
 exports.updateVideoUuid = updateVideoUuid;
 
 exports.updateVideo = function (newVideo, callback) {
-    updateVideoUuid({uuid: newVideo.uuid}, newVideo, function (err, doc) {
+    updateVideoUuid(newVideo.uuid, newVideo, function (err, doc) {
         if (err) {
             console.log('DB updateVideoUuid fail. ' + JSON.stringify(err));
         }
