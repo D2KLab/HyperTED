@@ -482,13 +482,15 @@ function getMetadata(video, callback) {
                 video.videoLocator = (datatalk.media.internal ? datatalk.media.internal['950k']||datatalk.media.internal['600k'] : datatalk.media.external).uri;
                 video.vendor_id = String(datatalk.id);
                 metadata.title = datatalk.name;
-                metadata.thumb = datatalk.images[1].image.url;
+                if(datatalk.images){
+                    metadata.thumb = datatalk.images[1].image.url;
+                    metadata.poster = datatalk.images[2].image.url;
+                }
                 metadata.descr = datatalk.description.replace(new RegExp('<br />', 'g'), '\n');
                 metadata.views = datatalk.viewed_count;
                 metadata.comments = datatalk.commented_count;
                 metadata.published = datatalk.published_at;
                 metadata.event = datatalk.event.name;
-                metadata.poster = datatalk.images[2].image.url;
 
                 var subUrl = vendors['ted'].sub_url.replace('<id>', video.vendor_id);
 
@@ -633,13 +635,15 @@ function getFickleMetadata(video, callback) {
                 video.videoLocator = (datatalk.media.internal ? datatalk.media.internal['950k']||datatalk.media.internal['600k'] : datatalk.media.external).uri;
                 video.vendor_id = String(datatalk.id);
                 metadata.title = datatalk.name;
-                metadata.thumb = datatalk.images[1].image.url;
+                if(datatalk.images){
+                    metadata.thumb = datatalk.images[1].image.url;
+                    metadata.poster = datatalk.images[2].image.url;
+                }
                 metadata.descr = datatalk.description.replace(new RegExp('<br />', 'g'), '\n');
                 metadata.views = datatalk.viewed_count;
                 metadata.comments = datatalk.commented_count;
                 metadata.published = datatalk.published_at;
                 metadata.event = datatalk.event.name;
-                metadata.poster = datatalk.images[2].image.url;
 
                 onSuccessMetadataJson(err, metadata);
             });
@@ -1051,7 +1055,6 @@ exports.buildDb = function (req, res) {
                             }
                             var uuid;
                             if (data) uuid = data.uuid;
-
                             setTimeout(function () {
                                 loadVideo(index, uuid);
                                 talksLoop();
@@ -1076,6 +1079,7 @@ exports.buildDb = function (req, res) {
             vendor_id: index
         };
 
+        if(uuid) video.uuid = uuid;
         getMetadata(video, function (err, metadata) {
             if (err) {
                 console.log(LOG_TAG + 'Metadata retrieved with errors.');
