@@ -3,6 +3,9 @@ var storageKey = 'fragmentenricher.';
 var videokey = storageKey + video.uuid + '.';
 var parsedJSON;
 var $plainSubCont; //Container for subs with no entities
+var client = new $.es.Client({
+    hosts: 'localhost:8080'
+});
 
 $(document).ready(function () {
     // resize navbar on scroll

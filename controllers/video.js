@@ -5,6 +5,7 @@ var http = require('http'),
     optional = require('optional'),
     domain = require('domain'),
     moment = require('moment'),
+    elasticsearch = require('elasticsearch'),
     ffprobe = optional('node-ffprobe'),
     mfParser = require('mediafragment'),
     nerd = require('./nerdify'),
@@ -18,6 +19,11 @@ var hStatusValue = {
     'IN_PROGRESS': 1,
     'DONE': 2
 };
+
+var client = new elasticsearch.Client({
+    host: 'localhost:8080',
+    log: 'trace'
+});
 
 var time1d = 86400000; //one day
 var time1w = 7 * time1d; //one week

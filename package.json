@@ -24,7 +24,8 @@
         "morgan": "^1.2.2",
         "mediafragment": "git+https://github.com/pasqLisena/node-mediafragment",
         "install": "^0.1.7",
-        "npm": "^1.4.23"
+        "npm": "^1.4.23",
+        "elasticsearch": "^2.4.0"
     },
     "optionalDependencies": {
         "node-ffprobe": "^1.2.2"
