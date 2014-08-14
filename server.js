@@ -4,6 +4,7 @@ var express = require('express'),
     logger = require('morgan'),
     errMsg = require('./controllers/error_msg');
 
+
 var app = express();
 var DEBUG = false;
 app.set('view options', {layout: false});
@@ -21,6 +22,8 @@ app.get('/video?', video.search);
 app.get('/metadata/:uuid', video.ajaxGetMetadata);
 app.get('/filter_ent/:uuid', video.filterEntities);
 app.get('/builddb', video.buildDb);
+app.get('/elasticsearch/:search', video.suggestMF);
+
 app.get('/', function (req, res) {
     res.render('welcome.ejs')
 });

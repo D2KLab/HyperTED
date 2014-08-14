@@ -4,8 +4,9 @@ var videokey = storageKey + video.uuid + '.';
 var parsedJSON;
 var $plainSubCont; //Container for subs with no entities
 var client = new $.es.Client({
-    hosts: 'localhost:8080'
+    hosts: 'localhost:9200'
 });
+
 
 $(document).ready(function () {
     // resize navbar on scroll
@@ -133,22 +134,27 @@ $(document).ready(function () {
     $nerdFilterForm.submit(function (e) {
         e.preventDefault();
         var $form = $(this);
+        var $button = $('button', $form);
+        $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
         var extractor = window.location.toString().parseURL().search.enriched;
         $form.ajaxSubmit({
             data: {
                 extractor: extractor,
-                startTest: ($player.getMFJson().hash.t[0].startNormalized) || 0,
-                endTest: ($player.getMFJson().hash.t[0].endNormalized) || null
+                startMFFilt: ($player.getMFJson().hash.t[0].startNormalized) || 0,
+                endMFFilt: ($player.getMFJson().hash.t[0].endNormalized) || null
             },
             success: function (data) {
                 var text;
                 try {
                     if (data.error) {
                         text = 'Something went wrong. Try again later';
+                        $button.text().css('width', 'auto');
+                        $button.prop('disabled', false).html('Filter Entities');
                         console.error(data.error);
                         return;
                     } else {
-                        console.log(data);
+                        $button.prop('disabled', false).html('Filter Entities');
+                        return showfilterEnt(data);
                     }
                 } catch (e) {
                     text = 'Something went wrong. Try again later';
@@ -158,9 +164,22 @@ $(document).ready(function () {
             }});
     });
 
+    function showfilterEnt(entjson) {
+        entjson.results.sort(
+            function SortByRelevance(x, y) {
+                return ((x.relevance == y.relevance) ? 0 : ((x.relevance < y.relevance) ? 1 : -1 ));
+            });
+        var lab = "";
+        for (var i in entjson.results) {
+            lab = lab.concat(entjson.results[i].label, '&');
+            console.log(entjson.results[i].label);
+        }
+        return lab.substring(0, lab.length - 1);
+    }
 
     //ask for hotspots
     $('#hotspot-form').submit(function (e) {
+
         e.preventDefault();
         var $form = $(this);
         var $button = $('button', $form);

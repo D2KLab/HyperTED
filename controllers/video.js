@@ -5,9 +5,9 @@ var http = require('http'),
     optional = require('optional'),
     domain = require('domain'),
     moment = require('moment'),
-    elasticsearch = require('elasticsearch'),
     ffprobe = optional('node-ffprobe'),
     mfParser = require('mediafragment'),
+    elasticsearch = require('elasticsearch'),
     nerd = require('./nerdify'),
     db = require('./database'),
     ts = require('./linkedTVconnection'),
@@ -21,7 +21,7 @@ var hStatusValue = {
 };
 
 var client = new elasticsearch.Client({
-    host: 'localhost:8080',
+    host: 'localhost:9200',
     log: 'trace'
 });
 
@@ -120,7 +120,6 @@ exports.view = function (req, res) {
                             video.hotspotStatus = hStatusValue.DONE;
                             video.hotspots = data;
                         }
-
                         viewVideo(req, res, video);
                     });
                 } else {
@@ -488,7 +487,7 @@ function getMetadata(video, callback) {
                 video.videoLocator = (datatalk.media.internal ? datatalk.media.internal['950k'] || datatalk.media.internal['600k'] : datatalk.media.external).uri;
                 video.vendor_id = String(datatalk.id);
                 metadata.title = datatalk.name;
-                if(datatalk.images){
+                if (datatalk.images) {
                     metadata.thumb = datatalk.images[1].image.url;
                     metadata.poster = datatalk.images[2].image.url;
                 }
@@ -641,7 +640,7 @@ function getFickleMetadata(video, callback) {
                 video.videoLocator = (datatalk.media.internal ? datatalk.media.internal['950k'] || datatalk.media.internal['600k'] : datatalk.media.external).uri;
                 video.vendor_id = String(datatalk.id);
                 metadata.title = datatalk.name;
-                if(datatalk.images){
+                if (datatalk.images) {
                     metadata.thumb = datatalk.images[1].image.url;
                     metadata.poster = datatalk.images[2].image.url;
                 }
@@ -687,13 +686,37 @@ exports.filterEntities = function (req, res) {
         return;
     }
 
-    db.getFilterEntities(uuid, req.param('extractor'), req.param('startTest'), req.param('endTest'), function (err, doc) {
+    db.getFilterEntities(uuid, req.param('extractor'), req.param('startMFFilt'), req.param('endMFFilt'), function (err, doc) {
         if (err)
             res.json({error: 'db error'});
         else res.json({"results": doc});
 
     })
 };
+
+
+exports.suggestMF = function (req, res) {
+    var search = req.param('search');
+
+    client.search({
+            index: 'ent_index',
+            type: 'entity',
+            body: {
+                from: 0, size: 20,
+                query: {
+                    match: {label: search}
+                }
+            }
+        }
+    ).
+        then(function (resp) {
+            var hits = resp.hits.hits;
+            res.json(hits);
+        }, function (err) {
+            console.trace(err.message);
+            res.send(err.message, 500);
+        });
+}
 
 function getSubtitlesTV2RDF(uuid, callback) {
     http.getRemoteFile('http://linkedtv.eurecom.fr/tv2rdf/api/mediaresource/' + uuid + '/metadata?metadataType=subtitle', callback);
@@ -1100,7 +1123,7 @@ exports.buildDb = function (req, res) {
             vendor_id: index
         };
 
-        if(uuid) video.uuid = uuid;
+        if (uuid) video.uuid = uuid;
         getMetadata(video, function (err, metadata) {
             if (err) {
                 console.log(LOG_TAG + 'Metadata retrieved with errors.');
@@ -1266,7 +1289,7 @@ function runHotspotProcess(uuid, callback) {
 function checkHotspotResults(uuid, callback) {
     console.log("check Hotspot Results");
     /* Call to services */
-    //fake results
+//    fake results
     var results = {
         //"UUID":"c1851285-972f-4c30-a7fd-1d6b704bb471",
 //        "hp_list"
