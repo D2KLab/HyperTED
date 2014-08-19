@@ -1,6 +1,5 @@
 var nerd = require("nerd4node"),
     http = require('http'),
-    async = require('async'),
     utils = require('./utils');
 
 
