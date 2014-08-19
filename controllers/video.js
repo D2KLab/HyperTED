@@ -681,41 +681,124 @@ exports.ajaxGetMetadata = function (req, res) {
 
 exports.filterEntities = function (req, res) {
     var uuid = req.param('uuid');
+    var startMF = req.param('startMFFilt');
     if (!uuid) {
         res.json({error: 'empty uuid'});
         return;
     }
 
-    db.getFilterEntities(uuid, req.param('extractor'), req.param('startMFFilt'), req.param('endMFFilt'), function (err, doc) {
+    db.getFilterEntities(uuid, req.param('extractor'), startMF, req.param('endMFFilt'), function (err, doc) {
         if (err)
             res.json({error: 'db error'});
-        else res.json({"results": doc});
+        else {
+            doc.sort(
+                function SortByRelevance(x, y) {
+                    return ((x.relevance == y.relevance) ? 0 : ((x.relevance < y.relevance) ? 1 : -1 ));
+                });
+            var lab = "";
+            for (var i in doc) {
+                lab = lab.concat(doc[i].label, '&');
+                console.log(doc[i].label);
+            }
+            var filtered = lab.substring(0, lab.length - 1);
+            suggestMF(filtered, function (err, resp) {
+                if (err)
+                    res.send(err.message, 500);
+                else {
+                    checkMF(resp, function (err, vids) {
+                        if (err)
+                            res.send(err.message, 500);
+                        else {
+                            if (vids[uuid]) {
+                                for (var c in vids[uuid]) {
+                                    if (vids[uuid][c].startNPT == startMF) {
+                                        delete vids[uuid][c];
+                                    }
+                                }
+
+//                                if (!vids[uuid].length)
+//                                    delete vids[uuid];
+                            }
+                            res.json({"results": vids});
+                        }
+
+                    })
+
+                }
+            });
+
+        }
 
     })
+
 };
 
-
-exports.suggestMF = function (req, res) {
-    var search = req.param('search');
-
+function suggestMF(search, callback) {
     client.search({
             index: 'ent_index',
             type: 'entity',
             body: {
-                from: 0, size: 20,
+                from: 0, size: 10,
                 query: {
-                    match: {label: search}
+                    match: {
+                        label: search}
                 }
             }
         }
-    ).
-        then(function (resp) {
+    ).then(function (resp) {
             var hits = resp.hits.hits;
-            res.json(hits);
+            callback(null, hits);
         }, function (err) {
             console.trace(err.message);
-            res.send(err.message, 500);
+            callback(err);
         });
+}
+exports.suggestMF = suggestMF;
+
+function checkMF(json, callback) {
+    var chapters = [], functs = [];
+
+
+    json.forEach(function (ent) { // entity
+        var uuid = ent._source.uuid;
+        var st = ent._source.startNPT;
+        var f = function (async_callback) {
+            db.getChaptersAtTime(st, uuid, function (err, ch) {
+                console.log(ch)
+                chapters.push(ch);
+                async_callback();
+            });
+        };
+
+        functs.push(f);
+
+    });
+
+
+    async.parallel(functs, function (err) {
+        if (err)callback(err);
+        else {
+            var suggested = {};
+            chapters.forEach(function (c) {
+                if (!c)return;
+                console.log(c)
+                var v1 = suggested[c.uuid];
+                if (v1) {
+                    var notExists = v1.every(function (ch) {
+                        return ch.chapNum != c.chapNum;
+                    });
+                    if (notExists) v1.push(c);
+                    return;
+                }
+                v1 = [c];
+                suggested[c.uuid] = v1;
+            });
+            callback(null, suggested);
+            console.log(suggested)
+        }
+    });
+
+
 }
 
 function getSubtitlesTV2RDF(uuid, callback) {

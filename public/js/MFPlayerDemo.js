@@ -149,11 +149,11 @@ $(document).ready(function () {
                     if (data.error) {
                         text = 'Something went wrong. Try again later';
                         $button.text().css('width', 'auto');
-                        $button.prop('disabled', false).html('Filter Entities');
+                        $button.prop('disabled', false).html('Suggest Chapters');
                         console.error(data.error);
                         return;
                     } else {
-                        $button.prop('disabled', false).html('Filter Entities');
+                        $button.prop('disabled', false).html('Suggest Chapters');
                         return showfilterEnt(data);
                     }
                 } catch (e) {
@@ -165,16 +165,7 @@ $(document).ready(function () {
     });
 
     function showfilterEnt(entjson) {
-        entjson.results.sort(
-            function SortByRelevance(x, y) {
-                return ((x.relevance == y.relevance) ? 0 : ((x.relevance < y.relevance) ? 1 : -1 ));
-            });
-        var lab = "";
-        for (var i in entjson.results) {
-            lab = lab.concat(entjson.results[i].label, '&');
-            console.log(entjson.results[i].label);
-        }
-        return lab.substring(0, lab.length - 1);
+        console.log(entjson);
     }
 
     //ask for hotspots
