@@ -13,6 +13,8 @@ This dependency is included in package.json, so no further operation is required
 
 <p>You need a <a href="http://www.mongodb.org/">MongoDB</a> database on your computer.</p>
 
+<p>You need also to run <a href="http://www.elasticsearch.org/download/">Elasticsearch</a> on your computer.</p>
+
 <p>We suggest also to install <a href="https://www.ffmpeg.org/">ffmpeg</a> for give to the application access to mp4 
 metadata (es. duration of videos).</p>
 
