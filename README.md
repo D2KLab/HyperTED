@@ -3,18 +3,29 @@ MediaFragPlayerDemo
 
 Media Fragment Player Demo
 
-<h2>Dependencies</h2>
+## Requirements
+
+* [Node.js](http://www.nodejs.org/)
+* A [MongoDB](http://www.mongodb.org) database running at port 27017
+* An instance of [Elasticsearch](http://www.elasticsearch.org) running at port 9200
+
+We suggest also to install [ffmpeg](https://www.ffmpeg.org/) and add it to enviroment variables in order to have access to mp4 metadata (es. duration of videos).
+
+## Install
 
 All "npm" dependencies are specified on package.json, so you can install them with 
-<code>npm install</code>.
+<pre>npm install</pre>
 
-<p>This demo uses <a href="https://github.com/giusepperizzo/nerd4node">Nerd4Node</a>, installed from Github.
-This dependency is included in package.json, so no further operation is required.</p>
+## Run
 
-<p>You need a <a href="http://www.mongodb.org/">MongoDB</a> database on your computer.</p>
+<pre>node project_path\server</pre>
 
-<p>You need also to run <a href="http://www.elasticsearch.org/download/">Elasticsearch</a> on your computer.</p>
+You can browse the application at <code>localhost:8080</code>
 
-<p>We suggest also to install <a href="https://www.ffmpeg.org/">ffmpeg</a> for give to the application access to mp4 
-metadata (es. duration of videos).</p>
 
+## Related project
+
+In this application, the following project/library are used
+
+* [Nerd4Node](https://github.com/giusepperizzo/nerd4node)
+* [media-fragment.js](https://github.com/tomayac/Media-Fragments-URI) and its [Node.js version](https://github.com/pasqLisena/node-mediafragment)
