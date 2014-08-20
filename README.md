@@ -26,7 +26,9 @@ ES_HOME/bin/plugin -install richardwilly98/elasticsearch-river-mongodb/1.4.0
 </pre>
 
 Then, you have to run
-<pre>curl -XPUT ‘/_river/hyperted/_meta’ -d {
+<pre>
+curl -XPUT '/_river/hyperted/_meta' -d
+{
   "type": "mongodb",
   "mongodb": {
     "servers": [
@@ -44,7 +46,7 @@ Then, you have to run
 }
 </pre>
 
-If you can not use <code>curl</code>, you can also run it with [Sense extension](https://chrome.google.com/webstore/detail/sense-beta/lhjgkmllcaadmopgmanpapmpjgmfcfig) for Google Chrome.
+*If you can not use <code>curl</code>, you can also run it with [Sense extension](https://chrome.google.com/webstore/detail/sense-beta/lhjgkmllcaadmopgmanpapmpjgmfcfig) for Google Chrome. In this case the first row become <code>PUT /_river/hyperted/_meta</code>*
 
 ### Server
 
