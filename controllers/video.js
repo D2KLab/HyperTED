@@ -698,7 +698,6 @@ exports.filterEntities = function (req, res) {
             var lab = "";
             for (var i in doc) {
                 lab = lab.concat(doc[i].label, '&');
-                console.log(doc[i].label);
             }
             var filtered = lab.substring(0, lab.length - 1);
             suggestMF(filtered, function (err, resp) {
@@ -712,12 +711,11 @@ exports.filterEntities = function (req, res) {
                             if (vids[uuid]) {
                                 for (var c in vids[uuid]) {
                                     if (vids[uuid][c].startNPT == startMF) {
-                                        delete vids[uuid][c];
+                                        vids[uuid].splice(c);
                                     }
                                 }
-
-//                                if (!vids[uuid].length)
-//                                    delete vids[uuid];
+                                if (!vids[uuid].length)
+                                    delete vids[uuid];
                             }
                             res.json({"results": vids});
                         }
@@ -738,10 +736,10 @@ function suggestMF(search, callback) {
             index: 'ent_index',
             type: 'entity',
             body: {
-                from: 0, size: 10,
+                from: 0, size: 20,
                 query: {
                     match: {
-                        label: search}
+                        abstract: search}
                 }
             }
         }
@@ -764,7 +762,6 @@ function checkMF(json, callback) {
         var st = ent._source.startNPT;
         var f = function (async_callback) {
             db.getChaptersAtTime(st, uuid, function (err, ch) {
-                console.log(ch)
                 chapters.push(ch);
                 async_callback();
             });
@@ -781,7 +778,6 @@ function checkMF(json, callback) {
             var suggested = {};
             chapters.forEach(function (c) {
                 if (!c)return;
-                console.log(c)
                 var v1 = suggested[c.uuid];
                 if (v1) {
                     var notExists = v1.every(function (ch) {
@@ -794,7 +790,6 @@ function checkMF(json, callback) {
                 suggested[c.uuid] = v1;
             });
             callback(null, suggested);
-            console.log(suggested)
         }
     });
 
