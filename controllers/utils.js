@@ -20,7 +20,16 @@ exports.mergeObj = function () {
     return mObj;
 };
 
-var http = require('http');
+if (typeof String.prototype.startsWith != 'function') {
+    // see below for better implementation!
+    String.prototype.startsWith = function (str) {
+        return this.indexOf(str) == 0;
+    };
+}
+
+var http = require('http'),
+    https = require('https');
+
 if (!http.getRemoteFile) {
     http.getRemoteFile = function (url, callback) {
         var protocol = http;

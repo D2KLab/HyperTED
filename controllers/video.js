@@ -1,5 +1,4 @@
 var http = require('http'),
-    https = require('https'),
     url = require("url"),
     async = require('async'),
     optional = require('optional'),
@@ -1083,13 +1082,6 @@ function detectId(url, v) {
 
     var matches = url.match(vendor.url_pattern);
     return String(matches[matches.length - 1]);
-}
-
-if (typeof String.prototype.startsWith != 'function') {
-    // see below for better implementation!
-    String.prototype.startsWith = function (str) {
-        return this.indexOf(str) == 0;
-    };
 }
 
 exports.buildDb = function (req, res) {

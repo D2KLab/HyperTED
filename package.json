@@ -21,10 +21,8 @@
         "nerd4node": "git+https://github.com/giusepperizzo/nerd4node",
         "moment": "^2.8.0",
         "morgan": "^1.2.2",
-        "mediafragment": "git+https://github.com/pasqLisena/node-mediafragment",
-        "install": "^0.1.7",
-        "npm": "^1.4.23",
-        "elasticsearch": "^2.4.0"
+        "elasticsearch": "^2.4.0",
+        "mediafragment": "git+https://github.com/pasqLisena/node-mediafragment"
     },
     "optionalDependencies": {
         "node-ffprobe": "^1.2.2"
