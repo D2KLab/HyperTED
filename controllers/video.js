@@ -691,7 +691,10 @@ exports.filterEntities = function (req, res) {
             res.json({error: 'db error'});
         else {
             doc.sort(
-                function SortByRelevance(x, y) {
+                /**
+                 * @return {number}
+                 */
+                    function SortByRelevance(x, y) {
                     return ((x.relevance == y.relevance) ? 0 : ((x.relevance < y.relevance) ? 1 : -1 ));
                 });
             var lab = "";
