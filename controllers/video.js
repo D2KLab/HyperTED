@@ -1281,16 +1281,22 @@ function runHotspotProcess(uuid, callback) {
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
                     data += chunk;
-                    if (data.toLowerCase().indexOf('internal error') != -1) {
-                        callback({'message': 'Internal error'});
-                    }
                 });
                 res.on('end', function (err) {
                     if (err) {
                         callback(err);
                         return;
                     }
-//                    db.setHotspotProcess(uuid, hStatusValue.IN_PROGRESS, callback);
+
+                    if (data.toLowerCase().indexOf('internal error') != -1) {
+                        callback({'message': 'Internal error'});
+                        return;
+                    }
+                    if (data.toLowerCase().indexOf('service temporarily unavailable') != -1) {
+                        callback({'message': 'service temporarily unavailable'});
+                        return;
+                    }
+
                     var results = JSON.parse(data);
                     if (results && results.hp_list) {
                         video.hotspots = results.hp_list;
@@ -1298,16 +1304,15 @@ function runHotspotProcess(uuid, callback) {
 
                         callback(false, video);
 
-                        // we do not save nothing, so that hotspots are ever coming from server
-//                        db.addHotspots(uuid, results.hp_list, function (err) {
-//                            if (err) {
-//                                callback(err);
-//                                return;
-//                            }
-//                            db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
-//                                callback(err, results.hp_list);
-//                            });
-//                        });
+                        db.addHotspots(uuid, results.hp_list, function (err) {
+                            if (err) {
+                                callback(err);
+                                return;
+                            }
+                            db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
+                                callback(err, results.hp_list);
+                            });
+                        });
                     } else {
                         callback(true, false);
                     }

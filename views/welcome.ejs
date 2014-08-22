@@ -8,13 +8,6 @@
     <link rel="icon" type="image/png" href="/img/favicons/favicon_48.png">
     <!--[if IE]>
     <link rel="shortcut icon" href="/img/favicons/favicon.ico"/><![endif]-->
-    <link rel="apple-touch-icon" href="apple-touch-icon-precomposed.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="apple-touch-icon-72x72-precomposed.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="apple-touch-icon-114x114-precomposed.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="apple-touch-icon-144x144-precomposed.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
@@ -55,6 +48,7 @@
     <div class="container home_cont row">
         <div class="col-md-8">
             <h3>Start discovering from a video fragment...</h3>
+
             <div class="form-switch-cont">
                 <div class="btn-group btn-goup-lg" id="form-switch" data-toggle="buttons">
                     <label class="btn btn-danger active">
@@ -71,7 +65,8 @@
                     <input name="uri" type="url"
                            placeholder="e.g. https://www.ted.com/talks/will_potter_the_shocking_move_to_criminalize_non_violent_protest"
                            class="form-control input-lg" required>
-                    <label class="col-md-12 col-sm-12 suggesting">or try with <strong><em>https://www.ted.com/talks/2018</em></strong>
+                    <label class="col-md-12 col-sm-12 suggesting">or try with
+                        <strong><em>https://www.ted.com/talks/2018</em></strong>
                         or
                         <strong><em>https://www.ted.com/talks/sarah_lewis_embrace_the_near_win</em></strong>
                     </label>
@@ -113,11 +108,12 @@
         </div>
         <div class="col-md-4">
             <h3>...or search a topic</h3>
-            <form id="topic-form" method="get" action="TODO">
+
+            <form id="topic-form" method="get" action="topicsearch">
                 <label>Search a topic</label>
 
                 <div class="input-group">
-                    <input name="uri" type="text" placeholder="e.g. Democracy, United States, Wikipedia"
+                    <input name="topic" type="text" placeholder="e.g. Democracy, United States, Wikipedia"
                            class="form-control input-lg" required>
              <span class="input-group-btn">
                     <button class="btn btn-danger btn-lg" type="submit">Go!</button>

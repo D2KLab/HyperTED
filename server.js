@@ -23,6 +23,15 @@ app.get('/metadata/:uuid', video.ajaxGetMetadata);
 app.get('/filter_ent/:uuid', video.filterEntities);
 app.get('/builddb', video.buildDb);
 app.get('/elasticsearch/:search', video.suggestMF);
+app.get('/topicsearch', function (req, res) {
+    var topic = req.param('topic');
+
+    require('./controllers/course_suggestion').getSuggestedCouses([topic], function (err, data) {
+        if (err)res.json(err);
+        else res.json(data);
+    })
+
+});
 
 app.get('/home', function (req, res, next) {
     res.render('welcome.ejs')
