@@ -16,9 +16,7 @@
         var totWidth = (locals.duration);
         return((endT - startT) / totWidth) * 100;
     }
-
-
-
+if(locals.chapters){
             switch (locals.hotspotStatus){
     case 1:
     %>
@@ -96,6 +94,7 @@
         <input type="hidden" name="uuid" value="<%= locals.uuid %>">
         <button class="btn btn-hotspot" type="submit">GENERATE HOTSPOTS</button>
     </form>
-    <% } %>
+    <% }
+    } %>
 
 </div>

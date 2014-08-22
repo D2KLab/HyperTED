@@ -737,8 +737,11 @@ function suggestMF(search, callback) {
             body: {
                 from: 0, size: 20,
                 query: {
-                    match: {
-                        abstract: search}
+                    multi_match: {
+                        query: search,
+                        fields: ["label", "abstract", "uri^4"]
+
+                    }
                 }
             }
         }
