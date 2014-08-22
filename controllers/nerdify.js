@@ -41,9 +41,20 @@ function getEntities(doc_type, text, ext, callback) {
 }
 
 function getDbpediaAbstract(wikiUrl, callback) {
+    var topic;
+    if (wikiUrl.indexOf('wikipedia') >= 0) {
+        topic = "?res <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> <" + wikiUrl + ">.";
+    } else if (wikiUrl.indexOf('dbpedia') >= 0) {
+        topic = "FILTER (?res = <" + wikiUrl + "> ). ";
+    }
+    if (!topic) {
+        var tErr = new Error("could not retrieve abstract for " + wikiUrl);
+        console.warn(tErr);
+        callback(tErr);
+        return;
+    }
     var query = "select distinct ?res ?abstract where {" +
-        "?res <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> <" + wikiUrl + ">." +
-        " ?res dbpedia-owl:abstract ?abstract" +
+        " ?res dbpedia-owl:abstract ?abstract. " + topic +
         " FILTER langMatches( lang(?abstract), 'en')" +
         "} LIMIT 100";
 
@@ -53,10 +64,11 @@ function getDbpediaAbstract(wikiUrl, callback) {
     http.getJSON(fullUrl, function (err, data) {
         if (err) {
             console.error(err);
+        }
+        if(err || !data.results.bindings || !data.results.bindings.length){
             callback(err, data);
             return;
         }
-
         try {
             var abstract = data.results.bindings[0].abstract.value;
             callback(err, abstract)

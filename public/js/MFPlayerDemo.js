@@ -7,7 +7,6 @@ var client = new $.es.Client({
     hosts: 'localhost:9200'
 });
 
-
 $(document).ready(function () {
     // resize navbar on scroll
     var $navbar = $('.navbar').not('.navbar-placeholder');
@@ -137,11 +136,13 @@ $(document).ready(function () {
         var $button = $('button', $form);
         $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
         var extractor = window.location.toString().parseURL().search.enriched;
+
+        var timeFrag = $player.getMFJson().hash.t;
         $form.ajaxSubmit({
             data: {
                 extractor: extractor,
-                startMFFilt: ($player.getMFJson().hash.t[0].startNormalized) || 0,
-                endMFFilt: ($player.getMFJson().hash.t[0].endNormalized) || null
+                startMFFilt: (timeFrag && timeFrag[0].startNormalized) || 0,
+                endMFFilt: (timeFrag && timeFrag[0].endNormalized) || null
             },
             success: function (data) {
                 var text;
@@ -151,7 +152,6 @@ $(document).ready(function () {
                         $button.text().css('width', 'auto');
                         $button.prop('disabled', false).html('Suggest Chapters');
                         console.error(data.error);
-                        return;
                     } else {
                         $button.prop('disabled', false).html('Suggest Chapters');
                         return showfilterEnt(data);
