@@ -24,6 +24,9 @@ app.get('/filter_ent/:uuid', video.filterEntities);
 app.get('/builddb', video.buildDb);
 app.get('/elasticsearch/:search', video.suggestMF);
 
+app.get('/home', function (req, res, next) {
+    res.render('welcome.ejs')
+});
 app.get('/', function (req, res) {
     res.render('welcome.ejs')
 });

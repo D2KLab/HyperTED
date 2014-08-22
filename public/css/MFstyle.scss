@@ -46,7 +46,7 @@ html, body {
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
   margin: 0 0 30px;
   height: 300px;
-  max-height: 40%;
+  max-height: 35%;
   min-height: 120px;
   width: 100%;
   @media screen and (max-width: 767px) {
@@ -54,7 +54,9 @@ html, body {
   }
   position: relative;
   .HTlogo {
-    position: absolute;
+    @media (min-width: 768px) {
+      position: absolute;
+    }
     bottom: 0;
     text-align: center;
     padding-bottom: 30px;
@@ -64,6 +66,46 @@ html, body {
       margin: auto;
       display: inline-block;
     }
+  }
+
+  .logos {
+    text-align: center;
+    .inner {
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    p {
+      font: {
+        family: CaviarDreams, Helvetica, sans-serif;
+      }
+      text-align: center;
+      display: inline-block;
+      margin: 0 20px 0 0;
+    }
+    a {
+      display: inline-block;
+      max-height: 30px;
+      margin: 0 10px;
+      img {
+        max-height: 100%;
+      }
+    }
+    a, p {
+      vertical-align: middle;
+    }
+
+    @media screen and (min-width: 767px) {
+      text-align: right;
+      .inner {
+        display: inline-block;
+        border-bottom: 2px solid $dark_red;
+        margin-bottom: 20 pxsss;
+      }
+      a {
+        max-height: 50px;
+      }
+    }
+
   }
 }
 
@@ -111,7 +153,9 @@ html, body {
 }
 
 .home_cont {
+  font-size: 0.9em;
   padding-bottom: 90px;
+  margin: auto;
   form label {
     color: $medium_gray;
     font: {
@@ -119,9 +163,33 @@ html, body {
       size: 1.2em;
     }
   }
+  .input-lg {
+    font-size: 1em;
+  }
+
+  .suggesting{
+    font-size: 0.8em;
+  }
+
+  > div {
+    border-right: 1px dotted $medium_gray;
+    @media screen and (max-width: 991px) {
+      border-right: none;
+      border-bottom: 1px dotted $medium_gray;
+      padding-bottom: 30px;
+    }
+    &:last-child {
+      border: none;
+    }
+  }
+  h3 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
 }
 
 #basic-form {
+  max-width: 100%;
   button {
     margin-top: 1.3em;
   }
