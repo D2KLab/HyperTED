@@ -16,9 +16,25 @@ openCourseWare.prefix_map = {
     'dbpedia': 'http://dbpedia.org/property/'
 };
 
+var tedDataset = new sparql.Client('http://data-observatory.org/lod-profiles/sparql?default-graph-uri=http://data-observatory.org/ted_talks&format=json');
+tedDataset.prefix_map = {
+    'bibo': 'http://purl.org/ontology/bibo/',
+    'ma-ont': 'http://www.w3.org/ns/ma-ont#'
+};
+
+function getAllTalks(callback) {
+    tedDataset.query(
+            'SELECT DISTINCT ?talk ?title' +
+            '    WHERE {' +
+            '    ?talk a bibo:AudioVisualDocument.' +
+            '    ?talk ma-ont:title ?title.' +
+            '}', callback)
+}
+
+exports.getAllTalks = getAllTalks;
 
 function getFromOpenUniversity(keywords, callback) {
-    // keywords: array to regex
+    // keywords: array to regex€
     var regex = "";
     keywords.forEach(function (k) {
         regex += "(" + k + ")"
@@ -63,7 +79,7 @@ function getFromOpenUniversity(keywords, callback) {
             coursesList.forEach(function (c) {
                 var s = c.title.value + c.description.value;
                 c.score = s.match(rg).length;
-                c.source="openuniversity"
+                c.source = "openuniversity"
             });
 
             callback(err, coursesList);
@@ -106,12 +122,12 @@ function getFromOpenCourseWare(keywords, callback) {
                 return;
             }
 
-            // scrore: first the courses with more matches
+            // score: first the courses with more matches
             var rg = new RegExp(regex, 'gi');
             coursesList.forEach(function (c) {
                 var s = c.title.value + c.description.value;
                 c.score = s.match(rg).length;
-                c.source="opencourseware";
+                c.source = "opencourseware";
             });
 
             callback(err, coursesList);

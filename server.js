@@ -33,6 +33,8 @@ app.get('/topicsearch', function (req, res) {
 
 });
 
+app.get('/rdftalks', video.rdfTalks);
+
 app.get('/home', function (req, res, next) {
     res.render('welcome.ejs')
 });

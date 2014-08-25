@@ -1678,3 +1678,17 @@ function checkHotspotResults(uuid, callback) {
         callback(true, false);
     }
 }
+
+
+module.exports.rdfTalks = function (req, res) {
+    courseSuggestion.getAllTalks(function (err, data) {
+        if (err) {
+            console.error(err);
+            res.render('error', errorMsg.e500);
+            return;
+        }
+
+        db.
+        res.json(data);
+    })
+};
