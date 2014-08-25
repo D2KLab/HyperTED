@@ -15,6 +15,7 @@ ents.index('extractor');
 
 var hots = db.get('hotspots');
 hots.index('uuid');
+hots.index('uuid startNPT', {unique: true});
 
 var chaps = db.get('chapters');
 chaps.index('uuid');
@@ -139,6 +140,15 @@ function insertVideo(video, callback) {
             cbs.push(function (async_callback) {
                 addChapters(video.uuid, chapters, async_callback);
             });
+        }
+
+        if (video.hotspots) {
+            var hotspots = video.hotspots;
+            delete video.hotspots;
+
+//            cbs.push(function (async_callback) {
+//                addHotspots(video.uuid, hotspots, async_callback);
+//            });
         }
 
         if (cbs.length) {
@@ -274,7 +284,7 @@ module.exports.getHotspotProcess = function (uuid, callback) {
         else callback({message: "video not in db"});
     });
 };
-module.exports.addHotspots = function (uuid, hotspots, callback) {
+ function addHotspots(uuid, hotspots, callback) {
     var e = false;
     hotspots.forEach(function (h) {
         h.uuid = uuid;
@@ -287,3 +297,5 @@ module.exports.addHotspots = function (uuid, hotspots, callback) {
     });
     callback(e);
 };
+
+module.exports.addHotspots = addHotspots;

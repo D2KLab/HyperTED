@@ -63,6 +63,7 @@ function getFromOpenUniversity(keywords, callback) {
             coursesList.forEach(function (c) {
                 var s = c.title.value + c.description.value;
                 c.score = s.match(rg).length;
+                c.source="openuniversity"
             });
 
             callback(err, coursesList);
@@ -110,6 +111,7 @@ function getFromOpenCourseWare(keywords, callback) {
             coursesList.forEach(function (c) {
                 var s = c.title.value + c.description.value;
                 c.score = s.match(rg).length;
+                c.source="opencourseware";
             });
 
             callback(err, coursesList);
