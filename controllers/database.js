@@ -298,4 +298,60 @@ module.exports.getHotspotProcess = function (uuid, callback) {
     callback(e);
 };
 
+
+module.exports.forEachVideo=function(f){
+            var videos = db.get('videos');
+    videos.find({ timedtext: { $exists: true, $nin:[""]}, hotspotStatus:{ $exists: false}},{stream:true}).each(f).error(function(err){console.trace(err)});
+
+}
+
+
+
+module.exports.saveAbstracts = function(){
+        var ents = db.get('entities');
+
+    ents.find({ uri: { $exists: true, $nin:[""]}, abstract: { $exists: false}},{stream:true}).each(function(doc){
+        console.log(doc.label);
+        if(doc.uri){
+            getDbpediaAbstract(doc.uri, function(err,abstract){
+ents.updateById(doc._id, {'$set':{'abstract': abstract} }, function(err){
+                        if(err)  console.trace(err);
+                        console.log(doc.label + ' done');
+
+})
+            });
+        }
+    })  .error(function(err){console.trace(err)});
+
+
+    function getDbpediaAbstract(wikiUrl, callback) {
+        var http = require('http');
+        var query = "select distinct ?res ?abstract where {" +
+            "?res <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> <" + wikiUrl + ">." +
+            " ?res dbpedia-owl:abstract ?abstract" +
+            " FILTER langMatches( lang(?abstract), 'en')" +
+            "} LIMIT 100";
+
+        var fullUrl = "http://dbpedia.org/sparql?query=" + query +
+            "&format=json";
+
+        http.getJSON(fullUrl, function (err, data) {
+            if (err) {
+                console.error(err);
+                callback(err, data);
+                return;
+            }
+
+            try {
+                var abstract = data.results.bindings[0].abstract.value;
+                callback(err, abstract)
+            } catch (e) {
+                console.error(e);
+                callback(e);
+            }
+        });
+    }
+
+}};
+
 module.exports.addHotspots = addHotspots;

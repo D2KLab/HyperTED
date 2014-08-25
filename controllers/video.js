@@ -1262,6 +1262,55 @@ exports.runHotspot = function (req, res) {
     });
 };
 
+exports.runHotspotFull  = function(req,res){
+        var remainingRequest = 3;
+
+    loopFunc = function(video){
+        var uuid = video.uuid;
+        if(remainingRequest <= 0){
+            setTimeout(function(){
+                loopFunc(video)
+            }, 1000)
+    }else{
+        remainingRequest--;
+        db.getHotspotProcess(uuid, function (e, status) {
+        if (e) {
+            console.log("DB Error: " + e.message);
+           // res.json({error: {code: 500, message: e.message}});
+            return;
+        }
+
+        if (!status) {
+            runHotspotProcess(uuid, function (err, data) {
+                                remainingRequest++;
+
+                if (err) {
+                    console.log("Error: " + err.message);
+                  //  res.json({error: {code: 500, message: err.message}});
+                    return;
+                }
+                    if (data) {
+                        db.addHotspots(uuid, data.hotspots, function (err) {
+                            if (err) {
+                                return;
+                            }
+            db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
+            });
+        });
+}
+//                res.json({done: true});
+              //  res.render('hp_resp.ejs', data);
+
+            });
+        } 
+        //else res.json({done: true});
+
+    });}
+        }
+
+    db.forEachVideo(loopFunc)
+}
+
 function runHotspotProcess(uuid, callback) {
     db.getVideoFromUuid(uuid, true, function (err, video) {
         if (err || !video) {
@@ -1302,6 +1351,7 @@ function runHotspotProcess(uuid, callback) {
             var post_req = http.request(post_options, function (res) {
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
+
                     data += chunk;
                 });
                 res.on('end', function (err) {

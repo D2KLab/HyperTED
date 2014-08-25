@@ -4,7 +4,6 @@ var express = require('express'),
     logger = require('morgan'),
     errMsg = require('./controllers/error_msg');
 
-
 var app = express();
 var DEBUG = false;
 app.set('view options', {layout: false});
@@ -17,11 +16,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/nerdify', video.nerdify);
 app.get('/runhotspot', video.runHotspot);
+app.get('/runhp', video.runHotspotFull);
 app.get('/video/:uuid', video.view);
 app.get('/video?', video.search);
 app.get('/metadata/:uuid', video.ajaxGetMetadata);
 app.get('/filter_ent/:uuid', video.filterEntities);
 app.get('/builddb', video.buildDb);
+app.get('/abstract', function(res, req){
+    console.log('we');
+    require('./controllers/database').saveAbstracts();
+
+
+})
 app.get('/elasticsearch/:search', video.suggestMF);
 app.get('/topicsearch', function (req, res) {
     var topic = req.param('topic');
