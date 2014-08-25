@@ -697,12 +697,14 @@ exports.filterEntities = function (req, res) {
                     function SortByRelevance(x, y) {
                     return ((x.relevance == y.relevance) ? 0 : ((x.relevance < y.relevance) ? 1 : -1 ));
                 });
-            var lab = "";
+            var lab = "", uri = "";
             for (var i in doc) {
                 lab = lab.concat(doc[i].label, '&');
+                uri = uri.concat(doc[i].uri, '&');
             }
-            var filtered = lab.substring(0, lab.length - 1);
-            suggestMF(filtered, function (err, resp) {
+            var filt_lab = lab.substring(0, lab.length - 1);
+            var filt_uri = uri.substring(0, uri.length - 1);
+            suggestMF(filt_lab, filt_uri, function (err, resp) {
                 if (err)
                     res.send(err.message, 500);
                 else {
@@ -733,7 +735,7 @@ exports.filterEntities = function (req, res) {
 
 };
 
-function suggestMF(search, callback) {
+function suggestMF(search, search_uri, callback) {
     client.search({
             index: 'ent_index',
             type: 'entity',
