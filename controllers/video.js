@@ -712,6 +712,7 @@ exports.filterEntities = function (req, res) {
                         if (err)
                             res.send(err.message, 500);
                         else {
+
                             if (vids[uuid]) {
                                 for (var c in vids[uuid]) {
                                     if (vids[uuid][c].startNPT == startMF) {
@@ -721,7 +722,7 @@ exports.filterEntities = function (req, res) {
                                 if (!vids[uuid].length)
                                     delete vids[uuid];
                             }
-                            res.json({"results": vids});
+                            res.render('partials/playlist.ejs', {'suggestedVids': vids});
                         }
 
                     })

@@ -1009,8 +1009,6 @@ div.chapterscontent.visible {
 }
 
 .video-list .video-link .content {
-    display: none;
-    opacity: 0;
     -webkit-transition: opacity 200ms ease-out;
     -moz-transition: opacity 200ms ease-out;
     -o-transition: opacity 200ms ease-out;

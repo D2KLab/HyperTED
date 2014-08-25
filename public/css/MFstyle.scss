@@ -709,8 +709,6 @@ div.chapterscontent {
       margin-right: 12px;
     }
     .content {
-      display: none;
-      opacity: 0;
       @include transition(opacity, 200ms);
       &.visible {
         opacity: 1;
