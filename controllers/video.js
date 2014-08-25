@@ -1262,51 +1262,52 @@ exports.runHotspot = function (req, res) {
     });
 };
 
-exports.runHotspotFull  = function(req,res){
-        var remainingRequest = 3;
+exports.runHotspotFull = function (req, res) {
+    var remainingRequest = 3;
 
-    loopFunc = function(video){
+    loopFunc = function (video) {
         var uuid = video.uuid;
-        if(remainingRequest <= 0){
-            setTimeout(function(){
+        if (remainingRequest <= 0) {
+            setTimeout(function () {
                 loopFunc(video)
             }, 1000)
-    }else{
-        remainingRequest--;
-        db.getHotspotProcess(uuid, function (e, status) {
-        if (e) {
-            console.log("DB Error: " + e.message);
-           // res.json({error: {code: 500, message: e.message}});
-            return;
-        }
-
-        if (!status) {
-            runHotspotProcess(uuid, function (err, data) {
-                                remainingRequest++;
-
-                if (err) {
-                    console.log("Error: " + err.message);
-                  //  res.json({error: {code: 500, message: err.message}});
+        } else {
+            remainingRequest--;
+            db.getHotspotProcess(uuid, function (e, status) {
+                if (e) {
+                    console.log("DB Error: " + e.message);
+                    // res.json({error: {code: 500, message: e.message}});
                     return;
                 }
-                    if (data) {
-                        db.addHotspots(uuid, data.hotspots, function (err) {
-                            if (err) {
-                                return;
-                            }
-            db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
-            });
-        });
-}
+
+                if (!status) {
+                    runHotspotProcess(uuid, function (err, data) {
+                        remainingRequest++;
+
+                        if (err) {
+                            console.log("Error: " + err.message);
+                            //  res.json({error: {code: 500, message: err.message}});
+                            return;
+                        }
+                        if (data) {
+                            db.addHotspots(uuid, data.hotspots, function (err) {
+                                if (err) {
+                                    return;
+                                }
+                                db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
+                                });
+                            });
+                        }
 //                res.json({done: true});
-              //  res.render('hp_resp.ejs', data);
+                        //  res.render('hp_resp.ejs', data);
+
+                    });
+                }
+                //else res.json({done: true});
 
             });
-        } 
-        //else res.json({done: true});
-
-    });}
         }
+    }
 
     db.forEachVideo(loopFunc)
 }
@@ -1738,7 +1739,10 @@ module.exports.rdfTalks = function (req, res) {
             return;
         }
 
-        db.
-        res.json(data);
+        var rdfTalks = data.results.bindings;
+        db.addRdfTalks(rdfTalks, function (err) {
+            if (err) res.render('error', errorMsg.e500);
+            else res.json({'all': 'ok'});
+        });
     })
 };

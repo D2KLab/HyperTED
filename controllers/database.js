@@ -284,7 +284,7 @@ module.exports.getHotspotProcess = function (uuid, callback) {
         else callback({message: "video not in db"});
     });
 };
- function addHotspots(uuid, hotspots, callback) {
+function addHotspots(uuid, hotspots, callback) {
     var e = false;
     hotspots.forEach(function (h) {
         h.uuid = uuid;
@@ -299,59 +299,74 @@ module.exports.getHotspotProcess = function (uuid, callback) {
 };
 
 
-module.exports.forEachVideo=function(f){
-            var videos = db.get('videos');
-    videos.find({ timedtext: { $exists: true, $nin:[""]}, hotspotStatus:{ $exists: false}},{stream:true}).each(f).error(function(err){console.trace(err)});
+module.exports.forEachVideo = function (f) {
+    var videos = db.get('videos');
+    videos.find({ timedtext: { $exists: true, $nin: [""]}, hotspotStatus: { $exists: false}}, {stream: true}).each(f).error(function (err) {
+        console.trace(err)
+    });
 
-}
+};
 
 
+module.exports.saveAbstracts = function () {
+    var ents = db.get('entities');
 
-module.exports.saveAbstracts = function(){
-        var ents = db.get('entities');
-
-    ents.find({ uri: { $exists: true, $nin:[""]}, abstract: { $exists: false}},{stream:true}).each(function(doc){
+    ents.find({ uri: { $exists: true, $nin: [""]}, abstract: { $exists: false}}, {stream: true}).each(function (doc) {
         console.log(doc.label);
-        if(doc.uri){
-            getDbpediaAbstract(doc.uri, function(err,abstract){
-ents.updateById(doc._id, {'$set':{'abstract': abstract} }, function(err){
-                        if(err)  console.trace(err);
-                        console.log(doc.label + ' done');
+        if (doc.uri) {
+            getDbpediaAbstract(doc.uri, function (err, abstract) {
+                ents.updateById(doc._id, {'$set': {'abstract': abstract} }, function (err) {
+                    if (err)  console.trace(err);
+                    console.log(doc.label + ' done');
 
-})
+                })
             });
         }
-    })  .error(function(err){console.trace(err)});
+    }).error(function (err) {
+        console.trace(err)
+    });
+};
 
+function getDbpediaAbstract(wikiUrl, callback) {
+    var http = require('http');
+    var query = "select distinct ?res ?abstract where {" +
+        "?res <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> <" + wikiUrl + ">." +
+        " ?res dbpedia-owl:abstract ?abstract" +
+        " FILTER langMatches( lang(?abstract), 'en')" +
+        "} LIMIT 100";
 
-    function getDbpediaAbstract(wikiUrl, callback) {
-        var http = require('http');
-        var query = "select distinct ?res ?abstract where {" +
-            "?res <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> <" + wikiUrl + ">." +
-            " ?res dbpedia-owl:abstract ?abstract" +
-            " FILTER langMatches( lang(?abstract), 'en')" +
-            "} LIMIT 100";
+    var fullUrl = "http://dbpedia.org/sparql?query=" + query +
+        "&format=json";
 
-        var fullUrl = "http://dbpedia.org/sparql?query=" + query +
-            "&format=json";
+    http.getJSON(fullUrl, function (err, data) {
+        if (err) {
+            console.error(err);
+            callback(err, data);
+            return;
+        }
 
-        http.getJSON(fullUrl, function (err, data) {
-            if (err) {
-                console.error(err);
-                callback(err, data);
-                return;
-            }
-
-            try {
-                var abstract = data.results.bindings[0].abstract.value;
-                callback(err, abstract)
-            } catch (e) {
-                console.error(e);
-                callback(e);
-            }
-        });
-    }
-
-}};
+        try {
+            var abstract = data.results.bindings[0].abstract.value;
+            callback(err, abstract)
+        } catch (e) {
+            console.error(e);
+            callback(e);
+        }
+    });
+}
 
 module.exports.addHotspots = addHotspots;
+
+module.exports.addRdfTalks = function (rdfTalks, callback) {
+    rdfTalks.forEach(function (rdd) {
+        console.log(rdd.speaker.value + ' '+ rdd.title.value);
+        videos.findAndModify({'metadata.title': rdd.speaker.value + ' ' + rdd.title.value}, {$set: {'rdfUrl': rdd.talk.value}}, function (err, data) {
+            if (err || !data) {
+                console.log(rdd.talk.value);
+                console.log(err);
+                console.log(data);
+            }
+        })
+
+    });
+};

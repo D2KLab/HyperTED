@@ -24,10 +24,11 @@ tedDataset.prefix_map = {
 
 function getAllTalks(callback) {
     tedDataset.query(
-            'SELECT DISTINCT ?talk ?title' +
+            'SELECT DISTINCT ?talk ?speaker ?title' +
             '    WHERE {' +
             '    ?talk a bibo:AudioVisualDocument.' +
             '    ?talk ma-ont:title ?title.' +
+            '    OPTIONAL{?talk ma-ont:hasContributor ?speaker.}'+
             '}', callback)
 }
 
