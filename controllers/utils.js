@@ -21,6 +21,7 @@ exports.mergeObj = function () {
 };
 
 var http = require('http');
+var https = require('https');
 if (!http.getRemoteFile) {
     http.getRemoteFile = function (url, callback) {
         var protocol = http;

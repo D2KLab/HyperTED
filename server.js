@@ -16,10 +16,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/nerdify', video.nerdify);
 app.get('/runhotspot', video.runHotspot);
+app.get('/runhp', video.runHotspotFull);
 app.get('/video/:uuid', video.view);
 app.get('/video?', video.search);
 app.get('/metadata/:uuid', video.ajaxGetMetadata);
 app.get('/builddb', video.buildDb);
+app.get('/abstract', function(res, req){
+    console.log('we');
+    require('./controllers/database').saveAbstracts();
+
+
+})
 app.get('/', function (req, res) {
     res.render('welcome.ejs')
 });
