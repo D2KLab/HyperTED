@@ -4,6 +4,7 @@ var express = require('express'),
     logger = require('morgan'),
     errMsg = require('./controllers/error_msg');
 
+
 var app = express();
 var DEBUG = false;
 app.set('view options', {layout: false});
@@ -19,7 +20,22 @@ app.get('/runhotspot', video.runHotspot);
 app.get('/video/:uuid', video.view);
 app.get('/video?', video.search);
 app.get('/metadata/:uuid', video.ajaxGetMetadata);
+app.get('/filter_ent/:uuid', video.filterEntities);
 app.get('/builddb', video.buildDb);
+app.get('/elasticsearch/:search', video.suggestMF);
+app.get('/topicsearch', function (req, res) {
+    var topic = req.param('topic');
+
+    require('./controllers/course_suggestion').getSuggestedCouses([topic], function (err, data) {
+        if (err)res.json(err);
+        else res.json(data);
+    })
+
+});
+
+app.get('/home', function (req, res, next) {
+    res.render('welcome.ejs')
+});
 app.get('/', function (req, res) {
     res.render('welcome.ejs')
 });

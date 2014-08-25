@@ -15,6 +15,7 @@ ents.index('extractor');
 
 var hots = db.get('hotspots');
 hots.index('uuid');
+hots.index('uuid startNPT', {unique: true});
 
 var chaps = db.get('chapters');
 chaps.index('uuid');
@@ -52,6 +53,19 @@ function getEntitiesFor(video, callback) {
     });
 }
 
+function getFilterEntities(uuid, extractor, start, end, callback) {
+    var timeFiltering = {'$gte': parseFloat(start)};
+    var ext = extractor;
+
+    if (end)
+        timeFiltering.$lte = parseFloat(end);
+
+    if (ext == "combined")
+        ents.find({'uuid': uuid, 'startNPT': timeFiltering, 'source': ext}, callback);
+    else ents.find({'uuid': uuid, 'startNPT': timeFiltering, 'extractor': ext}, callback);
+
+}
+
 function getHotspotsFor(video, callback) {
     hots.find({'uuid': video.uuid}, function (err, docs) {
         if (!err && docs && docs.length > 0) {
@@ -68,6 +82,10 @@ function getChaptersFor(video, callback) {
         }
         callback(false, video);
     });
+}
+
+function getChaptersAtTime(t, uuid, callback) {
+    chaps.findOne({'uuid': uuid, 'startNPT': {'$lte': t}, 'endNPT': { '$gte': t}}).on('complete', callback);
 }
 
 function getVideoFromVendorId(vendor, id, callback) {
@@ -106,50 +124,59 @@ function insertVideo(video, callback) {
         }
     }
     previousCheck(function () {
-    if (video.entities) {
-        var entities = video.entities;
-        delete video.entities;
+        if (video.entities) {
+            var entities = video.entities;
+            delete video.entities;
 
-        cbs.push(function (async_callback) {
-            addEntities(video.uuid, entities, async_callback);
-        });
-    }
-
-    if (video.chapters) {
-        var chapters = video.chapters;
-        delete video.chapters;
-
-        cbs.push(function (async_callback) {
-            addChapters(video.uuid, chapters, async_callback);
-        });
-    }
-
-    if (cbs.length) {
-        cb = function (err, data) {
-            if (err) {
-                callback(err, video);
-                return;
-            }
-            async.parallel(cbs, function () {
-                callback(err, video);
+            cbs.push(function (async_callback) {
+                addEntities(video.uuid, entities, async_callback);
             });
         }
-    }
 
-    videos.insert(video, function (err, doc) {
-        if (err) {
-            console.log('DB insert fail. ' + JSON.stringify(err));
-            videos.findOne({uuid: video.uuid}).on('complete', function (e, data) {
-                if (!e && data) { //retry with another uuid
-                    exports.insert(video, callback);
-                } else {
-                    cb(e, video);
+        if (video.chapters) {
+            var chapters = video.chapters;
+            delete video.chapters;
+
+            cbs.push(function (async_callback) {
+                addChapters(video.uuid, chapters, async_callback);
+            });
+        }
+
+        if (video.hotspots) {
+            var hotspots = video.hotspots;
+            delete video.hotspots;
+
+//            cbs.push(function (async_callback) {
+//                addHotspots(video.uuid, hotspots, async_callback);
+//            });
+        }
+
+        if (cbs.length) {
+            cb = function (err, data) {
+                if (err) {
+                    callback(err, video);
+                    return;
                 }
-            });
-        } else {
-            cb(err, video);
+                async.parallel(cbs, function () {
+                    callback(err, video);
+                });
+            }
         }
-    });
+
+        videos.insert(video, function (err, doc) {
+            if (err) {
+                console.log('DB insert fail. ' + JSON.stringify(err));
+                videos.findOne({uuid: video.uuid}).on('complete', function (e, data) {
+                    if (!e && data) { //retry with another uuid
+                        exports.insert(video, callback);
+                    } else {
+                        cb(e, video);
+                    }
+                });
+            } else {
+                cb(err, video);
+            }
+        });
     });
 }
 
@@ -193,7 +220,7 @@ function updateVideoUuid(uuid, newVideo, callback) {
         }
     }
 
-    videos.findAndModify({uuid: uuid}, {$set:newVideo}, {upsert :true,new:true}, cb);
+    videos.findAndModify({uuid: uuid}, {$set: newVideo}, {upsert: true, new: true}, cb);
 }
 
 function addChapters(uuid, chapters, callback) {
@@ -238,6 +265,8 @@ module.exports = {
     getVideoFromUuid: getVideoFromUuid,
     getVideoFromLocator: getVideoFromLocator,
     getVideoFromVendorId: getVideoFromVendorId,
+    getFilterEntities: getFilterEntities,
+    getChaptersAtTime: getChaptersAtTime,
     insertVideo: insertVideo,
     updateVideoUuid: updateVideoUuid,
     updateVideo: function (newVideo, callback) {
@@ -255,7 +284,7 @@ module.exports.getHotspotProcess = function (uuid, callback) {
         else callback({message: "video not in db"});
     });
 };
-module.exports.addHotspots = function (uuid, hotspots, callback) {
+ function addHotspots(uuid, hotspots, callback) {
     var e = false;
     hotspots.forEach(function (h) {
         h.uuid = uuid;
@@ -268,3 +297,5 @@ module.exports.addHotspots = function (uuid, hotspots, callback) {
     });
     callback(e);
 };
+
+module.exports.addHotspots = addHotspots;

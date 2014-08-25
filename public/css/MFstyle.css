@@ -178,7 +178,7 @@ html, body {
   box-shadow: 0 1px 8px -2px #5d5d5d;
   margin: 0 0 30px;
   height: 300px;
-  max-height: 40%;
+  max-height: 35%;
   min-height: 120px;
   width: 100%;
   position: relative; }
@@ -186,15 +186,44 @@ html, body {
     .home_header {
       max-height: 150px; } }
   .home_header .HTlogo {
-    position: absolute;
     bottom: 0;
     text-align: center;
     padding-bottom: 30px;
     display: block;
     width: 100%; }
+    @media (min-width: 768px) {
+      .home_header .HTlogo {
+        position: absolute; } }
     .home_header .HTlogo .top-brand {
       margin: auto;
       display: inline-block; }
+  .home_header .logos {
+    text-align: center; }
+    .home_header .logos .inner {
+      padding: 10px;
+      margin-bottom: 10px; }
+    .home_header .logos p {
+      font-family: CaviarDreams, Helvetica, sans-serif;
+      text-align: center;
+      display: inline-block;
+      margin: 0 20px 0 0; }
+    .home_header .logos a {
+      display: inline-block;
+      max-height: 30px;
+      margin: 0 10px; }
+      .home_header .logos a img {
+        max-height: 100%; }
+    .home_header .logos a, .home_header .logos p {
+      vertical-align: middle; }
+    @media screen and (min-width: 767px) {
+      .home_header .logos {
+        text-align: right; }
+        .home_header .logos .inner {
+          display: inline-block;
+          border-bottom: 2px solid #b11200;
+          margin-bottom: 20 pxsss; }
+        .home_header .logos a {
+          max-height: 50px; } }
 
 .home_footer, .video_footer {
   width: 100%; }
@@ -226,16 +255,36 @@ html, body {
   margin-bottom: 40px; }
 
 .home_cont {
-  padding-bottom: 90px; }
+  font-size: 0.9em;
+  padding-bottom: 90px;
+  margin: auto; }
   .home_cont form label {
     color: #aaaaaa;
     font-weight: 100;
     font-size: 1.2em; }
+  .home_cont .input-lg {
+    font-size: 1em; }
+  .home_cont .suggesting {
+    font-size: 0.8em; }
+  .home_cont > div {
+    border-right: 1px dotted #aaaaaa; }
+    @media screen and (max-width: 991px) {
+      .home_cont > div {
+        border-right: none;
+        border-bottom: 1px dotted #aaaaaa;
+        padding-bottom: 30px; } }
+    .home_cont > div:last-child {
+      border: none; }
+  .home_cont h3 {
+    text-align: center;
+    margin-bottom: 20px; }
 
-#basic-form button {
-  margin-top: 1.3em; }
-#basic-form > * {
-  display: block; }
+#basic-form {
+  max-width: 100%; }
+  #basic-form button {
+    margin-top: 1.3em; }
+  #basic-form > * {
+    display: block; }
 
 .video_footer {
   margin-top: 50px; }

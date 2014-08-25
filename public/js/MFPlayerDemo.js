@@ -3,6 +3,9 @@ var storageKey = 'fragmentenricher.';
 var videokey = storageKey + video.uuid + '.';
 var parsedJSON;
 var $plainSubCont; //Container for subs with no entities
+var client = new $.es.Client({
+    hosts: 'localhost:9200'
+});
 
 $(document).ready(function () {
     // resize navbar on scroll
@@ -125,8 +128,49 @@ $(document).ready(function () {
         });
     }
 
+    //filter entities for MF
+    var $nerdFilterForm = $('#nerd-filter-form');
+    $nerdFilterForm.submit(function (e) {
+        e.preventDefault();
+        var $form = $(this);
+        var $button = $('button', $form);
+        $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
+        var extractor = window.location.toString().parseURL().search.enriched;
+
+        var timeFrag = $player.getMFJson().hash.t;
+        $form.ajaxSubmit({
+            data: {
+                extractor: extractor,
+                startMFFilt: (timeFrag && timeFrag[0].startNormalized) || 0,
+                endMFFilt: (timeFrag && timeFrag[0].endNormalized) || null
+            },
+            success: function (data) {
+                var text;
+                try {
+                    if (data.error) {
+                        text = 'Something went wrong. Try again later';
+                        $button.text().css('width', 'auto');
+                        $button.prop('disabled', false).html('Suggest Chapters');
+                        console.error(data.error);
+                    } else {
+                        $button.prop('disabled', false).html('Suggest Chapters');
+                        return showfilterEnt(data);
+                    }
+                } catch (e) {
+                    text = 'Something went wrong. Try again later';
+                    console.error(text);
+                    console.log(e);
+                }
+            }});
+    });
+
+    function showfilterEnt(entjson) {
+        console.log(entjson);
+    }
+
     //ask for hotspots
     $('#hotspot-form').submit(function (e) {
+
         e.preventDefault();
         var $form = $(this);
         var $button = $('button', $form);
@@ -633,7 +677,6 @@ function displayEntitiesSub(entJson) {
 
             var $thisSub = $subList.get(subIndex);
             if (!$thisSub.id || $thisSub.id == '') {
-
                 subIndex--;
             } else {
                 var entStart = parseFloat(entity.startNPT).toFixed(2);
@@ -641,9 +684,7 @@ function displayEntitiesSub(entJson) {
                 $thisSub = $($thisSub);
                 var subStart = parseFloat($thisSub.data('startss')).toFixed(2);
                 var subEnd = parseFloat($thisSub.data('endss')).toFixed(2);
-                console.log(entStart + " >= " + subStart + " && " + entEnd + " <= " + subEnd);
                 if (entStart >= subStart && entEnd <= subEnd) {
-                    console.log(entity.label);
                     var text = $thisSub[0].innerHTML;
                     var nerdTypeSplit = entity.nerdType.split('#');
                     var nerdType = nerdTypeSplit.length > 1 ? nerdTypeSplit[1].toLowerCase() : "thing";
@@ -651,7 +692,6 @@ function displayEntitiesSub(entJson) {
                     var str = '<span class="entity ' + nerdType + '">' + entity.label + '</span>';
 
                     var replace = text.replace(entity.label, str);
-                    console.log(replace);
                     $thisSub.html(replace);
                     break;
                 } else {
@@ -663,7 +703,6 @@ function displayEntitiesSub(entJson) {
 
     $('.sub-text', document).replaceWith($newSubCont);
     $('p > span.entity').has('span').addClass('nesting');
-
 }
 
 

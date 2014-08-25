@@ -1,5 +1,4 @@
 var http = require('http'),
-    https = require('https'),
     url = require("url"),
     async = require('async'),
     optional = require('optional'),
@@ -7,9 +6,11 @@ var http = require('http'),
     moment = require('moment'),
     ffprobe = optional('node-ffprobe'),
     mfParser = require('mediafragment'),
+    elasticsearch = require('elasticsearch'),
     nerd = require('./nerdify'),
     db = require('./database'),
     ts = require('./linkedTVconnection'),
+    courseSuggestion = require('./course_suggestion'),
     errorMsg = require('./error_msg'),
     utils = require('./utils');
 
@@ -18,6 +19,11 @@ var hStatusValue = {
     'IN_PROGRESS': 1,
     'DONE': 2
 };
+
+var client = new elasticsearch.Client({
+    host: 'localhost:9200',
+    log: 'trace'
+});
 
 var time1d = 86400000; //one day
 var time1w = 7 * time1d; //one week
@@ -70,8 +76,24 @@ function renderVideo(res, video, options) {
     if (video.timedtext) {
         video.subtitles = srtToJson(video.timedtext, video.chapters);
     }
-    var source = mergeObj(video, options);
-    res.render('video.ejs', source);
+    if (video.hotspots) {
+        var topicList = [];
+        video.hotspots.forEach(function (hs) {
+            hs.topic_list.forEach(function (topic) {
+                topicList.push(topic);
+            })
+        });
+        courseSuggestion.getSuggestedCouses(topicList, function (err, courses) {
+            if (!err && courses && courses.length) {
+                video.courses = courses;
+            }
+            var source = mergeObj(video, options);
+            res.render('video.ejs', source);
+        })
+    } else {
+        var source = mergeObj(video, options);
+        res.render('video.ejs', source);
+    }
 }
 
 exports.view = function (req, res) {
@@ -114,7 +136,6 @@ exports.view = function (req, res) {
                             video.hotspotStatus = hStatusValue.DONE;
                             video.hotspots = data;
                         }
-
                         viewVideo(req, res, video);
                     });
                 } else {
@@ -419,7 +440,7 @@ function getMetadata(video, callback) {
                         metadata.comments = data.comments_total;
                         metadata.likes = data.ratings_total;
                         metadata.avgRate = data.rating;
-                        metadata.published = data.created_time + '';
+                        metadata.published = '' + moment.unix(data.created_time).format("YYYY-MM-DD");
                         metadata.category = data.genre;
                         async_callback(false);
 
@@ -479,10 +500,10 @@ function getMetadata(video, callback) {
                     return;
                 }
                 var datatalk = data.talk;
-                video.videoLocator = (datatalk.media.internal ? datatalk.media.internal['950k']||datatalk.media.internal['600k'] : datatalk.media.external).uri;
+                video.videoLocator = (datatalk.media.internal ? datatalk.media.internal['950k'] || datatalk.media.internal['600k'] : datatalk.media.external).uri;
                 video.vendor_id = String(datatalk.id);
                 metadata.title = datatalk.name;
-                if(datatalk.images){
+                if (datatalk.images) {
                     metadata.thumb = datatalk.images[1].image.url;
                     metadata.poster = datatalk.images[2].image.url;
                 }
@@ -499,7 +520,7 @@ function getMetadata(video, callback) {
                             http.getJSON(subUrl, function (err, data) {
                                 if (err) {
                                     console.log('[ERROR ' + err + '] on retrieving sub for ' + video.locator);
-                                }else video.jsonSub = data;
+                                } else video.jsonSub = data;
 
                                 async_callback(err, data);
                             });
@@ -632,10 +653,10 @@ function getFickleMetadata(video, callback) {
                     return;
                 }
                 var datatalk = data.talk;
-                video.videoLocator = (datatalk.media.internal ? datatalk.media.internal['950k']||datatalk.media.internal['600k'] : datatalk.media.external).uri;
+                video.videoLocator = (datatalk.media.internal ? datatalk.media.internal['950k'] || datatalk.media.internal['600k'] : datatalk.media.external).uri;
                 video.vendor_id = String(datatalk.id);
                 metadata.title = datatalk.name;
-                if(datatalk.images){
+                if (datatalk.images) {
                     metadata.thumb = datatalk.images[1].image.url;
                     metadata.poster = datatalk.images[2].image.url;
                 }
@@ -673,6 +694,129 @@ exports.ajaxGetMetadata = function (req, res) {
     });
 
 };
+
+exports.filterEntities = function (req, res) {
+    var uuid = req.param('uuid');
+    var startMF = req.param('startMFFilt');
+    if (!uuid) {
+        res.json({error: 'empty uuid'});
+        return;
+    }
+
+    db.getFilterEntities(uuid, req.param('extractor'), startMF, req.param('endMFFilt'), function (err, doc) {
+        if (err)
+            res.json({error: 'db error'});
+        else {
+            doc.sort(
+                /**
+                 * @return {number}
+                 */
+                    function SortByRelevance(x, y) {
+                    return ((x.relevance == y.relevance) ? 0 : ((x.relevance < y.relevance) ? 1 : -1 ));
+                });
+            var lab = "";
+            for (var i in doc) {
+                lab = lab.concat(doc[i].label, '&');
+            }
+            var filtered = lab.substring(0, lab.length - 1);
+            suggestMF(filtered, function (err, resp) {
+                if (err)
+                    res.send(err.message, 500);
+                else {
+                    checkMF(resp, function (err, vids) {
+                        if (err)
+                            res.send(err.message, 500);
+                        else {
+                            if (vids[uuid]) {
+                                for (var c in vids[uuid]) {
+                                    if (vids[uuid][c].startNPT == startMF) {
+                                        vids[uuid].splice(c);
+                                    }
+                                }
+                                if (!vids[uuid].length)
+                                    delete vids[uuid];
+                            }
+                            res.json({"results": vids});
+                        }
+
+                    })
+
+                }
+            });
+
+        }
+
+    })
+
+};
+
+function suggestMF(search, callback) {
+    client.search({
+            index: 'ent_index',
+            type: 'entity',
+            body: {
+                from: 0, size: 20,
+                query: {
+                    multi_match: {
+                        query: search,
+                        fields: ["label", "abstract", "uri^4"]
+
+                    }
+                }
+            }
+        }
+    ).then(function (resp) {
+            var hits = resp.hits.hits;
+            callback(null, hits);
+        }, function (err) {
+            console.trace(err.message);
+            callback(err);
+        });
+}
+exports.suggestMF = suggestMF;
+
+function checkMF(json, callback) {
+    var chapters = [], functs = [];
+
+
+    json.forEach(function (ent) { // entity
+        var uuid = ent._source.uuid;
+        var st = ent._source.startNPT;
+        var f = function (async_callback) {
+            db.getChaptersAtTime(st, uuid, function (err, ch) {
+                chapters.push(ch);
+                async_callback();
+            });
+        };
+
+        functs.push(f);
+
+    });
+
+
+    async.parallel(functs, function (err) {
+        if (err)callback(err);
+        else {
+            var suggested = {};
+            chapters.forEach(function (c) {
+                if (!c)return;
+                var v1 = suggested[c.uuid];
+                if (v1) {
+                    var notExists = v1.every(function (ch) {
+                        return ch.chapNum != c.chapNum;
+                    });
+                    if (notExists) v1.push(c);
+                    return;
+                }
+                v1 = [c];
+                suggested[c.uuid] = v1;
+            });
+            callback(null, suggested);
+        }
+    });
+
+
+}
 
 function getSubtitlesTV2RDF(uuid, callback) {
     http.getRemoteFile('http://linkedtv.eurecom.fr/tv2rdf/api/mediaresource/' + uuid + '/metadata?metadataType=subtitle', callback);
@@ -963,13 +1107,6 @@ function detectId(url, v) {
     return String(matches[matches.length - 1]);
 }
 
-if (typeof String.prototype.startsWith != 'function') {
-    // see below for better implementation!
-    String.prototype.startsWith = function (str) {
-        return this.indexOf(str) == 0;
-    };
-}
-
 exports.buildDb = function (req, res) {
     var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=100&externals=false&filter=id:>';
     var retrieveNerd = true;
@@ -1042,7 +1179,7 @@ exports.buildDb = function (req, res) {
             vendor_id: index
         };
 
-        if(uuid) video.uuid = uuid;
+        if (uuid) video.uuid = uuid;
         getMetadata(video, function (err, metadata) {
             if (err) {
                 console.log(LOG_TAG + 'Metadata retrieved with errors.');
@@ -1116,7 +1253,9 @@ exports.runHotspot = function (req, res) {
                     return;
                 }
 //                res.json({done: true});
-                res.render('hp_resp.ejs', data);
+
+//                res.render('hp_resp.ejs', {hotspot: data});
+                res.json({hotspot: data});
             });
         } else res.json({done: true});
 
@@ -1164,33 +1303,35 @@ function runHotspotProcess(uuid, callback) {
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
                     data += chunk;
-                    if (data.toLowerCase().indexOf('internal error') != -1) {
-                        callback({'message': 'Internal error'});
-                    }
                 });
                 res.on('end', function (err) {
                     if (err) {
                         callback(err);
                         return;
                     }
-//                    db.setHotspotProcess(uuid, hStatusValue.IN_PROGRESS, callback);
+
+                    if (data.toLowerCase().indexOf('internal error') != -1) {
+                        callback({'message': 'Internal error'});
+                        return;
+                    }
+                    if (data.toLowerCase().indexOf('service temporarily unavailable') != -1) {
+                        callback({'message': 'service temporarily unavailable'});
+                        return;
+                    }
+
                     var results = JSON.parse(data);
                     if (results && results.hp_list) {
-                        video.hotspots = results.hp_list;
-                        video.hotspotStatus = 2;
-
-                        callback(false, video);
-
-                        // we do not save nothing, so that hotspots are ever coming from server
-//                        db.addHotspots(uuid, results.hp_list, function (err) {
-//                            if (err) {
-//                                callback(err);
-//                                return;
-//                            }
-//                            db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
-//                                callback(err, results.hp_list);
-//                            });
-//                        });
+                        var hotspots = results.hp_list;
+                        console.log(hotspots)
+                        db.addHotspots(uuid, hotspots, function (err) {
+                            if (err) {
+                                callback(err, hotspots);
+                                return;
+                            }
+                            db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
+                                callback(err, hotspots);
+                            });
+                        });
                     } else {
                         callback(true, false);
                     }
@@ -1208,7 +1349,7 @@ function runHotspotProcess(uuid, callback) {
 function checkHotspotResults(uuid, callback) {
     console.log("check Hotspot Results");
     /* Call to services */
-    //fake results
+//    fake results
     var results = {
         //"UUID":"c1851285-972f-4c30-a7fd-1d6b704bb471",
 //        "hp_list"
