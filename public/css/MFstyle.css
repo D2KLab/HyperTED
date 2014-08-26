@@ -981,17 +981,21 @@ div.chapterscontent.visible {
 .video-list .video-link {
     padding: 10px;
     border-top: 1px solid #aaaaaa;
-    min-height: 100px;
+    min-height: 135px;
 }
 
 .video-list .video-link:first-child {
     border-top: none;
 }
 
-.video-list .video-link h4 {
+.video-list .video-link h4.playlist_title {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.video-list .video-link h4.playlist_title a {
+    color: #b11200;
 }
 
 .video-list .video-link .loader {

@@ -708,12 +708,11 @@ exports.filterEntities = function (req, res) {
                 if (err)
                     res.send(err.message, 500);
                 else {
-                    checkMF(resp, function (err, vids) {
+                    getChaptersFromSuggestion(resp, function (err, vids) {
                         if (err)
                             res.send(err.message, 500);
                         else {
-
-                            if (vids[uuid]) {
+                            if (vids[uuid]) { //remove fragment that I am watching
                                 for (var c in vids[uuid]) {
                                     if (vids[uuid][c].startNPT == startMF) {
                                         vids[uuid].splice(c);
@@ -723,6 +722,7 @@ exports.filterEntities = function (req, res) {
                                     delete vids[uuid];
                             }
                             res.render('partials/playlist.ejs', {'suggestedVids': vids});
+
                         }
 
                     })
@@ -741,7 +741,7 @@ function suggestMF(search, search_uri, callback) {
             index: 'ent_index',
             type: 'entity',
             body: {
-                from: 0, size: 20,
+                from: 0, size: 10,
                 query: {
                     multi_match: {
                         query: search,
@@ -761,9 +761,8 @@ function suggestMF(search, search_uri, callback) {
 }
 exports.suggestMF = suggestMF;
 
-function checkMF(json, callback) {
+function getChaptersFromSuggestion(json, callback) {
     var chapters = [], functs = [];
-
 
     json.forEach(function (ent) { // entity
         var uuid = ent._source.uuid;
@@ -788,16 +787,38 @@ function checkMF(json, callback) {
                 if (!c)return;
                 var v1 = suggested[c.uuid];
                 if (v1) {
-                    var notExists = v1.every(function (ch) {
+                    var notExists = v1.chaps.every(function (ch) {
                         return ch.chapNum != c.chapNum;
                     });
-                    if (notExists) v1.push(c);
+                    if (notExists) v1.chaps.push(c);
                     return;
                 }
-                v1 = [c];
+                v1 = {'chaps': [c]};
                 suggested[c.uuid] = v1;
             });
-            callback(null, suggested);
+            var funct2 = [];
+
+            for (var uuid in suggested) {
+                (function () {
+                    var c = uuid;
+                    var f2 = function (async_callback) {
+                        db.getVideoFromUuid(c, false, function (err, vid) {
+                            if (err) {
+                                console.trace(err);
+                                async_callback(false);
+                                return;
+                            }
+                            suggested[c].metadata = vid.metadata;
+                            async_callback();
+                        });
+                    }
+                    funct2.push(f2);
+                })();
+            }
+            async.parallel(funct2, function () {
+                callback(null, suggested);
+            });
+
         }
     });
 
