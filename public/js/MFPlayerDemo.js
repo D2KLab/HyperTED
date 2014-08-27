@@ -165,7 +165,8 @@ $(document).ready(function () {
     });
 
     function showfilterEnt(entjson) {
-        console.log(entjson);
+        $('.see-also').html(entjson);
+        console.log(entjson)
     }
 
     //ask for hotspots

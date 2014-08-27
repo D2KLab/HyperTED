@@ -754,15 +754,18 @@ div.chapterscontent {
   .video-link {
     padding: 10px;
     border-top: 1px solid $medium_gray;
-    min-height: 100px;
+    min-height: 135px;
     &:first-child {
       border-top: none;
     }
 
-    h4 {
+    h4.playlist_title {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      a {
+        color: $dark_red;
+      }
     }
     .loader {
       height: 16px;
@@ -777,8 +780,6 @@ div.chapterscontent {
       margin-right: 12px;
     }
     .content {
-      display: none;
-      opacity: 0;
       @include transition(opacity, 200ms);
       &.visible {
         opacity: 1;

@@ -11,37 +11,63 @@
 
     <div class="row">
         <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
-            <form method="get" id="nerd-filter-form" action="/filter_ent/<%= uuid %>">
+            <form method="get" id="nerd-filter-form" action="/filter_ent/<%= locals.uuid %>">
             <input type="hidden" name="uuid" value="<%= locals.uuid %>">
                 <input type="hidden" name="startMF">
                 <input type="hidden" name="endMF">
                 <button class="btn btn-danger" type="submit">Suggest Chapters</button>
             </form>
             <%
-            var videoList = [
+            function labelTime(time) {
+                var hh = Math.floor(time / 3600);
+                hh = hh < 10 ? '0' + hh : hh;
+                var mm = Math.floor((time % 3600) / 60);
+                mm = mm < 10 ? '0' + mm : mm;
+                var ss = Math.floor((time % 3600) % 60);
+                ss = ss < 10 ? '0' + ss : ss;
 
-            ];
+                return hh + ':' + mm + ':' + ss;
+            }
+            var videoList = [];
+            if (locals.suggestedVids) videoList = locals.suggestedVids;
             %>
             <div id="playlist-sect">
                 <ul class="video-list">
-                    <% videoList.forEach(function(v){ %>
-                    <li class="video-link" data-uuid="<%= v.uuid %>">
-                        <img class="loader" src="/img/ajax-loader.gif">
-
+                    <% for (var uuid in videoList){ %>
+                    <li class="video-link" data-uuid="<%= uuid %>">
                         <div class="content">
-                            <h4><a href="/video/<%= v.uuid %>"></a></h4>
-                            <a class="thumb-cont" href="/video/<%= v.uuid %>"></a>
+                            <%
+                                var meta = videoList[uuid].metadata;
+                                var title, thumb;
+                                if (videoList[uuid].metadata && videoList[uuid].metadata != 'undefined') {
+                                    title = meta.title;
+                                    thumb = meta.thumb;
+                                } else {
+                                    title = "Video"
+                                    thumb = "../img/thumb-default.png"
+                                }
+                            %>
+                            <h4 class="playlist_title"><a href="/video/<%= uuid %>" alt="<%= title %>"><%= title %></a>
+                            </h4>
+                            <a class="thumb-cont" href="/video/<%= uuid %>" title="<%= title %>"><img src="<%= thumb %>"
+                                                                                                      class="thumb"></a>
                             <ul class="frag-list">
-                                <% v.frags.forEach(function(frag){ %>
+
+                                <%
+                                    var frags = videoList[uuid].chaps;
+                                        for (var f in frags){
+                                %>
                                 <li class="frag-link">
-                                    <a href='/video/<%= v.uuid %> <%= frag.hash %>'><%= frag.title %>
-                                        <br/>(<%= frag.timing %>)</a>
+                                    <a href='/video/<%= uuid %>#t=<%= frags[f].startNPT %>,<%= frags[f].endNPT %>'>Chapter <%= frags[f].chapNum %>
+                                        <br/>(<%= labelTime(frags[f].startNPT) %> - <%= labelTime(frags[f].endNPT) %>
+                                        )</a>
                                 </li>
-                                <% }) %>
+                                <% } %>
                             </ul>
                         </div>
+
                     </li>
-                    <% }) %>
+                    <% } %>
                 </ul>
             </div>
         </div>
