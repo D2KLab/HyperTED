@@ -10,6 +10,7 @@ var http = require('http'),
     nerd = require('./nerdify'),
     db = require('./database'),
     ts = require('./linkedTVconnection'),
+    courseSuggestion = require('./course_suggestion'),
     errorMsg = require('./error_msg'),
     utils = require('./utils');
 
@@ -75,8 +76,24 @@ function renderVideo(res, video, options) {
     if (video.timedtext) {
         video.subtitles = srtToJson(video.timedtext, video.chapters);
     }
-    var source = mergeObj(video, options);
-    res.render('video.ejs', source);
+    if (video.hotspots) {
+        var topicList = [];
+        video.hotspots.forEach(function (hs) {
+            hs.topic_list.forEach(function (topic) {
+                topicList.push(topic);
+            })
+        });
+        courseSuggestion.getSuggestedCouses(topicList, function (err, courses) {
+            if (!err && courses && courses.length) {
+                video.courses = courses;
+            }
+            var source = mergeObj(video, options);
+            res.render('video.ejs', source);
+        })
+    } else {
+        var source = mergeObj(video, options);
+        res.render('video.ejs', source);
+    }
 }
 
 exports.view = function (req, res) {
@@ -1271,7 +1288,9 @@ exports.runHotspot = function (req, res) {
                     return;
                 }
 //                res.json({done: true});
-                res.render('hp_resp.ejs', data);
+
+//                res.render('hp_resp.ejs', {hotspot: data});
+                res.json({hotspot: data});
             });
         } else res.json({done: true});
 
@@ -1319,33 +1338,35 @@ function runHotspotProcess(uuid, callback) {
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
                     data += chunk;
-                    if (data.toLowerCase().indexOf('internal error') != -1) {
-                        callback({'message': 'Internal error'});
-                    }
                 });
                 res.on('end', function (err) {
                     if (err) {
                         callback(err);
                         return;
                     }
-//                    db.setHotspotProcess(uuid, hStatusValue.IN_PROGRESS, callback);
+
+                    if (data.toLowerCase().indexOf('internal error') != -1) {
+                        callback({'message': 'Internal error'});
+                        return;
+                    }
+                    if (data.toLowerCase().indexOf('service temporarily unavailable') != -1) {
+                        callback({'message': 'service temporarily unavailable'});
+                        return;
+                    }
+
                     var results = JSON.parse(data);
                     if (results && results.hp_list) {
-                        video.hotspots = results.hp_list;
-                        video.hotspotStatus = 2;
-
-                        callback(false, video);
-
-                        // we do not save nothing, so that hotspots are ever coming from server
-//                        db.addHotspots(uuid, results.hp_list, function (err) {
-//                            if (err) {
-//                                callback(err);
-//                                return;
-//                            }
-//                            db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
-//                                callback(err, results.hp_list);
-//                            });
-//                        });
+                        var hotspots = results.hp_list;
+                        console.log(hotspots)
+                        db.addHotspots(uuid, hotspots, function (err) {
+                            if (err) {
+                                callback(err, hotspots);
+                                return;
+                            }
+                            db.setHotspotProcess(uuid, hStatusValue.DONE, function (err, data) {
+                                callback(err, hotspots);
+                            });
+                        });
                     } else {
                         callback(true, false);
                     }

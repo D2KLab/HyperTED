@@ -16,7 +16,7 @@
         var totWidth = (locals.duration);
         return((endT - startT) / totWidth) * 100;
     }
-if(locals.chapters){
+            if(locals.chapters){
             switch (locals.hotspotStatus){
     case 1:
     %>
@@ -27,7 +27,10 @@ if(locals.chapters){
         break;
     case 2:
         locals.hotspots.sort(
-                function SortByStart(x, y) {
+                /**
+                 * @return {number}
+                 */
+                        function SortByStart(x, y) {
                     return ((x.startNPT == y.startNPT) ? 0 : ((x.startNPT > y.startNPT) ? 1 : -1 ));
                 });
             locals.hotspots.forEach(function(h){
@@ -45,7 +48,10 @@ if(locals.chapters){
             <%
             if(h.entity_list.length > 0){
                 h.entity_list.sort(
-                        function SortByRelevance(x, y) {
+                        /**
+                         * @return {number}
+                         */
+                                function SortByRelevance(x, y) {
                             return ((x.relevance == y.relevance) ? 0 : ((x.relevance < y.relevance) ? 1 : -1 ));
                         });
             %>
@@ -65,7 +71,10 @@ if(locals.chapters){
             <div class="topic-cont">
                 <%
                     h.topic_list.sort(
-                            function SortByRelevance(x, y) {
+                            /**
+                             * @return {number}
+                             */
+                                    function SortByRelevance(x, y) {
                                 return ((x.relevance == y.relevance) ? 0 : ((x.relevance < y.relevance) ? 1 : -1 ));
                             });
 
@@ -80,8 +89,9 @@ if(locals.chapters){
             <%
             h.entity_list.forEach(function(el){ %>
 
-            <span class="entity hotspotEnt <%= el.nerdType.toLowerCase().split("#").slice(1) %>"><a href="<%= el.uri %>"
-                                                                                                    target="_blank"><%= el.label %></a></span>
+            <span class="entity hotspotEnt <%= el.nerdType.toLowerCase().split("#").slice(1) %>">
+                <a href="<%= el.uri %>" target="_blank"><%= el.label %></a>
+            </span>
             <% }); %>
         </div>
     </div>

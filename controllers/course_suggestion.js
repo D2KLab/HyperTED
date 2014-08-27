@@ -63,6 +63,7 @@ function getFromOpenUniversity(keywords, callback) {
             coursesList.forEach(function (c) {
                 var s = c.title.value + c.description.value;
                 c.score = s.match(rg).length;
+                c.source="openuniversity"
             });
 
             callback(err, coursesList);
@@ -110,6 +111,7 @@ function getFromOpenCourseWare(keywords, callback) {
             coursesList.forEach(function (c) {
                 var s = c.title.value + c.description.value;
                 c.score = s.match(rg).length;
+                c.source="opencourseware";
             });
 
             callback(err, coursesList);
@@ -117,7 +119,7 @@ function getFromOpenCourseWare(keywords, callback) {
     );
 }
 
-exports.getSuggestedCouses = function (keyword, callback) {
+exports.getSuggestedCouses = function (keywords, callback) {
     if (!keywords instanceof Array || !keywords.length) {
         callback(Error('Keywords Parameter must be an array with at least 1 strings'));
         return;
@@ -126,14 +128,14 @@ exports.getSuggestedCouses = function (keyword, callback) {
     var coursesList = [];
     async.parallel([
         function (async_callback) {
-            getFromOpenUniversity(keyword, function (err, data) {
+            getFromOpenUniversity(keywords, function (err, data) {
                 if (err) console.error(err);
                 if (data && data.length) coursesList = coursesList.concat(data);
                 async_callback();
             });
         },
         function (async_callback) {
-            getFromOpenCourseWare(keyword, function (err, data) {
+            getFromOpenCourseWare(keywords, function (err, data) {
                 if (err) console.error(err);
                 if (data && data.length) coursesList = coursesList.concat(data);
                 async_callback();
