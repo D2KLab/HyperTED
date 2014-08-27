@@ -735,9 +735,10 @@ exports.filterEntities = function (req, res) {
                                         vids[uuid].splice(c);
                                     }
                                 }
-                                if (!vids[uuid].length)
+                                if (!Object.keys(vids).length)
                                     delete vids[uuid];
                             }
+
                             res.render('partials/playlist.ejs', {'suggestedVids': vids});
 
                         }

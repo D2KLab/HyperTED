@@ -36,6 +36,7 @@ $(document).ready(function () {
                     displayPins();
                     if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
                         highlightMFSub($player.getMFJson().hash.t[0].value);
+                        showTEDSuggestedChaps();
                     }
                     var $pop = Popcorn(media);
                     $('.sub-text p[data-time]').each(function () {
@@ -128,63 +129,31 @@ $(document).ready(function () {
             });
         }
 
-        //filter entities for MF
-//    var $nerdFilterForm = $('#nerd-filter-form');
-//    $nerdFilterForm.submit(function (e) {
-//        e.preventDefault();
-//        var $form = $(this);
-//        var $button = $('button', $form);
-//        $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
-//        var extractor = window.location.toString().parseURL().search.enriched;
-//
-//        var timeFrag = $player.getMFJson().hash.t;
-//        $form.ajaxSubmit({
-//            data: {
-//                extractor: extractor,
-//                startMFFilt: (timeFrag && timeFrag[0].startNormalized) || 0,
-//                endMFFilt: (timeFrag && timeFrag[0].endNormalized) || null
-//            },
-//            success: function (data) {
-//                var text;
-//                try {
-//                    if (data.error) {
-//                        text = 'Something went wrong. Try again later';
-//                        $button.text().css('width', 'auto');
-//                        $button.prop('disabled', false).html('Suggest Chapters');
-//                        console.error(data.error);
-//                    } else {
-//                        $button.prop('disabled', false).html('Suggest Chapters');
-//
-//                        return showTedSuggestedChapters(data);
-//                    }
-//                } catch (e) {
-//                    text = 'Something went wrong. Try again later';
-//                    console.error(text);
-//                    console.log(e);
-//                }
-//            }});
-//    });
-
-        function showTedSuggestedChapters(entjson) {
-            console.log(entjson);
-            $('.see-also').html(entjson);
-        }
-
-
-        $(document).on('click', '.subChapGroup', function () {
+        function showTEDSuggestedChaps() {
             var extractor = window.location.toString().parseURL().search.enriched;
 
             if (extractor) {
                 var timeFrag = $player.getMFJson().hash.t;
 
-                var data = {
-                    uuid: video.uuid,
-                    extractor: extractor,
-                    startMFFilt: (timeFrag && timeFrag[0].startNormalized) || 0,
-                    endMFFilt: (timeFrag && timeFrag[0].endNormalized) || null
-                }
-                showTedSuggestedChapters(data);
+                $.ajax({
+                    url: '/filter_ent/' + video.uuid,
+                    data: {
+                        extractor: extractor,
+                        startMFFilt: (timeFrag && timeFrag[0].startNormalized) || 0,
+                        endMFFilt: (timeFrag && timeFrag[0].endNormalized) || null
+
+                    }
+                }).done(function (res) {
+                    $('.see-also').html(res);
+
+                }).fail(function () {
+                    //do nothing
+                })
             }
+        }
+
+        $(document).on('click', '.subChapGroup', function () {
+            showTEDSuggestedChaps();
         });
 
 
@@ -398,35 +367,6 @@ $(document).ready(function () {
             }, 500);
 
         }
-
-
-//                    $form.ajaxSubmit({
-//
-//                        data: {
-//                            extractor: extractor,
-//                            startMFFilt: (timeFrag && timeFrag[0].startNormalized) || 0,
-//                            endMFFilt: (timeFrag && timeFrag[0].endNormalized) || null
-//                        },
-//                        success: function (data) {
-//                            var text;
-//                            try {
-//                                if (data.error) {
-//                                    console.error(data.error);
-//                                } else {
-//                                    console.log($form);
-//                                    return showTedSuggestedChapters(data);
-//                                }
-//                            } catch (e) {
-//                                text = 'Something went wrong. Try again later';
-//                                console.error(text);
-//                            }
-//                        }
-//                    });
-        //$nerdFilterForm.reset();
-//            )
-
-//            };
-//        });
 
         function updateMFurl() {
             if (Modernizr.history) {
