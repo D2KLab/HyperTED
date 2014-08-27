@@ -696,7 +696,8 @@ div.chapterscontent {
       overflow: hidden;
       text-overflow: ellipsis;
       a {
-        color: $dark_red;
+        color: $darker_gray;
+        font-style: italic;
       }
     }
     .loader {
@@ -727,6 +728,9 @@ div.chapterscontent {
           padding: 0 3px;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
+        }
+        a {
+          color: $dark_red;
         }
       }
     }
