@@ -995,7 +995,8 @@ div.chapterscontent.visible {
 }
 
 .video-list .video-link h4.playlist_title a {
-    color: #b11200;
+    color: #444444;
+    font-style: italic;
 }
 
 .video-list .video-link .loader {
@@ -1030,6 +1031,10 @@ div.chapterscontent.visible {
     padding: 0 3px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+.video-list .video-link ul.frag-list li.frag-link a {
+    color: #b11200;
 }
 
 span.wiki a {

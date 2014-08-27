@@ -754,6 +754,28 @@ exports.filterEntities = function (req, res) {
 };
 
 function suggestMF(search, search_uri, callback) {
+//    client.search({
+//            index: 'ent_index',
+//            type: 'entity',
+//            body: {
+//                from: 0, size: 10,
+//                query: {
+//                    multi_match: {
+//                        query: search_uri,
+//                        fields: ["uri"]
+//
+//                    }
+//                }
+//            }
+//        }
+//    ).then(function (resp) {
+//            var hits = resp.hits.hits;
+//            callback(null, hits);
+//        }, function (err) {
+//            console.trace(err.message);
+//            callback(err);
+//        });
+
     client.search({
             index: 'ent_index',
             type: 'entity',
@@ -762,7 +784,7 @@ function suggestMF(search, search_uri, callback) {
                 query: {
                     multi_match: {
                         query: search,
-                        fields: ["label", "abstract", "uri^4"]
+                        fields: ["label", "abstract"]
 
                     }
                 }
