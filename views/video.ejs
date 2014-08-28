@@ -115,7 +115,7 @@
         <div class="left">
             <% if(locals.rdfUrl){ %>
             <a class="rdf-link" href="<%= locals.rdfUrl %>" title="rdf" target="_blank">
-            <img src="/img/rdf-30_plain.png" height="30"></a>
+                <img src="/img/rdf-30_plain.png" height="30"></a>
             <% } %>
             <% if(metadata.published) { %>
             <h5 class="video-info">published on <%= metadata.published.substring(0, 10) %>
@@ -272,8 +272,8 @@
 <script type="text/html" id="course">
     <li class="course">
         <h4 class="title">
-            <a data-href="url" data-title="title"><img data-src="thumb" data-alt="title"/></a>
-            <a data-href="url" data-title="title" data-content="title"></a>
+            <a data-href="url"><img data-src="thumb" data-alt="title"/></a>
+            <a data-href="url" data-content="title"></a>
         </h4>
     </li>
 </script>

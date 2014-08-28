@@ -320,7 +320,6 @@ $(document).ready(function () {
 
                     if (i >= 1)break;
                 }
-
             }).fail(function () {
                 $('.loading', $suggCourses).hide();
             })
@@ -329,7 +328,6 @@ $(document).ready(function () {
             $('.loading', $suggCourses).hide();
         }
     }
-
 
     $("#video-info-chapters").fadeIn();
     var $chapLinks = $('.chap-link');
