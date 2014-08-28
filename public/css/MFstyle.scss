@@ -216,7 +216,7 @@ $navbarTransitionTime: 100ms;
   background: #fff;
   margin-bottom: 0;
   position: fixed;
-  z-index: 100;
+  z-index: 105;
   width: 100%;
 
   @include box-shadow(0, 1px, 8px, -2px, $dark_gray);
@@ -390,6 +390,22 @@ $navbarTransitionTime: 100ms;
         }
       }
 
+    }
+  }
+}
+
+#suggested-courses {
+  .invite {
+    display: none;
+  }
+  .loading {
+    font-style: italic;
+    text-align: center;
+  }
+  .course {
+    img {
+      max-width: 100px;
+      max-height: 60px;
     }
   }
 }
@@ -860,7 +876,7 @@ span.wiki {
   }
 }
 
-.rdf-link{
+.rdf-link {
   float: left;
   margin-right: 5px;
 }

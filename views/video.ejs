@@ -212,6 +212,7 @@
 
             <div class="col-md-5 col-lg-5 see-also">
                 <% include partials/playlist.ejs %>
+                <div id="suggested-courses"></div>
             </div>
         </div>
 
@@ -268,6 +269,37 @@
 <script src="/js/jquery.loadTemplate-1.4.4.min.js"></script>
 <script src="/js/MFPlayerDemo.js"></script>
 
+<script type="text/html" id="course">
+    <li class="course">
+        <h4 class="title">
+            <a data-href="url" data-title="title"><img data-src="thumb" data-alt="title"/></a>
+            <a data-href="url" data-title="title" data-content="title"></a>
+        </h4>
+    </li>
+</script>
+
+<script type="text/html" id="courseList">
+    <div class="row">
+        <div class="col-lg-7 col-md-7 col-sm-9 col-xs-6">
+            <hr class="red_rule">
+        </div>
+
+        <div class="col-lg-5 col-md-5 col-sm-3 col-xs-6">
+            <h1 class="title">learn also</h1>
+        </div>
+    </div>
+    <div>
+        <p class="invite">generate hotspots for having suggestion about courses</p>
+
+        <p class="loading">
+            <img src="\img\ajax-loader.gif">
+            loading suggested courses
+            <img src="\img\ajax-loader.gif">
+        </p>
+        <ul class="courses-list" id="courses-list">
+        </ul>
+    </div>
+</script>
 
 </body>
 

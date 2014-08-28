@@ -62,7 +62,7 @@ function viewVideo(req, res, video) {
         // we have to retrive entities from NERD
         getEntities(video, enriched, function (err, data) {
             if (err) {
-                console.log(LOG_TAG + 'error in getEntity: ' + err.message);
+                console.log(LOG_TAG + ' error in getEntity: ' + err.message);
                 options.error = "Sorry. We are not able to retrieving NERD entities now.";
             } else {
                 video.entities = data;
@@ -76,24 +76,8 @@ function renderVideo(res, video, options) {
     if (video.timedtext) {
         video.subtitles = srtToJson(video.timedtext, video.chapters);
     }
-    if (video.hotspots) {
-        var topicList = [];
-        video.hotspots.forEach(function (hs) {
-            hs.topic_list.forEach(function (topic) {
-                topicList.push(topic);
-            })
-        });
-        courseSuggestion.getSuggestedCouses(topicList, function (err, courses) {
-            if (!err && courses && courses.length) {
-                video.courses = courses;
-            }
-            var source = mergeObj(video, options);
-            res.render('video.ejs', source);
-        })
-    } else {
-        var source = mergeObj(video, options);
-        res.render('video.ejs', source);
-    }
+    var source = mergeObj(video, options);
+    res.render('video.ejs', source);
 }
 
 exports.view = function (req, res) {
@@ -1723,3 +1707,36 @@ function checkHotspotResults(uuid, callback) {
         callback(true, false);
     }
 }
+
+module.exports.getSuggestedCouses = function (req, res) {
+    var uuid = req.param('uuid');
+    db.getVideoFromUuid(uuid, true, function (err, video) {
+        var error;
+        if (err) error = err;
+        else if (!video || !video.hotspots) error = new Error("No video or no hotspots");
+        if (error) {
+            console.error(error);
+            res.status(500).json({'error': error});
+            return;
+        }
+
+        var topicList = [];
+        video.hotspots.forEach(function (hs) {
+            var mostImportantTopic = hs.topic_list[0];
+            hs.topic_list.forEach(function (topic) {
+                if (mostImportantTopic.finalScore < topic.finalScore)
+                    mostImportantTopic = topic;
+            });
+            topicList.push(mostImportantTopic.label);
+        });
+
+        courseSuggestion.getSuggestedCouses(topicList, function (err, courses) {
+            if (err || !courses || !courses.length) {
+                console.error(err);
+                res.status(500).json({'error': error});
+                return;
+            }
+            res.json(courses);
+        })
+    });
+};

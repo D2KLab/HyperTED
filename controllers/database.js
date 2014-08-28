@@ -22,6 +22,7 @@ chaps.index('uuid');
 chaps.index('uuid chapNum', {unique: true});
 
 function getVideoFromUuid(uuid, full, callback) {
+//    console.log('search video '+uuid + ' in database');
     var cb = !full ? callback : function (err, video) {
         if (err || !video) {
             callback(err, video);
@@ -38,6 +39,7 @@ function getVideoFromUuid(uuid, full, callback) {
                 getChaptersFor(video, asyncCallback);
             }
         ], function () {
+//            console.log('video found!');
             callback(false, video);
         });
     };
@@ -284,7 +286,7 @@ module.exports.getHotspotProcess = function (uuid, callback) {
         else callback({message: "video not in db"});
     });
 };
- function addHotspots(uuid, hotspots, callback) {
+function addHotspots(uuid, hotspots, callback) {
     var e = false;
     hotspots.forEach(function (h) {
         h.uuid = uuid;
@@ -296,6 +298,6 @@ module.exports.getHotspotProcess = function (uuid, callback) {
         });
     });
     callback(e);
-};
+}
 
 module.exports.addHotspots = addHotspots;

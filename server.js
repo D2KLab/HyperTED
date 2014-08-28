@@ -19,6 +19,7 @@ app.get('/nerdify', video.nerdify);
 app.get('/runhotspot', video.runHotspot);
 app.get('/video/:uuid', video.view);
 app.get('/video?', video.search);
+app.get('/courses?', video.getSuggestedCouses);
 app.get('/metadata/:uuid', video.ajaxGetMetadata);
 app.get('/filter_ent/:uuid', video.filterEntities);
 app.get('/builddb', video.buildDb);

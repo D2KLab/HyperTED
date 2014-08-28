@@ -297,7 +297,7 @@ html, body {
   background: #fff;
   margin-bottom: 0;
   position: fixed;
-  z-index: 100;
+  z-index: 105;
   width: 100%;
   -moz-box-shadow: 0 1px 8px -2px #5d5d5d;
   -webkit-box-shadow: 0 1px 8px -2px #5d5d5d;
@@ -428,6 +428,15 @@ html, body {
             text-align: center; }
             .nerdificable #entity-sect .entity-content div .entityList .displayEntity li {
               display: inline-block; }
+
+#suggested-courses .invite {
+  display: none; }
+#suggested-courses .loading {
+  font-style: italic;
+  text-align: center; }
+#suggested-courses .course img {
+  max-width: 100px;
+  max-height: 60px; }
 
 .red_rule {
   background-color: #b11200;

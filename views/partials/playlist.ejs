@@ -5,7 +5,7 @@
         </div>
 
         <div class="col-lg-5 col-md-5 col-sm-3 col-xs-6">
-            <h1 class="title">see also</h1>
+            <h1 class="title">watch also</h1>
         </div>
     </div>
 
@@ -32,7 +32,10 @@
             %>
             <div id="playlist-sect">
                 <ul class="video-list">
-                    <% for (var uuid in videoList){ %>
+                    <%
+                    for (var uuid in videoList){
+                        if (!videoList.hasOwnProperty(uuid))continue;
+                    %>
                     <li class="video-link" data-uuid="<%= uuid %>">
                         <div class="content">
                             <%
@@ -46,15 +49,17 @@
                                     thumb = "../img/thumb-default.png"
                                 }
                             %>
-                            <h4 class="playlist_title"><a href="/video/<%= uuid %>" alt="<%= title %>"><%= title %></a>
+                            <h4 class="playlist_title">
+                                <a href="/video/<%= uuid %>" title="<%= title %>"><%= title %></a>
                             </h4>
-                            <a class="thumb-cont" href="/video/<%= uuid %>" title="<%= title %>"><img src="<%= thumb %>"
-                                                                                                      class="thumb"></a>
+                            <a class="thumb-cont" href="/video/<%= uuid %>" title="<%= title %>">
+                                <img src="<%= thumb %>" class="thumb" alt="<%= title %>"></a>
                             <ul class="frag-list">
 
                                 <%
                                     var frags = videoList[uuid].chaps;
                                         for (var f in frags){
+                                    if (!frags.hasOwnProperty(f))continue;
                                 %>
                                 <li class="frag-link">
                                     <a href='/video/<%= uuid %>#t=<%= frags[f].startNPT %>,<%= frags[f].endNPT %>'>Chapter <%= frags[f].chapNum %>
