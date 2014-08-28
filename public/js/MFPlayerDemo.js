@@ -8,522 +8,517 @@ var client = new $.es.Client({
 });
 
 $(document).ready(function () {
-        // resize navbar on scroll
-        var $navbar = $('.navbar').not('.navbar-placeholder');
-        var navHeight = $navbar.height();
-        $(window).scroll(function () {
-            $navbar.toggleClass('compact', $(window).scrollTop() > navHeight);
-        });
+    // resize navbar on scroll
+    var $navbar = $('.navbar').not('.navbar-placeholder');
+    var navHeight = $navbar.height();
+    $(window).scroll(function () {
+        $navbar.toggleClass('compact', $(window).scrollTop() > navHeight);
+    });
 
-        var $subCont = $('#sub-cont');
-        var hasVideoSub = $subCont.exists();
+    var $subCont = $('#sub-cont');
+    var hasVideoSub = $subCont.exists();
 
-        //init smfplayer
-        var $playerSect = $('#player-sect');
-        var $player = $("#video").smfplayer({
-            mfURI: videoUri,
-            spatialOverlay: true,
-            temporalHighlight: true,
-            width: 640,
-            height: 360,
-            alwaysShowControls: true,
-            preload: 'metadata',
-            features: ['playpause', 'current', 'progress', 'duration', 'volume'],
-            autoStart: false,  //TODO remove
-            success: function (media, domObj) {
-                $(media).one('loadedmetadata', function () {
-                    displayChapters();
-                    displayPins();
-                    if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
-                        highlightMFSub($player.getMFJson().hash.t[0].value);
-                        showTEDSuggestedChaps();
-                    }
-                    var $pop = Popcorn(media);
-                    $('.sub-text p[data-time]').each(function () {
-                        var $this = $(this);
-                        var thisId = $this.attr('id');
-                        if (!thisId || !thisId.length) {
-                            return;
-                        }
-                        $pop.highlightSub({
-                            start: Math.round($this.data('startss')),
-                            end: Math.round($this.data('endss')),
-                            subId: thisId
-                        });
-                    });
-                }).on('play', function () {
-                    $('.info-on-player', $playerSect).hide();
-                }).on('pause', function () {
-                    $('.info-on-player', $playerSect).show();
-
-                });
-            }
-        });
-        video.player = $player;
-        console.debug($player);
-
-
-        //play/pause clicking on the video
-        var isPlaying = false;
-        $('.mejs-inner').on("click", function () {
-            if (isPlaying) {
-                $player.pause();
-                isPlaying = false;
-            } else {
-                $player.play();
-                isPlaying = true;
-            }
-        });
-
-        if (Modernizr.history && Modernizr.localstorage) {
-            // Nerdify form become an ajax form
-            var $nerdifyForm = $('form.nerdify');
-            var ajaxAction = $nerdifyForm.data('action');
-
-            $nerdifyForm.attr('action', ajaxAction).submit(function (e) {
-                e.preventDefault();
-                var $submitButton = $('button[type="submit"]', $nerdifyForm);
-                $submitButton.width($submitButton.width()).prop('disabled', true).html('<img src="../img/ajax-loader-greyRed.gif"><img src="../img/ajax-loader-greyRed.gif"><img src="../img/ajax-loader-greyRed.gif">');
-
-                var extractor = $('.nerdSelect select', $nerdifyForm).val();
-                var page_url = window.location.toString().parseURL();
-                page_url.search.enriched = extractor;
-
-                // if entities are in LocalStorage, get them and go on
-                var entitiesLS = getFromLocalStorage(videokey + extractor);
-                if (entitiesLS) {
-                    $submitButton.prop('disabled', false).html('Nerdify');
-                    history.pushState(null, null, page_url.toString());
-                    onEntitiesToShow(entitiesLS);
-                    return false;
+    //init smfplayer
+    var $playerSect = $('#player-sect');
+    var $player = $("#video").smfplayer({
+        mfURI: videoUri,
+        spatialOverlay: true,
+        temporalHighlight: true,
+        width: 640,
+        height: 360,
+        alwaysShowControls: true,
+        preload: 'metadata',
+        features: ['playpause', 'current', 'progress', 'duration', 'volume'],
+        autoStart: false,  //TODO remove
+        success: function (media, domObj) {
+            $(media).one('loadedmetadata', function () {
+                displayChapters();
+                displayPins();
+                if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
+                    highlightMFSub($player.getMFJson().hash.t[0].value);
+                    showTEDSuggestedChaps();
                 }
-
-                $(this).ajaxSubmit({
-                    success: function (data) {
-                        try {
-                            if (data.error) {
-                                var alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
-                                alert.appendTo($nerdifyForm).alert();
-                                $submitButton.prop('disabled', false).html('Nerdify');
-                                console.error(data.error);
-                                return;
-                            }
-                        } catch (e) {
-                            console.error(e);
-                            //DO NOTHING
-                        }
-
-                        saveInLocalStorage(videokey + extractor, data);
-
-                        $submitButton.prop('disabled', false).html('Nerdify');
-                        history.pushState(null, null, page_url.toString());
-                        onEntitiesToShow(data);
-                    },
-                    error: function () {
-                        var alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
-                        alert.appendTo($nerdifyForm).alert();
-                        $submitButton.removeLoader();
-                        console.error('Something went wrong');
+                var $pop = Popcorn(media);
+                $('.sub-text p[data-time]').each(function () {
+                    var $this = $(this);
+                    var thisId = $this.attr('id');
+                    if (!thisId || !thisId.length) {
+                        return;
                     }
+                    $pop.highlightSub({
+                        start: Math.round($this.data('startss')),
+                        end: Math.round($this.data('endss')),
+                        subId: thisId
+                    });
                 });
+            }).on('play', function () {
+                $('.info-on-player', $playerSect).hide();
+            }).on('pause', function () {
+                $('.info-on-player', $playerSect).show();
+
             });
         }
+    });
+    video.player = $player;
+    console.debug($player);
 
-        function showTEDSuggestedChaps() {
-            var extractor = window.location.toString().parseURL().search.enriched;
 
-            if (extractor) {
-                var timeFrag = $player.getMFJson().hash.t;
-
-                $.ajax({
-                    url: '/filter_ent/' + video.uuid,
-                    data: {
-                        extractor: extractor,
-                        startMFFilt: (timeFrag && timeFrag[0].startNormalized) || 0,
-                        endMFFilt: (timeFrag && timeFrag[0].endNormalized) || null
-
-                    }
-                }).done(function (res) {
-                    $('.see-also').html(res);
-
-                }).fail(function () {
-                    //do nothing
-                })
-            }
+    //play/pause clicking on the video
+    var isPlaying = false;
+    $('.mejs-inner').on("click", function () {
+        if (isPlaying) {
+            $player.pause();
+            isPlaying = false;
+        } else {
+            $player.play();
+            isPlaying = true;
         }
+    });
 
+    if (Modernizr.history && Modernizr.localstorage) {
+        // Nerdify form become an ajax form
+        var $nerdifyForm = $('form.nerdify');
+        var ajaxAction = $nerdifyForm.data('action');
 
-        //ask for hotspots
-        $('#hotspot-form').submit(function (e) {
-
+        $nerdifyForm.attr('action', ajaxAction).submit(function (e) {
             e.preventDefault();
-            var $form = $(this);
-            var $button = $('button', $form);
-            $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
+            var $submitButton = $('button[type="submit"]', $nerdifyForm);
+            $submitButton.width($submitButton.width()).prop('disabled', true).html('<img src="../img/ajax-loader-greyRed.gif"><img src="../img/ajax-loader-greyRed.gif"><img src="../img/ajax-loader-greyRed.gif">');
+
+            var extractor = $('.nerdSelect select', $nerdifyForm).val();
+            var page_url = window.location.toString().parseURL();
+            page_url.search.enriched = extractor;
+
+            // if entities are in LocalStorage, get them and go on
+            var entitiesLS = getFromLocalStorage(videokey + extractor);
+            if (entitiesLS) {
+                $submitButton.prop('disabled', false).html('Nerdify');
+                history.pushState(null, null, page_url.toString());
+                onEntitiesToShow(entitiesLS);
+                return false;
+            }
+
             $(this).ajaxSubmit({
                 success: function (data) {
-                    var text;
                     try {
                         if (data.error) {
-                            text = 'Something went wrong. Try again later';
-                            $button.text().css('width', 'auto');
+                            var alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
+                            alert.appendTo($nerdifyForm).alert();
+                            $submitButton.prop('disabled', false).html('Nerdify');
                             console.error(data.error);
                             return;
                         }
-//                    text = 'The request was sent successfully. Came back later to see hotspots.'
-//                    location.reload(true);
-                        $('#hotspots-cont').html(data);
-                        displayPins();
                     } catch (e) {
-                        text = 'Something went wrong. Try again later';
-                        console.error(text);
-                        console.log(e);
+                        console.error(e);
+                        //DO NOTHING
                     }
-                    var $p = $('<p>').text(text);
-                    $button.children().fadeOut();
-                    $button.append($p).width($p.width());
-                    setTimeout(function () {
-                        $button.append($p);
-                        $p.css('opacity', 1);
-                    }, 600);
+
+                    saveInLocalStorage(videokey + extractor, data);
+
+                    $submitButton.prop('disabled', false).html('Nerdify');
+                    history.pushState(null, null, page_url.toString());
+                    onEntitiesToShow(data);
                 },
                 error: function () {
-                    var text = 'Something went wrong. Try again later';
-
-                    var $p = $('<p>').text(text);
-                    $button.children().fadeOut();
-                    $button.append($p).width($p.width());
-                    $p.css('opacity', 1);
-
-                    console.error(data.error);
+                    var alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
+                    alert.appendTo($nerdifyForm).alert();
+                    $submitButton.removeLoader();
+                    console.error('Something went wrong');
                 }
             });
         });
+    }
 
-        $plainSubCont = $('.sub-text');
-        if (video.entitiesL) {
-            onEntitiesToShow(video.entitiesL);
-        }
+    function showTEDSuggestedChaps() {
+        var extractor = window.location.toString().parseURL().search.enriched;
 
-        // managing of click on a sub
-        // 1: in a chapter
-        $(document).on({
-            click: function (e) {
-                e.preventDefault();
-                var chapId = $(this).data('chapter');
-                $('#ch' + chapId).click();
-            }
-        }, '.sub-text p[data-chapter]');
+        if (extractor) {
+            var timeFrag = $player.getMFJson().hash.t;
 
-        // 2: not in a chapter
-        $(document).on('click', '.sub-text p[data-time]:not([data-chapter])', function () {
-            var srtTime = $(this).data('time');
-            var hms = srtTime.replace(/,/g, '.').replace(' --> ', ',');
-            $player.setmf('t=' + hms).playmf();
-            $('.chap-link').removeClass('selected-chap');
-            updateMFurl();
-        });
+            $.ajax({
+                url: '/filter_ent/' + video.uuid,
+                data: {
+                    extractor: extractor,
+                    startMFFilt: (timeFrag && timeFrag[0].startNormalized) || 0,
+                    endMFFilt: (timeFrag && timeFrag[0].endNormalized) || null
 
-        function calcDivWidth(startTime, endTime) {
-            var totWidth = ($player.getDuration() / 1000);
-            return((endTime - startTime) / totWidth) * 100;
-        }
-
-        function calcSpaceWidth(startTime, oldEndTime) {
-            var totWidth = ($player.getDuration() / 1000);
-            return ((startTime - oldEndTime) / totWidth) * 100;
-        }
-
-        function displayPins() {
-            var $pin = $('.pin');
-            $pin.each(function () {
-                var $this = $(this);
-                $this.qtip({
-                    content: {
-                        text: $('.qtipEnt', $this).html(),
-                        title: $('.qtipTitle', $this).html()
-                    },
-                    style: {
-                        classes: 'qtip-light qtip-rounded',
-                        padding: '15px',
-                        tip: 'bottom middle'
-                    },
-                    position: {
-                        my: 'bottom center',
-                        at: 'top center'
-                    },
-                    hide: {
-                        fixed: true,
-                        delay: 300
-                    }
-                });
-            });
-
-            $pin.fadeIn();
-
-            var oldEnd = 0;
-
-
-            $pin.each(function () {
-                var $hotSpot = $(this).children('a');
-                var startHS = $hotSpot.data('start-time');
-                var endHS = $hotSpot.data('end-time');
-
-                var width = calcDivWidth(startHS, endHS);
-                $(this).css("width", width + "%");
-
-                if (oldEnd < startHS) {
-                    var spaceWidth = calcSpaceWidth(startHS, oldEnd);
-                    $(this).css("margin-left", spaceWidth + "%");
                 }
-                oldEnd = endHS;
+            }).done(function (res) {
+                $('.see-also').html(res);
 
-
-                $(this).on('click', function () {
-                    $player.setmf('t=' + startHS + ',' + endHS).playmf();
-                    updateMFurl();
-                });
-                if ($(".pinEnt", $(this)).width >= $(this).width)
-                    $(".pinEnt", $(this)).css("max-width", $(this).width - 15);
-
-            });
-
-            var $suggCourses = $("#suggested-courses");
-            if ($('.chap-link').length)
-                $suggCourses.loadTemplate($("#courseList"), {});
-
-            if ($pin.length) {
-                $('.invite', $suggCourses).hide();
-                $('.loading', $suggCourses).show();
-
-                $.ajax({
-                    url: '/courses',
-                    data: {
-                        uuid: video.uuid
-                    }
-                }).done(function (data) {
-                    $('.loading', $suggCourses).hide();
-
-                    if (!data.length) return;
-                    for (var i in data) {
-                        if (!data.hasOwnProperty(i)) continue;
-                        var course = data[i];
-                        $('#courses-list').loadTemplate($('#course'), {
-                            url: course.locator.value,
-                            title: course.title.value,
-                            thumb: '\\img\\logos\\' + course.source + '.png'
-                        }, {append: true});
-
-                        if (i >= 1)break;
-                    }
-
-                }).fail(function () {
-                    $('.loading', $suggCourses).hide();
-                })
-            } else {
-                $('.invite', $suggCourses).show();
-                $('.loading', $suggCourses).hide();
-            }
-        }
-
-
-        $("#video-info-chapters").fadeIn();
-        var $chapLinks = $('.chap-link');
-        if (!$chapLinks.first().data("duration")) {
-            var $totChapters = $chapLinks.length;
-            $chapLinks.each(function () {
-                $(this).css("width", 100 / $totChapters + "%");
-            });
-        }
-
-        function displayChapters() {
-            $("#video-info-chapters").fadeIn();
-            var $chapLinks = $('.chap-link');
-            var $totChapters = $chapLinks.length;
-
-            $chapLinks.each(function () {
-                var $chapNum = $(this).find('.chap-num');
-                var index = $('.chap-line .chap-link').index(this);
-
-                var $chapter = $(this).children('a');
-                var startChapter = $chapter.data('start-time');
-                var endChapter = $chapter.data('end-time');
-
-                if (!$('.chap-link').data("duration")) {
-                    var chapWidth;
-                    if (index === $totChapters - 1) {
-                        chapWidth = calcDivWidth(startChapter, ($player.getDuration() / 1000));
-                    } else
-                        chapWidth = calcDivWidth(startChapter, endChapter);
-
-                    $(this).css("width", chapWidth + "%");
-                }
-
-
-                $(this).hover(function () {
-                    if ($(this).width() < 175) {
-                        var opt = {
-                            top: "16px",
-                            opacity: "1",
-                            cursor: "auto"
-                        };
-
-                        if (index > Math.floor($totChapters / 2)) {
-                            opt.right = 0;
-                        }
-                        $chapter.children('.chap-timing').css(opt);
-                    }
-                });
-
-                $(this).on('click', function () {
-                    $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
-                    var chapNumLast = $('.chap-num:last')[0].innerText;
-                    var chapNum = $chapNum[0].innerText;
-
-                    $('.chap-link').removeClass('selected-chap');
-
-                    $(this).addClass('selected-chap');
-                    $('.first-part').text("chapter   ");
-                    $('.selected-chap-num').text(chapNum);
-                    $('.last-part').text("   of   " + chapNumLast);
-
-                    updateMFurl();
-                });
-            });
-
-            setTimeout(function () {
-                $('.chap-link').each(function () {
-                    var $chapNum = $(this).find('.chap-num');
-                    if ($(this).width() >= 25) {
-                        $chapNum.fadeIn();
-                        $chapNum.css("display", "inline-block");
-                    }
-                });
-            }, 500);
-
-        }
-
-        function updateMFurl() {
-            if (Modernizr.history) {
-                parsedJSON = $player.getMFJson();
-                var hash = parsedJSON.hash;
-                var page_url = window.location.toString().parseURL();
-
-                if (!$.isEmptyObject(hash)) {
-                    for (var key in hash) {
-                        if (!hash.hasOwnProperty(key))continue;
-                        page_url.hash[key] = hash[key][0].value;
-                    }
-                } else {
-                    page_url.hash = {};
-                }
-                highlightMFSub(hash.t[0].value);
-                showTEDSuggestedChaps();
-                delete page_url.search.t;
-                delete page_url.search.xywh;
-
-                history.pushState(null, null, page_url.toString());
-            }
-        }
-
-        function timeToSec(hms) {
-            var time = (hms.split(":"));
-            var hh = parseInt(time[0]);
-            var mm = parseInt(time[1]);
-            var ss = parseInt(time[2]);
-
-            return ((mm * 60) + (hh * 3600) + ss);
-        }
-
-        function highlightMFSub(t) {
-            var sMF, eMF, sMFtest, eMFtest;
-
-            t = t.replace('npt:', '');
-
-            if (t.indexOf(",") != -1) {
-                var mfTime = (t.split(","));
-                sMFtest = mfTime[0];
-                sMFtest = sMFtest.length > 0 ? sMFtest : '0';
-                eMFtest = mfTime[1];
-            } else {
-                sMFtest = t;
-                eMFtest = '86400';
-            }
-
-            sMF = sMFtest.indexOf(":") == -1 ? sMFtest : timeToSec(sMFtest);
-            eMF = eMFtest.indexOf(":") == -1 ? eMFtest : timeToSec(eMFtest);
-            sMF = parseFloat(sMF);
-            eMF = parseFloat(eMF);
-
-            $('.sub-text p').removeClass("selected-frag").each(function () {
-                var eSub = parseFloat($(this).data('endss'));
-
-                if (sMF < eSub && eMF >= eSub) {
-                    $(this).addClass("selected-frag");
-                }
-            });
-            var $firstSelFrag = $(".selected-frag:first");
-            if ($firstSelFrag.length > 0) {
-                var $subText = $('.sub-text');
-                var scrollPos = $firstSelFrag.position().top + $subText.scrollTop();
-
-                $subText.animate({
-                    scrollTop: scrollPos
-                });
-            } else {
-                console.warn("No subtitles in this fragment. Are you sure that fragment is inside video duration?")
-            }
-        }
-
-
-        // Browser back and forward
-        $(window).off('popstate').on('popstate', function () {
-            var page_url = window.location.toString().parseURL();
-
-            // media fragment
-            var frag;
-            var t = page_url.search.t || page_url.hash.t;
-            if (t)
-                frag = 't=' + t;
-
-            var xywh = page_url.search.xywh || page_url.hash.xywh;
-            if (xywh)
-                frag = frag ? frag + '&' + 'xywh=' + xywh : 'xywh=' + xywh;
-
-            if (frag) {
-                console.info("popstate! new fragment: " + frag);
-
-                $player.setmf(frag);
-                if (hasVideoSub) {
-                    highlightMFSub(t);
-                }
-            }
-
-            // nerdification
-            var extractor = page_url.search.enriched;
-            if (extractor) {
-                console.info("popstate! new extractor: " + extractor);
-                $('.nerdSelect select').val(extractor).change();
-                var ents = getFromLocalStorage(videokey + extractor);
-                if (ents) {
-                    onEntitiesToShow(ents);
-                } else {
-                    $('form.nerdify').submit();
-                }
-            } else {
-                $('#entity-sect').fadeOut();
-                if ($('.sub-text').find('.entity').length > 0) {
-                    displayEntitiesSub([]);
-                }
-            }
-        });
-
-        function retrieveInfo(uuid, callback) {
-            $.getJSON('/metadata/' + uuid, callback);
+            }).fail(function () {
+                //do nothing
+            })
         }
     }
-)
-;
+
+
+    //ask for hotspots
+    $('#hotspot-form').submit(function (e) {
+
+        e.preventDefault();
+        var $form = $(this);
+        var $button = $('button', $form);
+        $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
+        $(this).ajaxSubmit({
+            success: function (data) {
+                var text;
+                try {
+                    if (data.error) {
+                        text = 'Something went wrong. Try again later';
+                        $button.text().css('width', 'auto');
+                        console.error(data.error);
+                        return;
+                    }
+//                    text = 'The request was sent successfully. Came back later to see hotspots.'
+//                    location.reload(true);
+                    $('#hotspots-cont').html(data);
+                    displayPins();
+                } catch (e) {
+                    text = 'Something went wrong. Try again later';
+                    console.error(text);
+                    console.log(e);
+                }
+                var $p = $('<p>').text(text);
+                $button.children().fadeOut();
+                $button.append($p).width($p.width());
+                setTimeout(function () {
+                    $button.append($p);
+                    $p.css('opacity', 1);
+                }, 600);
+            },
+            error: function () {
+                var text = 'Something went wrong. Try again later';
+
+                var $p = $('<p>').text(text);
+                $button.children().fadeOut();
+                $button.append($p).width($p.width());
+                $p.css('opacity', 1);
+
+                console.error(data.error);
+            }
+        });
+    });
+
+    $plainSubCont = $('.sub-text');
+    if (video.entitiesL) {
+        onEntitiesToShow(video.entitiesL);
+    }
+
+    // managing of click on a sub
+    // 1: in a chapter
+    $(document).on({
+        click: function (e) {
+            e.preventDefault();
+            var chapId = $(this).data('chapter');
+            $('#ch' + chapId).click();
+        }
+    }, '.sub-text p[data-chapter]');
+
+    // 2: not in a chapter
+    $(document).on('click', '.sub-text p[data-time]:not([data-chapter])', function () {
+        var srtTime = $(this).data('time');
+        var hms = srtTime.replace(/,/g, '.').replace(' --> ', ',');
+        $player.setmf('t=' + hms).playmf();
+        $('.chap-link').removeClass('selected-chap');
+        updateMFurl();
+    });
+
+    function calcDivWidth(startTime, endTime) {
+        var totWidth = ($player.getDuration() / 1000);
+        return((endTime - startTime) / totWidth) * 100;
+    }
+
+    function calcSpaceWidth(startTime, oldEndTime) {
+        var totWidth = ($player.getDuration() / 1000);
+        return ((startTime - oldEndTime) / totWidth) * 100;
+    }
+
+    function displayPins() {
+        var $pin = $('.pin');
+        $pin.each(function () {
+            var $this = $(this);
+            $this.qtip({
+                content: {
+                    text: $('.qtipEnt', $this).html(),
+                    title: $('.qtipTitle', $this).html()
+                },
+                style: {
+                    classes: 'qtip-light qtip-rounded',
+                    padding: '15px',
+                    tip: 'bottom middle'
+                },
+                position: {
+                    my: 'bottom center',
+                    at: 'top center'
+                },
+                hide: {
+                    fixed: true,
+                    delay: 300
+                }
+            });
+        });
+
+        $pin.fadeIn();
+
+        var oldEnd = 0;
+
+
+        $pin.each(function () {
+            var $hotSpot = $(this).children('a');
+            var startHS = $hotSpot.data('start-time');
+            var endHS = $hotSpot.data('end-time');
+
+            var width = calcDivWidth(startHS, endHS);
+            $(this).css("width", width + "%");
+
+            if (oldEnd < startHS) {
+                var spaceWidth = calcSpaceWidth(startHS, oldEnd);
+                $(this).css("margin-left", spaceWidth + "%");
+            }
+            oldEnd = endHS;
+
+
+            $(this).on('click', function () {
+                $player.setmf('t=' + startHS + ',' + endHS).playmf();
+                updateMFurl();
+            });
+            if ($(".pinEnt", $(this)).width >= $(this).width)
+                $(".pinEnt", $(this)).css("max-width", $(this).width - 15);
+
+        });
+
+        var $suggCourses = $("#suggested-courses");
+        if ($('.chap-link').length)
+            $suggCourses.loadTemplate($("#courseList"), {});
+
+        if ($pin.length) {
+            $('.invite', $suggCourses).hide();
+            $('.loading', $suggCourses).show();
+
+            $.ajax({
+                url: '/courses',
+                data: {
+                    uuid: video.uuid
+                }
+            }).done(function (data) {
+                $('.loading', $suggCourses).hide();
+
+                if (!data.length) return;
+                for (var i in data) {
+                    if (!data.hasOwnProperty(i)) continue;
+                    var course = data[i];
+                    $('#courses-list').loadTemplate($('#course'), {
+                        url: course.locator.value,
+                        title: course.title.value,
+                        thumb: '\\img\\logos\\' + course.source + '.png'
+                    }, {append: true});
+
+                    if (i >= 1)break;
+                }
+
+            }).fail(function () {
+                $('.loading', $suggCourses).hide();
+            })
+        } else {
+            $('.invite', $suggCourses).show();
+            $('.loading', $suggCourses).hide();
+        }
+    }
+
+
+    $("#video-info-chapters").fadeIn();
+    var $chapLinks = $('.chap-link');
+    if (!$chapLinks.first().data("duration")) {
+        var $totChapters = $chapLinks.length;
+        $chapLinks.each(function () {
+            $(this).css("width", 100 / $totChapters + "%");
+        });
+    }
+
+    function displayChapters() {
+        $("#video-info-chapters").fadeIn();
+        var $chapLinks = $('.chap-link');
+        var $totChapters = $chapLinks.length;
+
+        $chapLinks.each(function () {
+            var $chapNum = $(this).find('.chap-num');
+            var index = $('.chap-line .chap-link').index(this);
+
+            var $chapter = $(this).children('a');
+            var startChapter = $chapter.data('start-time');
+            var endChapter = $chapter.data('end-time');
+
+            if (!$('.chap-link').data("duration")) {
+                var chapWidth;
+                if (index === $totChapters - 1) {
+                    chapWidth = calcDivWidth(startChapter, ($player.getDuration() / 1000));
+                } else
+                    chapWidth = calcDivWidth(startChapter, endChapter);
+
+                $(this).css("width", chapWidth + "%");
+            }
+
+
+            $(this).hover(function () {
+                if ($(this).width() < 175) {
+                    var opt = {
+                        top: "16px",
+                        opacity: "1",
+                        cursor: "auto"
+                    };
+
+                    if (index > Math.floor($totChapters / 2)) {
+                        opt.right = 0;
+                    }
+                    $chapter.children('.chap-timing').css(opt);
+                }
+            });
+
+            $(this).on('click', function () {
+                $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
+                var chapNumLast = $('.chap-num:last')[0].innerText;
+                var chapNum = $chapNum[0].innerText;
+
+                $('.chap-link').removeClass('selected-chap');
+
+                $(this).addClass('selected-chap');
+                $('.first-part').text("chapter   ");
+                $('.selected-chap-num').text(chapNum);
+                $('.last-part').text("   of   " + chapNumLast);
+
+                updateMFurl();
+            });
+        });
+
+        setTimeout(function () {
+            $('.chap-link').each(function () {
+                var $chapNum = $(this).find('.chap-num');
+                if ($(this).width() >= 25) {
+                    $chapNum.fadeIn();
+                    $chapNum.css("display", "inline-block");
+                }
+            });
+        }, 500);
+
+    }
+
+    function updateMFurl() {
+        if (Modernizr.history) {
+            parsedJSON = $player.getMFJson();
+            var hash = parsedJSON.hash;
+            var page_url = window.location.toString().parseURL();
+
+            if (!$.isEmptyObject(hash)) {
+                for (var key in hash) {
+                    if (!hash.hasOwnProperty(key))continue;
+                    page_url.hash[key] = hash[key][0].value;
+                }
+            } else {
+                page_url.hash = {};
+            }
+            highlightMFSub(hash.t[0].value);
+            showTEDSuggestedChaps();
+            delete page_url.search.t;
+            delete page_url.search.xywh;
+
+            history.pushState(null, null, page_url.toString());
+        }
+    }
+
+    function timeToSec(hms) {
+        var time = (hms.split(":"));
+        var hh = parseInt(time[0]);
+        var mm = parseInt(time[1]);
+        var ss = parseInt(time[2]);
+
+        return ((mm * 60) + (hh * 3600) + ss);
+    }
+
+    function highlightMFSub(t) {
+        var sMF, eMF, sMFtest, eMFtest;
+
+        t = t.replace('npt:', '');
+
+        if (t.indexOf(",") != -1) {
+            var mfTime = (t.split(","));
+            sMFtest = mfTime[0];
+            sMFtest = sMFtest.length > 0 ? sMFtest : '0';
+            eMFtest = mfTime[1];
+        } else {
+            sMFtest = t;
+            eMFtest = '86400';
+        }
+
+        sMF = sMFtest.indexOf(":") == -1 ? sMFtest : timeToSec(sMFtest);
+        eMF = eMFtest.indexOf(":") == -1 ? eMFtest : timeToSec(eMFtest);
+        sMF = parseFloat(sMF);
+        eMF = parseFloat(eMF);
+
+        $('.sub-text p').removeClass("selected-frag").each(function () {
+            var eSub = parseFloat($(this).data('endss'));
+
+            if (sMF < eSub && eMF >= eSub) {
+                $(this).addClass("selected-frag");
+            }
+        });
+        var $firstSelFrag = $(".selected-frag:first");
+        if ($firstSelFrag.length > 0) {
+            var $subText = $('.sub-text');
+            var scrollPos = $firstSelFrag.position().top + $subText.scrollTop();
+
+            $subText.animate({
+                scrollTop: scrollPos
+            });
+        } else {
+            console.warn("No subtitles in this fragment. Are you sure that fragment is inside video duration?")
+        }
+    }
+
+
+    // Browser back and forward
+    $(window).off('popstate').on('popstate', function () {
+        var page_url = window.location.toString().parseURL();
+
+        // media fragment
+        var frag;
+        var t = page_url.search.t || page_url.hash.t;
+        if (t)
+            frag = 't=' + t;
+
+        var xywh = page_url.search.xywh || page_url.hash.xywh;
+        if (xywh)
+            frag = frag ? frag + '&' + 'xywh=' + xywh : 'xywh=' + xywh;
+
+        if (frag) {
+            console.info("popstate! new fragment: " + frag);
+
+            $player.setmf(frag);
+            if (hasVideoSub) {
+                highlightMFSub(t);
+            }
+        }
+
+        // nerdification
+        var extractor = page_url.search.enriched;
+        if (extractor) {
+            console.info("popstate! new extractor: " + extractor);
+            $('.nerdSelect select').val(extractor).change();
+            var ents = getFromLocalStorage(videokey + extractor);
+            if (ents) {
+                onEntitiesToShow(ents);
+            } else {
+                $('form.nerdify').submit();
+            }
+        } else {
+            $('#entity-sect').fadeOut();
+            if ($('.sub-text').find('.entity').length > 0) {
+                displayEntitiesSub([]);
+            }
+        }
+    });
+
+});
 
 jQuery.fn.extend({
     addLoader: function (direction) {
