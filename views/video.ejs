@@ -114,8 +114,8 @@
     <div class="play-video-info clearfix">
         <div class="left">
             <% if(locals.rdfUrl){ %>
-            <a class="rdf-link" href="<%= locals.rdfUrl %>" title="rdf">
-                <img src="/img/rdf-30_plain.png" height="30"></a>
+            <a class="rdf-link" href="<%= locals.rdfUrl %>" title="rdf" target="_blank">
+            <img src="/img/rdf-30_plain.png" height="30"></a>
             <% } %>
             <% if(metadata.published) { %>
             <h5 class="video-info">published on <%= metadata.published.substring(0, 10) %>

@@ -36,6 +36,7 @@ $(document).ready(function () {
                 displayPins();
                 if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
                     highlightMFSub($player.getMFJson().hash.t[0].value);
+                        showTEDSuggestedChaps();
                 }
                 var $pop = Popcorn(media);
                 $('.sub-text p[data-time]').each(function () {
@@ -128,46 +129,33 @@ $(document).ready(function () {
         });
     }
 
-    //filter entities for MF
-    var $nerdFilterForm = $('#nerd-filter-form');
-    $nerdFilterForm.submit(function (e) {
-        e.preventDefault();
-        var $form = $(this);
-        var $button = $('button', $form);
-        $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
+    function showTEDSuggestedChaps() {
         var extractor = window.location.toString().parseURL().search.enriched;
 
-        var timeFrag = $player.getMFJson().hash.t;
-        $form.ajaxSubmit({
-            data: {
-                extractor: extractor,
-                startMFFilt: (timeFrag && timeFrag[0].startNormalized) || 0,
-                endMFFilt: (timeFrag && timeFrag[0].endNormalized) || null
-            },
-            success: function (result) {
-                var text;
-                try {
-                    if (result.error) {
-                        text = 'Something went wrong. Try again later';
-                        $button.text().css('width', 'auto');
-                        $button.prop('disabled', false).html('Suggest Chapters');
-                        console.error(result.error);
-                    } else {
-                        $button.prop('disabled', false).html('Suggest Chapters');
-                        return showfilterEnt(result);
-                    }
-                } catch (e) {
-                    text = 'Something went wrong. Try again later';
-                    console.error(text);
-                    console.log(e);
+        if (extractor) {
+            var timeFrag = $player.getMFJson().hash.t;
+
+            $.ajax({
+                url: '/filter_ent/' + video.uuid,
+                data: {
+                    extractor: extractor,
+                    startMFFilt: (timeFrag && timeFrag[0].startNormalized) || 0,
+                    endMFFilt: (timeFrag && timeFrag[0].endNormalized) || null
+
                 }
-            }});
+            }).done(function (res) {
+                $('.see-also').html(res);
+
+            }).fail(function () {
+                //do nothing
+            })
+        }
+    }
+
+    $(document).on('click', '.subChapGroup', function () {
+        showTEDSuggestedChaps();
     });
 
-    function showfilterEnt(entjson) {
-        $('.see-also').html(entjson);
-        console.log(entjson)
-    }
 
     //ask for hotspots
     $('#hotspot-form').submit(function (e) {
@@ -279,6 +267,7 @@ $(document).ready(function () {
 
         var oldEnd = 0;
 
+
         $pin.each(function () {
             var $hotSpot = $(this).children('a');
             var startHS = $hotSpot.data('start-time');
@@ -315,7 +304,7 @@ $(document).ready(function () {
                 url: '/courses',
                 data: {
                     uuid: video.uuid
-                }
+    }
             }).done(function (data) {
                 $('.loading', $suggCourses).hide();
 
@@ -373,6 +362,7 @@ $(document).ready(function () {
 
                 $(this).css("width", chapWidth + "%");
             }
+
 
             $(this).hover(function () {
                 if ($(this).width() < 175) {
@@ -530,10 +520,6 @@ $(document).ready(function () {
                 displayEntitiesSub([]);
             }
         }
-    });
-
-    $('.video-list .video-link').each(function () {
-//old method
     });
 
     function retrieveInfo(uuid, callback) {
@@ -765,6 +751,7 @@ function showEntityList(entityList) {
         });
     }
 }
+
 function onEntitiesToShow(entJson) {
     displayEntitiesSub(entJson);
     showEntityList(entJson);
