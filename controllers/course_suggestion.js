@@ -19,10 +19,7 @@ openCourseWare.prefix_map = {
 
 function getFromOpenUniversity(keywords, callback) {
     // keywords: array to regex
-    var regex = "";
-    keywords.forEach(function (k) {
-        regex += "(" + k + ")"
-    });
+    var regex = "(" + keywords.join(')|(') + ")";
 
     openUniversity.query('SELECT DISTINCT ?course ?description ?title ?subject ?locator ' +
             ' FROM <http://data.open.ac.uk/context/openlearn>  ' +
@@ -31,7 +28,7 @@ function getFromOpenUniversity(keywords, callback) {
             ' ?course purl:title ?title.    ' +
 //            '?course purl:subject ?subject.    ' +
             '?course w3-ont:locator ?locator.   ' +
-            '?course a <http://data.open.ac.uk/openlearn/ontology/OpenLearnUnit>   ' +
+            '?course a openlearn:OpenLearnUnit   ' +
             '{  FILTER EXISTS {' +
             '  	  FILTER regex(str(?description), "' + regex + '", "i" )' +
             '  	  FILTER regex(str(?title), "' + regex + '", "i" )' +
@@ -52,39 +49,36 @@ function getFromOpenUniversity(keywords, callback) {
                 return;
             }
 
-            var coursesList = data.results.bindings;
-            if (!coursesList || !coursesList.length) {
+            var cList = data.results.bindings;
+            if (!cList || !cList.length) {
                 callback(err);
                 return;
             }
 
             // score: first the courses with more matches
             var rg = new RegExp(regex, 'gi');
-            coursesList.forEach(function (c) {
+            cList.forEach(function (c) {
                 var s = c.title.value + c.description.value;
                 c.score = s.match(rg).length;
-                c.source="openuniversity"
+                c.source = "openuniversity";
             });
 
-            callback(err, coursesList);
+            callback(err, cList);
         }
     );
 }
 
 function getFromOpenCourseWare(keywords, callback) {
     // keywords: array to regex
-    var regex = "";
-    keywords.forEach(function (k) {
-        regex += "(" + k + ")"
-    });
+    var regex = "(" + keywords.join(')|(') + ")";
 
-    openCourseWare.query('select DISTINCT  ?course ?title ?subject ?description ?url ' +
+    openCourseWare.query('select DISTINCT  ?course ?title ?subject ?description ?locator ' +
             'where {' +
             ' 	?course a linkedu:OpenEducationalResource.' +
             ' 	?course purl:title ?title.' +
             ' 	?course purl:description ?description.' +
 //            ' 	?course purl:subject ?subject.' +
-            ' 	?course dbpedia:url ?url.' +
+            ' 	?course dbpedia:url ?locator.' +
             ' 	{ 	FILTER EXISTS {' +
             ' 	  FILTER regex(str(?description), "' + regex + '", "i" )' +
             ' 	  FILTER regex(str(?title), "' + regex + '", "i" ) 	' +
@@ -100,21 +94,21 @@ function getFromOpenCourseWare(keywords, callback) {
                 return;
             }
 
-            var coursesList = data.results.bindings;
-            if (!coursesList || !coursesList.length) {
+            var cwList = data.results.bindings;
+            if (!cwList || !cwList.length) {
                 callback(err);
                 return;
             }
 
             // scrore: first the courses with more matches
             var rg = new RegExp(regex, 'gi');
-            coursesList.forEach(function (c) {
+            cwList.forEach(function (c) {
                 var s = c.title.value + c.description.value;
                 c.score = s.match(rg).length;
-                c.source="opencourseware";
+                c.source = "opencourseware";
             });
 
-            callback(err, coursesList);
+            callback(err, cwList);
         }
     );
 }
@@ -125,25 +119,41 @@ exports.getSuggestedCouses = function (keywords, callback) {
         return;
     }
 
-    var coursesList = [];
+    var dataOU = [], dataOC = [];
     async.parallel([
         function (async_callback) {
             getFromOpenUniversity(keywords, function (err, data) {
                 if (err) console.error(err);
-                if (data && data.length) coursesList = coursesList.concat(data);
+                if (data && data.length) dataOU = data;
                 async_callback();
             });
         },
         function (async_callback) {
             getFromOpenCourseWare(keywords, function (err, data) {
                 if (err) console.error(err);
-                if (data && data.length) coursesList = coursesList.concat(data);
+                if (data && data.length) dataOC = data;
                 async_callback();
             });
 
         }
     ], function (err) {
+        var coursesList = dataOU.concat(dataOC);
         if (coursesList.length) {
+            //remove duplicates
+            coursesList.sort(function (a, b) {
+                if (b.locator.value == a.locator.value)
+                    return a.score - b.score;
+                else return b.locator.value.localeCompare(a.locator.value);
+            });
+            var oldTitle = '';
+            for (var k = coursesList.length - 1; k >= 0; k--) { //reverse loop
+                var c = coursesList[k];
+                if (c.locator.value == oldTitle) {
+                    coursesList.splice(k, 1);
+                } else oldTitle = c.locator.value;
+            }
+
+            //order for score
             coursesList.sort(function (a, b) {
                 return b.score - a.score;
             });

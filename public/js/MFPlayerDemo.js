@@ -144,17 +144,17 @@ $(document).ready(function () {
                 startMFFilt: (timeFrag && timeFrag[0].startNormalized) || 0,
                 endMFFilt: (timeFrag && timeFrag[0].endNormalized) || null
             },
-            success: function (data) {
+            success: function (result) {
                 var text;
                 try {
-                    if (data.error) {
+                    if (result.error) {
                         text = 'Something went wrong. Try again later';
                         $button.text().css('width', 'auto');
                         $button.prop('disabled', false).html('Suggest Chapters');
-                        console.error(data.error);
+                        console.error(result.error);
                     } else {
                         $button.prop('disabled', false).html('Suggest Chapters');
-                        return showfilterEnt(data);
+                        return showfilterEnt(result);
                     }
                 } catch (e) {
                     text = 'Something went wrong. Try again later';
@@ -279,7 +279,6 @@ $(document).ready(function () {
 
         var oldEnd = 0;
 
-
         $pin.each(function () {
             var $hotSpot = $(this).children('a');
             var startHS = $hotSpot.data('start-time');
@@ -303,22 +302,61 @@ $(document).ready(function () {
                 $(".pinEnt", $(this)).css("max-width", $(this).width - 15);
 
         });
+
+        var $suggCourses = $("#suggested-courses");
+        if ($('.chap-link').length)
+            $suggCourses.loadTemplate($("#courseList"), {});
+
+        if ($pin.length) {
+            $('.invite', $suggCourses).hide();
+            $('.loading', $suggCourses).show();
+
+            $.ajax({
+                url: '/courses',
+                data: {
+                    uuid: video.uuid
+                }
+            }).done(function (data) {
+                $('.loading', $suggCourses).hide();
+
+                if (!data.length) return;
+                for (var i in data) {
+                    if (!data.hasOwnProperty(i)) continue;
+                    var course = data[i];
+                    $('#courses-list').loadTemplate($('#course'), {
+                        url: course.locator.value,
+                        title: course.title.value,
+                        thumb: '\\img\\logos\\' + course.source + '.png'
+                    }, {append: true});
+
+                    if (i >= 1)break;
+                }
+
+            }).fail(function () {
+                $('.loading', $suggCourses).hide();
+            })
+        } else {
+            $('.invite', $suggCourses).show();
+            $('.loading', $suggCourses).hide();
+        }
     }
 
 
     $("#video-info-chapters").fadeIn();
-    if (!$('.chap-link').data("duration")) {
-        var $totChapters = $('.chap-link').length;
-        $('.chap-link').each(function () {
+    var $chapLinks = $('.chap-link');
+    if (!$chapLinks.first().data("duration")) {
+        var $totChapters = $chapLinks.length;
+        $chapLinks.each(function () {
             $(this).css("width", 100 / $totChapters + "%");
         });
     }
 
     function displayChapters() {
         $("#video-info-chapters").fadeIn();
-        var $totChapters = $('.chap-link').length;
+        var $chapLinks = $('.chap-link');
+        var $totChapters = $chapLinks.length;
 
-        $('.chap-link').each(function () {
+        $chapLinks.each(function () {
             var $chapNum = $(this).find('.chap-num');
             var index = $('.chap-line .chap-link').index(this);
 
@@ -335,7 +373,6 @@ $(document).ready(function () {
 
                 $(this).css("width", chapWidth + "%");
             }
-
 
             $(this).hover(function () {
                 if ($(this).width() < 175) {
@@ -388,6 +425,7 @@ $(document).ready(function () {
 
             if (!$.isEmptyObject(hash)) {
                 for (var key in hash) {
+                    if (!hash.hasOwnProperty(key))continue;
                     page_url.hash[key] = hash[key][0].value;
                 }
             } else {
