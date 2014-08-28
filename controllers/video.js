@@ -714,18 +714,19 @@ exports.filterEntities = function (req, res) {
                         if (err)
                             res.send(err.message, 500);
                         else {
-                            var chaps = vids[uuid].chaps || [];
                             if (vids[uuid]) { //remove fragment that I am watching
+                                    var chaps = vids[uuid].chaps;
 
                                 for (var c in chaps) {
                                     if (chaps[c].startNPT >= startMF && chaps[c].startNPT < endMF) {
                                         chaps.splice(c);
                                     }
                                 }
+                                if (!chaps.length || chaps.length == 0) {
+                                    delete vids[uuid];
+                                }
                             }
-                            if (!chaps.length || chaps.length == 0) {
-                                delete vids[uuid];
-                            }
+
 
                             var totVids = Object.keys(vids).length;
                             var maxVids = 4;

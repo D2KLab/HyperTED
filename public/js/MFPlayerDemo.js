@@ -36,7 +36,7 @@ $(document).ready(function () {
                     displayPins();
                     if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
                         highlightMFSub($player.getMFJson().hash.t[0].value);
-
+                        showTEDSuggestedChaps();
                     }
                     var $pop = Popcorn(media);
                     $('.sub-text p[data-time]').each(function () {
@@ -151,7 +151,6 @@ $(document).ready(function () {
                 })
             }
         }
-
 
 
         //ask for hotspots
@@ -289,60 +288,60 @@ $(document).ready(function () {
 
             });
 
-        var $suggCourses = $("#suggested-courses");
-        if ($('.chap-link').length)
-            $suggCourses.loadTemplate($("#courseList"), {});
+            var $suggCourses = $("#suggested-courses");
+            if ($('.chap-link').length)
+                $suggCourses.loadTemplate($("#courseList"), {});
 
-        if ($pin.length) {
-            $('.invite', $suggCourses).hide();
-            $('.loading', $suggCourses).show();
+            if ($pin.length) {
+                $('.invite', $suggCourses).hide();
+                $('.loading', $suggCourses).show();
 
-            $.ajax({
-                url: '/courses',
-                data: {
-                    uuid: video.uuid
-        }
-            }).done(function (data) {
+                $.ajax({
+                    url: '/courses',
+                    data: {
+                        uuid: video.uuid
+                    }
+                }).done(function (data) {
+                    $('.loading', $suggCourses).hide();
+
+                    if (!data.length) return;
+                    for (var i in data) {
+                        if (!data.hasOwnProperty(i)) continue;
+                        var course = data[i];
+                        $('#courses-list').loadTemplate($('#course'), {
+                            url: course.locator.value,
+                            title: course.title.value,
+                            thumb: '\\img\\logos\\' + course.source + '.png'
+                        }, {append: true});
+
+                        if (i >= 1)break;
+                    }
+
+                }).fail(function () {
+                    $('.loading', $suggCourses).hide();
+                })
+            } else {
+                $('.invite', $suggCourses).show();
                 $('.loading', $suggCourses).hide();
-
-                if (!data.length) return;
-                for (var i in data) {
-                    if (!data.hasOwnProperty(i)) continue;
-                    var course = data[i];
-                    $('#courses-list').loadTemplate($('#course'), {
-                        url: course.locator.value,
-                        title: course.title.value,
-                        thumb: '\\img\\logos\\' + course.source + '.png'
-                    }, {append: true});
-
-                    if (i >= 1)break;
-                }
-
-            }).fail(function () {
-                $('.loading', $suggCourses).hide();
-            })
-        } else {
-            $('.invite', $suggCourses).show();
-            $('.loading', $suggCourses).hide();
+            }
         }
-    }
 
 
         $("#video-info-chapters").fadeIn();
-    var $chapLinks = $('.chap-link');
-    if (!$chapLinks.first().data("duration")) {
-        var $totChapters = $chapLinks.length;
-        $chapLinks.each(function () {
+        var $chapLinks = $('.chap-link');
+        if (!$chapLinks.first().data("duration")) {
+            var $totChapters = $chapLinks.length;
+            $chapLinks.each(function () {
                 $(this).css("width", 100 / $totChapters + "%");
             });
         }
 
         function displayChapters() {
             $("#video-info-chapters").fadeIn();
-        var $chapLinks = $('.chap-link');
-        var $totChapters = $chapLinks.length;
+            var $chapLinks = $('.chap-link');
+            var $totChapters = $chapLinks.length;
 
-        $chapLinks.each(function () {
+            $chapLinks.each(function () {
                 var $chapNum = $(this).find('.chap-num');
                 var index = $('.chap-line .chap-link').index(this);
 
@@ -412,14 +411,14 @@ $(document).ready(function () {
 
                 if (!$.isEmptyObject(hash)) {
                     for (var key in hash) {
-                    if (!hash.hasOwnProperty(key))continue;
+                        if (!hash.hasOwnProperty(key))continue;
                         page_url.hash[key] = hash[key][0].value;
                     }
                 } else {
                     page_url.hash = {};
                 }
                 highlightMFSub(hash.t[0].value);
-
+                showTEDSuggestedChaps();
                 delete page_url.search.t;
                 delete page_url.search.xywh;
 

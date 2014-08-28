@@ -407,6 +407,11 @@ $navbarTransitionTime: 100ms;
       max-width: 100px;
       max-height: 60px;
     }
+    h4 {
+      a {
+        color: $dark_red;
+      }
+    }
   }
 }
 
@@ -1076,7 +1081,7 @@ p {
   border: 1px solid $light_gray;
   background-color: $light_gray;
   margin: 5px 0;
-  height: 550px;
+  height: 750px;
   overflow: auto;
   resize: vertical;
   font-weight: 400;
