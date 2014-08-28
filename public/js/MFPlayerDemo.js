@@ -36,7 +36,7 @@ $(document).ready(function () {
                     displayPins();
                     if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
                         highlightMFSub($player.getMFJson().hash.t[0].value);
-                        showTEDSuggestedChaps();
+
                     }
                     var $pop = Popcorn(media);
                     $('.sub-text p[data-time]').each(function () {
@@ -145,16 +145,12 @@ $(document).ready(function () {
                     }
                 }).done(function (res) {
                     $('.see-also').html(res);
-
+                    console.log('you puz')
                 }).fail(function () {
                     //do nothing
                 })
             }
         }
-
-        $(document).on('click', '.subChapGroup', function () {
-            showTEDSuggestedChaps();
-        });
 
 
         //ask for hotspots
@@ -285,6 +281,7 @@ $(document).ready(function () {
 
                 $(this).on('click', function () {
                     $player.setmf('t=' + startHS + ',' + endHS).playmf();
+
                     updateMFurl();
                 });
                 if ($(".pinEnt", $(this)).width >= $(this).width)
@@ -342,6 +339,7 @@ $(document).ready(function () {
 
                 $(this).on('click', function () {
                     $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
+
                     var chapNumLast = $('.chap-num:last')[0].innerText;
                     var chapNum = $chapNum[0].innerText;
 
@@ -382,7 +380,7 @@ $(document).ready(function () {
                     page_url.hash = {};
                 }
                 highlightMFSub(hash.t[0].value);
-
+                showTEDSuggestedChaps();
                 delete page_url.search.t;
                 delete page_url.search.xywh;
 

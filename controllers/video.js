@@ -698,12 +698,13 @@ exports.ajaxGetMetadata = function (req, res) {
 exports.filterEntities = function (req, res) {
     var uuid = req.param('uuid');
     var startMF = req.param('startMFFilt');
+    var endMF = req.param('endMFFilt');
     if (!uuid) {
         res.json({error: 'empty uuid'});
         return;
     }
 
-    db.getFilterEntities(uuid, req.param('extractor'), startMF, req.param('endMFFilt'), function (err, doc) {
+    db.getFilterEntities(uuid, req.param('extractor'), startMF, endMF, function (err, doc) {
         if (err)
             res.json({error: 'db error'});
         else {
@@ -729,29 +730,37 @@ exports.filterEntities = function (req, res) {
                         if (err)
                             res.send(err.message, 500);
                         else {
+                            var chaps = vids[uuid].chaps || [];
                             if (vids[uuid]) { //remove fragment that I am watching
-                                for (var c in vids[uuid]) {
-                                    if (vids[uuid][c].startNPT == startMF) {
-                                        vids[uuid].splice(c);
+
+                                for (var c in chaps) {
+                                    if (chaps[c].startNPT >= startMF && chaps[c].startNPT < endMF) {
+                                        chaps.splice(c);
                                     }
                                 }
-                                if (!Object.keys(vids).length)
-                                    delete vids[uuid];
+                            }
+                            if (!chaps.length || chaps.length == 0) {
+                                delete vids[uuid];
                             }
 
+                            var totVids = Object.keys(vids).length;
+                            var maxVids = 4;
+                            var count = 0;
+                            if (totVids > maxVids) {
+                                for (var k in vids) {
+                                    count++;
+                                    if (count > maxVids) {
+                                        delete vids[k];
+                                    }
+                                }
+                            }
                             res.render('partials/playlist.ejs', {'suggestedVids': vids});
-
                         }
-
                     })
-
                 }
             });
-
         }
-
     })
-
 };
 
 function suggestMF(search, search_uri, callback) {
