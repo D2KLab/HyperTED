@@ -462,11 +462,14 @@ $(document).ready(function () {
 
             if (sMF < eSub && eMF >= eSub) {
                 $(this).addClass("selected-frag");
+                $(this).siblings('.chap-title').addClass("selected-frag");
             }
         });
         var $firstSelFrag = $(".selected-frag:first");
         if ($firstSelFrag.length > 0) {
             var $subText = $('.sub-text');
+            console.log($firstSelFrag.position().top)
+            console.log($subText.scrollTop());
             var scrollPos = $firstSelFrag.position().top + $subText.scrollTop();
 
             $subText.animate({
