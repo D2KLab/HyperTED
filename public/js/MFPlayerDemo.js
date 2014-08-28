@@ -95,6 +95,7 @@ $(document).ready(function () {
                 $submitButton.prop('disabled', false).html('Nerdify');
                 history.pushState(null, null, page_url.toString());
                 onEntitiesToShow(entitiesLS);
+                showTEDSuggestedChaps();
                 return false;
             }
 
@@ -118,6 +119,7 @@ $(document).ready(function () {
                     $submitButton.prop('disabled', false).html('Nerdify');
                     history.pushState(null, null, page_url.toString());
                     onEntitiesToShow(data);
+                    showTEDSuggestedChaps();
                 },
                 error: function () {
                     var alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
@@ -516,6 +518,8 @@ $(document).ready(function () {
                 displayEntitiesSub([]);
             }
         }
+
+        showTEDSuggestedChaps();
     });
 
 });
