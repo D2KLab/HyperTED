@@ -645,12 +645,22 @@ html, body {
 }
 
 #suggested-courses .course img {
-    max-width: 100px;
-    max-height: 60px;
+    max-width: 70px;
+    max-height: auto;
 }
 
-#suggested-courses .course h4 a {
+#suggested-courses .course h4 {
+    width: 100%;
+    margin: 10px 0;
+}
+
+#suggested-courses .course h4 a.name {
     color: #b11200;
+    width: 80%;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .red_rule {
