@@ -36,7 +36,7 @@ $(document).ready(function () {
                 displayPins();
                 if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
                     highlightMFSub($player.getMFJson().hash.t[0].value);
-                        showTEDSuggestedChaps();
+                    showTEDSuggestedChaps();
                 }
                 var $pop = Popcorn(media);
                 $('.sub-text p[data-time]').each(function () {
@@ -304,7 +304,7 @@ $(document).ready(function () {
                 url: '/courses',
                 data: {
                     uuid: video.uuid
-    }
+                }
             }).done(function (data) {
                 $('.loading', $suggCourses).hide();
 
