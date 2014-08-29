@@ -210,12 +210,14 @@
 
             </div>
 
+            <% if(locals.subtitles) { %>
             <div class="col-md-5 col-lg-5">
                 <div class="see-also">
                 <% include partials/playlist.ejs %>
                 </div>
                 <div id="suggested-courses"></div>
             </div>
+            <% } %>
         </div>
 
         <div class="row">
