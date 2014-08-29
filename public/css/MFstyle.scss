@@ -394,6 +394,18 @@ $navbarTransitionTime: 100ms;
   }
 }
 
+.see-also {
+
+  .loading, .invite {
+    display: none;
+    font-style: italic;
+    text-align: center;
+  }
+  .loading {
+    display: none;
+  }
+}
+
 #suggested-courses {
   .invite {
     display: none;

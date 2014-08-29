@@ -131,10 +131,18 @@ $(document).ready(function () {
         });
     }
 
+
+    $('.invite', $('.see-also #playlist-sect')).show();
     function showTEDSuggestedChaps() {
+        var $playlistSect = $('.see-also #playlist-sect');
         var extractor = window.location.toString().parseURL().search.enriched;
 
-        if (extractor) {
+        if (!extractor) {
+            $('.invite', $playlistSect).show();
+
+        } else {
+            $('.invite', $playlistSect).hide();
+            $('.loading', $playlistSect).show();
             var timeFrag = $player.getMFJson().hash.t;
 
             $.ajax({
@@ -146,16 +154,19 @@ $(document).ready(function () {
 
                 }
             }).done(function (res) {
+                $('.invite', $playlistSect).hide();
+                $('.loading', $playlistSect).hide();
                 $('.see-also').html(res);
 
             }).fail(function () {
-                //do nothing
+                $('.loading', $playlistSect).hide();
+                $('.see-also').html("<p>Something went wrong, please try later</p>");
             })
         }
     }
 
 
-    //ask for hotspots
+//ask for hotspots
     $('#hotspot-form').submit(function (e) {
 
         e.preventDefault();
@@ -289,6 +300,7 @@ $(document).ready(function () {
                 $(".pinEnt", $(this)).css("max-width", $(this).width - 15);
 
         });
+
 
         var $suggCourses = $("#suggested-courses");
         if ($('.chap-link').length)
@@ -468,8 +480,6 @@ $(document).ready(function () {
         var $firstSelFrag = $(".selected-frag:first");
         if ($firstSelFrag.length > 0) {
             var $subText = $('.sub-text');
-            console.log($firstSelFrag.position().top)
-            console.log($subText.scrollTop());
             var scrollPos = $firstSelFrag.position().top + $subText.scrollTop();
 
             $subText.animate({
