@@ -11,7 +11,7 @@ var to = 10; //timeOut
 
 
 function getEntities(doc_type, text, ext, callback) {
-    if (ext == null || ext == '')ext = "textrazor";
+    if (ext == null || ext == '') ext = "textrazor";
     if (text != null && text != '') {
         nerd.annotate(api_instance, apiID, ext, doc_type, text, gran, to, function (err, data) {
             if (err) {
@@ -19,20 +19,24 @@ function getEntities(doc_type, text, ext, callback) {
                 return;
             }
             var entsLeft = data.length;
+            console.log('TOT Ents ' + entsLeft);
 
             data.forEach(function (ent) {
                 if (ent.uri) {
                     getDbpediaAbstract(ent.uri, function (err, abstract) {
                         ent.abstract = abstract;
                         --entsLeft;
-
-                        if (!entsLeft)
-                            callback(err, data);
+                        if (entsLeft == 0) {
+                            --entsLeft;
+                            callback(null, data);
+                        }
                     });
                 } else --entsLeft;
 
-                if (!entsLeft)
-                    callback(err, data);
+                if (entsLeft == 0) {
+                    --entsLeft;
+                    callback(null, data);
+                }
             });
         });
     } else {
@@ -65,7 +69,7 @@ function getDbpediaAbstract(wikiUrl, callback) {
         if (err) {
             console.error(err);
         }
-        if(err || !data.results.bindings || !data.results.bindings.length){
+        if (err || !data.results.bindings || !data.results.bindings.length) {
             callback(err, data);
             return;
         }

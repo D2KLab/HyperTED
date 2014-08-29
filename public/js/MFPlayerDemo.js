@@ -34,9 +34,9 @@ $(document).ready(function () {
             $(media).one('loadedmetadata', function () {
                 displayChapters();
                 displayPins();
+                showTEDSuggestedChaps();
                 if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
                     highlightMFSub($player.getMFJson().hash.t[0].value);
-                    showTEDSuggestedChaps();
                 }
                 var $pop = Popcorn(media);
                 $('.sub-text p[data-time]').each(function () {
@@ -132,16 +132,15 @@ $(document).ready(function () {
     }
 
 
-    $('.invite', $('.see-also #playlist-sect')).show();
+    var $suggestedVideoList = $('#suggestedVideoList');
+    var $playlistSect = $('.see-also #playlist-sect');
+
     function showTEDSuggestedChaps() {
-        var $playlistSect = $('.see-also #playlist-sect');
         var extractor = window.location.toString().parseURL().search.enriched;
+        $('.invite', $playlistSect).toggle(!extractor);
+        $('.no_ent', $playlistSect).hide();
 
-        if (!extractor) {
-            $('.invite', $playlistSect).show();
-
-        } else {
-            $('.invite', $playlistSect).hide();
+        if (extractor) {
             $('.loading', $playlistSect).show();
             var timeFrag = $player.getMFJson().hash.t;
 
@@ -154,14 +153,51 @@ $(document).ready(function () {
 
                 }
             }).done(function (res) {
-                $('.invite', $playlistSect).hide();
                 $('.loading', $playlistSect).hide();
-                $('.see-also').html(res);
+                $suggestedVideoList.empty();
+                $('.no_ent', $playlistSect).toggle(!Object.keys(res).length);
 
+                for (var v in res) {
+                    var suggVideo = res[v];
+                    var meta = suggVideo.metadata;
+                    var title, thumb;
+                    if (suggVideo.metadata && suggVideo.metadata != 'undefined') {
+                        title = meta.title;
+                        thumb = meta.thumb;
+                    } else {
+                        title = "Video";
+                        thumb = "../img/thumb-default.png";
+                    }
+                    $suggestedVideoList.loadTemplate($('#suggTedChap'),
+                        {
+                            uuid: v,
+                            href: '/video/' + v,
+                            title: title,
+                            thumb: thumb
+                        },
+                        {append: true}
+                    );
+
+                    var thisVid = $('.video-link[data-uuid=' + v + ']', $suggestedVideoList);
+                    var frags = suggVideo.chaps;
+                    for (var f in frags) {
+                        if (!frags.hasOwnProperty(f))continue;
+                        $('.frag-list', thisVid).loadTemplate($('#fragLi'),
+                            {
+                                href: '/video/' + v + '#t=' + frags[f].startNPT + ',' + frags[f].endNPT,
+                                content: 'Chapter ' + frags[f].chapNum + ' (' + labelTime(frags[f].startNPT) + ' - ' + labelTime(frags[f].endNPT) + ')'
+                            },
+                            {append: true});
+                    }
+
+                }
             }).fail(function () {
                 $('.loading', $playlistSect).hide();
                 $('.see-also').html("<p>Something went wrong, please try later</p>");
             })
+        } else {
+            $('.loading', $playlistSect).hide();
+
         }
     }
 
@@ -579,7 +615,7 @@ function saveInLocalStorage(key, value) {
         localStorage[key] = JSON.stringify({timestamp: Date.now(), value: value});
     } catch (e) {
         console.log(e);
-        if (e == DOMException.QUOTA_EXCEEDED_ERR) {
+        if (e == DOMException.QUOTA_EXCEEDED_ERR || e.code == DOMException.QUOTA_EXCEEDED_ERR) {
             console.warn('Quota exceeded! Delete all and write');
             localStorage.clear();
             saveInLocalStorage(key, value);
@@ -782,3 +818,15 @@ function onEntitiesToShow(entJson) {
         };
     });
 })(Popcorn);
+
+
+function labelTime(time) {
+    var hh = Math.floor(time / 3600);
+    hh = hh < 10 ? '0' + hh : hh;
+    var mm = Math.floor((time % 3600) / 60);
+    mm = mm < 10 ? '0' + mm : mm;
+    var ss = Math.floor((time % 3600) % 60);
+    ss = ss < 10 ? '0' + ss : ss;
+
+    return hh + ':' + mm + ':' + ss;
+}

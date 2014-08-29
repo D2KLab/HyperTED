@@ -11,24 +11,7 @@
 
     <div class="row">
         <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
-            <form method="get" id="nerd-filter-form" action="/filter_ent/<%= locals.uuid %>">
-                <input type="hidden" name="uuid" value="<%= locals.uuid %>">
-                <input type="hidden" name="startMF">
-                <input type="hidden" name="endMF">
-            </form>
-            <%
-            function labelTime(time) {
-                var hh = Math.floor(time / 3600);
-                hh = hh < 10 ? '0' + hh : hh;
-                var mm = Math.floor((time % 3600) / 60);
-                mm = mm < 10 ? '0' + mm : mm;
-                var ss = Math.floor((time % 3600) % 60);
-                ss = ss < 10 ? '0' + ss : ss;
 
-                return hh + ':' + mm + ':' + ss;
-            }
-            var videoList = [];
-            %>
             <div id="playlist-sect">
                 <p class="invite">click on Nerdify for having suggestion about chapters</p>
 
@@ -38,51 +21,37 @@
                     <img src="\img\ajax-loader.gif">
                 </p>
 
-                <% if (locals.suggestedVids) videoList = locals.suggestedVids; %>
-                <ul class="video-list">
-                    <%
-                    for (var uuid in videoList){
-                        if (!videoList.hasOwnProperty(uuid))continue;
-                    %>
-                    <li class="video-link" data-uuid="<%= uuid %>">
-                        <div class="content">
-                            <%
-                                var meta = videoList[uuid].metadata;
-                                var title, thumb;
-                                if (videoList[uuid].metadata && videoList[uuid].metadata != 'undefined') {
-                                    title = meta.title;
-                                    thumb = meta.thumb;
-                                } else {
-                                    title = "Video"
-                                    thumb = "../img/thumb-default.png"
-                                }
-                                %>
-                            <h4 class="playlist_title">
-                                <a href="/video/<%= uuid %>" title="<%= title %>"><%= title %></a>
-                            </h4>
-                            <a class="thumb-cont" href="/video/<%= uuid %>" title="<%= title %>">
-                                <img src="<%= thumb %>" class="thumb" alt="<%= title %>"></a>
-                            <ul class="frag-list">
+                <p class="no_ent">this chapter has no entity. </br>Please, choose another one</p>
 
-                                <%
-                                    var frags = videoList[uuid].chaps;
-                                        for (var f in frags){
-                                    if (!frags.hasOwnProperty(f))continue;
-                                %>
-                                <li class="frag-link">
-                                    <a href='/video/<%= uuid %>#t=<%= frags[f].startNPT %>,<%= frags[f].endNPT %>'>Chapter <%= frags[f].chapNum %>
-                                        (<%= labelTime(frags[f].startNPT) %> - <%= labelTime(frags[f].endNPT) %>
-                                        )</a>
-                                </li>
-                                <% } %>
-                            </ul>
-                        </div>
 
-                    </li>
-                    <% } %>
+                <ul class="video-list" id="suggestedVideoList">
                 </ul>
             </div>
         </div>
-        </div>
     </div>
+</div>
 
+<script type="text/html" id="suggTedChap">
+    <li class="video-link" data-template-bind='[
+     {"attribute": "data-uuid", "value": "uuid"}]'
+            >
+        <div class="content">
+
+            <h4 class="playlist_title">
+                <a data-href="href" data-title="title" data-content="title"></a>
+            </h4>
+            <a class="thumb-cont" data-href="href" data-title="title">
+                <img data-src="thumb" class="thumb" data-alt="title"></a>
+            <ul class="frag-list">
+            </ul>
+        </div>
+
+    </li>
+</script>
+
+<script type="text/html" id="fragLi">
+
+    <li class="frag-link">
+        <a data-href="href" data-content="content"></a>
+    </li>
+</script>

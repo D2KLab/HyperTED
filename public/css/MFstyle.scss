@@ -396,13 +396,15 @@ $navbarTransitionTime: 100ms;
 
 .see-also {
 
-  .loading, .invite {
-    display: none;
+  .loading, .invite, .no_ent {
     font-style: italic;
     text-align: center;
   }
-  .loading {
+  .invite, .no_ent {
     display: none;
+  }
+  .no_ent {
+    color: $dark_red;
   }
 }
 

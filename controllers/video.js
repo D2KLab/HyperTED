@@ -695,6 +695,7 @@ exports.filterEntities = function (req, res) {
             doc.sort(
                 /**
                  * @return {number}
+                 * @return {number}
                  */
                     function SortByRelevance(x, y) {
                     return ((x.relevance == y.relevance) ? 0 : ((x.relevance < y.relevance) ? 1 : -1 ));
@@ -715,7 +716,7 @@ exports.filterEntities = function (req, res) {
                             res.send(err.message, 500);
                         else {
                             if (vids[uuid]) { //remove fragment that I am watching
-                                    var chaps = vids[uuid].chaps;
+                                var chaps = vids[uuid].chaps;
 
                                 for (var c in chaps) {
                                     if (chaps[c].startNPT >= startMF && chaps[c].startNPT < endMF) {
@@ -739,7 +740,8 @@ exports.filterEntities = function (req, res) {
                                     }
                                 }
                             }
-                            res.render('partials/playlist.ejs', {'suggestedVids': vids});
+                            res.json(vids);
+//                            res.render('partials/playlist.ejs', {'suggestedVids': vids});
                         }
                     })
                 }

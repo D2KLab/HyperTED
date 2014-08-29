@@ -635,14 +635,17 @@ html, body {
     display: inline-block;
 }
 
-.see-also .loading, .see-also .invite {
-    display: none;
+.see-also .loading, .see-also .invite, .see-also .no_ent {
     font-style: italic;
     text-align: center;
 }
 
-.see-also .loading {
+.see-also .invite, .see-also .no_ent {
     display: none;
+}
+
+.see-also .no_ent {
+    color: #b11200;
 }
 
 #suggested-courses .invite {
