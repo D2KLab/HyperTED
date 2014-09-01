@@ -750,6 +750,29 @@ exports.filterEntities = function (req, res) {
     })
 };
 
+function suggestHS(search_topic, callback) {
+    client.search({
+            index: 'hs_index',
+            type: 'hotspot',
+            body: {
+                from: 0, size: 20,
+                query: {
+                    match: {
+                        "topic_list.label": search_topic
+                    }
+                }
+            }
+        }
+    ).then(function (resp) {
+            var hits = resp.hits.hits;
+            callback(null, hits);
+        }, function (err) {
+            console.trace(err.message);
+            callback(err);
+        });
+}
+exports.suggestHS = suggestHS;
+
 function suggestMF(search, search_uri, callback) {
     client.search({
             index: 'ent_index',
