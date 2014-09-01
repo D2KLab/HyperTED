@@ -679,7 +679,7 @@ exports.ajaxGetMetadata = function (req, res) {
 
 };
 
-exports.filterEntities = function (req, res) {
+exports.ajaxSuggestMF = function (req, res) {
     var uuid = req.param('uuid');
     var startMF = req.param('startMFFilt');
     var endMF = req.param('endMFFilt');
@@ -1734,7 +1734,7 @@ function checkHotspotResults(uuid, callback) {
     }
 }
 
-module.exports.getSuggestedCouses = function (req, res) {
+module.exports.getSuggestedCourses = function (req, res) {
     var uuid = req.param('uuid');
     db.getVideoFromUuid(uuid, true, function (err, video) {
         var error;
@@ -1763,6 +1763,22 @@ module.exports.getSuggestedCouses = function (req, res) {
                 return;
             }
             res.json(courses);
-        })
+        });
+    });
+};
+
+module.exports.topicSearch = function (req, res) {
+    var topic = req.param('topic');
+    if (!topic) {
+        //TODO send error
+    }
+
+    courseSuggestion.getSuggestedCouses([topic], function (err, courses) {
+        if (err || !courses || !courses.length) {
+            console.error(err);
+            resp.render('error.ejs', errorMsg.e500);
+            return;
+        }
+        res.json(courses);
     });
 };

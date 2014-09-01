@@ -145,7 +145,7 @@ $(document).ready(function () {
             var timeFrag = $player.getMFJson().hash.t;
 
             $.ajax({
-                url: '/filter_ent/' + video.uuid,
+                url: '/suggestmf/' + video.uuid,
                 data: {
                     extractor: extractor,
                     startMFFilt: (timeFrag && timeFrag[0].startNormalized) || 0,
