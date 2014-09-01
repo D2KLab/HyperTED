@@ -1750,12 +1750,18 @@ module.exports.topicSearch = function (req, res) {
         //TODO send error
     }
 
-    courseSuggestion.getSuggestedCouses([topic], function (err, courses) {
-        if (err || !courses || !courses.length) {
+    courseSuggestion.getSuggestedCouses([topic], function (err, docs) {
+        if (err) {
             console.error(err);
-            resp.render('error.ejs', errorMsg.e500);
+            res.render('error.ejs', errorMsg.e500);
             return;
         }
-        res.json(courses);
+
+        var source;
+        if (!docs || !docs.length)
+            source = {"msg": "No video available for this topic. \nPlease try with another one."};
+        else source = {"videos": docs};
+
+        res.render('topic_driven_playlist.ejs', source);
     });
 };

@@ -158,6 +158,7 @@ $(document).ready(function () {
                 $('.no_ent', $playlistSect).toggle(!Object.keys(res).length);
 
                 for (var v in res) {
+                    if(!res.hasOwnProperty(v))continue;
                     var suggVideo = res[v];
                     var meta = suggVideo.metadata;
                     var title, thumb;

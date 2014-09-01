@@ -9,9 +9,6 @@
     <!--[if IE]>
     <link rel="shortcut icon" href="/img/favicons/favicon.ico"/><![endif]-->
 
-    <link rel="stylesheet" type="text/css" href="/js/sfmplayer/mediaelementplayer.min.css"/>
-    <link rel="stylesheet" type="text/css" href="/js/sfmplayer/smfplayer.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/jquery.qtip.min.css"/>
     <link rel="stylesheet" type="text/css" href="/css/MFstyle.css"/>
 </head>
 <body>
@@ -60,6 +57,23 @@
 
 <nav class="navbar navbar-placeholder"></nav>
 
+<div class="playlist-holder">
+    <%
+    if(locals.msg){
+    %>
+    <div class="alert alert-danger"><%= locals.msg %></div>
+    <%
+    }
+            if(locals.videos){
+    %>
+    <% include partials/playlist.ejs %>
+    <script>
+        var videos = <%= JSON.stringify(videos) %>;
+    </script>
+    <%
+    }
+    %>
+</div>
 
 <footer class="video_footer">
     <div class="foo">
@@ -76,49 +90,52 @@
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js"></script>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
-<script src="http://malsup.github.com/jquery.form.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-<script src="http://popcornjs.org/code/dist/popcorn-complete.min.js"></script>
-<script src="http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"></script>
 
-<script src="/js/sfmplayer/mediaelement-and-player.js"></script>
-<script src="/js/sfmplayer/dep/jquery.url.js"></script>
-<script src="/js/sfmplayer/dep/mediafragments.js"></script>
-<script src="/js/sfmplayer/synote.multimedia.namespace.js"></script>
-<script src="/js/sfmplayer/synote.multimedia.utils.js"></script>
-<script src="/js/sfmplayer/synotemfplayer.js"></script>
 <script src="/js/jquery.loadTemplate-1.4.4.min.js"></script>
 
-<script type="text/html" id="course">
-    <li class="course">
-        <h4 class="title">
-            <a data-href="url"><img data-src="thumb" data-alt="title"/></a>
-            <a data-href="url" class="name" data-content="title"></a>
-        </h4>
-    </li>
-</script>
+<script>
+    $(document).ready(function () {
+        if (videos) {
+            var $suggestedVideoList = $('#suggestedVideoList');
+            for (var v in videos) {
+                if(!videos.hasOwnProperty(v))continue;
+                var suggVideo = videos[v];
+                var meta = suggVideo.metadata;
+                var title, thumb;
+                if (suggVideo.metadata && suggVideo.metadata != 'undefined') {
+                    title = meta.title;
+                    thumb = meta.thumb;
+                } else {
+                    title = "Video";
+                    thumb = "../img/thumb-default.png";
+                }
+                $suggestedVideoList.loadTemplate($('#suggTedChap'),
+                        {
+                            uuid: v,
+                            href: '/video/' + v,
+                            title: title,
+                            thumb: thumb
+                        },
+                        {append: true}
+                );
 
-<script type="text/html" id="courseList">
-    <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-8 col-xs-5">
-            <hr class="red_rule">
-        </div>
+                var thisVid = $('.video-link[data-uuid=' + v + ']', $suggestedVideoList);
+                var frags = suggVideo.chaps;
+                for (var f in frags) {
+                    if (!frags.hasOwnProperty(f))continue;
+                    $('.frag-list', thisVid).loadTemplate($('#fragLi'),
+                            {
+                                href: '/video/' + v + '#t=' + frags[f].startNPT + ',' + frags[f].endNPT,
+                                content: 'Chapter ' + frags[f].chapNum + ' (' + labelTime(frags[f].startNPT) + ' - ' + labelTime(frags[f].endNPT) + ')'
+                            },
+                            {append: true});
+                }
 
-        <div class="col-lg-6 col-md-6 col-sm-4 col-xs-7">
-            <h1 class="title">learn also</h1>
-        </div>
-    </div>
-    <div>
-        <p class="invite">generate hotspots for having suggestion about courses</p>
+            }
 
-        <p class="loading">
-            <img src="\img\ajax-loader.gif">
-            loading suggested courses
-            <img src="\img\ajax-loader.gif">
-        </p>
-        <ul class="courses-list" id="courses-list">
-        </ul>
-    </div>
+        }
+    });
 </script>
 
 
