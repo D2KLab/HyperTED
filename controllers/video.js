@@ -1439,7 +1439,8 @@ module.exports.getSuggestedCourses = function (req, res) {
                 if (mostImportantTopic.finalScore < topic.finalScore)
                     mostImportantTopic = topic;
             });
-            topicList.push(mostImportantTopic.label);
+            if (mostImportantTopic)
+                topicList.push(mostImportantTopic.label);
         });
 
         courseSuggestion.getSuggestedCouses(topicList, function (err, courses) {
