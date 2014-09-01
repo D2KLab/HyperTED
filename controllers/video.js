@@ -750,6 +750,30 @@ exports.ajaxSuggestMF = function (req, res) {
     })
 };
 
+
+function suggestHS(search_topic, callback) {
+    client.search({
+            index: 'hs_index',
+            type: 'hotspot',
+            body: {
+                from: 0, size: 20,
+                query: {
+                    match: {
+                        "topic_list.label": search_topic
+                    }
+                }
+            }
+        }
+    ).then(function (resp) {
+            var hits = resp.hits.hits;
+            callback(null, hits);
+        }, function (err) {
+            console.trace(err.message);
+            callback(err);
+        });
+}
+exports.suggestHS = suggestHS;
+
 function suggestMF(search, search_uri, callback) {
     client.search({
             index: 'ent_index',
@@ -771,7 +795,6 @@ function suggestMF(search, search_uri, callback) {
                                 }
                             }
                         ]
-
                     }
                 }
             }
@@ -824,6 +847,7 @@ function getChaptersFromSuggestion(json, callback) {
             var funct2 = [];
 
             for (var uuid in suggested) {
+                if(!suggested.hasOwnProperty(uuid))continue;
                 (function () {
                     var c = uuid;
                     var f2 = function (async_callback) {
@@ -836,7 +860,7 @@ function getChaptersFromSuggestion(json, callback) {
                             suggested[c].metadata = vid.metadata;
                             async_callback();
                         });
-                    }
+                    };
                     funct2.push(f2);
                 })();
             }
@@ -1381,320 +1405,6 @@ function runHotspotProcess(uuid, callback) {
 function checkHotspotResults(uuid, callback) {
     console.log("check Hotspot Results");
     /* Call to services */
-//    fake results
-    var results = {
-        //"UUID":"c1851285-972f-4c30-a7fd-1d6b704bb471",
-//        "hp_list"
-        "hotspots": [
-            {
-                "startNPT": 41.375999450683594,
-                "endNPT": 72.91999816894531,
-                "topic_list": [
-                    {
-                        "label": "Terrorism",
-                        "relevance": 0.9563,
-                        "url": "http://en.wikipedia.org/Terrorism",
-                        "frequency": 1,
-                        "inverseFrequency": 0,
-                        "finalScore": 1.9126
-                    },
-                    {
-                        "label": "Federal Bureau of Investigation",
-                        "relevance": 1.0,
-                        "url": "http://en.wikipedia.org/Federal_Bureau_of_Investigation",
-                        "frequency": 0,
-                        "inverseFrequency": 0,
-                        "finalScore": 1.0
-                    },
-                    {
-                        "label": "Homegrown terrorism",
-                        "relevance": 0.660215,
-                        "url": "http://en.wikipedia.org/Homegrown_terrorism",
-                        "frequency": 0,
-                        "inverseFrequency": 0,
-                        "finalScore": 0.660215
-                    },
-                    {
-                        "label": "Fear",
-                        "relevance": 0.2867,
-                        "url": "http://en.wikipedia.org/Fear",
-                        "frequency": 1,
-                        "inverseFrequency": 0,
-                        "finalScore": 0.5734
-                    }
-                ],
-                "entity_list": [
-                    {
-                        "idEntity": 0,
-                        "label": "FBI",
-                        "startChar": 542,
-                        "endChar": 545,
-                        "extractorType": "DBpedia:Agent,Organisation;Freebase:/book/book_subject,/government/government_agency,/business/employer,/projects/project_participant,/fictional_universe/fictional_employer,/dataworld/data_provider,/fictional_universe/fictional_organization,/government/governmental_body,/organization/organization",
-                        "nerdType": "http://nerd.eurecom.fr/ontology#Organization",
-                        "confidence": 5.38761,
-                        "relevance": 0.497684,
-                        "startNPT": 44.376,
-                        "endNPT": 46.413,
-                        "uri": "http://en.wikipedia.org/wiki/Federal_Bureau_of_Investigation",
-                        "inverseFrequency": 1,
-                        "finalScore": 0.497684
-                    },
-                    {
-                        "idEntity": 0,
-                        "label": "FBI",
-                        "startChar": 931,
-                        "endChar": 934,
-                        "extractorType": "DBpedia:Agent,Organisation;Freebase:/book/book_subject,/government/government_agency,/business/employer,/projects/project_participant,/fictional_universe/fictional_employer,/dataworld/data_provider,/fictional_universe/fictional_organization,/government/governmental_body,/organization/organization",
-                        "nerdType": "http://nerd.eurecom.fr/ontology#Organization",
-                        "confidence": 5.38761,
-                        "relevance": 0.497684,
-                        "startNPT": 67.429,
-                        "endNPT": 69.342,
-                        "uri": "http://en.wikipedia.org/wiki/Federal_Bureau_of_Investigation",
-                        "inverseFrequency": 1,
-                        "finalScore": 0.497684
-                    },
-                    {
-                        "idEntity": 0,
-                        "label": "FBI\u0027s",
-                        "startChar": 931,
-                        "endChar": 936,
-                        "extractorType": "DBpedia:Agent,Organisation;Freebase:/book/book_subject,/government/government_agency,/business/employer,/projects/project_participant,/fictional_universe/fictional_employer,/dataworld/data_provider,/fictional_universe/fictional_organization,/government/governmental_body,/organization/organization",
-                        "nerdType": "http://nerd.eurecom.fr/ontology#Organization",
-                        "confidence": 1.2213,
-                        "relevance": 0.497684,
-                        "startNPT": 67.429,
-                        "endNPT": 69.342,
-                        "uri": "http://en.wikipedia.org/wiki/Federal_Bureau_of_Investigation",
-                        "inverseFrequency": 0,
-                        "finalScore": 0.497684
-                    },
-                    {
-                        "idEntity": 0,
-                        "label": "FBI agents",
-                        "startChar": 542,
-                        "endChar": 552,
-                        "extractorType": "DBpedia:Agent,Organisation;Freebase:/book/book_subject,/government/government_agency,/business/employer,/projects/project_participant,/fictional_universe/fictional_employer,/dataworld/data_provider,/fictional_universe/fictional_organization,/government/governmental_body,/organization/organization",
-                        "nerdType": "http://nerd.eurecom.fr/ontology#Organization",
-                        "confidence": 4.70778,
-                        "relevance": 0.452969,
-                        "startNPT": 44.376,
-                        "endNPT": 46.413,
-                        "uri": "http://en.wikipedia.org/wiki/Federal_Bureau_of_Investigation",
-                        "inverseFrequency": 1,
-                        "finalScore": 0.452969
-                    }
-                ],
-                "visualConcept_list": [  ]
-            },
-            {
-                "startNPT": 146.2760009765625,
-                "endNPT": 188.3470001220703,
-                "topic_list": [
-                    {
-                        "label": "Law",
-                        "relevance": 0.396366,
-                        "url": "http://en.wikipedia.org/Category:Law",
-                        "frequency": 3,
-                        "inverseFrequency": 0,
-                        "finalScore": 1.585464
-                    },
-                    {
-                        "label": "Eco-terrorism",
-                        "relevance": 0.712097,
-                        "url": "http://en.wikipedia.org/Eco-terrorism",
-                        "frequency": 1,
-                        "inverseFrequency": 0,
-                        "finalScore": 1.424194
-                    },
-                    {
-                        "label": "Criminal law",
-                        "relevance": 0.680863,
-                        "url": "http://en.wikipedia.org/Category:Criminal_law",
-                        "frequency": 0,
-                        "inverseFrequency": 0,
-                        "finalScore": 0.680863
-                    },
-                    {
-                        "label": "Terrorism",
-                        "relevance": 0.300221,
-                        "url": "http://en.wikipedia.org/Terrorism",
-                        "frequency": 1,
-                        "inverseFrequency": 0,
-                        "finalScore": 0.600442
-                    },
-                    {
-                        "label": "Violence",
-                        "relevance": 0.231538,
-                        "url": "http://en.wikipedia.org/Violence",
-                        "frequency": 1,
-                        "inverseFrequency": 0,
-                        "finalScore": 0.463076
-                    }
-                ],
-                "entity_list": [
-                    {
-                        "idEntity": 0,
-                        "label": "terrorists",
-                        "startChar": 2340,
-                        "endChar": 2350,
-                        "extractorType": "Freebase:/film/film_subject,/organization/organization_type,/media_common/quotation_subject,/fictional_universe/fictional_organization_type,/book/book_subject,/education/field_of_study",
-                        "nerdType": "http://nerd.eurecom.fr/ontology#Organization",
-                        "confidence": 1.74152,
-                        "relevance": 0.518995,
-                        "startNPT": 161.287,
-                        "endNPT": 163.425,
-                        "uri": "http://en.wikipedia.org/wiki/Terrorism",
-                        "inverseFrequency": 1,
-                        "finalScore": 0.518995
-                    },
-                    {
-                        "idEntity": 0,
-                        "label": "animal cruelty",
-                        "startChar": 2553,
-                        "endChar": 2567,
-                        "extractorType": "null",
-                        "nerdType": "http://nerd.eurecom.fr/ontology#Thing",
-                        "confidence": 3.64763,
-                        "relevance": 0.340285,
-                        "startNPT": 176.487,
-                        "endNPT": 179.747,
-                        "uri": "http://en.wikipedia.org/wiki/Cruelty_to_animals",
-                        "inverseFrequency": 0,
-                        "finalScore": 0.340285
-                    },
-                    {
-                        "idEntity": 0,
-                        "label": "nonviolent",
-                        "startChar": 2315,
-                        "endChar": 2325,
-                        "extractorType": "Freebase:/film/film_subject,/organization/organization_sector,/media_common/quotation_subject,/book/book_subject",
-                        "nerdType": "http://nerd.eurecom.fr/ontology#Organization",
-                        "confidence": 3.39831,
-                        "relevance": 0.337412,
-                        "startNPT": 158.598,
-                        "endNPT": 161.287,
-                        "uri": "http://en.wikipedia.org/wiki/Nonviolence",
-                        "inverseFrequency": 0,
-                        "finalScore": 0.337412
-                    },
-                    {
-                        "idEntity": 0,
-                        "label": "police",
-                        "startChar": 2254,
-                        "endChar": 2260,
-                        "extractorType": "Freebase:/film/film_subject,/organization/organization_sector,/tv/tv_genre,/book/book_subject,/film/film_genre,/media_common/media_genre,/interests/collection_category,/organization/organization_type,/media_common/quotation_subject,/fictional_universe/fictional_organization_type",
-                        "nerdType": "http://nerd.eurecom.fr/ontology#Organization",
-                        "confidence": 1.13486,
-                        "relevance": 0.313671,
-                        "startNPT": 155.273,
-                        "endNPT": 158.598,
-                        "uri": "http://en.wikipedia.org/wiki/Police",
-                        "inverseFrequency": 1,
-                        "finalScore": 0.313671
-                    },
-                    {
-                        "idEntity": 0,
-                        "label": "eco-terrorism",
-                        "startChar": 2384,
-                        "endChar": 2397,
-                        "extractorType": "null",
-                        "nerdType": "http://nerd.eurecom.fr/ontology#Thing",
-                        "confidence": 6.85926,
-                        "relevance": 0.830181,
-                        "startNPT": 163.425,
-                        "endNPT": 167.048,
-                        "uri": "http://en.wikipedia.org/wiki/Eco-terrorism",
-                        "inverseFrequency": 3,
-                        "finalScore": 0.276727
-                    }
-                ],
-                "visualConcept_list": [
-
-                ]
-            },
-            {
-                "startNPT": 188.2899932861328,
-                "endNPT": 217.6300048828125,
-                "topic_list": [
-                    {
-                        "label": "Ag-gag",
-                        "relevance": 0.508107,
-                        "url": "http://en.wikipedia.org/Ag-gag",
-                        "frequency": 1,
-                        "inverseFrequency": 0,
-                        "finalScore": 1.016214
-                    },
-                    {
-                        "label": "Prosecutor",
-                        "relevance": 0.30489,
-                        "url": "http://en.wikipedia.org/Prosecutor",
-                        "frequency": 1,
-                        "inverseFrequency": 0,
-                        "finalScore": 0.60978
-                    },
-                    {
-                        "label": "Slaughterhouse",
-                        "relevance": 0.198223,
-                        "url": "http://en.wikipedia.org/Slaughterhouse",
-                        "frequency": 1,
-                        "inverseFrequency": 0,
-                        "finalScore": 0.396446
-                    }
-                ],
-                "entity_list": [
-                    {
-                        "idEntity": 0,
-                        "label": "ag-gag",
-                        "startChar": 2741,
-                        "endChar": 2747,
-                        "extractorType": "null",
-                        "nerdType": "http://nerd.eurecom.fr/ontology#Thing",
-                        "confidence": 4.38494,
-                        "relevance": 0.826092,
-                        "startNPT": 188.347,
-                        "endNPT": 190.685,
-                        "uri": "http://en.wikipedia.org/wiki/Ag-gag",
-                        "inverseFrequency": 0,
-                        "finalScore": 0.826092
-                    },
-                    {
-                        "idEntity": 0,
-                        "label": "Amy Meyer",
-                        "startChar": 2805,
-                        "endChar": 2814,
-                        "extractorType": "DBpedia:Person;Freebase:/people/person",
-                        "nerdType": "http://nerd.eurecom.fr/ontology#Person",
-                        "confidence": 0.5,
-                        "relevance": 0.5,
-                        "startNPT": 192.12,
-                        "endNPT": 193.772,
-                        "uri": "",
-                        "inverseFrequency": 0,
-                        "finalScore": 0.5
-                    },
-                    {
-                        "idEntity": 0,
-                        "label": "Amy",
-                        "startChar": 2820,
-                        "endChar": 2823,
-                        "extractorType": "DBpedia:Person;Freebase:/people/person",
-                        "nerdType": "http://nerd.eurecom.fr/ontology#Person",
-                        "confidence": 0.5,
-                        "relevance": 0.5,
-                        "startNPT": 193.772,
-                        "endNPT": 195.385,
-                        "uri": "",
-                        "inverseFrequency": 0,
-                        "finalScore": 0.5
-                    }
-                ],
-                "visualConcept_list": [
-
-                ]
-            }
-        ]
-    };
 
     if (results) {
         db.addHotspots(uuid, results.hotspots, function (err) {
@@ -1746,11 +1456,13 @@ module.exports.getSuggestedCourses = function (req, res) {
 
 module.exports.topicSearch = function (req, res) {
     var topic = req.param('topic');
+
     if (!topic) {
-        //TODO send error
+        res.json({error: 'empty topic'});
+        return;
     }
 
-    courseSuggestion.getSuggestedCouses([topic], function (err, docs) {
+    suggestHS(topic, function (err, docs) {
         if (err) {
             console.error(err);
             res.render('error.ejs', errorMsg.e500);
