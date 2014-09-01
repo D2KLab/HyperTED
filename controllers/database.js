@@ -68,6 +68,7 @@ function getFilterEntities(uuid, extractor, start, end, callback) {
 
 }
 
+
 function getHotspotsFor(video, callback) {
     hots.find({'uuid': video.uuid}, function (err, docs) {
         if (!err && docs && docs.length > 0) {
