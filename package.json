@@ -1,6 +1,6 @@
 {
     "name": "MediaFragmentPlayerDemo",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "scripts": {
         "start": "node server"
     },
@@ -22,7 +22,8 @@
         "moment": "^2.8.0",
         "morgan": "^1.2.2",
         "elasticsearch": "^2.4.0",
-        "mediafragment": "git+https://github.com/pasqLisena/node-mediafragment"
+        "mediafragment": "git+https://github.com/pasqLisena/node-mediafragment",
+        "valid-url": "^1.0.9"
     },
     "optionalDependencies": {
         "node-ffprobe": "^1.2.2"

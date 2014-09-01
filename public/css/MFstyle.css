@@ -1115,10 +1115,22 @@ div.chapterscontent.visible {
     border-top: none;
 }
 
+.video-list .video-link.suggTopic {
+    max-width: 290px;
+    border-top: none;
+    border-left: 1px;
+    display: inline-block;
+    float: left;
+}
+
 .video-list .video-link h4.playlist_title {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.video-list .video-link h4.playlist_title.topic_title {
+    max-width: 260px;
 }
 
 .video-list .video-link h4.playlist_title a {

@@ -13,9 +13,9 @@
 
 <% include partials/header.ejs %>
 
-<div class="playlist-holder">
+<div class="playlist-holder clearfix">
 
-    <%
+<%
     if(locals.msg){
     %>
 
@@ -91,6 +91,7 @@
                                 content: (frags[f].chapNum) ? 'Chapter ' + frags[f].chapNum + ' (' + fullLabelTime + ')' : fullLabelTime
                             },
                             {append: true});
+                    thisVid.addClass("suggTopic");
                 }
 
             }

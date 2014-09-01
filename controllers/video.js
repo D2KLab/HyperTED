@@ -12,7 +12,8 @@ var http = require('http'),
     ts = require('./linkedTVconnection'),
     courseSuggestion = require('./course_suggestion'),
     errorMsg = require('./error_msg'),
-    utils = require('./utils');
+    utils = require('./utils'),
+    validUrl = require('valid-url');
 
 var LOG_TAG = '[VIDEO.JS]: ';
 var hStatusValue = {
@@ -1461,6 +1462,12 @@ module.exports.topicSearch = function (req, res) {
         res.json({error: 'empty topic'});
         return;
     }
+
+    if (validUrl.isUri(topic)) {
+        res.redirect('/video?uri=' + topic);
+        return;
+    }
+
 
     suggestHS(topic, function (err, docs) {
         if (err) {

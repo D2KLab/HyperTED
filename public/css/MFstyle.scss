@@ -801,11 +801,21 @@ div.chapterscontent {
     &:first-child {
       border-top: none;
     }
+    &.suggTopic {
+      max-width: 290px;
+      border-top: none;
+      border-left: 1px;
+      display: inline-block;
+      float: left;
+    }
 
     h4.playlist_title {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      &.topic_title {
+        max-width: 260px;
+      }
       a {
         color: $darker_gray;
         font-style: italic;
