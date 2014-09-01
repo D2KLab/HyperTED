@@ -44,9 +44,28 @@ curl -XPUT '/_river/hyperted/_meta' -d
     "type": "entity"
   }
 }
+
+curl -XPUT '/_river/hypertedHS/_meta' -d
+{
+  "type": "mongodb",
+  "mongodb": {
+    "servers": [
+      { "host": "localhost", "port": 27017 }
+    ],
+    "db": "hyperted",
+    "collection": "hotspots",
+    "options": { "secondary_read_preference": true },
+    "gridfs": false
+  },
+  "index": {
+    "name": "hs_index",
+    "type": "hotspot"
+  }
+}
 </pre>
 
-*If you can not use <code>curl</code>, you can also run it with [Sense extension](https://chrome.google.com/webstore/detail/sense-beta/lhjgkmllcaadmopgmanpapmpjgmfcfig) for Google Chrome. In this case the first row become <code>PUT /_river/hyperted/_meta</code>*
+*If you can not use <code>curl</code>, you can also run it with [Sense extension](https://chrome.google.com/webstore/detail/sense-beta/lhjgkmllcaadmopgmanpapmpjgmfcfig) for Google Chrome.
+In this case the first rows become <code>PUT /_river/hyperted/_meta</code>*
 
 ### Server
 

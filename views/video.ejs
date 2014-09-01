@@ -15,50 +15,7 @@
     <link rel="stylesheet" type="text/css" href="/css/MFstyle.css"/>
 </head>
 <body>
-
-<nav class="navbar" role="navigation">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <div class="navbar-default">
-                <button type="button" class="navbar-toggle" data-toggle="collapse"
-                        data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-            </div>
-            <a class="navbar-brand" href="/home">
-                <span class="top-brand">
-                   <img class="left-mark" src="/img/logos/left_mark.png">
-                   <img class="logo-text" src="/img/logos/hTedLogo_big_text.png">
-                   <img class="right-mark" src="/img/logos/right_mark.png">
-                </span>
-            </a>
-        </div>
-
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <form class="navbar-form navbar-right" method="get" action="/video" id="video-search" role="search">
-                <div class="form-group">
-                    <div class="input-group">
-                        <input name="uri" type="url" placeholder="Insert a Media Fragment URL" class="form-control ">
-             <span class="input-group-btn">
-                    <button class="btn btn-danger" type="submit">Go!</button>
-             </span>
-                    </div>
-                </div>
-
-            </form>
-        </div>
-        <!-- /.navbar-collapse -->
-
-    </div>
-    <!-- /.container-fluid -->
-</nav>
-
-<nav class="navbar navbar-placeholder"></nav>
+<% include partials/header.ejs %>
 <section id="player-sect">
     <div id="player-container" class="clearfix">
         <div id="video"></div>
@@ -143,7 +100,7 @@
             <div class="col-md-7 col-lg-7">
                 <div class="row">
                     <div class="col-lg-9 col-md-9 col-sm-8 col-xs-6">
-                    <hr class="red_rule">
+                        <hr class="red_rule">
                     </div>
 
                     <div class="col-lg-2 col-md-2 col-sm-3 col-xs-5">
@@ -213,7 +170,38 @@
             <% if(locals.subtitles) { %>
             <div class="col-md-5 col-lg-5">
                 <div class="see-also">
-                <% include partials/playlist.ejs %>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-8 col-xs-5">
+                                <hr class="red_rule">
+                            </div>
+
+                            <div class="col-lg-6 col-md-6 col-sm-4 col-xs-5">
+                                <h1 class="title">watch also</h1>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+
+                                <div id="playlist-sect">
+                                    <p class="invite">click on Nerdify for having suggestion about chapters</p>
+
+                                    <p class="loading">
+                                        <img src="\img\ajax-loader.gif">
+                                        loading suggested chapters
+                                        <img src="\img\ajax-loader.gif">
+                                    </p>
+
+                                    <p class="no_ent">this chapter has no entity. </br>Please, choose another one</p>
+
+                                    <% include partials/playlist.ejs %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                 </div>
                 <div id="suggested-courses"></div>
             </div>
@@ -284,11 +272,11 @@
 <script type="text/html" id="courseList">
     <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-8 col-xs-5">
-        <hr class="red_rule">
+            <hr class="red_rule">
         </div>
 
         <div class="col-lg-6 col-md-6 col-sm-4 col-xs-7">
-        <h1 class="title">learn also</h1>
+            <h1 class="title">learn also</h1>
         </div>
     </div>
     <div>

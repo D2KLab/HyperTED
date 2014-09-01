@@ -23,7 +23,6 @@ app.get('/courses?', video.getSuggestedCourses);
 app.get('/metadata/:uuid', video.ajaxGetMetadata);
 app.get('/suggestmf/:uuid', video.ajaxSuggestMF);
 app.get('/builddb', video.buildDb);
-app.get('/elasticsearch/:search', video.suggestMF);
 app.get('/topicsearch', video.topicSearch);
 
 app.get('/home', function (req, res, next) {

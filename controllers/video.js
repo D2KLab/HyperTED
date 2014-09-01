@@ -702,6 +702,7 @@ exports.ajaxSuggestMF = function (req, res) {
                 });
             var lab = "", uri = "";
             for (var i in doc) {
+                if (!doc.hasOwnProperty(i))continue;
                 lab = lab.concat(doc[i].label, '&');
                 uri = uri.concat(doc[i].uri, '&');
             }
@@ -772,7 +773,6 @@ function suggestHS(search_topic, callback) {
             callback(err);
         });
 }
-exports.suggestHS = suggestHS;
 
 function suggestMF(search, search_uri, callback) {
     client.search({
@@ -807,7 +807,6 @@ function suggestMF(search, search_uri, callback) {
             callback(err);
         });
 }
-exports.suggestMF = suggestMF;
 
 function getChaptersFromSuggestion(json, callback) {
     var chapters = [], functs = [];
@@ -847,7 +846,7 @@ function getChaptersFromSuggestion(json, callback) {
             var funct2 = [];
 
             for (var uuid in suggested) {
-                if(!suggested.hasOwnProperty(uuid))continue;
+                if (!suggested.hasOwnProperty(uuid))continue;
                 (function () {
                     var c = uuid;
                     var f2 = function (async_callback) {
@@ -1468,12 +1467,50 @@ module.exports.topicSearch = function (req, res) {
             res.render('error.ejs', errorMsg.e500);
             return;
         }
+        if (!docs || !docs.length) {
+            var source = {"msg": "No video available for this topic. \nPlease try with another one."};
+            res.render('topic_driven_playlist.ejs', source);
+            return;
+        }
+        var suggested = {};
+        docs.forEach(function (r) {
+            if (!r)return;
+            var c = r._source;
+            var v1 = suggested[c.uuid];
+            if (v1) {
+//                var notExists = v1.chaps.every(function (ch) {
+//                    return ch.chapNum != c.chapNum;
+//                });
+//                if (notExists)
+                v1.chaps.push(c);
+                return;
+            }
+            v1 = {'chaps': [c]};
+            suggested[c.uuid] = v1;
+        });
+        var funct2 = [];
 
-        var source;
-        if (!docs || !docs.length)
-            source = {"msg": "No video available for this topic. \nPlease try with another one."};
-        else source = {"videos": docs};
+        for (var uuid in suggested) {
+            if (!suggested.hasOwnProperty(uuid))continue;
+            (function () {
+                var c = uuid;
+                var f2 = function (async_callback) {
+                    db.getVideoFromUuid(c, false, function (err, vid) {
+                        if (err) {
+                            console.trace(err);
+                            async_callback(false);
+                            return;
+                        }
+                        suggested[c].metadata = vid.metadata;
+                        async_callback();
+                    });
+                };
+                funct2.push(f2);
+            })();
+        }
+        async.parallel(funct2, function () {
+            res.render('topic_driven_playlist.ejs', {"suggVids": suggested});
 
-        res.render('topic_driven_playlist.ejs', source);
+        });
     });
 };

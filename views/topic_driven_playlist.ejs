@@ -2,9 +2,7 @@
 <html>
 <head lang="en">
     <meta charset="UTF8">
-    <% var metadata = locals.metadata || false %>
-    <% var pageTitle = (metadata && locals.metadata.title) ? locals.metadata.title + '|HyperTED' : 'HyperTED'; %>
-    <title><%= pageTitle %></title>
+    <title>Search Results|HyperTED</title>
     <link rel="icon" type="image/png" href="/img/favicons/favicon_48.png">
     <!--[if IE]>
     <link rel="shortcut icon" href="/img/favicons/favicon.ico"/><![endif]-->
@@ -13,62 +11,22 @@
 </head>
 <body>
 
-<nav class="navbar" role="navigation">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <div class="navbar-default">
-                <button type="button" class="navbar-toggle" data-toggle="collapse"
-                        data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-            </div>
-            <a class="navbar-brand" href="/home">
-                <span class="top-brand">
-                   <img class="left-mark" src="/img/logos/left_mark.png">
-                   <img class="logo-text" src="/img/logos/hTedLogo_big_text.png">
-                   <img class="right-mark" src="/img/logos/right_mark.png">
-                </span>
-            </a>
-        </div>
-
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <form class="navbar-form navbar-right" method="get" action="/video" id="video-search" role="search">
-                <div class="form-group">
-                    <div class="input-group">
-                        <input name="uri" type="url" placeholder="Insert a Media Fragment URL" class="form-control ">
-             <span class="input-group-btn">
-                    <button class="btn btn-danger" type="submit">Go!</button>
-             </span>
-                    </div>
-                </div>
-
-            </form>
-        </div>
-        <!-- /.navbar-collapse -->
-
-    </div>
-    <!-- /.container-fluid -->
-</nav>
-
-<nav class="navbar navbar-placeholder"></nav>
+<% include partials/header.ejs %>
 
 <div class="playlist-holder">
+
     <%
     if(locals.msg){
     %>
+
     <div class="alert alert-danger"><%= locals.msg %></div>
     <%
     }
-            if(locals.videos){
+            if(locals.suggVids){
     %>
     <% include partials/playlist.ejs %>
     <script>
-        var videos = <%= JSON.stringify(videos) %>;
+        var videos = <%- JSON.stringify(locals.suggVids) %>;
     </script>
     <%
     }
@@ -99,7 +57,7 @@
         if (videos) {
             var $suggestedVideoList = $('#suggestedVideoList');
             for (var v in videos) {
-                if(!videos.hasOwnProperty(v))continue;
+                if (!videos.hasOwnProperty(v))continue;
                 var suggVideo = videos[v];
                 var meta = suggVideo.metadata;
                 var title, thumb;
@@ -124,10 +82,13 @@
                 var frags = suggVideo.chaps;
                 for (var f in frags) {
                     if (!frags.hasOwnProperty(f))continue;
+
+                    var fullLabelTime = labelTime(frags[f].startNPT) + ' - ' + labelTime(frags[f].endNPT)
+
                     $('.frag-list', thisVid).loadTemplate($('#fragLi'),
                             {
                                 href: '/video/' + v + '#t=' + frags[f].startNPT + ',' + frags[f].endNPT,
-                                content: 'Chapter ' + frags[f].chapNum + ' (' + labelTime(frags[f].startNPT) + ' - ' + labelTime(frags[f].endNPT) + ')'
+                                content: (frags[f].chapNum) ? 'Chapter ' + frags[f].chapNum + ' (' + fullLabelTime + ')' : fullLabelTime
                             },
                             {append: true});
                 }
@@ -136,6 +97,17 @@
 
         }
     });
+
+    function labelTime(time) {
+        var hh = Math.floor(time / 3600);
+        hh = hh < 10 ? '0' + hh : hh;
+        var mm = Math.floor((time % 3600) / 60);
+        mm = mm < 10 ? '0' + mm : mm;
+        var ss = Math.floor((time % 3600) % 60);
+        ss = ss < 10 ? '0' + ss : ss;
+
+        return hh + ':' + mm + ':' + ss;
+    }
 </script>
 
 
