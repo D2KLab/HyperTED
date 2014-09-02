@@ -647,21 +647,19 @@ html, body {
     display: none;
 }
 
-.see-also .loading, .see-also .invite, .see-also .no_ent {
+.see-also .loading, .see-also .no_ent {
     font-style: italic;
     text-align: center;
 }
 
-.see-also .invite, .see-also .no_ent {
-    display: none;
-}
-
 .see-also .no_ent {
+    display: none;
     color: #b11200;
 }
 
 .invite {
     font-style: italic;
+    font-size: 17px;
     text-align: center;
     display: none;
 }

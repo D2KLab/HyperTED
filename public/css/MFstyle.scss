@@ -404,20 +404,19 @@ $navbarTransitionTime: 100ms;
 .see-also {
   display: none;
 
-  .loading, .invite, .no_ent {
+  .loading, .no_ent {
     font-style: italic;
     text-align: center;
   }
-  .invite, .no_ent {
-    display: none;
-  }
   .no_ent {
+    display: none;
     color: $dark_red;
   }
 }
 
 .invite {
   font-style: italic;
+  font-size: 17px;
   text-align: center;
   display: none;
 }
