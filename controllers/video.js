@@ -702,10 +702,18 @@ exports.ajaxSuggestMF = function (req, res) {
                     return ((x.relevance == y.relevance) ? 0 : ((x.relevance < y.relevance) ? 1 : -1 ));
                 });
             var lab = "", uri = "";
-            for (var i in doc) {
-                if (!doc.hasOwnProperty(i))continue;
-                lab = lab.concat(doc[i].label, '&');
-                uri = uri.concat(doc[i].uri, '&');
+            if (doc.length > 5) {
+                for (var i = 0; i < 5; i++) {
+                    if (!doc.hasOwnProperty(i))continue;
+                    lab = lab.concat(doc[i].label, '&');
+                    uri = uri.concat(doc[i].uri, '&');
+                }
+            } else {
+                for (var i in doc) {
+                    if (!doc.hasOwnProperty(i))continue;
+                    lab = lab.concat(doc[i].label, '&');
+                    uri = uri.concat(doc[i].uri, '&');
+                }
             }
             var filt_lab = lab.substring(0, lab.length - 1);
             var filt_uri = uri.substring(0, uri.length - 1);
