@@ -82,7 +82,7 @@
             <h3 class="video-info"><%= metadata.title %></h3>
         </div>
         <% if(locals.metadata && metadata.descr) { %>
-        <div class="right"><p class="descr"><%= metadata.descr %></p></div>
+        <div class="right"><p class="descr"><%- metadata.descr %></p></div>
 
         <% } %>
     </div>
@@ -169,6 +169,9 @@
 
             <% if(locals.subtitles) { %>
             <div class="col-md-5 col-lg-5">
+                <a id="recommend" class="btn btn-danger btn-block recommend_btn"><h4>RECOMMEND FRAGMENTS</br> AND
+                        COURSES</h4></a>
+
                 <div class="see-also">
                     <div class="container-fluid">
                         <div class="row">
@@ -185,7 +188,7 @@
                             <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
 
                                 <div id="playlist-sect">
-                                    <p class="invite">click on Nerdify for having suggestion about chapters</p>
+                                    <p class="invite">click on Nerdify for having suggestion about related chapters</p>
 
                                     <p class="loading">
                                         <img src="\img\ajax-loader.gif">
@@ -263,8 +266,8 @@
 <script type="text/html" id="course">
     <li class="course">
         <h4 class="title">
-            <a data-href="url"><img data-src="thumb" data-alt="title"/></a>
-            <a data-href="url" class="name" data-content="title"></a>
+            <a data-href="url" target="_blank"><img data-src="thumb" data-alt="title"/></a>
+            <a data-href="url" class="name" data-content="title" target="_blank"></a>
         </h4>
     </li>
 </script>

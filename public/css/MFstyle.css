@@ -643,6 +643,10 @@ html, body {
     display: inline-block;
 }
 
+.see-also {
+    display: none;
+}
+
 .see-also .loading, .see-also .invite, .see-also .no_ent {
     font-style: italic;
     text-align: center;
@@ -656,7 +660,14 @@ html, body {
     color: #b11200;
 }
 
-#suggested-courses .invite {
+.invite {
+    font-style: italic;
+    text-align: center;
+    display: none;
+}
+
+#suggested-courses {
+    margin-top: 30px;
     display: none;
 }
 
@@ -922,11 +933,16 @@ html, body {
 
 .chap-label span {
     display: inline-block;
+    margin: 0 3px;
 }
 
-.chap-label span.selected-chap-num, .chap-label span.first-part, .chap-label span.last-part {
+.chap-label span:not(.glyphicon) {
     font-family: CaviarDreams, Helvetica, sans-serif;
     font-size: 2.6em;
+}
+
+.chap-label .intro {
+    display: none;
 }
 
 @media (max-width: 768px) {
@@ -1278,38 +1294,6 @@ div.descr-cont .descr.full {
     max-height: 100em;
 }
 
-div.descr-cont .see-all {
-    position: relative;
-    right: 0;
-    top: -42px;
-    float: right;
-    background: #f4f4f4;
-    border: 1px solid #aaaaaa;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    -ms-border-radius: 5px;
-    -o-border-radius: 5px;
-    border-radius: 5px;
-    border-bottom: none;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    color: #aaaaaa;
-    text-transform: uppercase;
-    font-size: 0.8em;
-    line-height: 1em;
-    padding: 5px 15px;
-    margin: 0 9px;
-    opacity: 0.7;
-    -webkit-transition: opacity 200ms ease-out;
-    -moz-transition: opacity 200ms ease-out;
-    -o-transition: opacity 200ms ease-out;
-    transition: opacity 200ms ease-out;
-}
-
-div.descr-cont .see-all:hover {
-    opacity: 1;
-}
-
 p span.entity.nesting:not(:hover) {
     color: #000000;
     background: linear-gradient(white, #cccccc);
@@ -1576,4 +1560,14 @@ p span.entity.nesting:hover span {
 
 .error_header {
     text-align: center;
+}
+
+.recommend_btn {
+    margin: 60px auto;
+    width: 50%;
+    height: 80px;
+}
+
+.recommend_btn h4 {
+    margin-top: 15px;
 }

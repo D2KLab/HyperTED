@@ -1,6 +1,6 @@
 <div class="hscont clearfix">
-
-    <%
+    <div class="hscont-inner">
+        <%
     function labelTime(time) {
         var hh = Math.floor(time / 3600);
         hh = hh < 10 ? '0' + hh : hh;
@@ -16,6 +16,9 @@
         var totWidth = (locals.duration);
         return((endT - startT) / totWidth) * 100;
     }
+    if (!locals.hotspotted)
+        locals.hotspotStatus = null;
+
             if(locals.chapters){
             switch (locals.hotspotStatus){
     case 1:
@@ -99,12 +102,15 @@
     <% });
         break;
     default:
-    %>
-    <form method="get" id="hotspot-form" action="../runhotspot">
+    }
+    } %>
+    </div>
+    <form method="get" id="hotspot-form" action="../runhotspot" <% if(locals.hotspotted){ %>style="display: none"
+            <% } %>
+            >
         <input type="hidden" name="uuid" value="<%= locals.uuid %>">
+        <input type="hidden" name="hotspotted" value="true">
         <button class="btn btn-hotspot" type="submit">GENERATE HOTSPOTS</button>
     </form>
-    <% }
-    } %>
 
 </div>

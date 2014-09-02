@@ -37,6 +37,7 @@ var mergeObj = utils.mergeObj;
  */
 function viewVideo(req, res, video) {
     var enriched = req.query.enriched;
+    var hotspotted = req.query.hotspotted;
     var videoURI = video.videoLocator || video.locator;
 
     // Identify the media fragment part
@@ -48,7 +49,8 @@ function viewVideo(req, res, video) {
 
     var options = {
         videoURI: videoURI,
-        enriched: enriched
+        enriched: enriched,
+        hotspotted: hotspotted ? true : false
     };
 
     // Prepare nerd entity part
@@ -706,7 +708,9 @@ exports.ajaxSuggestMF = function (req, res) {
                 for (var i = 0; i < 5; i++) {
                     if (!doc.hasOwnProperty(i))continue;
                     lab = lab.concat(doc[i].label, '&');
-                    uri = uri.concat(doc[i].uri, '&');
+                    if (doc[i].uri == null)continue;
+                    else
+                        uri = uri.concat(doc[i].uri, '&');
                 }
             } else {
                 for (var i in doc) {
@@ -727,7 +731,6 @@ exports.ajaxSuggestMF = function (req, res) {
                         else {
                             if (vids[uuid]) { //remove fragment that I am watching
                                 var chaps = vids[uuid].chaps;
-
                                 for (var c in chaps) {
                                     if (chaps[c].startNPT >= startMF && chaps[c].startNPT < endMF) {
                                         chaps.splice(c);
@@ -1318,9 +1321,13 @@ exports.runHotspot = function (req, res) {
                 }
 //                res.json({done: true});
 
-//                res.render('hp_resp.ejs', {hotspot: data});
-                res.json({hotspot: data});
+                res.render('hp_resp.ejs', {hotspots: data, hotspotted: true, hotspotStatus: 2, chapters: v.chapters});
+//                res.json({hotspot: data, hotspotted: true});
             });
+        } else if (status == 2) {
+            db.getVideoFromUuid(uuid, true, function (err, v) {
+                res.render('hp_resp.ejs', {hotspots: v.hotspots, hotspotted: true, hotspotStatus: 2, chapters: v.chapters});
+            })
         } else res.json({done: true});
 
     });

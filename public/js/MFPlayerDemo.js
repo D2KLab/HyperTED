@@ -128,6 +128,11 @@ $(document).ready(function () {
         });
     }
 
+    $('#recommend').on('click', function () {
+        $(this).hide();
+        $('.see-also').show();
+        $('#suggested-courses').show();
+    })
 
     var $suggestedVideoList = $('#suggestedVideoList');
     var $playlistSect = $('.see-also #playlist-sect');
@@ -155,7 +160,7 @@ $(document).ready(function () {
                 $('.no_ent', $playlistSect).toggle(!Object.keys(res).length);
 
                 for (var v in res) {
-                    if(!res.hasOwnProperty(v))continue;
+                    if (!res.hasOwnProperty(v))continue;
                     var suggVideo = res[v];
                     var meta = suggVideo.metadata;
                     var title, thumb;
@@ -219,8 +224,15 @@ $(document).ready(function () {
                     }
 //                    text = 'The request was sent successfully. Came back later to see hotspots.'
 //                    location.reload(true);
-                    $('#hotspots-cont').html(data);
+                    $('#hotspots-cont .hscont-inner').html($(data).find('.hscont-inner'));
+                    $form.hide();
                     displayPins();
+                    if (Modernizr.history) {
+                        var page_url = window.location.toString().parseURL();
+                        page_url.search.hotspotted = true;
+
+                        history.pushState(null, null, page_url.toString());
+                    }
                 } catch (e) {
                     text = 'Something went wrong. Try again later';
                     console.error(text);
@@ -351,20 +363,23 @@ $(document).ready(function () {
                 }
             }).done(function (data) {
                 $('.loading', $suggCourses).hide();
-
+                var $coursesList = $('#courses-list');
                 if (!data.length) return;
                 for (var i in data) {
                     if (!data.hasOwnProperty(i)) continue;
                     var course = data[i];
-                    $('#courses-list').loadTemplate($('#course'), {
+                    $coursesList.loadTemplate($('#course'), {
                         url: course.locator.value,
                         title: course.title.value,
                         thumb: '\\img\\logos\\' + course.source + '.png'
                     }, {append: true});
 
-                    if (i >= 1)break;
+                    if (i >= 2)break;
                 }
-
+                $coursesList.on('click', 'a', function (e) {
+                    e.preventDefault();
+                    openPopup($(this).attr('href'));
+                })
             }).fail(function () {
                 $('.loading', $suggCourses).hide();
             })
@@ -431,10 +446,14 @@ $(document).ready(function () {
                 $('.chap-link').removeClass('selected-chap');
 
                 $(this).addClass('selected-chap');
-                $('.first-part').text("chapter   ");
-                $('.selected-chap-num').text(chapNum);
-                $('.last-part').text("   of   " + chapNumLast);
-
+                var isOpening = chapNum == '0';
+                if (!isOpening) {
+                    $('.first-part').text("chapter   ");
+                    $('.selected-chap-num').text(chapNum);
+                    $('.last-part').text("   of   " + chapNumLast);
+                }
+                $('.hide-on-intro').toggle(!isOpening);
+                $('.intro').toggle(isOpening);
                 updateMFurl();
             });
         });
@@ -546,6 +565,21 @@ $(document).ready(function () {
             if (hasVideoSub) {
                 highlightMFSub(t);
             }
+        }
+
+        // hotspotted
+        var hotspotted = page_url.search.hotspotted;
+        if (hotspotted) {
+//            var ents = getFromLocalStorage(videokey + extractor);
+//            if (ents) {
+//                onEntitiesToShow(ents);
+//            } else {
+            $('#hotspot-form').submit();
+//            }
+        } else {
+            $('.hscont-inner').hide();
+            $('.btn-hotspot').text("GENERATE HOTSPOTS").removeAttr('style').prop("disabled", false);
+            $('#hotspot-form').show();
         }
 
         // nerdification
@@ -827,4 +861,8 @@ function labelTime(time) {
     ss = ss < 10 ? '0' + ss : ss;
 
     return hh + ':' + mm + ':' + ss;
+}
+
+function openPopup(uri) {
+    window.open(uri, 'titolo', 'width=800, height=600, resizable, status, scrollbars=1, location');
 }

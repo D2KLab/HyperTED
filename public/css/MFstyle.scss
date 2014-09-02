@@ -402,6 +402,7 @@ $navbarTransitionTime: 100ms;
 }
 
 .see-also {
+  display: none;
 
   .loading, .invite, .no_ent {
     font-style: italic;
@@ -415,10 +416,16 @@ $navbarTransitionTime: 100ms;
   }
 }
 
+.invite {
+  font-style: italic;
+  text-align: center;
+  display: none;
+}
+
 #suggested-courses {
-  .invite {
-    display: none;
-  }
+  margin-top: 30px;
+  display: none;
+
   .loading {
     font-style: italic;
     text-align: center;
@@ -640,14 +647,17 @@ h1.title {
   text-align: center;
   span {
     display: inline-block;
-    &.selected-chap-num, &.first-part, &.last-part {
+    margin: 0 3px;
+    &:not(.glyphicon) {
       font: {
         family: CaviarDreams, Helvetica, sans-serif;
         size: 2.6em;
       }
     }
   }
-
+  .intro {
+    display: none;
+  }
   @media(max-width: 768px) {
     text-align: center;
     min-height: 10px;
@@ -942,30 +952,6 @@ div.descr-cont {
       max-height: 100em;
     }
   }
-  .see-all {
-    position: relative;
-    right: 0;
-    top: -42px;
-    float: right;
-    background: $light_gray;
-    border: 1px solid $medium_gray;
-    @include border-radius(5px);
-    border-bottom: none;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    color: $medium_gray;
-    text-transform: uppercase;
-    font-size: 0.8em;
-    line-height: 1em;
-    padding: 5px 15px;
-    margin: 0 9px;
-    opacity: 0.7;
-    @include transition(opacity, 200ms);
-    &:hover {
-      opacity: 1;
-    }
-  }
-
 }
 
 p {
@@ -1210,7 +1196,6 @@ p {
     }
   }
 }
-
 .errorcode {
   font: {
     family: Arial Black, Arial, Verdana, sans-serif;
@@ -1223,4 +1208,13 @@ p {
 
 .error_header {
   text-align: center;
+}
+
+.recommend_btn {
+  margin: 60px auto;
+  width: 50%;
+  height: 80px;
+  h4 {
+    margin-top: 15px;
+  }
 }
