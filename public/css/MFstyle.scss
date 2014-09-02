@@ -349,6 +349,13 @@ $navbarTransitionTime: 100ms;
     margin: 10px;
 
   }
+
+  .playlist-holder {
+    padding: 10px;
+    .topic_sugg {
+      margin-left: 20px;
+    }
+  }
   #entity-sect {
     margin: 10px;
     display: none;
@@ -991,7 +998,7 @@ p {
   }
 }
 
-.extractor {
+.extractor, .topic_sugg {
   font-weight: 700;
 }
 

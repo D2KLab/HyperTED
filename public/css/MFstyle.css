@@ -584,6 +584,14 @@ html, body {
     margin: 10px;
 }
 
+.nerdificable .playlist-holder {
+    padding: 10px;
+}
+
+.nerdificable .playlist-holder .topic_sugg {
+    margin-left: 20px;
+}
+
 .nerdificable #entity-sect {
     margin: 10px;
     display: none;
@@ -1331,7 +1339,7 @@ p span.entity.nesting:hover span {
     box-shadow: 0 1px 8px -2px #5d5d5d;
 }
 
-.extractor {
+.extractor, .topic_sugg {
     font-weight: 700;
 }
 

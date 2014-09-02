@@ -1457,7 +1457,7 @@ module.exports.getSuggestedCourses = function (req, res) {
 
 module.exports.topicSearch = function (req, res) {
     var topic = req.param('topic');
-
+    var source = {'topic': topic};
     if (!topic) {
         res.json({error: 'empty topic'});
         return;
@@ -1476,7 +1476,7 @@ module.exports.topicSearch = function (req, res) {
             return;
         }
         if (!docs || !docs.length) {
-            var source = {"msg": "No video available for this topic. \nPlease try with another one."};
+            source.msg = "No video available for this topic. \nPlease try with another one.";
             res.render('topic_driven_playlist.ejs', source);
             return;
         }
@@ -1486,10 +1486,6 @@ module.exports.topicSearch = function (req, res) {
             var c = r._source;
             var v1 = suggested[c.uuid];
             if (v1) {
-//                var notExists = v1.chaps.every(function (ch) {
-//                    return ch.chapNum != c.chapNum;
-//                });
-//                if (notExists)
                 v1.chaps.push(c);
                 return;
             }
@@ -1517,7 +1513,8 @@ module.exports.topicSearch = function (req, res) {
             })();
         }
         async.parallel(funct2, function () {
-            res.render('topic_driven_playlist.ejs', {"suggVids": suggested});
+            source.suggVids = suggested;
+            res.render('topic_driven_playlist.ejs', source);
 
         });
     });

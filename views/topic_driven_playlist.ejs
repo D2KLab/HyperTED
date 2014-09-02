@@ -12,8 +12,8 @@
 <body>
 
 <% include partials/header.ejs %>
-
-<div class="playlist-holder clearfix">
+<div class="nerdificable">
+    <div class="playlist-holder clearfix">
 
 <%
     if(locals.msg){
@@ -24,13 +24,15 @@
     }
             if(locals.suggVids){
     %>
-    <% include partials/playlist.ejs %>
+        <h3 class="topic_sugg">Suggested Media Fragments for the topic <%= locals.topic.toUpperCase() %></h3>
+        <% include partials/playlist.ejs %>
     <script>
         var videos = <%- JSON.stringify(locals.suggVids) %>;
     </script>
     <%
     }
     %>
+    </div>
 </div>
 
 <footer class="video_footer">
