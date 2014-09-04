@@ -1195,6 +1195,7 @@ p {
     }
   }
 }
+
 .errorcode {
   font: {
     family: Arial Black, Arial, Verdana, sans-serif;
@@ -1217,7 +1218,7 @@ p {
     margin-top: 15px;
     font-size: 15px;
 
-    @media(max-width: 990px) {
+    @media(min-width: 530px) and(max-width: 990px) {
       font-size: 18px;
     }
   }
