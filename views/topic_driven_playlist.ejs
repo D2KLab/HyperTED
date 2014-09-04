@@ -25,6 +25,7 @@
             if(locals.suggVids){
     %>
         <h3 class="topic_sugg">Suggested Media Fragments for the topic <%= locals.topic.toUpperCase() %></h3>
+        <hr class="red_rule">
         <% include partials/playlist.ejs %>
     <script>
         var videos = <%- JSON.stringify(locals.suggVids) %>;

@@ -618,7 +618,7 @@ h1.title {
   }
   .qtip-content {
     text-align: center;
-    max-width: 190px;
+    max-width: 250px;
   }
 }
 
@@ -1215,5 +1215,10 @@ p {
   height: 80px;
   h4 {
     margin-top: 15px;
+    font-size: 15px;
+
+    @media(max-width: 990px) {
+      font-size: 18px;
+    }
   }
 }

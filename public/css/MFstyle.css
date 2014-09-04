@@ -901,7 +901,7 @@ html, body {
 
 .qtip-light .qtip-content {
     text-align: center;
-    max-width: 190px;
+    max-width: 250px;
 }
 
 .topic-cont .topic {
@@ -1568,4 +1568,11 @@ p span.entity.nesting:hover span {
 
 .recommend_btn h4 {
     margin-top: 15px;
+    font-size: 15px;
+}
+
+@media (max-width: 990px) {
+    .recommend_btn h4 {
+        font-size: 18px;
+    }
 }

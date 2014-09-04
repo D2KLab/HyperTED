@@ -297,6 +297,7 @@ $(document).ready(function () {
         var $pin = $('.pin');
         $pin.each(function () {
             var $this = $(this);
+
             $this.qtip({
                 content: {
                     text: $('.qtipEnt', $this).html(),
