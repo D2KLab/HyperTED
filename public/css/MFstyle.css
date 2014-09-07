@@ -325,11 +325,11 @@ html, body {
     margin: -6px 0 0 0;
 }
 
-.home_footer .foo .eurecomLogo, .home_footer .foo .mediamixerLogo, .video_footer .foo .eurecomLogo, .video_footer .foo .mediamixerLogo {
+.home_footer .foo .eurecomLogo, .home_footer .foo .mediamixerLogo, .home_footer .foo .linkedtvLogo, .video_footer .foo .eurecomLogo, .video_footer .foo .mediamixerLogo, .video_footer .foo .linkedtvLogo {
     display: inline-block;
 }
 
-.home_footer .foo .eurecomLogo img, .home_footer .foo .mediamixerLogo img, .video_footer .foo .eurecomLogo img, .video_footer .foo .mediamixerLogo img {
+.home_footer .foo .eurecomLogo img, .home_footer .foo .mediamixerLogo img, .home_footer .foo .linkedtvLogo img, .video_footer .foo .eurecomLogo img, .video_footer .foo .mediamixerLogo img, .video_footer .foo .linkedtvLogo img {
     padding-right: 20px;
 }
 
@@ -413,7 +413,7 @@ html, body {
     margin-top: 50px;
 }
 
-.video_footer .eurecomLogo img, .video_footer .mediamixerLogo img {
+.video_footer .eurecomLogo img, .video_footer .mediamixerLogo img, .video_footer .linkedtvLogo img {
     padding: 4px 0;
     height: 55px;
     width: auto;
