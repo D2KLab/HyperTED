@@ -1472,6 +1472,7 @@ module.exports.getSuggestedCourses = function (req, res) {
 
 module.exports.topicSearch = function (req, res) {
     var topic = req.param('topic');
+    console.log("search for topic: " + topic);
     var source = {'topic': topic};
     if (!topic) {
         res.json({error: 'empty topic'});
@@ -1479,6 +1480,7 @@ module.exports.topicSearch = function (req, res) {
     }
 
     if (validUrl.isUri(topic)) {
+        console.log("url found");
         res.redirect('/video?uri=' + topic);
         return;
     }
