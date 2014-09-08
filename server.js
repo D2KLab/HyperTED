@@ -25,7 +25,7 @@ app.get('/suggestmf/:uuid', video.ajaxSuggestMF);
 app.get('/builddb', video.buildDb);
 app.get('/topicsearch', video.topicSearch);
 
-app.get('/home', function (req, res, next) {
+app.get('/mediafragmentplayer', function (req, res, next) {
     res.render('welcome.ejs')
 });
 app.get('/', function (req, res) {
