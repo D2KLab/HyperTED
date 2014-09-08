@@ -7,7 +7,7 @@ Media Fragment Player Demo
 
 * [Node.js](http://www.nodejs.org/)
 * A [MongoDB](http://www.mongodb.org) database running:
-* An instance of [Elasticsearch](http://www.elasticsearch.org) running at port 9200
+* An instance of [Elasticsearch](http://www.elasticsearch.org) running at port 9201
 
 We suggest also to install [ffmpeg](https://www.ffmpeg.org/) and add it to enviroment variables, in order to have access to mp4 metadata (es. duration of videos).
 
@@ -22,7 +22,7 @@ The first time you need to run <code>rs.initiate()</code>.
 Install the following plugin for Elasticsearch
 <pre>
 ES_HOME/bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/1.4.0
-ES_HOME/bin/plugin -install richardwilly98/elasticsearch-river-mongodb/1.4.0
+ES_HOME/bin/plugin -install com.github.richardwilly98.elasticsearch/elasticsearch-river-mongodb/2.0.1
 </pre>
 
 Then, you have to run
@@ -77,7 +77,7 @@ All "npm" dependencies are specified on package.json, so you can install them wi
 
 <pre>node PROJECT_HOME\server</pre>
 
-You can browse the application at <code>localhost:8080</code>
+You can browse the application at <code>localhost:8011</code>
 
 
 # Related project
