@@ -340,15 +340,7 @@ html, body {
 }
 
 .page_cont {
-    min-height: 100%;
     position: relative;
-}
-
-.home_footer {
-    position: absolute;
-    bottom: 0;
-    max-height: 15%;
-    background: white;
 }
 
 .form-switch-cont {
@@ -358,7 +350,7 @@ html, body {
 
 .home_cont {
     font-size: 0.9em;
-    padding-bottom: 90px;
+    padding-bottom: 20px;
     margin: auto;
 }
 
