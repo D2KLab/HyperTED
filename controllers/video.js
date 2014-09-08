@@ -1532,7 +1532,6 @@ module.exports.topicSearch = function (req, res) {
         async.parallel(funct2, function () {
             source.suggVids = suggested;
             res.render('topic_driven_playlist.ejs', source);
-
         });
     });
 };
