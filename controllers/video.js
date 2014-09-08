@@ -22,7 +22,7 @@ var hStatusValue = {
 };
 
 var client = new elasticsearch.Client({
-    host: 'localhost:9200',
+    host: 'localhost:9201',
     log: 'trace'
 });
 
