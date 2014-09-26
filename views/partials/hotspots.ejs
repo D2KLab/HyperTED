@@ -105,7 +105,8 @@
     }
     } %>
     </div>
-    <form method="get" id="hotspot-form" action="../runhotspot" <% if(locals.hotspotted){ %>style="display: none"
+    <form method="get" id="hotspot-form" action="../runhotspot"
+          <% if(locals.hotspotted || !locals.chapters){ %>style="display: none"
             <% } %>
             >
         <input type="hidden" name="uuid" value="<%= locals.uuid %>">

@@ -147,7 +147,7 @@ exports.search = function (req, resp) {
 
     for (var k in parsedURI.query) {
         var parsedQueryUnit = k + '=' + parsedURI.query[k];
-        if (k == 't' || k == 'xywh' || k == 'track' || k == 'id' || k == 'enriched') {
+        if (k == 't' || k == 'xywh' || k == 'track' || k == 'id' || k == 'enriched' || k == 'hotspotted') {
             fragPart += fragSeparator + parsedQueryUnit;
             fragSeparator = '&';
         } else {
@@ -270,7 +270,7 @@ exports.nerdify = function (req, res) {
  * Used for new video (search)
  */
 function collectMetadata(video, callback) {
-    // 1. search for metadata in sparql
+    // 1. search for metadata in linkedTV sparql
     getMetadataFromSparql(video, function (err, data) {
         if (err || !data) {
             console.log("No data obtained from sparql");
@@ -1335,7 +1335,7 @@ exports.runHotspot = function (req, res) {
 
 function runHotspotProcess(uuid, callback) {
     db.getVideoFromUuid(uuid, true, function (err, video) {
-        if (err || !video) {
+        if (err || !video || !video.chapters) {
             callback(err, video);
             return;
         }
