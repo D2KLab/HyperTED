@@ -211,7 +211,7 @@ $(document).ready(function () {
     $('#hotspot-form').submit(function (e) {
 
         e.preventDefault();
-        var errText = 'We can not find hotspot for this video. Are you sure that it is a TED Talk?';
+        var errText = 'We can not find hotspots for this video. Are you sure that it is a TED Talk?';
         var $form = $(this);
         var $button = $('button', $form);
         $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
