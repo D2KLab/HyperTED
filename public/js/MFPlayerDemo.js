@@ -211,6 +211,7 @@ $(document).ready(function () {
     $('#hotspot-form').submit(function (e) {
 
         e.preventDefault();
+        var errText = 'We can not find hotspot for this video. Are you sure that it is a TED Talk?';
         var $form = $(this);
         var $button = $('button', $form);
         $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
@@ -219,7 +220,7 @@ $(document).ready(function () {
                 var text;
                 try {
                     if (data.error) {
-                        text = 'Something went wrong. Try again later';
+                        text = errText;
                         $button.text().css('width', 'auto');
                         console.error(data.error);
                         return;
@@ -236,7 +237,7 @@ $(document).ready(function () {
                         history.pushState(null, null, page_url.toString());
                     }
                 } catch (e) {
-                    text = 'Something went wrong. Try again later';
+                    text = errText;
                     console.error(text);
                     console.log(e);
                 }
@@ -249,7 +250,7 @@ $(document).ready(function () {
                 }, 600);
             },
             error: function () {
-                var text = 'Something went wrong. Try again later';
+                var text = errText;
 
                 var $p = $('<p>').text(text);
                 $button.children().fadeOut();

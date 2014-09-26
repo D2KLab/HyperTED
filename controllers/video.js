@@ -1336,7 +1336,7 @@ exports.runHotspot = function (req, res) {
 function runHotspotProcess(uuid, callback) {
     db.getVideoFromUuid(uuid, true, function (err, video) {
         if (err || !video || !video.chapters) {
-            callback(err, video);
+            callback(err || new Error("no chapter for this video"), video);
             return;
         }
 
