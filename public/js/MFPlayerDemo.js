@@ -28,6 +28,8 @@ $(document).ready(function () {
         features: ['playpause', 'current', 'progress', 'duration', 'volume'],
         autoStart: false,  //TODO remove
         success: function (media, domObj) {
+            showTEDSuggestedChaps();
+
             $(media).one('loadedmetadata', function () {
                 displayChapters();
                 displayPins();
