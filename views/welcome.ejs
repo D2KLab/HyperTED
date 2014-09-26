@@ -56,9 +56,9 @@
                            placeholder="e.g. https://www.ted.com/talks/will_potter_the_shocking_move_to_criminalize_non_violent_protest"
                            class="form-control input-lg" required>
                     <label class="col-md-12 col-sm-12 suggesting">or try with
-                        <strong><em>https://www.ted.com/talks/2018</em></strong>
+                        <strong class="example_link"><em>https://www.ted.com/talks/2018</em></strong>
                         or
-                        <strong><em>https://www.ted.com/talks/sarah_lewis_embrace_the_near_win</em></strong>
+                        <strong class="example_link"><em>https://www.ted.com/talks/sarah_lewis_embrace_the_near_win</em></strong>
                     </label>
 
                 </label>
@@ -92,8 +92,9 @@
                     <button class="btn btn-danger btn-lg" type="submit">Go!</button>
              </span>
                 </div>
-                <label>or try with <strong><em>https://www.ted.com/talks/2018#t=0:00:18,0:00:57</em></strong> or
-                    <strong><em>https://www.ted.com/talks/sarah_lewis_embrace_the_near_win#t=0:00:18,0:00:57</em></strong></label>
+                <label>or try with <strong
+                            class="example_link"><em>https://www.ted.com/talks/2018#t=0:00:18,0:00:57</em></strong> or
+                    <strong class="example_link"><em>https://www.ted.com/talks/sarah_lewis_embrace_the_near_win#t=0:00:18,0:00:57</em></strong></label>
 
             </form>
         </div>
@@ -141,6 +142,10 @@
 
         $('input', $formSwitch).change(function () {
             $advancedForm.add($basicForm).toggleClass('hidden');
+        });
+
+        $(".example_link").click(function () {
+            $("input[name=uri]:visible").val($(this).text());
         });
 
         $basicForm.submit(function () {

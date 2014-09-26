@@ -339,6 +339,11 @@ html, body {
     width: auto;
 }
 
+.example_link:hover {
+    text-decoration: underline;
+    color: #b11200;
+}
+
 .page_cont {
     position: relative;
 }
