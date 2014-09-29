@@ -4,7 +4,7 @@ var express = require('express'),
     logger = require('morgan'),
     errMsg = require('./controllers/error_msg');
 
-
+var basepath = "/HyperTED/";
 var app = express();
 var DEBUG = false;
 app.set('view options', {layout: false});
@@ -13,25 +13,25 @@ app.set('view engine', 'ejs');
 
 if (DEBUG)
     app.use(logger('dev'));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(basepath, express.static(path.join(__dirname, 'public')));
 
-app.get('/nerdify', video.nerdify);
-app.get('/runhotspot', video.runHotspot);
-app.get('/video/:uuid', video.view);
-app.get('/video?', video.search);
-app.get('/courses?', video.getSuggestedCourses);
-app.get('/metadata/:uuid', video.ajaxGetMetadata);
-app.get('/suggestmf/:uuid', video.ajaxSuggestMF);
-app.get('/builddb', video.buildDb);
-app.get('/topicsearch', video.topicSearch);
+app.get(basepath+'nerdify', video.nerdify);
+app.get(basepath+'runhotspot', video.runHotspot);
+app.get(basepath+'video/:uuid', video.view);
+app.get(basepath+'video?', video.search);
+app.get(basepath+'courses?', video.getSuggestedCourses);
+app.get(basepath+'metadata/:uuid', video.ajaxGetMetadata);
+app.get(basepath+'suggestmf/:uuid', video.ajaxSuggestMF);
+app.get(basepath+'builddb', video.buildDb);
+app.get(basepath+'topicsearch', video.topicSearch);
 
 app.get('/mediafragmentplayer', function (req, res, next) {
     res.render('welcome.ejs')
 });
-app.get('/', function (req, res) {
+app.get(basepath, function (req, res) {
     res.render('welcome.ejs')
 });
-app.get('*', function (req, res) {
+app.get(basepath+'*', function (req, res) {
     res.render('error.ejs', errMsg.e404);
 });
 

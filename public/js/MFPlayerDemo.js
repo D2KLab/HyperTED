@@ -33,10 +33,17 @@ $(document).ready(function () {
             $(media).one('loadedmetadata', function () {
                 displayChapters();
                 displayPins();
-                showTEDSuggestedChaps();
                 if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
-                    highlightMFSub($player.getMFJson().hash.t[0].value);
-                }
+                    highlightMFSub($player.getMFJson().hash.t[0].value, function () {
+                        var $selFrag = $('.selected-frag');
+                        if ($selFrag.exists() && $selFrag.hasClass("chap-title")) {
+                            var chapId = $selFrag.parent().data('chapter');
+                            selectChap(chapId);
+                        }
+                        showTEDSuggestedChaps();
+                    });
+                } else showTEDSuggestedChaps();
+
                 var $pop = Popcorn(media);
                 $('.sub-text p[data-time]').each(function () {
                     var $this = $(this);
@@ -82,7 +89,7 @@ $(document).ready(function () {
         $nerdifyForm.attr('action', ajaxAction).submit(function (e) {
             e.preventDefault();
             var $submitButton = $('button[type="submit"]', $nerdifyForm);
-            $submitButton.width($submitButton.width()).prop('disabled', true).html('<img src="../img/ajax-loader-greyRed.gif"><img src="../img/ajax-loader-greyRed.gif"><img src="../img/ajax-loader-greyRed.gif">');
+            $submitButton.width($submitButton.width()).prop('disabled', true).html('<img src="/HyperTED/img/ajax-loader-greyRed.gif"><img src="/HyperTED/img/ajax-loader-greyRed.gif"><img src="/HyperTED/img/ajax-loader-greyRed.gif">');
 
             var extractor = $('.nerdSelect select', $nerdifyForm).val();
             var page_url = window.location.toString().parseURL();
@@ -134,12 +141,13 @@ $(document).ready(function () {
         $(this).hide();
         $('.see-also').show();
         $('#suggested-courses').show();
-    })
+    });
 
     var $suggestedVideoList = $('#suggestedVideoList');
     var $playlistSect = $('.see-also #playlist-sect');
 
     function showTEDSuggestedChaps() {
+        if (!$player)return;
         var extractor = window.location.toString().parseURL().search.enriched;
         $('.invite', $playlistSect).toggle(!extractor);
         $('.no_ent', $playlistSect).hide();
@@ -149,12 +157,11 @@ $(document).ready(function () {
             var timeFrag = $player.getMFJson().hash.t;
 
             $.ajax({
-                url: '/suggestmf/' + video.uuid,
+                url: '/HyperTED/suggestmf/' + video.uuid,
                 data: {
                     extractor: extractor,
                     startMFFilt: (timeFrag && timeFrag[0].startNormalized) || 0,
                     endMFFilt: (timeFrag && timeFrag[0].endNormalized) || null
-
                 }
             }).done(function (res) {
                 $('.loading', $playlistSect).hide();
@@ -171,12 +178,12 @@ $(document).ready(function () {
                         thumb = meta.thumb;
                     } else {
                         title = "Video";
-                        thumb = "../img/thumb-default.png";
+                        thumb = "../HyperTED/img/thumb-default.png";
                     }
                     $suggestedVideoList.loadTemplate($('#suggTedChap'),
                         {
                             uuid: v,
-                            href: '/video/' + v,
+                            href: 'video/' + v,
                             title: title,
                             thumb: thumb
                         },
@@ -189,13 +196,20 @@ $(document).ready(function () {
                         if (!frags.hasOwnProperty(f))continue;
                         $('.frag-list', thisVid).loadTemplate($('#fragLi'),
                             {
-                                href: '/video/' + v + '#t=' + frags[f].startNPT + ',' + frags[f].endNPT,
+                                href: 'video/' + v + '#t=' + frags[f].startNPT + ',' + frags[f].endNPT,
                                 content: 'Chapter ' + frags[f].chapNum + ' (' + labelTime(frags[f].startNPT) + ' - ' + labelTime(frags[f].endNPT) + ')'
                             },
                             {append: true});
                     }
 
                 }
+                var raccFor = "the entire video";
+                var tFrag = $player.getMFJson().hash.t;
+                if (tFrag) {
+                    raccFor = $(".selected-chap-num").text();
+                    raccFor = raccFor.trim().length ? "chapter " + raccFor : "t=" + tFrag[0].start + ',' + tFrag[0].end;
+                }
+                $suggestedVideoList.prepend($("<h4>Raccomandation for " + raccFor + "</h4>"));
             }).fail(function () {
                 $('.loading', $playlistSect).hide();
                 $('.see-also').html("<p>Something went wrong, please try later</p>");
@@ -214,7 +228,7 @@ $(document).ready(function () {
         var errText = 'We can not generate hotspots for this video. This functionality is only available for TED Talks';
         var $form = $(this);
         var $button = $('button', $form);
-        $button.width($button.width()).prop('disabled', true).html('<img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif"><img src="../img/ajax-loader-white.gif">');
+        $button.width($button.width()).prop('disabled', true).html('<img src="/HyperTED/img/ajax-loader-white.gif"><img src="/HyperTED/img/ajax-loader-white.gif"><img src="/HyperTED/img/ajax-loader-white.gif">');
         $(this).ajaxSubmit({
             success: function (data) {
                 var text;
@@ -361,7 +375,7 @@ $(document).ready(function () {
             $('.loading', $suggCourses).show();
 
             $.ajax({
-                url: '/courses',
+                url: '/HyperTED/courses',
                 data: {
                     uuid: video.uuid
                 }
@@ -375,7 +389,7 @@ $(document).ready(function () {
                     $coursesList.loadTemplate($('#course'), {
                         url: course.locator.value,
                         title: course.title.value,
-                        thumb: '\\img\\logos\\' + course.source + '.png'
+                        thumb: '\\HyperTED\\img\\logos\\' + course.source + '.png'
                     }, {append: true});
 
                     if (i >= 2)break;
@@ -426,7 +440,6 @@ $(document).ready(function () {
                 $(this).css("width", chapWidth + "%");
             }
 
-
             $(this).hover(function () {
                 if ($(this).width() < 175) {
                     var opt = {
@@ -444,20 +457,9 @@ $(document).ready(function () {
 
             $(this).on('click', function () {
                 $player.setmf('t=' + startChapter + ',' + endChapter).playmf();
-                var chapNumLast = $('.chap-num:last')[0].innerText;
                 var chapNum = $chapNum[0].innerText;
 
-                $('.chap-link').removeClass('selected-chap');
-
-                $(this).addClass('selected-chap');
-                var isOpening = chapNum == '0';
-                if (!isOpening) {
-                    $('.first-part').text("chapter   ");
-                    $('.selected-chap-num').text(chapNum);
-                    $('.last-part').text("   of   " + chapNumLast);
-                }
-                $('.hide-on-intro').toggle(!isOpening);
-                $('.intro').toggle(isOpening);
+                selectChap(chapNum);
                 updateMFurl();
             });
         });
@@ -474,6 +476,20 @@ $(document).ready(function () {
 
     }
 
+    function selectChap(chapNum){
+        var chapNumLast = $('.chap-num:last')[0].innerText;
+        $('.chap-link').removeClass('selected-chap');
+
+        $(this).addClass('selected-chap');
+        var isOpening = (chapNum == '0');
+        if (!isOpening) {
+            $('.first-part').text("chapter   ");
+            $('.selected-chap-num').text(chapNum);
+            $('.last-part').text("   of   " + chapNumLast);
+        }
+        $('.hide-on-intro').toggle(!isOpening);
+        $('.intro').toggle(isOpening);
+    }
     function updateMFurl() {
         if (Modernizr.history) {
             parsedJSON = $player.getMFJson();
@@ -506,7 +522,7 @@ $(document).ready(function () {
         return ((mm * 60) + (hh * 3600) + ss);
     }
 
-    function highlightMFSub(t) {
+    function highlightMFSub(t, callback) {
         var sMF, eMF, sMFtest, eMFtest;
 
         t = t.replace('npt:', '');
@@ -543,8 +559,9 @@ $(document).ready(function () {
                 scrollTop: scrollPos
             });
         } else {
-            console.warn("No subtitles in this fragment. Are you sure that fragment is inside video duration?")
+            console.warn("No subtitles in this fragment. Are you sure that the fragment is inside video duration?")
         }
+        if (callback)callback();
     }
 
 
@@ -574,12 +591,7 @@ $(document).ready(function () {
         // hotspotted
         var hotspotted = page_url.search.hotspotted;
         if (hotspotted) {
-//            var ents = getFromLocalStorage(videokey + extractor);
-//            if (ents) {
-//                onEntitiesToShow(ents);
-//            } else {
             $('#hotspot-form').submit();
-//            }
         } else {
             $('.hscont-inner').hide();
             $('.btn-hotspot').text("GENERATE HOTSPOTS").removeAttr('style').prop("disabled", false);
@@ -612,7 +624,7 @@ $(document).ready(function () {
 jQuery.fn.extend({
     addLoader: function (direction) {
         if (!jQuery.loaderImg) {
-            jQuery.loaderImg = $("<img>").attr('src', '/img/ajax-loader.gif');
+            jQuery.loaderImg = $("<img>").attr('src', '/HyperTED/img/ajax-loader.gif');
         }
 
         var $loaderImg = jQuery.loaderImg;
@@ -821,7 +833,7 @@ function showEntityList(entityList) {
         entTypeList.forEach(function (ent) {
 
             var $e = $("<li>").loadTemplate($("#templateEnt"), {
-                entA: '#' + ent.label
+                entA: ent.label
             });
             $(".displayEntity", $row).append($e);
 

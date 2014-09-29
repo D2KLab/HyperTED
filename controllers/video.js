@@ -138,7 +138,7 @@ exports.search = function (req, resp) {
     var videoURI = req.query.uri;
     if (!videoURI) {
         console.log(LOG_TAG + 'No specified video uri.');
-        resp.redirect('/');
+        resp.redirect('/HyperTED');
         return;
     }
     var parsedURI = url.parse(videoURI, true);
@@ -177,7 +177,7 @@ exports.search = function (req, resp) {
         }
 
         if (data) { //video in db
-            var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
+            var redirectUrl = 'video/' + data.uuid + fragPart + hashPart;
             console.log('Video at ' + locator + ' already in db.');
             console.log('Redirecting to ' + redirectUrl);
             resp.redirect(redirectUrl);
@@ -189,7 +189,7 @@ exports.search = function (req, resp) {
 
         db.getVideoFromVendorId(vendor, id, function (err, data) {
             if (!err && data) {
-                var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
+                var redirectUrl = 'video/' + data.uuid + fragPart + hashPart;
                 console.log('Video at ' + locator + ' already in db.');
                 console.log('Redirecting to ' + redirectUrl);
                 resp.redirect(redirectUrl);
@@ -216,7 +216,7 @@ exports.search = function (req, resp) {
                         resp.render('error.ejs', errorMsg.e500);
                         return;
                     }
-                    var redirectUrl = '/video/' + data.uuid + fragPart + hashPart;
+                    var redirectUrl = 'video/' + data.uuid + fragPart + hashPart;
                     console.log('Video at ' + locator + ' successfully added to db.');
                     console.log('Redirecting to ' + redirectUrl);
                     resp.redirect(redirectUrl);
@@ -1177,7 +1177,7 @@ function detectId(url, v) {
 exports.buildDb = function (req, res) {
     var TEDListQuery = 'http://api.ted.com/v1/talks.json?api-key=uzdyad5pnc2mv2dd8r8vd65c&limit=100&externals=false&filter=id:>';
     var retrieveNerd = true;
-    var limitQps = retrieveNerd ? 10200 : 2200;
+    var limitQps = retrieveNerd ? 10200 : 2200; // waiting time
     loadList(0);
 
     function loadList(index) {
@@ -1481,7 +1481,7 @@ module.exports.topicSearch = function (req, res) {
 
     if (validUrl.isUri(topic)) {
         console.log("url found");
-        res.redirect('/video?uri=' + topic);
+        res.redirect('video?uri=' + topic);
         return;
     }
 

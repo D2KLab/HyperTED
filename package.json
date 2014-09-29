@@ -1,12 +1,26 @@
 {
     "name": "MediaFragmentPlayerDemo",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "scripts": {
         "start": "node server"
     },
+    "author": "EURECOM",
+    "contributors": [
+        {
+            "name": "Pasquale Lisena",
+            "email": "lisena@eurecom.fr"
+        },
+        {
+            "name": "Mariella Sabatino",
+            "email": "sabatino@eurecom.fr"
+        }
+    ],
     "repository": {
         "type": "git",
         "url": "https://github.com/pasqLisena/MediaFragPlayerDemo"
+    },
+    "scripts": {
+        "start": "node server.js"
     },
     "dependencies": {
         "express": "^4.0.0",

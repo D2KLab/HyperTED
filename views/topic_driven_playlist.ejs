@@ -2,12 +2,12 @@
 <html>
 <head lang="en">
     <meta charset="UTF8">
-    <title>Search Results|HyperTED</title>
-    <link rel="icon" type="image/png" href="/img/favicons/favicon_48.png">
+    <title>Search Results | HyperTED</title>
+    <link rel="icon" type="image/png" href="img/favicons/favicon_48.png">
     <!--[if IE]>
-    <link rel="shortcut icon" href="/img/favicons/favicon.ico"/><![endif]-->
+    <link rel="shortcut icon" href="img/favicons/favicon.ico"/><![endif]-->
 
-    <link rel="stylesheet" type="text/css" href="/css/MFstyle.css"/>
+    <link rel="stylesheet" type="text/css" href="css/MFstyle.css"/>
 </head>
 <body>
 
@@ -43,9 +43,9 @@
         </div>
 
         <a href="http://www.eurecom.fr" title="Eurecom" class="eurecomLogo"><img
-                    src="../img/logos/eurecom_logo.png"/></a>
+                    src="img/logos/eurecom_logo.png"/></a>
         <a href="http://www.mediamixer.eu/" title="Media Mixer" class="mediamixerLogo"><img
-                    src="../img/logos/mediamixer_logo.png"/></a>
+                    src="img/logos/mediamixer_logo.png"/></a>
     </div>
 </footer>
 
@@ -53,7 +53,7 @@
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
-<script src="/js/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="js/jquery.loadTemplate-1.4.4.min.js"></script>
 
 <script>
     $(document).ready(function () {
@@ -69,12 +69,12 @@
                     thumb = meta.thumb;
                 } else {
                     title = "Video";
-                    thumb = "../img/thumb-default.png";
+                    thumb = "img/thumb-default.png";
                 }
                 $suggestedVideoList.loadTemplate($('#suggTedChap'),
                         {
                             uuid: v,
-                            href: '/video/' + v,
+                            href: 'video/' + v,
                             title: title,
                             thumb: thumb
                         },
@@ -90,7 +90,7 @@
 
                     $('.frag-list', thisVid).loadTemplate($('#fragLi'),
                             {
-                                href: '/video/' + v + '#t=' + frags[f].startNPT + ',' + frags[f].endNPT,
+                                href: 'video/' + v + '#t=' + frags[f].startNPT + ',' + frags[f].endNPT,
                                 content: (frags[f].chapNum) ? 'Chapter ' + frags[f].chapNum + ' (' + fullLabelTime + ')' : fullLabelTime
                             },
                             {append: true});

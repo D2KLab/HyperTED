@@ -5,14 +5,14 @@
     <% var metadata = locals.metadata || false %>
     <% var pageTitle = (metadata && locals.metadata.title) ? locals.metadata.title + '|HyperTED' : 'HyperTED'; %>
     <title><%= pageTitle %></title>
-    <link rel="icon" type="image/png" href="/img/favicons/favicon_48.png">
+    <link rel="icon" type="image/png" href="../img/favicons/favicon_48.png">
     <!--[if IE]>
-    <link rel="shortcut icon" href="/img/favicons/favicon.ico"/><![endif]-->
+    <link rel="shortcut icon" href="../img/favicons/favicon.ico"/><![endif]-->
 
-    <link rel="stylesheet" type="text/css" href="/js/sfmplayer/mediaelementplayer.min.css"/>
-    <link rel="stylesheet" type="text/css" href="/js/sfmplayer/smfplayer.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/jquery.qtip.min.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/MFstyle.css"/>
+    <link rel="stylesheet" type="text/css" href="../js/sfmplayer/mediaelementplayer.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../js/sfmplayer/smfplayer.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/jquery.qtip.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/MFstyle.css"/>
 </head>
 <body>
 <% include partials/header.ejs %>
@@ -72,7 +72,7 @@
         <div class="left">
             <% if(locals.rdfUrl){ %>
             <a class="rdf-link" href="<%= locals.rdfUrl %>" title="rdf" target="_blank">
-                <img src="/img/rdf-30_plain.png" height="30"></a>
+                <img src="../img/rdf-30_plain.png" height="30"></a>
             <% } %>
             <% if(metadata.published) { %>
             <h5 class="video-info">published on <%= metadata.published.substring(0, 10) %>
@@ -114,7 +114,8 @@
                 </section>
 
 
-                <form method="get" action="/video/<%= uuid %>" data-action="/nerdify" class="nerdify button-cont">
+                <form method="get" action="/HyperTED/video/<%= uuid %>" data-action="/HyperTED/nerdify"
+                      class="nerdify button-cont">
                     <input type="hidden" name="uuid" value="<%= uuid %>"/>
                     <!--<input type="hidden" name="enriched" value="true"/>-->
 
@@ -169,9 +170,8 @@
 
             <% if(locals.subtitles) { %>
             <div class="col-md-5 col-lg-5">
-                <a id="recommend" class="btn btn-danger btn-block recommend_btn"><h4>RECOMMEND RELATED </br>FRAGMENTS
-                        AND
-                        COURSES</h4></a>
+                <a id="recommend" class="btn btn-danger btn-block recommend_btn">
+                    <h4>RECOMMEND RELATED </br>FRAGMENTS AND COURSES</h4></a>
 
                 <div class="see-also">
                     <div class="container-fluid">
@@ -192,9 +192,9 @@
                                     <p class="invite">click on Nerdify for having suggestion about related chapters</p>
 
                                     <p class="loading">
-                                        <img src="\img\ajax-loader.gif">
+                                        <img src="..\img\ajax-loader.gif">
                                         loading suggested chapters
-                                        <img src="\img\ajax-loader.gif">
+                                        <img src="..\img\ajax-loader.gif">
                                     </p>
 
                                     <p class="no_ent">this chapter has no entity. </br>Please, choose another one</p>
@@ -236,17 +236,16 @@
 </footer>
 
 <script>
-    var entitiesL;
-    <%if(locals.enriched && locals.entities){ %>
-    entitiesL = <%- JSON.stringify(entities)%>
-
-            <%}else{%>
-            entitiesL = "";
-    <%}%>
+    <%
+     var entitiesL = "null";
+     if(locals.enriched && locals.entities){
+         entitiesL = JSON.stringify(entities)
+     }
+     %>
     var video = {
         uri: "<%= videoURI %>",
         uuid: "<%= uuid %>",
-        entitiesL: entitiesL
+        entitiesL: <%- entitiesL %>
     };
 
 </script>
@@ -257,14 +256,14 @@
 <script src="http://popcornjs.org/code/dist/popcorn-complete.min.js"></script>
 <script src="http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"></script>
 
-<script src="/js/sfmplayer/mediaelement-and-player.js"></script>
-<script src="/js/sfmplayer/dep/jquery.url.js"></script>
-<script src="/js/sfmplayer/dep/mediafragments.js"></script>
-<script src="/js/sfmplayer/synote.multimedia.namespace.js"></script>
-<script src="/js/sfmplayer/synote.multimedia.utils.js"></script>
-<script src="/js/sfmplayer/synotemfplayer.js"></script>
-<script src="/js/jquery.loadTemplate-1.4.4.min.js"></script>
-<script src="/js/MFPlayerDemo.js"></script>
+<script src="../js/sfmplayer/mediaelement-and-player.js"></script>
+<script src="../js/sfmplayer/dep/jquery.url.js"></script>
+<script src="../js/sfmplayer/dep/mediafragments.js"></script>
+<script src="../js/sfmplayer/synote.multimedia.namespace.js"></script>
+<script src="../js/sfmplayer/synote.multimedia.utils.js"></script>
+<script src="../js/sfmplayer/synotemfplayer.js"></script>
+<script src="../js/jquery.loadTemplate-1.4.4.min.js"></script>
+<script src="../js/MFPlayerDemo.js"></script>
 
 <script type="text/html" id="course">
     <li class="course">
@@ -289,9 +288,9 @@
         <p class="invite">generate hotspots for having suggestion about related courses</p>
 
         <p class="loading">
-            <img src="\img\ajax-loader.gif">
+            <img src="..\img\ajax-loader.gif">
             loading suggested courses
-            <img src="\img\ajax-loader.gif">
+            <img src="..\img\ajax-loader.gif">
         </p>
         <ul class="courses-list" id="courses-list">
         </ul>
