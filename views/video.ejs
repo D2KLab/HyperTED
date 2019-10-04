@@ -125,7 +125,7 @@
                         <div class="nerdForm nerdSelect">
                             <select class="form-control" name="enriched">
                                 <%
-                                    var sel = locals.enriched || "";
+                                    var sel = locals.enriched || "textrazor";
 
                                     var exts = {
                                         "alchemyapi": "AlchemyAPI",
@@ -142,12 +142,12 @@
                                         "combined": "NERD"
                                     }
 
-                                        for (var k in exts){
+                                    for (var k in exts){
                                         if (exts.hasOwnProperty(k)) {
-                                    var s = k == sel ? " selected" : "";
-                                %>
-                                <option value="<%= k %>"<%= s %>><%= exts[k] %></option>
-                                <% }} %>
+                                          var s = k == sel ? " selected" : "";
+                                    %>
+                                    <option value="<%= k %>"<%= s %>><%= exts[k] %></option>
+                                    <% }} %>
                             </select>
                         </div>
                         <div class="nerdForm nerdBtn">

@@ -1,7 +1,5 @@
-MediaFragPlayerDemo
+HyperTED
 ===================
-
-Media Fragment Player Demo
 
 # Requirements
 
@@ -9,24 +7,28 @@ Media Fragment Player Demo
 * A [MongoDB](http://www.mongodb.org) database running:
 * An instance of [Elasticsearch](http://www.elasticsearch.org) running at port 9201
 
-We suggest also to install [ffmpeg](https://www.ffmpeg.org/) and add it to enviroment variables, in order to have access to mp4 metadata (es. duration of videos).
+We suggest also to install [ffmpeg](https://www.ffmpeg.org/) and add it to environment variables, in order to have access to mp4 metadata (es. duration of videos).
 
 # Install
 
 ### Database
 
-Run MongoDB at port 2701 with [replica set enabled](http://docs.mongodb.org/manual/tutorial/deploy-replica-set/). Maybe you can use
-<pre>mongod --dbpath DB_PATH --replSet "rs0"</pre>
-The first time you need to run <code>rs.initiate()</code>.
+Run MongoDB at port 27017 with [replica set enabled](http://docs.mongodb.org/manual/tutorial/deploy-replica-set/). Maybe you can use
+
+    mongod --dbpath ./database --replSet "rs0"
+
+The first time you need to run `rs.initiate()`.
 
 Install the following plugin for Elasticsearch
-<pre>
+
+```
 ES_HOME/bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/1.4.0
 ES_HOME/bin/plugin -install com.github.richardwilly98.elasticsearch/elasticsearch-river-mongodb/2.0.1
-</pre>
+```
 
 Then, you have to run
-<pre>
+
+```
 curl -XPUT '/_river/hyperted/_meta' -d
 {
   "type": "mongodb",
@@ -62,20 +64,21 @@ curl -XPUT '/_river/hypertedHS/_meta' -d
     "type": "hotspot"
   }
 }
-</pre>
+```
 
 *If you can not use <code>curl</code>, you can also run it with [Sense extension](https://chrome.google.com/webstore/detail/sense-beta/lhjgkmllcaadmopgmanpapmpjgmfcfig) for Google Chrome.
-In this case the first rows become <code>PUT /_river/hyperted/_meta</code>*
+In this case the first rows become `PUT /_river/hyperted/_meta`*
 
 ### Server
 
-All "npm" dependencies are specified on package.json, so you can install them with 
-<pre>npm install</pre>
+All "npm" dependencies are specified on package.json, so you can install them with
+
+    npm install
 
 
 # Run
 
-<pre>node PROJECT_HOME\server</pre>
+    npm start
 
 You can browse the application at <code>localhost:8011</code>
 

@@ -1,86 +1,63 @@
-var nerd = require("nerd4node"),
-    http = require('http'),
-    utils = require('./utils');
+import nerd from 'nerd4node';
+import Promise from 'bluebird';
+import SparqlClient from './sparql_client.mjs';
 
+const client = new SparqlClient('http://dbpedia.org/sparql');
 
-var api_instance = "nerd.eurecom.fr/api/";
-//var apiID = '1qb6bi7kjmcudkh5gsqr79ufmflo4mlu';
-var apiID = '155ma0q9dpavn42uol7geocve20t1l22';
-var gran = "oed";
-var to = 10; //timeOut
+const API_INSTANCE = 'nerd.eurecom.fr/api/';
+// var apiID = '1qb6bi7kjmcudkh5gsqr79ufmflo4mlu';
+const apiID = '155ma0q9dpavn42uol7geocve20t1l22';
+const gran = 'oed';
+const to = 10; // timeOut
 
+function getDbpediaAbstract(wikiUrl) {
+  let topic;
+  if (wikiUrl.indexOf('wikipedia') >= 0) {
+    topic = `?res <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> <${wikiUrl}>.`;
+  } else if (wikiUrl.indexOf('dbpedia') >= 0) {
+    topic = `FILTER (?res = <${wikiUrl}> ).`;
+  } else {
+    const tErr = new Error(`could not retrieve abstract for ${wikiUrl}`);
+    return Promise.reject(tErr);
+  }
 
-function getEntities(doc_type, text, ext, callback) {
-    if (ext == null || ext == '') ext = "textrazor";
-    if (text != null && text != '') {
-        nerd.annotate(api_instance, apiID, ext, doc_type, text, gran, to, function (err, data) {
-            if (err) {
-                callback(err, data);
-                return;
-            }
-            var entsLeft = data.length;
-            console.log('TOT Ents ' + entsLeft);
+  const query = `select distinct ?res ?abstract where {
+         ?res dbo:abstract ?abstract.
+         ${topic}
+         FILTER langMatches( lang(?abstract), 'en')
+      } LIMIT 100`;
 
-            data.forEach(function (ent) {
-                if (ent.uri) {
-                    getDbpediaAbstract(ent.uri, function (err, abstract) {
-                        ent.abstract = abstract;
-                        --entsLeft;
-                        if (entsLeft == 0) {
-                            --entsLeft;
-                            callback(null, data);
-                        }
-                    });
-                } else --entsLeft;
+  return client.query(query)
+    .then((data) => {
+      if (!data.results.bindings || !data.results.bindings.length) return null;
 
-                if (entsLeft == 0) {
-                    --entsLeft;
-                    callback(null, data);
-                }
-            });
-        });
-    } else {
-        callback(true, 'Empty Text');
-    }
-}
-
-function getDbpediaAbstract(wikiUrl, callback) {
-    var topic;
-    if (wikiUrl.indexOf('wikipedia') >= 0) {
-        topic = "?res <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> <" + wikiUrl + ">.";
-    } else if (wikiUrl.indexOf('dbpedia') >= 0) {
-        topic = "FILTER (?res = <" + wikiUrl + "> ). ";
-    }
-    if (!topic) {
-        var tErr = new Error("could not retrieve abstract for " + wikiUrl);
-        console.warn(tErr);
-        callback(tErr);
-        return;
-    }
-    var query = "select distinct ?res ?abstract where {" +
-        " ?res dbpedia-owl:abstract ?abstract. " + topic +
-        " FILTER langMatches( lang(?abstract), 'en')" +
-        "} LIMIT 100";
-
-    var fullUrl = "http://dbpedia.org/sparql?query=" + query +
-        "&format=json";
-
-    http.getJSON(fullUrl, function (err, data) {
-        if (err) {
-            console.error(err);
-        }
-        if (err || !data.results.bindings || !data.results.bindings.length) {
-            callback(err, data);
-            return;
-        }
-        try {
-            var abstract = data.results.bindings[0].abstract.value;
-            callback(err, abstract)
-        } catch (e) {
-            console.error(e);
-            callback(e);
-        }
+      if (!data.results.bindings[0].abstract) return null;
+      return data.results.bindings[0].abstract.value;
     });
 }
 
-exports.getEntities = getEntities;
+
+export default function getEntities(doctype, text, ext = 'textrazor') {
+  if (!ext) ext = 'textrazor';
+  if (!text) return Promise.reject(new Error('Empty Text'));
+
+  return new Promise((resolve, reject) => {
+    nerd.annotate(API_INSTANCE, apiID, ext, doctype, text, gran, to, (err, data) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      console.log(`TOT Ents ${data.length}`);
+
+      const prom = Promise.mapSeries(data, (ent) => {
+        if (!ent.uri) return null;
+        return getDbpediaAbstract(ent.uri)
+          .then((abstract) => {
+            ent.abstract = abstract;
+          });
+      }).then(() => data);
+
+      resolve(prom);
+    });
+  });
+}
