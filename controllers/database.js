@@ -1,4 +1,4 @@
-import { v4 as UUID } from 'uuid';
+import UUID from 'uuid/v5';
 import monk from 'monk';
 import Promise from 'bluebird';
 
@@ -46,7 +46,7 @@ function addEntities(uuid, entities) {
 }
 
 
-function getFilterEntities(uuid, extractor, start, end) {
+function getFilterEntities(uuid, extractor = 'textrazor', start = 0, end) {
   const timeFiltering = { $gte: parseFloat(start) };
   const ext = extractor;
 
@@ -93,11 +93,13 @@ function getVideoFromLocator(locator) {
 
 
 function insertVideo(video) {
-  video.uuid = UUID();
   video.timestamp = Date.now();
   const cbs = [];
 
-  if (!video.vendor) return Promise.resolve();
+  const { vendor } = video;
+  const id = video.vendor_id;
+  if (!vendor) return Promise.resolve();
+  video.uuid = UUID(vendor + id, UUID.URL); // deterministic UUID
 
   console.log('Check for existent vendor/id.');
   return getVideoFromVendorId(video.vendor, video.vendor_id)

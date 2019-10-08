@@ -18,5 +18,5 @@ const msg = {
 
 export default function (code = 500) {
   if (!(code in msg)) return msg[500];
-  return msg(code);
+  return msg[code];
 }

@@ -36,7 +36,7 @@ app.get(`${basepath}*`, (_req, res) => {
 });
 
 app.use((err, _req, res) => {
-  console.error(err);
+  console.error('ERROR', err);
   res.status(err.status || 500);
   res.render('error.ejs', errorMsg(500));
 });

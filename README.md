@@ -7,8 +7,6 @@ HyperTED
 * A [MongoDB](http://www.mongodb.org) database running:
 * An instance of [Elasticsearch](http://www.elasticsearch.org) running at port 9201
 
-We suggest also to install [ffmpeg](https://www.ffmpeg.org/) and add it to environment variables, in order to have access to mp4 metadata (es. duration of videos).
-
 # Install
 
 ### Database
@@ -24,6 +22,10 @@ Install the following plugin for Elasticsearch
 ```
 ES_HOME/bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/1.4.0
 ES_HOME/bin/plugin -install com.github.richardwilly98.elasticsearch/elasticsearch-river-mongodb/2.0.1
+```
+
+```
+docker stack deploy --compose-file docker-compose.yml hyperted
 ```
 
 Then, you have to run

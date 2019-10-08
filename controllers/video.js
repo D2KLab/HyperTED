@@ -592,8 +592,8 @@ function sortByRelevance(x, y) {
 
 function suggestHS(searchTopic) {
   return client.search({
-    index: 'hs_index',
-    type: 'hotspot',
+    index: 'hyperted',
+    type: 'hotspots',
     body: {
       from: 0,
       size: 20,
@@ -601,13 +601,13 @@ function suggestHS(searchTopic) {
         match: { 'topic_list.label': searchTopic },
       },
     },
-  }).then((resp) => resp.hits.hits);
+  }).then((resp) => resp.body.hits.hits);
 }
 
 function suggestMF(searchTerm, searchUri) {
   return client.search({
-    index: 'ent_index',
-    type: 'entity',
+    index: 'hyperted',
+    type: 'entities',
     body: {
       from: 0,
       size: 10,
@@ -624,12 +624,11 @@ function suggestMF(searchTerm, searchUri) {
         },
       },
     },
-  }).then((resp) => resp.hits.hits);
+  }).then((resp) => resp.body.hits.hits);
 }
 
 function getChaptersFromSuggestion(json) {
   /* eslint-disable no-underscore-dangle */
-
   return Promise.map(json, (ent) => { // entity
     const { uuid } = ent._source;
     const st = ent._source.startNPT;
@@ -648,26 +647,21 @@ function getChaptersFromSuggestion(json) {
         suggested[c.uuid] = v1;
       });
 
-
-    return Promise.map(Object.entries(suggested))((entry) => {
+    return Promise.map(Object.entries(suggested), async (entry) => {
       const [uuid, value] = entry;
-      return db.getVideoFromUuid(uuid, false)
-        .then((vid) => {
-          value.metadata = vid.metadata;
-        })
-        .catch((err) => console.warn(err));
-    });
+      const vid = await db.getVideoFromUuid(uuid, false);
+      value.metadata = vid.metadata;
+    }).then(() => suggested);
   });
 }
 
 
 function ajaxSuggestMF(req, res) {
   const { uuid } = req.params;
-  const startMF = req.params.startMFFilt;
-  const endMF = req.params.endMFFilt;
+  const { startMF, endMF, extractor } = req.query;
   if (!uuid) return res.json({ error: 'empty uuid' });
 
-  return db.getFilterEntities(uuid, req.params.extractor, startMF, endMF)
+  return db.getFilterEntities(uuid, extractor, startMF, endMF)
     .then((doc) => {
       doc.sort(
         /**
@@ -676,32 +670,28 @@ function ajaxSuggestMF(req, res) {
          */
         (x, y) => (sortByRelevance(x, y)),
       );
-      let lab = '';
-      let uri = '';
-      const terminus = (doc.length > 5) ? 5 : undefined;
-      for (const d of doc.slice(0, terminus)) {
-        lab = lab.concat(d.label, '&');
-        if (!d.uri) continue;
-        uri = uri.concat(d.uri, '&');
-      }
+      const maxdoc = 5;
+      doc = (doc.length > maxdoc) ? doc.slice(0, maxdoc) : doc;
 
-      const filtLab = lab.substring(0, lab.length - 1);
-      const filtUri = uri.substring(0, uri.length - 1);
-      return suggestMF(filtLab, filtUri)
+      const lab = doc.map((d) => d.label).join('&');
+      const uri = doc.filter((d) => d.uri).map((d) => d.uri).join('&');
+
+      return suggestMF(lab, uri)
         .then(getChaptersFromSuggestion)
         .then((vids) => {
-          if (vids[uuid]) { // remove fragment that I am watching
-            const { chaps } = vids[uuid];
-            for (const c in chaps) {
-              if (chaps[c].startNPT >= startMF && chaps[c].startNPT < endMF) {
-                chaps.splice(c);
-              }
-            }
-            if (!chaps.length) delete vids[uuid];
-          }
+          console.log(vids);
+          // if (vids[uuid]) { // remove fragment that I am watching
+          //   const { chaps } = vids[uuid];
+          //   for (const c in chaps) {
+          //     if (chaps[c].startNPT >= startMF && chaps[c].startNPT < endMF) {
+          //       chaps.splice(c);
+          //     }
+          //   }
+          //   if (!chaps.length) delete vids[uuid];
+          // }
 
           const maxVids = 4;
-          const returnObject = {};
+          const returnObject = {}; // TODO return array
           for (const [k, v] of Object.entries(vids).slice(0, maxVids)) {
             returnObject[k] = v;
           }
@@ -925,6 +915,7 @@ function loadVideo(index, uuid, retrieveNerd) {
   };
 
   if (uuid) video.uuid = uuid;
+  // console.log('-- loading metadata');
   return getMetadata(video)
     .then((metadata) => {
       if (!metadata) console.log(`${LOG_TAG} Metadata unavailable.`);
@@ -934,6 +925,7 @@ function loadVideo(index, uuid, retrieveNerd) {
     }).then((doc) => {
       // nerdify
       if (retrieveNerd && doc.timedtext) {
+        // console.log('-- nerdifying');
         return nerdify('timedtext', doc.timedtext)
           .then((data) => db.addEntities(doc.uuid, data))
           .catch((e) => {
@@ -952,7 +944,8 @@ function loadVideo(index, uuid, retrieveNerd) {
 function talksLoop(talk, total, limitQps, retrieveNerd) {
   const index = String(talk.id);
   console.log(`loading video ${index}/${total}`);
-  console.log(talk);
+  // console.log(talk);
+
   // if (total > current) {
   //   setTimeout(() => {
   //     loadList(index);
@@ -965,7 +958,10 @@ function talksLoop(talk, total, limitQps, retrieveNerd) {
 
   return db.getVideoFromVendorId('ted', index)
     .then((data) => {
-      if (data && (data.entities || !data.timedtext)) return null; // video already in db
+      if (data && data.entities) {
+        console.log('video already in db');
+        return Promise.resolve();
+      }
 
       let uuid;
       if (data) uuid = data.uuid;

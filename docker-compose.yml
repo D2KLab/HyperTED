@@ -1,0 +1,58 @@
+# Inspired by https://github.com/yeasy/docker-compose-files/blob/master/mongo-elasticsearch/docker-compose.yml
+#
+# This will start 5 nodes:
+# mongo will server as the only member of the cluster
+# mongosetup will init mongo as the master node
+# elasticsearch will server as the index search db
+# kibana will server as the web ui of elasticsearch
+# mongo-connector will pipeline mongodb content to the elasticsearch
+version: "2.4"
+
+services:
+  mongo:
+    image: mongo:3.4
+    hostname: mongo
+    mem_limit: 1024m
+    environment:
+      - TZ=Europe/Paris
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+      - "28017"
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--dbpath", "/database", "--replSet", "rs", "--httpinterface", "--rest" ]
+    volumes:
+      - ./database:/database
+
+  mongosetup:
+    image: yeasy/mongosetup
+    mem_limit: 1024m
+    links:
+      - mongo:mongo
+
+  elasticsearch:
+    image: elasticsearch:1.7
+    mem_limit: 1024m
+    environment:
+      - TZ=Europe/Paris
+    volumes:
+      - ./elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    expose:
+      - "9200"
+      - "9300"
+
+  kibana:
+    image: kibana:4.1
+    ports:
+      - "5601:5601"
+    links:
+      - elasticsearch:elasticsearch
+
+  mongoconnector:
+    build: ./db_config
+    links:
+      - elasticsearch:elasticsearch
+      - mongo:mongo
