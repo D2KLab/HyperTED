@@ -6,8 +6,6 @@
     <% var pageTitle = (metadata && locals.metadata.title) ? locals.metadata.title + '|HyperTED' : 'HyperTED'; %>
     <title><%= pageTitle %></title>
     <link rel="icon" type="image/png" href="../img/favicons/favicon_48.png">
-    <!--[if IE]>
-    <link rel="shortcut icon" href="../img/favicons/favicon.ico"/><![endif]-->
 
     <link rel="stylesheet" type="text/css" href="../js/sfmplayer/mediaelementplayer.min.css"/>
     <link rel="stylesheet" type="text/css" href="../js/sfmplayer/smfplayer.css"/>
@@ -64,7 +62,7 @@
     <% if (locals.chapters) { %>
     <% include partials/chapter.ejs %>
     <% }
-            if(locals.metadata && metadata.title) { %>
+   if(locals.metadata && metadata.title) { %>
     <div class="play-video-info clearfix">
         <div class="left">
             <% if(locals.rdfUrl){ %>
@@ -253,6 +251,7 @@
 <script src="http://malsup.github.com/jquery.form.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 <script src="http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"></script>
+<script src="https://unpkg.com/jquery.loadtemplate@1.5.10/dist/jquery.loadTemplate.js"></script>
 
 <script src="../js/sfmplayer/mediaelement-and-player.js"></script>
 <script src="../js/sfmplayer/dep/jquery.url.js"></script>
@@ -260,8 +259,7 @@
 <script src="../js/sfmplayer/synote.multimedia.namespace.js"></script>
 <script src="../js/sfmplayer/synote.multimedia.utils.js"></script>
 <script src="../js/sfmplayer/synotemfplayer.js"></script>
-<script src="../js/jquery.loadTemplate-1.4.4.min.js"></script>
-<script src="../js/MFPlayerDemo.js"></script>
+<script src="../js/main.js"></script>
 
 <script type="text/html" id="course">
     <li class="course">
