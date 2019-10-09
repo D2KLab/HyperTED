@@ -44,13 +44,6 @@ services:
       - "9200"
       - "9300"
 
-  kibana:
-    image: kibana:4.1
-    ports:
-      - "5601:5601"
-    links:
-      - elasticsearch:elasticsearch
-
   mongoconnector:
     build: ./db_config
     links:

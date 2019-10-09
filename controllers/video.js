@@ -679,16 +679,15 @@ function ajaxSuggestMF(req, res) {
       return suggestMF(lab, uri)
         .then(getChaptersFromSuggestion)
         .then((vids) => {
-          console.log(vids);
-          // if (vids[uuid]) { // remove fragment that I am watching
-          //   const { chaps } = vids[uuid];
-          //   for (const c in chaps) {
-          //     if (chaps[c].startNPT >= startMF && chaps[c].startNPT < endMF) {
-          //       chaps.splice(c);
-          //     }
-          //   }
-          //   if (!chaps.length) delete vids[uuid];
-          // }
+          if (vids[uuid]) { // remove fragment that I am watching
+            const { chaps } = vids[uuid];
+            for (const c in chaps) {
+              if (chaps[c].startNPT >= startMF && chaps[c].startNPT < endMF) {
+                chaps.splice(c);
+              }
+            }
+            if (!chaps.length) delete vids[uuid];
+          }
 
           const maxVids = 4;
           const returnObject = {}; // TODO return array

@@ -136,7 +136,6 @@
 </footer>
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js"></script>
 
 <script>
     $(document).ready(function () {
@@ -177,15 +176,7 @@
             var minInputEnd = $(this).val();
             var realInputEnd = $('input[name="end"]').val();
 
-            if (Modernizr.inputtypes.time) {
-                $('input[name="end"]').attr("min", minInputEnd);
-            } else {
-                if (realInputEnd.localeCompare(minInputEnd) == -1) {
-                    $('input[name="end"]').attr("id", "inputEnd");
-                    var input = document.getElementById('inputEnd');
-                    input.setCustomValidity("This field must be greater then " + minInputEnd);
-                }
-            }
+            $('input[name="end"]').attr("min", minInputEnd);
         });
 
     });

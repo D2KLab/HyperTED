@@ -1,10 +1,48 @@
+/* eslint-env browser */
+/* global $ jQuery video */
+
+
 const videoUri = video.uri.replace(new RegExp('&amp;', 'g'), '&') + window.location.hash;
 const storageKey = 'fragmentenricher.';
 const videokey = `${storageKey + video.uuid}.`;
 let parsedJSON;
 let $plainSubCont; // Container for subs with no entities
+let $player;
 
-$(document).ready(() => {
+const baseUri = '/Hyperted';
+
+
+function labelTime(time) {
+  let hh = Math.floor(time / 3600);
+  hh = hh < 10 ? `0${hh}` : hh;
+  let mm = Math.floor((time % 3600) / 60);
+  mm = mm < 10 ? `0${mm}` : mm;
+  let ss = Math.floor((time % 3600) % 60);
+  ss = ss < 10 ? `0${ss}` : ss;
+
+  return `${hh}:${mm}:${ss}`;
+}
+
+function openPopup(uri) {
+  window.open(uri, 'titolo', 'width=800, height=600, resizable, status, scrollbars=1, location');
+}
+
+function highlightSubLine(time) {
+  // Higlight 1 line of subtitles given the time
+
+  $('.sub-text p[data-time]')
+    .removeClass('now-playing')
+    .filter((_i, line) => {
+      const $line = $(line);
+      const start = $line.data('startss');
+      const end = $line.data('endss');
+      return start <= time && end > time;
+    })
+    .first()
+    .addClass('now-playing');
+}
+
+function init() {
   // resize navbar on scroll
   const $navbar = $('.navbar').not('.navbar-placeholder');
   const navHeight = $navbar.height();
@@ -17,7 +55,7 @@ $(document).ready(() => {
 
   // init smfplayer
   const $playerSect = $('#player-sect');
-  var $player = $('#video').smfplayer({
+  $player = $('#video').smfplayer({
     mfURI: videoUri,
     spatialOverlay: true,
     temporalHighlight: true,
@@ -27,41 +65,28 @@ $(document).ready(() => {
     preload: 'metadata',
     features: ['playpause', 'current', 'progress', 'duration', 'volume'],
     autoStart: false, // TODO remove
-    success(media, domObj) {
+    success(media) {
       showTEDSuggestedChaps();
 
-      $(media).one('loadedmetadata', () => {
-        displayChapters();
-        displayPins();
-        if ($player.getMFJson().hash.t != '' && $player.getMFJson().hash.t != 'NULL' && $player.getMFJson().hash.t != undefined) {
-          highlightMFSub($player.getMFJson().hash.t[0].value, () => {
+      $(media)
+        .one('loadedmetadata', () => {
+          displayChapters();
+          displayPins();
+
+          const { t } = $player.getMFJson().hash;
+          if (t && t !== 'NULL') {
+            highlightMFSub(t[0].value);
             const $selFrag = $('.selected-frag');
             if ($selFrag.exists() && $selFrag.hasClass('chap-title')) {
               const chapId = $selFrag.parent().data('chapter');
               selectChap(chapId);
             }
-            showTEDSuggestedChaps();
-          });
-        } else showTEDSuggestedChaps();
-
-        const $pop = Popcorn(media);
-        $('.sub-text p[data-time]').each(function () {
-          const $this = $(this);
-          const thisId = $this.attr('id');
-          if (!thisId || !thisId.length) {
-            return;
           }
-          $pop.highlightSub({
-            start: Math.round($this.data('startss')),
-            end: Math.round($this.data('endss')),
-            subId: thisId,
-          });
-        });
-      }).on('play', () => {
-        $('.info-on-player', $playerSect).hide();
-      }).on('pause', () => {
-        $('.info-on-player', $playerSect).show();
-      });
+          showTEDSuggestedChaps();
+        })
+        .on('timeupdate', (evt) => highlightSubLine(evt.target.currentTime))
+        .on('play', () => $('.info-on-player', $playerSect).hide())
+        .on('pause', () => $('.info-on-player', $playerSect).show());
     },
   });
   video.player = $player;
@@ -80,63 +105,61 @@ $(document).ready(() => {
     }
   });
 
-  if (Modernizr.history && Modernizr.localstorage) {
-    // Nerdify form become an ajax form
-    const $nerdifyForm = $('form.nerdify');
-    const ajaxAction = $nerdifyForm.data('action');
+  // Nerdify form become an ajax form
+  const $nerdifyForm = $('form.nerdify');
+  const ajaxAction = $nerdifyForm.data('action');
 
-    $nerdifyForm.attr('action', ajaxAction).submit(function (e) {
-      e.preventDefault();
-      const $submitButton = $('button[type="submit"]', $nerdifyForm);
-      $submitButton.width($submitButton.width()).prop('disabled', true).html('<img src="/HyperTED/img/ajax-loader-greyRed.gif"><img src="/HyperTED/img/ajax-loader-greyRed.gif"><img src="/HyperTED/img/ajax-loader-greyRed.gif">');
+  $nerdifyForm.attr('action', ajaxAction).submit(function nerdifySubmit(e) {
+    e.preventDefault();
+    const $submitButton = $('button[type="submit"]', $nerdifyForm);
+    $submitButton.width($submitButton.width()).prop('disabled', true).html('<img src="/HyperTED/img/ajax-loader-greyRed.gif"><img src="/HyperTED/img/ajax-loader-greyRed.gif"><img src="/HyperTED/img/ajax-loader-greyRed.gif">');
 
-      const extractor = $('.nerdSelect select', $nerdifyForm).val();
-      const page_url = window.location.toString().parseURL();
-      page_url.search.enriched = extractor;
+    const extractor = $('.nerdSelect select', $nerdifyForm).val();
+    const page_url = window.location.toString().parseURL();
+    page_url.search.enriched = extractor;
 
-      // if entities are in LocalStorage, get them and go on
-      const entitiesLS = getFromLocalStorage(videokey + extractor);
-      if (entitiesLS) {
+    // if entities are in LocalStorage, get them and go on
+    const entitiesLS = getFromLocalStorage(videokey + extractor);
+    if (entitiesLS) {
+      $submitButton.prop('disabled', false).html('Nerdify');
+      history.pushState(null, null, page_url.toString());
+      onEntitiesToShow(entitiesLS);
+      showTEDSuggestedChaps();
+      return false;
+    }
+
+    $(this).ajaxSubmit({
+      success(data) {
+        try {
+          if (data.error) {
+            const alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
+            alert.appendTo($nerdifyForm).alert();
+            $submitButton.prop('disabled', false).html('Nerdify');
+            console.error(data.error);
+            return;
+          }
+        } catch (e) {
+          console.error(e);
+          // DO NOTHING
+        }
+
+        saveInLocalStorage(videokey + extractor, data);
+
         $submitButton.prop('disabled', false).html('Nerdify');
         history.pushState(null, null, page_url.toString());
-        onEntitiesToShow(entitiesLS);
+        onEntitiesToShow(data);
         showTEDSuggestedChaps();
-        return false;
-      }
-
-      $(this).ajaxSubmit({
-        success(data) {
-          try {
-            if (data.error) {
-              const alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
-              alert.appendTo($nerdifyForm).alert();
-              $submitButton.prop('disabled', false).html('Nerdify');
-              console.error(data.error);
-              return;
-            }
-          } catch (e) {
-            console.error(e);
-            // DO NOTHING
-          }
-
-          saveInLocalStorage(videokey + extractor, data);
-
-          $submitButton.prop('disabled', false).html('Nerdify');
-          history.pushState(null, null, page_url.toString());
-          onEntitiesToShow(data);
-          showTEDSuggestedChaps();
-        },
-        error() {
-          const alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
-          alert.appendTo($nerdifyForm).alert();
-          $submitButton.removeLoader();
-          console.error('Something went wrong');
-        },
-      });
+      },
+      error() {
+        const alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
+        alert.appendTo($nerdifyForm).alert();
+        $submitButton.removeLoader();
+        console.error('Something went wrong');
+      },
     });
-  }
+  });
 
-  $('#recommend').on('click', function () {
+  $('#recommend').on('click', function recommendClick() {
     $(this).hide();
     $('.see-also').show();
     $('#suggested-courses').show();
@@ -167,36 +190,30 @@ $(document).ready(() => {
         $suggestedVideoList.empty();
         $('.no_ent', $playlistSect).toggle(!Object.keys(res).length);
 
-        for (const v in res) {
-          if (!res.hasOwnProperty(v)) continue;
-          const suggVideo = res[v];
+        for (const [uuid, suggVideo] of Object.entries(res)) {
           const meta = suggVideo.metadata;
-          var title; var
-            thumb;
-          if (suggVideo.metadata && suggVideo.metadata != 'undefined') {
+          let title = 'Video';
+          let thumb = `${baseUri}/img/thumb-default.png`;
+          if (suggVideo.metadata) {
             title = meta.title;
             thumb = meta.thumb;
-          } else {
-            title = 'Video';
-            thumb = '../HyperTED/img/thumb-default.png';
           }
           $suggestedVideoList.loadTemplate($('#suggTedChap'),
             {
-              uuid: v,
-              href: `video/${v}`,
+              uuid,
+              href: `${baseUri}/video/${uuid}`,
               title,
               thumb,
             },
             { append: true });
 
-          const thisVid = $(`.video-link[data-uuid=${v}]`, $suggestedVideoList);
+          const thisVid = $(`.video-link[data-uuid=${uuid}]`, $suggestedVideoList);
           const frags = suggVideo.chaps;
-          for (const f in frags) {
-            if (!frags.hasOwnProperty(f)) continue;
+          for (const frag of frags) {
             $('.frag-list', thisVid).loadTemplate($('#fragLi'),
               {
-                href: `video/${v}#t=${frags[f].startNPT},${frags[f].endNPT}`,
-                content: `Chapter ${frags[f].chapNum} (${labelTime(frags[f].startNPT)} - ${labelTime(frags[f].endNPT)})`,
+                href: `${baseUri}/video/${uuid}#t=${frag.startNPT},${frag.endNPT}`,
+                content: `Chapter ${frag.chapNum} (${labelTime(frag.startNPT)} - ${labelTime(frag.endNPT)})`,
               },
               { append: true });
           }
@@ -219,7 +236,7 @@ $(document).ready(() => {
 
 
   // ask for hotspots
-  $('#hotspot-form').submit(function (e) {
+  $('#hotspot-form').submit(function computeHS(e) {
     e.preventDefault();
     const errText = 'We can not generate hotspots for this video. This functionality is only available for TED Talks';
     const $form = $(this);
@@ -240,19 +257,17 @@ $(document).ready(() => {
           $('#hotspots-cont .hscont-inner').html($(data).find('.hscont-inner'));
           $form.hide();
           displayPins();
-          if (Modernizr.history) {
-            const page_url = window.location.toString().parseURL();
-            page_url.search.hotspotted = true;
+          const page_url = window.location.toString().parseURL();
+          page_url.search.hotspotted = true;
 
-            history.pushState(null, null, page_url.toString());
-          }
+          history.pushState(null, null, page_url.toString());
         } catch (e) {
           text = errText;
           console.error(text);
           console.log(e);
         }
         const $p = $('<p>').text(text);
-        $button.children().fadeOut();
+        $button.children().hide();
         $button.append($p).width($p.width());
         setTimeout(() => {
           $button.append($p);
@@ -263,7 +278,7 @@ $(document).ready(() => {
         const text = errText;
 
         const $p = $('<p>').text(text);
-        $button.children().fadeOut();
+        $button.children().hide();
         $button.append($p).width($p.width());
         $p.css('opacity', 1);
 
@@ -273,9 +288,8 @@ $(document).ready(() => {
   });
 
   $plainSubCont = $('.sub-text');
-  if (video.entitiesL) {
-    onEntitiesToShow(video.entitiesL);
-  }
+  if (video.entitiesL) onEntitiesToShow(video.entitiesL);
+
 
   // managing of click on a sub
   // 1: in a chapter
@@ -288,7 +302,7 @@ $(document).ready(() => {
   }, '.sub-text p[data-chapter]');
 
   // 2: not in a chapter
-  $(document).on('click', '.sub-text p[data-time]:not([data-chapter])', function () {
+  $(document).on('click', '.sub-text p[data-time]:not([data-chapter])', function onSubtextClick() {
     const srtTime = $(this).data('time');
     const hms = srtTime.replace(/,/g, '.').replace(' --> ', ',');
     $player.setmf(`t=${hms}`).playmf();
@@ -308,7 +322,7 @@ $(document).ready(() => {
 
   function displayPins() {
     const $pin = $('.pin');
-    $pin.each(function () {
+    $pin.each(function displaySinglePin() {
       const $this = $(this);
 
       $this.qtip({
@@ -332,7 +346,7 @@ $(document).ready(() => {
       });
     });
 
-    $pin.fadeIn();
+    $pin.show();
 
     let oldEnd = 0;
 
@@ -401,7 +415,7 @@ $(document).ready(() => {
   }
 
 
-  $('#video-info-chapters').fadeIn();
+  $('#video-info-chapters').show();
   const $chapLinks = $('.chap-link');
   if (!$chapLinks.first().data('duration')) {
     const $totChapters = $chapLinks.length;
@@ -411,7 +425,7 @@ $(document).ready(() => {
   }
 
   function displayChapters() {
-    $('#video-info-chapters').fadeIn();
+    $('#video-info-chapters').show();
     const $chapLinks = $('.chap-link');
     const $totChapters = $chapLinks.length;
 
@@ -460,7 +474,7 @@ $(document).ready(() => {
       $('.chap-link').each(function () {
         const $chapNum = $(this).find('.chap-num');
         if ($(this).width() >= 25) {
-          $chapNum.fadeIn();
+          $chapNum.show();
           $chapNum.css('display', 'inline-block');
         }
       });
@@ -472,7 +486,7 @@ $(document).ready(() => {
     $('.chap-link').removeClass('selected-chap');
 
     $(this).addClass('selected-chap');
-    const isOpening = (chapNum == '0');
+    const isOpening = (chapNum === '0');
     if (!isOpening) {
       $('.first-part').text('chapter   ');
       $('.selected-chap-num').text(chapNum);
@@ -481,27 +495,26 @@ $(document).ready(() => {
     $('.hide-on-intro').toggle(!isOpening);
     $('.intro').toggle(isOpening);
   }
+
   function updateMFurl() {
-    if (Modernizr.history) {
-      parsedJSON = $player.getMFJson();
-      const { hash } = parsedJSON;
-      const page_url = window.location.toString().parseURL();
+    parsedJSON = $player.getMFJson();
+    const { hash } = parsedJSON;
+    const pageUrl = window.location.toString().parseURL();
 
-      if (!$.isEmptyObject(hash)) {
-        for (const key in hash) {
-          if (!hash.hasOwnProperty(key)) continue;
-          page_url.hash[key] = hash[key][0].value;
-        }
-      } else {
-        page_url.hash = {};
+    if (!$.isEmptyObject(hash)) {
+      for (const key in hash) {
+        if (!hash.hasOwnProperty(key)) continue;
+        pageUrl.hash[key] = hash[key][0].value;
       }
-      highlightMFSub(hash.t[0].value);
-      showTEDSuggestedChaps();
-      delete page_url.search.t;
-      delete page_url.search.xywh;
-
-      history.pushState(null, null, page_url.toString());
+    } else {
+      pageUrl.hash = {};
     }
+    highlightMFSub(hash.t[0].value);
+    showTEDSuggestedChaps();
+    delete pageUrl.search.t;
+    delete pageUrl.search.xywh;
+
+    history.pushState(null, null, pageUrl.toString());
   }
 
   function timeToSec(hms) {
@@ -513,24 +526,25 @@ $(document).ready(() => {
     return ((mm * 60) + (hh * 3600) + ss);
   }
 
-  function highlightMFSub(t, callback) {
-    let sMF; let eMF; let sMFtest; let
-      eMFtest;
+  function highlightMFSub(t) {
+    let sMF;
+    let eMF;
+    let sMFtest;
+    let eMFtest;
 
     t = t.replace('npt:', '');
 
-    if (t.indexOf(',') != -1) {
+    if (t.indexOf(',') !== -1) {
       const mfTime = (t.split(','));
-      sMFtest = mfTime[0];
+      [sMFtest, eMFtest] = mfTime;
       sMFtest = sMFtest.length > 0 ? sMFtest : '0';
-      eMFtest = mfTime[1];
     } else {
       sMFtest = t;
       eMFtest = '86400';
     }
 
-    sMF = sMFtest.indexOf(':') == -1 ? sMFtest : timeToSec(sMFtest);
-    eMF = eMFtest.indexOf(':') == -1 ? eMFtest : timeToSec(eMFtest);
+    sMF = sMFtest.indexOf(':') === -1 ? sMFtest : timeToSec(sMFtest);
+    eMF = eMFtest.indexOf(':') === -1 ? eMFtest : timeToSec(eMFtest);
     sMF = parseFloat(sMF);
     eMF = parseFloat(eMF);
 
@@ -553,7 +567,6 @@ $(document).ready(() => {
     } else {
       console.warn('No subtitles in this fragment. Are you sure that the fragment is inside video duration?');
     }
-    if (callback) callback();
   }
 
 
@@ -600,15 +613,15 @@ $(document).ready(() => {
         $('form.nerdify').submit();
       }
     } else {
-      $('#entity-sect').fadeOut();
-      if ($('.sub-text').find('.entity').length > 0) {
-        displayEntitiesSub([]);
-      }
+      $('#entity-sect').hide();
+      if ($('.sub-text').find('.entity').length > 0) displayEntitiesSub([]);
     }
 
     showTEDSuggestedChaps();
   });
-});
+}
+
+$(document).ready(init);
 
 jQuery.fn.extend({
   addLoader(direction) {
@@ -652,7 +665,7 @@ function saveInLocalStorage(key, value) {
     localStorage[key] = JSON.stringify({ timestamp: Date.now(), value });
   } catch (e) {
     console.log(e);
-    if (e == DOMException.QUOTA_EXCEEDED_ERR || e.code == DOMException.QUOTA_EXCEEDED_ERR) {
+    if (e === DOMException.QUOTA_EXCEEDED_ERR || e.code === DOMException.QUOTA_EXCEEDED_ERR) {
       console.warn('Quota exceeded! Delete all and write');
       localStorage.clear();
       saveInLocalStorage(key, value);
@@ -744,7 +757,7 @@ function displayEntitiesSub(entJson) {
      * @return {number}
      */
     (x, y) => {
-      if (x.endNPT == y.endNPT) {
+      if (x.endNPT === y.endNPT) {
         return ((x.label.length == y.label.length) ? 0 : (x.label.length < y.label.length) ? 1 : -1);
       } if (parseFloat(x.endNPT) > parseFloat(y.endNPT)) return -1;
       return 1;
@@ -754,7 +767,7 @@ function displayEntitiesSub(entJson) {
   entityList.forEach((entity) => {
     while (subIndex >= 0) {
       let $thisSub = $subList.get(subIndex);
-      if (!$thisSub.id || $thisSub.id == '') {
+      if (!$thisSub.id) {
         subIndex--;
       } else {
         const entStart = parseFloat(entity.startNPT).toFixed(2);
@@ -786,7 +799,7 @@ function displayEntitiesSub(entJson) {
 
 function showEntityList(entityList) {
   $('.template-list-rows').empty();
-  $('#entity-sect').fadeIn();
+  $('#entity-sect').show();
 
   entityList.sort(
     (x, y) => ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1)),
@@ -804,27 +817,20 @@ function showEntityList(entityList) {
   $('.totEnt').html(entityList.length);
   $('.extEnt').html(extr.toUpperCase());
 
+  for (const [type, entities] of Object.entries(typeList)) {
+    const typeName = type.split('#')[1];
 
-  let count = 0;
-
-  for (const type in typeList) {
-    ++count;
-    var typeName = type.split('#')[1];
-    const entTypeList = typeList[type];
-
-    var $row = $('<div>').loadTemplate($('#templateType'), {
-      typeAndOccurrences: `${entTypeList.length} ${typeName}`,
+    const $row = $('<div>').loadTemplate($('#templateType'), {
+      typeAndOccurrences: `${entities.length} ${typeName}`,
     }).appendTo('.template-list-rows');
-    entTypeList.forEach((ent) => {
+    entities.forEach((ent) => {
       const $e = $('<li>').loadTemplate($('#templateEnt'), {
         entA: ent.label,
       });
       $('.displayEntity', $row).append($e);
 
       $('.entity.list', $e).addClass((typeName.toLowerCase()));
-      if (ent.uri) {
-        $('span>a', $e).attr('href', ent.uri).attr('target', '_blank');
-      }
+      if (ent.uri) $('span>a', $e).attr('href', ent.uri).attr('target', '_blank');
     });
   }
 }
@@ -832,34 +838,4 @@ function showEntityList(entityList) {
 function onEntitiesToShow(entJson) {
   displayEntitiesSub(entJson);
   showEntityList(entJson);
-}
-
-(function (Popcorn) {
-  Popcorn.plugin('highlightSub', (options) => ({
-    _setup(options) {
-      options.$sub = $(`#${options.subId}`);
-    },
-    start(event, options) {
-      options.$sub.addClass('now-playing');
-    },
-    end(event, options) {
-      options.$sub.removeClass('now-playing');
-    },
-  }));
-}(Popcorn));
-
-
-function labelTime(time) {
-  let hh = Math.floor(time / 3600);
-  hh = hh < 10 ? `0${hh}` : hh;
-  let mm = Math.floor((time % 3600) / 60);
-  mm = mm < 10 ? `0${mm}` : mm;
-  let ss = Math.floor((time % 3600) % 60);
-  ss = ss < 10 ? `0${ss}` : ss;
-
-  return `${hh}:${mm}:${ss}`;
-}
-
-function openPopup(uri) {
-  window.open(uri, 'titolo', 'width=800, height=600, resizable, status, scrollbars=1, location');
 }
