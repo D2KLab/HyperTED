@@ -20,6 +20,15 @@
     tracks: [], // a JSON array like {srclang:"en", kind:"subtitles", type:"text/vtt", src:"somefile.vtt"} or {srclang:"zh", kind:"chapter", type:"text/plain", src:"somefile.srt"}
   };
 
+  function startFragment(self) {
+    const data = $(self).data('smfplayer');
+
+    const lazyObj = getMfjsonLazy(data.mfjson);
+    self.setPosition(lazyObj.st * 1000);
+    if (!$.isEmptyObject(lazyObj.xywh) && data.settings.spatialEnabled) self.showxywh(lazyObj.xywh);
+  }
+
+
   const methods = {
     init(options) {
       const self = this; // save the instance of current smfplayer object
@@ -29,7 +38,7 @@
         if (VERBOSE) console.log('pause');
 
         const player = $(this).data('smfplayer').smfplayer;
-        if (player !== undefined) $(this).data('smfplayer').smfplayer.pause();
+        if (player) player.pause();
         else console.error("smfplayer hasn't been initalised");
       };
 
@@ -39,16 +48,14 @@
         if (VERBOSE) console.log('play');
 
         const player = $(this).data('smfplayer').smfplayer;
-        if (player !== undefined) player.play();
+        if (player) player.play();
         else console.error("smfplayer hasn't been initalised");
       };
 
       this.playmf = function playmf() {
         const data = $(this).data('smfplayer');
-        if (data === undefined) {
-          setTimeout(() => {
-            self.playmf();
-          }, 100);
+        if (!data) {
+          setTimeout(self.playmf, 100);
           return;
         }
         let st = 0;
@@ -75,14 +82,12 @@
 
         //* ********check data.xywhoverlay!!!*********
 
-        if (data === undefined) {
-          setTimeout(() => {
-            self.showxywh(xywh);
-          }, 100);
+        if (!data) {
+          setTimeout(() => self.showxywh(xywh), 100);
           return;
         }
 
-        if ($.isEmptyObject(xywh) || data.settings.spatialEnabled !== true) return;
+        if ($.isEmptyObject(xywh) || !data.settings.spatialEnabled) return;
 
         let spatialDiv;
         let overlayContainer;
@@ -186,7 +191,7 @@
         }
 
         const MEt = self.getMFJson().hash.t || self.getMFJson().query.t;
-        if (typeof MEt !== 'undefined') {
+        if (MEt) {
           // media frame starting point in milliseconds
           const startMS = MEt[0].startNormalized * 1000;
           // media frame ending point in milliseconds
@@ -212,26 +217,11 @@
         if (data.settings.xywhoverlay) data.settings.xywhoverlay.hide();
       };
 
-      /* Removed as it doesn't match the specification
-       this.stop =function(){
-
-       if(VERBOSE)
-       console.log("pause");
-
-       var player = $(this).data('smfplayer').smfplayer;
-       if(player !== undefined)
-       player.stop();
-       else
-       console.error("smfplayer hasn't been initalised");
-
-
-       }; */
-
       this.load = function load() {
         if (VERBOSE) console.log('load');
 
         const player = $(this).data('smfplayer').smfplayer;
-        if (player !== undefined) player.load();
+        if (player) player.load();
         else console.error("smfplayer hasn't been initalised");
       };
 
@@ -255,7 +245,7 @@
 
       this.getDuration = function getDuration() { // in milliseconds
         const player = $(this).data('smfplayer').smfplayer;
-        if (player !== undefined) return player.media.duration * 1000;
+        if (player) return player.media.duration * 1000;
 
         console.error("smfplayer hasn't been initalised");
         return -1;
@@ -319,44 +309,31 @@
           // if(VERBOSE)
           //      console.log(mfjson);
 
+
           settings.success = function onsuccess(mediaElement, domObject, p) {
             if (VERBOSE) console.log('smfplayer init success.');
 
+            let dat = $(self).data('smfplayer');
 
-            if (settings.autoStart === true) {
+            if (settings.autoStart) {
               if (mediaElement.pluginType === 'flash') {
                 mediaElement.addEventListener('canplay', () => {
                   if (VERBOSE) console.log('canplay');
                   mediaElement.play();
 
-                  if ($(self).data('smfplayer') === undefined) {
-                    setTimeout(() => {
-                      const lazyObj = getMfjsonLazy($(self).data('smfplayer').mfjson);
-                      self.setPosition(lazyObj.st * 1000);
-                      if (!$.isEmptyObject(lazyObj.xywh) && $(self).data('smfplayer').settings.spatialEnabled === true) self.showxywh(lazyObj.xywh);
-                    }, 100);
-                  } else {
-                    const lazyObj = getMfjsonLazy($(self).data('smfplayer').mfjson);
-                    self.setPosition(lazyObj.st * 1000);
-                    if (!$.isEmptyObject(lazyObj.xywh) && $(self).data('smfplayer').settings.spatialEnabled === true) self.showxywh(lazyObj.xywh);
-                  }
+                  dat = $(self).data('smfplayer');
+
+                  if (!dat) setTimeout(() => startFragment(self), 100);
+                  else startFragment(self);
                 }, false);
               } else {
                 mediaElement.play();
 
-                if ($(self).data('smfplayer') === undefined) {
-                  setTimeout(() => {
-                    const lazyObj = getMfjsonLazy($(self).data('smfplayer').mfjson);
-                    self.setPosition(lazyObj.st * 1000);
-                    if (!$.isEmptyObject(lazyObj.xywh) && $(self).data('smfplayer').settings.spatialEnabled === true) self.showxywh(lazyObj.xywh);
-                  }, 100);
-                } else {
-                  const lazyObj = getMfjsonLazy($(self).data('smfplayer').mfjson);
-                  self.setPosition(lazyObj.st * 1000);
-                  if (!$.isEmptyObject(lazyObj.xywh) && $(self).data('smfplayer').settings.spatialEnabled === true) self.showxywh(lazyObj.xywh);
-                }
+                if (!dat) setTimeout(() => startFragment(self), 100);
+                else startFragment(self);
               }
             }
+
 
             mediaElement.addEventListener('timeupdate', () => {
               const { currentTime } = mediaElement;
@@ -439,7 +416,7 @@
           };
 
           settings.error = function onerror() {
-            if (options.error !== undefined) options.error.call(this);
+            if (options.error) options.error.call(this);
           };
 
           let videosrc = settings.mfURI;

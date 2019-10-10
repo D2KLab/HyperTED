@@ -34,13 +34,104 @@ function labelTime(time) {
   return `${hh}:${mm}:${ss}`;
 }
 
+
+function displayEntitiesSub(entityList) {
+  const $newSubCont = $plainSubCont.clone();
+  const $subList = $newSubCont.find('p');
+
+  // sorting entities for end character desc and by length
+  entityList.sort((x, y) => {
+    if (x.endNPT === y.endNPT) {
+      if (x.label.length === y.label.length) return 0;
+      return (x.label.length < y.label.length) ? 1 : -1;
+    } if (parseFloat(x.endNPT) > parseFloat(y.endNPT)) return -1;
+    return 1;
+  });
+  let subIndex = $subList.length - 1;
+
+  entityList.forEach((entity) => {
+    while (subIndex >= 0) {
+      let $thisSub = $subList.get(subIndex);
+      if (!$thisSub.id) {
+        subIndex--;
+        continue;
+      }
+      const entStart = entity.startNPT;
+      const entEnd = entity.endNPT;
+
+      $thisSub = $($thisSub);
+      const subStart = $thisSub.data('startss');
+      const subEnd = $thisSub.data('endss');
+
+      if (entStart >= subStart && entEnd <= subEnd) {
+        const text = $thisSub[0].innerHTML;
+        const nerdTypeSplit = entity.nerdType.split('#');
+        const nerdType = nerdTypeSplit.length > 1 ? nerdTypeSplit[1].toLowerCase() : 'thing';
+
+        const str = `<span class="entity ${nerdType}">${entity.label}</span>`;
+
+        const replace = text.replace(entity.label, str);
+        $thisSub.html(replace);
+        break;
+      } else subIndex--;
+    }
+  });
+
+  $('.sub-text', document).replaceWith($newSubCont);
+  $('p > span.entity').has('span').addClass('nesting');
+}
+
+
+function showEntityList(entityList) {
+  $('.template-list-rows').empty();
+  $('#entity-sect').show();
+
+  entityList.sort(
+    (x, y) => ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1)),
+  );
+
+  const typeList = entityList.reduce((memo, ent) => {
+    if (!memo[ent.nerdType]) {
+      memo[ent.nerdType] = [];
+    }
+    memo[ent.nerdType].push(ent);
+    return memo;
+  }, {});
+
+  const extr = $('select[name=enriched] option:selected').text();
+  $('.totEnt').html(entityList.length);
+  $('.extEnt').html(extr.toUpperCase());
+
+  for (const [type, entities] of Object.entries(typeList)) {
+    const typeName = type.split('#')[1];
+
+    const $row = $('<div>').loadTemplate($('#templateType'), {
+      typeAndOccurrences: `${entities.length} ${typeName}`,
+    }).appendTo('.template-list-rows');
+    entities.forEach((ent) => {
+      const $e = $('<li>').loadTemplate($('#templateEnt'), {
+        entA: ent.label,
+      });
+      $('.displayEntity', $row).append($e);
+
+      $('.entity.list', $e).addClass((typeName.toLowerCase()));
+      if (ent.uri) $('span>a', $e).attr('href', ent.uri).attr('target', '_blank');
+    });
+  }
+}
+
+function onEntitiesToShow(entJson) {
+  displayEntitiesSub(entJson);
+  showEntityList(entJson);
+}
+
 function showTEDSuggestedChaps() {
   if (!$player) return;
 
   const $suggestedVideoList = $('#suggestedVideoList');
   const $playlistSect = $('.see-also #playlist-sect');
 
-  const extractor = (new URLSearchParams(window.location.search)).enriched;
+  const extractor = (new URLSearchParams(window.location.search)).get('enriched');
   $('.invite', $playlistSect).toggle(!extractor);
   $('.no_ent', $playlistSect).hide();
 
@@ -658,99 +749,4 @@ function saveInLocalStorage(key, value) {
       saveInLocalStorage(key, value);
     }
   }
-}
-
-
-function displayEntitiesSub(entJson) {
-  const $newSubCont = $plainSubCont.clone();
-  const $subList = $newSubCont.find('p');
-  const entityList = entJson;
-
-  // sorting JSON for end character desc and by length
-  entityList.sort(
-    /**
-     * @return {number}
-     */
-    (x, y) => {
-      if (x.endNPT === y.endNPT) {
-        return ((x.label.length == y.label.length) ? 0 : (x.label.length < y.label.length) ? 1 : -1);
-      } if (parseFloat(x.endNPT) > parseFloat(y.endNPT)) return -1;
-      return 1;
-    },
-  );
-  let subIndex = $subList.length - 1;
-  entityList.forEach((entity) => {
-    while (subIndex >= 0) {
-      let $thisSub = $subList.get(subIndex);
-      if (!$thisSub.id) {
-        subIndex--;
-      } else {
-        const entStart = parseFloat(entity.startNPT).toFixed(2);
-        const entEnd = parseFloat(entity.endNPT).toFixed(2);
-        $thisSub = $($thisSub);
-        const subStart = parseFloat($thisSub.data('startss')).toFixed(2);
-        const subEnd = parseFloat($thisSub.data('endss')).toFixed(2);
-        if (entStart >= subStart && entEnd <= subEnd) {
-          const text = $thisSub[0].innerHTML;
-          const nerdTypeSplit = entity.nerdType.split('#');
-          const nerdType = nerdTypeSplit.length > 1 ? nerdTypeSplit[1].toLowerCase() : 'thing';
-
-          const str = `<span class="entity ${nerdType}">${entity.label}</span>`;
-
-          const replace = text.replace(entity.label, str);
-          $thisSub.html(replace);
-          break;
-        } else {
-          subIndex--;
-        }
-      }
-    }
-  });
-
-  $('.sub-text', document).replaceWith($newSubCont);
-  $('p > span.entity').has('span').addClass('nesting');
-}
-
-
-function showEntityList(entityList) {
-  $('.template-list-rows').empty();
-  $('#entity-sect').show();
-
-  entityList.sort(
-    (x, y) => ((x.nerdType == y.nerdType) ? 0 : ((x.nerdType > y.nerdType) ? 1 : -1)),
-  );
-
-  const typeList = entityList.reduce((memo, ent) => {
-    if (!memo[ent.nerdType]) {
-      memo[ent.nerdType] = [];
-    }
-    memo[ent.nerdType].push(ent);
-    return memo;
-  }, {});
-
-  const extr = $('select[name=enriched] option:selected').text();
-  $('.totEnt').html(entityList.length);
-  $('.extEnt').html(extr.toUpperCase());
-
-  for (const [type, entities] of Object.entries(typeList)) {
-    const typeName = type.split('#')[1];
-
-    const $row = $('<div>').loadTemplate($('#templateType'), {
-      typeAndOccurrences: `${entities.length} ${typeName}`,
-    }).appendTo('.template-list-rows');
-    entities.forEach((ent) => {
-      const $e = $('<li>').loadTemplate($('#templateEnt'), {
-        entA: ent.label,
-      });
-      $('.displayEntity', $row).append($e);
-
-      $('.entity.list', $e).addClass((typeName.toLowerCase()));
-      if (ent.uri) $('span>a', $e).attr('href', ent.uri).attr('target', '_blank');
-    });
-  }
-}
-
-function onEntitiesToShow(entJson) {
-  displayEntitiesSub(entJson);
-  showEntityList(entJson);
 }

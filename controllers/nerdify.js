@@ -29,10 +29,12 @@ function getDbpediaAbstract(wikiUrl) {
 
   return client.query(query)
     .then((data) => {
-      if (!data.results.bindings || !data.results.bindings.length) return null;
+      const { bindings } = data.results;
+      if (!bindings || !bindings.length) return null;
 
-      if (!data.results.bindings[0].abstract) return null;
-      return data.results.bindings[0].abstract.value;
+      const [b] = data.results.bindings;
+      if (!b.abstract) return null;
+      return b.abstract.value;
     });
 }
 
