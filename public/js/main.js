@@ -157,7 +157,7 @@ function highlightMFSub(t) {
 
   t = t.replace('npt:', '');
 
-  if (t.indexOf(',') !== -1) {
+  if (t.includes(',')) {
     const mfTime = (t.split(','));
     [sMFtest, eMFtest] = mfTime;
     sMFtest = sMFtest.length > 0 ? sMFtest : '0';
@@ -166,8 +166,8 @@ function highlightMFSub(t) {
     eMFtest = '86400';
   }
 
-  sMF = sMFtest.indexOf(':') === -1 ? sMFtest : timeToSec(sMFtest);
-  eMF = eMFtest.indexOf(':') === -1 ? eMFtest : timeToSec(eMFtest);
+  sMF = !sMFtest.includes(':') ? sMFtest : timeToSec(sMFtest);
+  eMF = !eMFtest.includes(':') ? eMFtest : timeToSec(eMFtest);
   sMF = parseFloat(sMF);
   eMF = parseFloat(eMF);
 
@@ -180,13 +180,12 @@ function highlightMFSub(t) {
     }
   });
   const $firstSelFrag = $('.selected-frag:first');
-  if ($firstSelFrag.length > 0) {
+
+  if ($firstSelFrag.length) {
     const $subText = $('.sub-text');
     const scrollPos = $firstSelFrag.position().top + $subText.scrollTop();
 
-    $subText.animate({
-      scrollTop: scrollPos,
-    });
+    $subText.animate({ scrollTop: scrollPos });
   } else {
     console.warn('No subtitles in this fragment. Are you sure that the fragment is inside video duration?');
   }
