@@ -48,14 +48,3 @@ services:
     links:
       - elasticsearch:elasticsearch
       - mongo:mongo
-
-  web:
-    build: .
-    environment:
-      - TZ=Europe/Paris
-    ports:
-      - "8011:8011"
-    restart: always
-    links:
-      - elasticsearch:elasticsearch
-      - mongo:mongo
