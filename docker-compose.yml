@@ -14,8 +14,6 @@ services:
     mem_limit: 1024m
     environment:
       - TZ=Europe/Paris
-    ports:
-      - "27117:27017"
     expose:
       - "27017"
       - "28017"

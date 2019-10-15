@@ -9,7 +9,7 @@ Searching and browsing through fragments of TED Talks.
 - Make sure you have [Docker](https://www.docker.com/) installed and running.
 
 - Run the application with
-      docker-compose up
+      docker-compose up --build
 
 #### Dev Mode
 
