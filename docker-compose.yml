@@ -27,6 +27,8 @@ services:
     mem_limit: 1024m
     links:
       - mongo:mongo
+    depends_on:
+      - mongo
 
   elasticsearch:
     image: elasticsearch:1.7
@@ -46,6 +48,9 @@ services:
     links:
       - elasticsearch:elasticsearch
       - mongo:mongo
+    depends_on:
+      - mongo
+      - elasticsearch
 
   web:
     build: .
@@ -54,6 +59,9 @@ services:
     ports:
       - "8011:8011"
     restart: always
+    depends_on:
+      - mongo
+      - elasticsearch
     links:
       - elasticsearch:elasticsearch
       - mongo:mongo
