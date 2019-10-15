@@ -5,7 +5,7 @@
 # mongosetup will init mongo as the master node
 # elasticsearch will server as the index search db
 # mongo-connector will pipeline mongodb content to the elasticsearch
-version: "2.4"
+version: "2.0"
 
 services:
   mongo:
