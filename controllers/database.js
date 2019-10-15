@@ -1,8 +1,10 @@
 import UUID from 'uuid/v5';
 import monk from 'monk';
 import Promise from 'bluebird';
+import config from '../config.json';
 
-const db = monk('localhost:27017/hyperted');
+console.info(config);
+const db = monk(config.mongo);
 
 const videos = db.get('videos');
 videos.index('uuid', { unique: true });
@@ -109,28 +111,22 @@ function insertVideo(video) {
         return Promise.resolve(video);
       }
       if (video.entities) {
-        const { entities } = video;
+        cbs.push(addEntities(video.uuid, video.entities));
         delete video.entities;
-
-        cbs.push(addEntities(video.uuid, entities));
       }
 
       if (video.chapters) {
-        const { chapters } = video;
+        cbs.push(addChapters(video.uuid, video.chapters));
         delete video.chapters;
-
-        cbs.push(addChapters(video.uuid, chapters));
       }
 
       // if (video.hotspots) {
       //   const { hotspots } = video;
       //   delete video.hotspots;
-      //
-      //   //            cbs.push(function (async_callback) {
-      //   //                addHotspots(video.uuid, hotspots, async_callback);
-      //   //            });
+      //   // cbs.push(function (async_callback) {
+      //   // addHotspots(video.uuid, hotspots, async_callback);
+      //   // });
       // }
-
       return videos.insert(video);
     })
     .then(() => Promise.all(cbs))
@@ -180,9 +176,9 @@ function setHotspotProcess(uuid, value) {
   return videos.update({ uuid }, { $set: { hotspotStatus: value } });
 }
 
-function getHotspotProcess(uuid) {
-  return videos.findOne({ uuid })
-    .then((data) => data.hotspotStatus);
+async function getHotspotProcess(uuid) {
+  const data = await videos.findOne({ uuid });
+  return data.hotspotStatus;
 }
 
 function addHotspots(uuid, hotspots) {

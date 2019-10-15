@@ -12,6 +12,7 @@ RUN npm install --production
 
 # Bundle app source
 COPY . .
+COPY config-prod.json config.json
 
 EXPOSE 8011
 CMD [ "node", "index.js" ]

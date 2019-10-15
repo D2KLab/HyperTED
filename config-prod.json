@@ -1,0 +1,3 @@
+{
+ "mongo" : "mongo:27017/hyperted"
+}
