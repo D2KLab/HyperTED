@@ -56,17 +56,99 @@ const vendors = {
 };
 
 function detectVendor(uri) {
-  return Object.entries(vendors).findIndex((vend) => uri.match(vend.url_pattern));
+  for (const [k, v] of Object.entries(vendors)) {
+    const matches = uri.match(v.url_pattern);
+    if (matches) return [k, String(matches[matches.length - 1])];
+  }
+  return [];
 }
 
-function detectId(uri, v) {
-  if (!v) return undefined;
+/* from srt to a json ready to be used in render */
+function srtToJson(srt, chapters) {
+  let strList = srt.split('\n\n'); const
+    subList = [];
+  if (strList.length < 2) {
+    strList = srt.substr(1).split('\n\r');
+  }
+  let charIndex = -1;
 
-  const vendor = vendors[v];
-  if (!vendor.url_pattern) return undefined;
+  function calcTime(subtitleTime) {
+    const time = (subtitleTime.split(':'));
+    const hh = parseInt(time[0]);
+    const mm = parseInt(time[1]);
+    const ss = parseFloat(time[2].replace(',', '.'));
 
-  const matches = uri.match(vendor.url_pattern);
-  return String(matches[matches.length - 1]);
+    return ((mm * 60) + (hh * 3600) + ss);
+  }
+
+  for (const str of strList) {
+    const sub = { text: '', lineNum: 0 };
+    const lines = str.split('\n');
+
+    for (const line of lines) {
+      if (!sub.id) {
+        sub.id = line.trim();
+      } else if (!sub.time) {
+        sub.time = line.replace('\r', '');
+        const timeSplit = sub.time.split(' --> ');
+        const subStart = calcTime(timeSplit[0]);
+        sub.startSS = Math.round(subStart * 1000) / 1000;
+        const subEnd = calcTime(timeSplit[1]);
+        sub.endSS = Math.round(subEnd * 1000) / 1000;
+      } else {
+        const start = sub.lineNum > 0 ? '\n' : '';
+        sub.text += start + line;
+        sub.lineNum++;
+      }
+    }
+
+    sub.startChar = charIndex + 1;
+    charIndex = sub.startChar + sub.text.length; // because of a '\n' is a fake double char
+    sub.endChar = charIndex;
+    if (sub.id) subList.push(sub);
+  }
+
+  if (chapters) {
+    let subIndex = 0;
+
+    for (const [k, chap] of Object.entries(chapters)) {
+      let chapStart;
+      let chapEnd;
+      if (chap.tStart) {
+        chapStart = Math.round(chap.tStart.value);
+        chapEnd = Math.round(chap.tEnd.value);
+      } else {
+        chapStart = chap.startNPT;
+        chapEnd = chap.endNPT;
+      }
+
+      while (subIndex < subList.length) {
+        const thisSub = subList[subIndex];
+        thisSub.chapNum = k;
+        if (!thisSub.id) {
+          ++subIndex;
+        } else {
+          const sEnd = thisSub.endSS;
+          if (chapStart > sEnd) {
+            // chapter not yet started: go next sub
+            subIndex++;
+          } else if (chapStart <= sEnd && chapEnd >= sEnd) {
+            // we are in a chapter: save this info and go next sub
+            // thisSub.dataChap = ' data-chapter=' + c.chapter.value.replace("http://data.linkedtv.eu/chapter/", "");
+            thisSub.dataChap = ` data-chapter=${k}`;
+            subIndex++;
+          } else {
+            // chapter ends: go next chapter
+            if (subIndex > 0) subList[subIndex - 1].endChap = true;
+
+            break;
+          }
+        }
+      }
+    }
+    subList[subList.length - 1].endChap = true;
+  }
+  return subList;
 }
 
 
@@ -135,7 +217,6 @@ function getMetadataFromSparql(video) {
 
 
 function getMetadata(video) {
-  console.log(video);
   if (!video.vendor || !video.vendor_id) return Promise.reject(new Error('No vendor or id available'));
 
   const metadata = video.metadata || {};
@@ -223,7 +304,7 @@ function getMetadata(video) {
         .catch((err) => console.error(`[ERROR] on retrieving metadata from ${metadataUrl}`, err));
     case 'ted':
       return axios.get(metadataUrl)
-        .then((r) => {
+        .then(async (r) => {
           const { data } = r;
 
           const datatalk = data.talk;
@@ -242,7 +323,8 @@ function getMetadata(video) {
 
           subUrl = vendors.ted.sub_url.replace('<id>', video.vendor_id);
 
-          return axios.get(subUrl).then((x) => x.data);
+          const x = await axios.get(subUrl);
+          return x.data;
         }).then((sub) => {
           video.jsonSub = sub;
           video.chapters = getTedChapters(video.jsonSub);
@@ -336,10 +418,7 @@ function search(req, resp) {
     locator = locator.replace(/\?ticket=.+/, '');
   }
 
-  const vendor = detectVendor(locator);
-  const id = detectId(locator, vendor);
-
-  console.log(locator, vendor, id);
+  const [vendor, id] = detectVendor(locator);
 
   db.getVideoFromLocator(locator)
     .then((data) => {
@@ -359,7 +438,6 @@ function search(req, resp) {
       resp.redirect(redirectUrl);
     }).catch((e) => {
       if (e.message === 'handled') return;
-
       // new video
       console.log(`${LOG_TAG} Preparing metadata for adding to db`);
       const video = { locator };
@@ -371,8 +449,9 @@ function search(req, resp) {
         video.videoLocator = `${locator}/rawvideo/2/raw.mp4?ticket=77451bc0-e0bf-11e3-8b68-0800200c9a66`;
       }
 
+
       collectMetadata(video)
-        .then(db.insertVideo)
+        .then(() => db.insertVideo(video))
         .then(() => {
           const redirectUrl = `video/${video.uuid}${fragPart}${hashPart}`;
           console.log(`Video at ${locator} successfully added to db.`);
@@ -385,6 +464,28 @@ function search(req, resp) {
         });
     });
 }
+
+function getEntities(video, ext) {
+  console.log(`nerdifing video ${video.uuid} with ${ext}`);
+  let docType;
+  let text;
+  if (video.timedtext) {
+    docType = 'timedtext';
+    text = video.timedtext;
+  } else {
+    docType = 'text';
+    text = video.metadata.descr;
+  }
+  return nerdify(docType, text, ext).then((data = []) => {
+    if (ext === 'combined') {
+      for (const x of data) x.source = 'combined';
+    }
+
+    db.addEntities(video.uuid, data);
+    return data;
+  });
+}
+
 
 /*
  * Called on click on "Nerdify" button
@@ -453,29 +554,7 @@ function collectMetadata(video) {
     }).finally(() => getMetadata(video).then((metadata) => {
       if (!metadata) console.log(`${LOG_TAG} Metadata unavailable.`);
       else video.metadata = metadata;
-      return video;
     }));
-}
-
-function getEntities(video, ext) {
-  console.log(`nerdifing video ${video.uuid} with ${ext}`);
-  let docType;
-  let text;
-  if (video.timedtext) {
-    docType = 'timedtext';
-    text = video.timedtext;
-  } else {
-    docType = 'text';
-    text = video.metadata.descr;
-  }
-  return nerdify(docType, text, ext).then((data = []) => {
-    if (ext === 'combined') {
-      for (const x of data) x.source = 'combined';
-    }
-
-    db.addEntities(video.uuid, data);
-    return data;
-  });
 }
 
 
@@ -750,93 +829,6 @@ function getTedChapters(json, totDuration) {
   return chapters;
 }
 
-/* from srt to a json ready to be used in render */
-function srtToJson(srt, chapters) {
-  let strList = srt.split('\n\n'); const
-    subList = [];
-  if (strList.length < 2) {
-    strList = srt.substr(1).split('\n\r');
-  }
-  let charIndex = -1;
-
-  function calcTime(subtitleTime) {
-    const time = (subtitleTime.split(':'));
-    const hh = parseInt(time[0]);
-    const mm = parseInt(time[1]);
-    const ss = parseFloat(time[2].replace(',', '.'));
-
-    return ((mm * 60) + (hh * 3600) + ss);
-  }
-
-  for (const str of strList) {
-    const sub = { text: '', lineNum: 0 };
-    const lines = str.split('\n');
-
-    for (const line of lines) {
-      if (!sub.id) {
-        sub.id = line.trim();
-      } else if (!sub.time) {
-        sub.time = line.replace('\r', '');
-        const timeSplit = sub.time.split(' --> ');
-        const subStart = calcTime(timeSplit[0]);
-        sub.startSS = Math.round(subStart * 1000) / 1000;
-        const subEnd = calcTime(timeSplit[1]);
-        sub.endSS = Math.round(subEnd * 1000) / 1000;
-      } else {
-        const start = sub.lineNum > 0 ? '\n' : '';
-        sub.text += start + line;
-        sub.lineNum++;
-      }
-    }
-
-    sub.startChar = charIndex + 1;
-    charIndex = sub.startChar + sub.text.length; // because of a '\n' is a fake double char
-    sub.endChar = charIndex;
-    if (sub.id) subList.push(sub);
-  }
-
-  if (chapters) {
-    let subIndex = 0;
-
-    for (const [k, chap] of Object.entries(chapters)) {
-      let chapStart;
-      let chapEnd;
-      if (chap.tStart) {
-        chapStart = Math.round(chap.tStart.value);
-        chapEnd = Math.round(chap.tEnd.value);
-      } else {
-        chapStart = chap.startNPT;
-        chapEnd = chap.endNPT;
-      }
-
-      while (subIndex < subList.length) {
-        const thisSub = subList[subIndex];
-        thisSub.chapNum = k;
-        if (!thisSub.id) {
-          ++subIndex;
-        } else {
-          const sEnd = thisSub.endSS;
-          if (chapStart > sEnd) {
-            // chapter not yet started: go next sub
-            subIndex++;
-          } else if (chapStart <= sEnd && chapEnd >= sEnd) {
-            // we are in a chapter: save this info and go next sub
-            // thisSub.dataChap = ' data-chapter=' + c.chapter.value.replace("http://data.linkedtv.eu/chapter/", "");
-            thisSub.dataChap = ` data-chapter=${k}`;
-            subIndex++;
-          } else {
-            // chapter ends: go next chapter
-            if (subIndex > 0) subList[subIndex - 1].endChap = true;
-
-            break;
-          }
-        }
-      }
-    }
-    subList[subList.length - 1].endChap = true;
-  }
-  return subList;
-}
 
 // TODO sistemare
 function subTime(time) {
@@ -914,12 +906,12 @@ function loadVideo(index, uuid, retrieveNerd) {
   };
 
   if (uuid) video.uuid = uuid;
-  // console.log('-- loading metadata');
+  const fun = uuid ? db.updateVideo : db.insertVideo;
+
+  // console.log('-- loading metadata', video);
   return getMetadata(video)
     .then((metadata) => {
       if (!metadata) console.log(`${LOG_TAG} Metadata unavailable.`);
-
-      const fun = uuid ? db.updateVideo : db.insertVideo;
       return fun(video);
     }).then((doc) => {
       // nerdify
