@@ -1,3 +1,4 @@
 {
- "mongo" : "localhost:27017/hyperted"
+  "mongo" : "localhost:27017/hyperted",
+  "elastic" : "http://localhost:9200"
 }

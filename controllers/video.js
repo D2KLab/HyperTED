@@ -12,6 +12,9 @@ import db from './database';
 import ts from './linkedTVconnection';
 import courseSuggestion from './course_suggestion';
 import errorMsg from './error_msg';
+import config from '../config.json';
+
+console.info(config);
 
 const LOG_TAG = '[VIDEO.JS]: ';
 const hStatusValue = {
@@ -19,8 +22,9 @@ const hStatusValue = {
   DONE: 2,
 };
 
+
 const client = new elasticsearch.Client({
-  node: 'http://localhost:9200',
+  node: config.elastic,
   log: 'trace',
 });
 

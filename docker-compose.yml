@@ -23,12 +23,10 @@ services:
       - ./database:/database
 
   mongosetup:
-    image: yeasy/mongosetup
+    build: ./db_config/mongoconnect
     mem_limit: 1024m
     links:
       - mongo:mongo
-    depends_on:
-      - mongo
 
   elasticsearch:
     image: elasticsearch:1.7
@@ -44,13 +42,10 @@ services:
       - "9300"
 
   mongoconnector:
-    build: ./db_config
+    build: ./db_config/mongoconnect
     links:
       - elasticsearch:elasticsearch
       - mongo:mongo
-    depends_on:
-      - mongo
-      - elasticsearch
 
   web:
     build: .
@@ -59,9 +54,6 @@ services:
     ports:
       - "8011:8011"
     restart: always
-    depends_on:
-      - mongo
-      - elasticsearch
     links:
       - elasticsearch:elasticsearch
       - mongo:mongo

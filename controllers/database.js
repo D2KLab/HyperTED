@@ -3,7 +3,6 @@ import monk from 'monk';
 import Promise from 'bluebird';
 import config from '../config.json';
 
-console.info(config);
 const db = monk(config.mongo);
 
 const videos = db.get('videos');
