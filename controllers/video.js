@@ -974,7 +974,7 @@ function retrieveTedTalks(limitQps, retrieveNerd, startIndex = 0) {
 }
 
 function buildDb(_req, res) {
-  const retrieveNerd = false;
+  const retrieveNerd = true;
   const limitQps = retrieveNerd ? 10200 : 2200; // waiting time
 
   /* Load the full list of TED Talks */
