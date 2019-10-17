@@ -1,6 +1,6 @@
 # Source https://github.com/yeasy/docker-mongosetup
 
-FROM mongo:3.0
+FROM mongo:3.4
 MAINTAINER yeasy@github
 
 ENV DEBIAN_FRONTEND noninteractive

@@ -9,7 +9,7 @@ version: "2.4"
 
 services:
   mongo:
-    image: mongo:3.0
+    image: mongo:3.4
     hostname: mongo
     mem_limit: 1024m
     environment:
