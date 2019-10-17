@@ -2,13 +2,10 @@ Instruction for installing WITHOUT `docker-compose`.
 
 ## Install
 
-- Set up network
-
-      docker network create hyperted
 
 - Start mongo
 
-      docker run -d -p 27019:27017 --restart=unless-stopped  -v /var/docker/HyperTED/database:/database --network hyperted --name hyperted_mongo mongo:3.4 --replSet rs --dbpath /database --httpinterface --rest
+      docker run -d -p 27019:27017 --restart=unless-stopped  -v /var/docker/HyperTED/database:/database --name hyperted_mongo mongo:3.4 --replSet rs --dbpath /database --httpinterface --rest
 
       <!-- --configExpand rest -->
 
@@ -21,7 +18,7 @@ Instruction for installing WITHOUT `docker-compose`.
               "members": [
                   {
                       "_id": 0,
-                      "host": "hyperted_mongo:27017",
+                      "host": "10.0.0.14:27017",
                       "priority": 1
                   }
               ]
@@ -33,20 +30,35 @@ Instruction for installing WITHOUT `docker-compose`.
 
 - Start elasticsearch
 
-      docker run -d -p 9200:9200 --restart=unless-stopped  -v /var/docker/HyperTED/elasticsearch:/usr/share/elasticsearch/data --network hyperted --name hyperted_elastic elasticsearch:1.7
+      docker run -d -p 9200:9200 --restart=unless-stopped  -v /var/docker/HyperTED/elasticsearch:/usr/share/elasticsearch/data --name hyperted_elastic elasticsearch:1.7
 
 
 - Start mongoconnector
 
       docker build -t hyperted/mongoconnector ./db_config/mongoconnect0
 
-      docker run -d --restart=unless-stopped --network hyperted --name hyperted_mongoconnect hyperted/mongoconnector
+      docker run -d --restart=unless-stopped --name hyperted_mongoconnect hyperted/mongoconnector
 
 
 - Start web
 
       docker build -t hyperted/web .
-      docker run -d -p 8011:8011 --restart=unless-stopped --name hyperted_web --network hyperted hyperted/web
+      docker run -d -p 8011:8011 --restart=unless-stopped --name hyperted_web hyperted/web
+
+
+- Set up network
+
+      docker network create hyperted   --driver=bridge --subnet=10.0.0.40/16 --ip-range=10.0.0.50/24 --gateway=10.0.0.254
+      docker network connect hyperted hyperted_mongo
+      docker network connect hyperted hyperted_elastic
+      docker network connect hyperted hyperted_mongoconnect
+      docker network connect hyperted hyperted_web
+
+
+      docker network disconnect hyperted hyperted_mongo
+      docker network disconnect hyperted hyperted_elastic
+      docker network disconnect hyperted hyperted_mongoconnect
+      docker network disconnect hyperted hyperted_web
 
 ## Uninstall
       docker stop hyperted_web
@@ -62,3 +74,5 @@ Instruction for installing WITHOUT `docker-compose`.
 
       docker stop hyperted_mongo
       docker rm hyperted_mongo
+
+      docker network remove hyperted

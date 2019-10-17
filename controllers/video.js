@@ -941,16 +941,6 @@ function talksLoop(talk, total, limitQps, retrieveNerd) {
   console.log(`loading video ${index}/${total}`);
   // console.log(talk);
 
-  // if (total > current) {
-  //   setTimeout(() => {
-  //     loadList(index);
-  //   }, limitQps);
-  // } else {
-  //
-  // }
-  //
-  // return;
-
   return db.getVideoFromVendorId('ted', index)
     .then((data) => {
       if (data && data.entities) {
@@ -969,22 +959,27 @@ function talksLoop(talk, total, limitQps, retrieveNerd) {
     });
 }
 
-function buildDb(_req, res) {
-  const retrieveNerd = true;
-  const limitQps = retrieveNerd ? 10200 : 2200; // waiting time
-
-  /* Load the full list of TED Talks */
-  axios.get(TEDListQuery + 0) // 0 is the index from which I want to start
+function retrieveTedTalks(limitQps, retrieveNerd, startIndex = 0) {
+  // startIndex is the index from which I want to start
+  return axios.get(TEDListQuery + startIndex)
     .then((r) => {
       const { data } = r;
       const { total } = data.counts;
       const current = data.counts.this;
       if (current === 0) return Promise.resolve();
-      return Promise.mapSeries(data.talks, (t) => talksLoop(t.talk, total, limitQps, retrieveNerd));
-    })
-    .then(() => {
-      res.send('Db builded successfully');
-    })
+      const last = data.talks[data.talks.length - 1].talk.id;
+      return Promise.mapSeries(data.talks, (t) => talksLoop(t.talk, total, limitQps, retrieveNerd))
+        .then(() => retrieveTedTalks(limitQps, retrieveNerd, last));
+    });
+}
+
+function buildDb(_req, res) {
+  const retrieveNerd = false;
+  const limitQps = retrieveNerd ? 10200 : 2200; // waiting time
+
+  /* Load the full list of TED Talks */
+  retrieveTedTalks(limitQps, retrieveNerd)
+    .then(() => res.send('Db builded successfully'))
     .catch((err) => {
       console.error(err);
       res.status(500).send('A problem occurred');
