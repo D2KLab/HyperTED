@@ -170,7 +170,6 @@ function updateVideoUuid(uuid, newVideo) {
     }).then(() => newVideo);
 }
 
-
 function setHotspotProcess(uuid, value) {
   return videos.update({ uuid }, { $set: { hotspotStatus: value } });
 }
@@ -187,6 +186,10 @@ function addHotspots(uuid, hotspots) {
   });
 }
 
+async function hasEntities(uuid) {
+  const data = await ents.findOne({ uuid });
+  return !!data;
+}
 
 export default {
   getVideoFromUuid,
@@ -200,6 +203,7 @@ export default {
     return updateVideoUuid(newVideo.uuid, newVideo);
   },
   addEntities,
+  hasEntities,
   setHotspotProcess,
   getHotspotProcess,
   addHotspots,

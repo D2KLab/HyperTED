@@ -168,8 +168,7 @@ function renderVideo(res, video, options) {
  * Prepare and render a video already in db
  */
 function viewVideo(req, res, video) {
-  const { enriched } = req.query;
-  const { hotspotted } = req.query;
+  const { enriched, hotspotted } = req.query;
   let videoURI = video.videoLocator || video.locator;
 
   // Identify the media fragment part
@@ -938,12 +937,12 @@ function loadVideo(index, uuid, retrieveNerd) {
 
 function talksLoop(talk, total, limitQps, retrieveNerd) {
   const index = String(talk.id);
-  console.log(`loading video ${index}/${total}`);
+  console.log(new Date(), `| loading video ${index}/${total}`);
   // console.log(talk);
 
   return db.getVideoFromVendorId('ted', index)
     .then((data) => {
-      if (data && data.entities) {
+      if (data && db.hasEntities(data.uuid)) {
         console.log('video already in db');
         return Promise.resolve();
       }
@@ -973,12 +972,13 @@ function retrieveTedTalks(limitQps, retrieveNerd, startIndex = 0) {
     });
 }
 
-function buildDb(_req, res) {
+function buildDb(req, res) {
+  const { start } = req.query;
   const retrieveNerd = true;
   const limitQps = retrieveNerd ? 10200 : 2200; // waiting time
 
   /* Load the full list of TED Talks */
-  retrieveTedTalks(limitQps, retrieveNerd)
+  retrieveTedTalks(limitQps, retrieveNerd, start)
     .then(() => res.send('Db builded successfully'))
     .catch((err) => {
       console.error(err);
