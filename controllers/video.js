@@ -741,9 +741,11 @@ function getChaptersFromSuggestion(json) {
 function ajaxSuggestMF(req, res) {
   const { uuid } = req.params;
   const { startMF, endMF, extractor } = req.query;
-  if (!uuid) return res.json({ error: 'empty uuid' });
-
-  return db.getFilterEntities(uuid, extractor, startMF, endMF)
+  if (!uuid) {
+    res.json({ error: 'empty uuid' });
+    return;
+  }
+  db.getFilterEntities(uuid, extractor, startMF, endMF)
     .then((doc) => {
       doc.sort(
         /**
@@ -772,14 +774,14 @@ function ajaxSuggestMF(req, res) {
           }
 
           const maxVids = 4;
+          console.log(Object.entries(vids).slice(0, maxVids));
           const returnObject = {}; // TODO return array
           for (const [k, v] of Object.entries(vids).slice(0, maxVids)) {
             returnObject[k] = v;
           }
-          res.json(returnObject);
-          // res.render('partials/playlist.ejs', {'suggestedVids': vids});
+          return res.json(returnObject);
         });
-    }).catch((err) => res.status(500).send(err.message));
+    }).catch((err) => { console.log('wawa', err); res.status(500).send(err.message); });
 }
 
 
@@ -915,6 +917,7 @@ function loadVideo(index, uuid, retrieveNerd) {
   return getMetadata(video)
     .then((metadata) => {
       if (!metadata) console.log(`${LOG_TAG} Metadata unavailable.`);
+      video.metadata = metadata;
       return fun(video);
     }).then((doc) => {
       // nerdify
