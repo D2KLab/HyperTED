@@ -9,6 +9,7 @@ Searching and browsing through fragments of TED Talks.
 - Make sure you have [Docker](https://www.docker.com/) installed and running.
 
 - Run the application with
+
       docker-compose up --build
 
 #### Dev Mode
@@ -21,7 +22,7 @@ For better developing the web part of the application.
 
 - Install npm dependencies
 
-      npm installed
+      npm install
 
 - Run the server
 
