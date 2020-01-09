@@ -23,7 +23,7 @@ services:
       - ./database:/database
 
   mongosetup:
-    build: ./db_config/mongoconnect
+    build: ./db_config/mongosetup
     # mem_limit: 1024m
     links:
       - mongo:mongo

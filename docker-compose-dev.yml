@@ -44,7 +44,7 @@ services:
       - "9300"
 
   mongoconnector:
-    build: ./db_config
+    build: ./db_config/mongoconnect
     links:
       - elasticsearch:elasticsearch
       - mongo:mongo
