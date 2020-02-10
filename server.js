@@ -24,6 +24,7 @@ app.get(`${basepath}metadata/:uuid`, video.ajaxGetMetadata);
 app.get(`${basepath}suggestmf/:uuid`, video.ajaxSuggestMF);
 app.get(`${basepath}builddb`, video.buildDb);
 app.get(`${basepath}topicsearch`, video.topicSearch);
+app.get(`${basepath}topicmodel`, video.topicModel)
 
 app.get('/mediafragmentplayer', (_req, res) => {
   res.render('welcome.ejs');

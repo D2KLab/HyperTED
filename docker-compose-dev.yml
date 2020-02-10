@@ -48,3 +48,15 @@ services:
     links:
       - elasticsearch:elasticsearch
       - mongo:mongo
+      
+  topicmodel:
+    build:
+      context: ~/TEDTopicExtraction/app/
+      dockerfile: deployment/dev/Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ~/TEDTopicExtraction/app:/app
+      - ~/TEDTopicExtraction/models:/app/models
+      - ~/TEDTopicExtraction/data:/app/data
+    restart: always

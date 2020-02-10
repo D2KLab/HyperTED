@@ -134,7 +134,8 @@
                                         "wikimeta": "Wikimeta",
                                         "yahoo": "Yahoo!",
                                         "zemanta": "Zemanta",
-                                        "combined": "NERD"
+                                        "combined": "NERD",
+                                        "topicmodel": "Topic Model"
                                     }
 
                                     for (var k in exts){
@@ -147,6 +148,40 @@
                         </div>
                         <div class="nerdForm nerdBtn">
                             <button type="submit" class="btn btn-danger btn-block">Nerdify</button>
+                        </div>
+
+                    </div>
+                </form>
+
+                <form method="get" action="/HyperTED/video/<%= uuid %>" data-action="/HyperTED/topicmodel"
+                    class="topicModel">
+                    <input type="hidden" name="uuid" value="<%= uuid %>"/>
+
+                    <div class="topicModelFormContent clearfix">
+                        <p>choose your topic model</p>
+
+                        <div class="topicModelForm topicModelSelect">
+                            <select class="form-control" name="modelname">
+                                <%
+                                    var sel = "";
+
+                                    var exts = {
+                                        "lda": "LDA",
+                                        "lftm": "LFTM",
+                                        "tfidf": "TFIDF",
+                                        "gsdmm": "GSDMM",
+                                    }
+
+                                    for (var k in exts){
+                                        if (exts.hasOwnProperty(k)) {
+                                          var s = k == sel ? " selected" : "";
+                                    %>
+                                    <option value="<%= k %>"<%= s %>><%= exts[k] %></option>
+                                    <% }} %>
+                            </select>
+                        </div>
+                        <div class="topicModelForm topicModelBtn">
+                            <button type="submit" class="btn btn-danger btn-block">Extract Topics</button>
                         </div>
 
                     </div>

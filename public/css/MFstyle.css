@@ -1545,6 +1545,47 @@ p span.entity.nesting:hover span {
     }
 }
 
+.topicModelFormContent {
+    width: 100%;
+    padding-top: 10px;
+}
+
+.topicModelFormContent p {
+    text-align: left;
+}
+
+.topicModelFormContent .topicModelForm {
+    float: left;
+}
+
+.topicModelFormContent .topicModelForm.topicModelSelect {
+    width: 100%;
+    margin-left: 1%;
+}
+
+.topicModelFormContent .topicModelForm.topicModelSelect .topicModelLabel {
+    font-weight: 200;
+}
+
+@media (min-width: 400px) {
+    .topicModelFormContent .topicModelForm.topicModelSelect {
+        width: 25%;
+    }
+}
+
+.topicModelFormContent .topicModelForm.topicModelBtn {
+    padding-top: 5px;
+    width: 100%;
+}
+
+@media (min-width: 400px) {
+    .topicModelFormContent .topicModelForm.topicModelBtn {
+        width: 55%;
+        padding-left: 5%;
+        padding-top: 0;
+    }
+}
+
 .errorcode {
     font-family: Arial Black, Arial, Verdana, sans-serif;
     font-weight: bold;

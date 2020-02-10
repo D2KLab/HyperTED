@@ -14,6 +14,11 @@ import courseSuggestion from './course_suggestion';
 import errorMsg from './error_msg';
 import config from '../config.json';
 
+import topic from './topic'
+
+const NodeCache = require('node-cache');
+const cache = new NodeCache();
+
 console.info(config);
 
 const LOG_TAG = '[VIDEO.JS]: ';
@@ -502,6 +507,8 @@ function runNerdify(req, res) {
   db.getVideoFromUuid(uuid, true)
     .then((video) => {
       if (!video) throw new Error('no video in the DB');
+
+      console.log(ext);
 
       if (video.entities && containsExtractor(video.entities, ext)) {
         // we have already enriched with this extractor
@@ -1163,6 +1170,128 @@ function topicSearch(req, res) {
     });
 }
 
+function topicModel(req, res) {
+  const uuid = req.query.uuid;
+  const modelname = req.query.modelname;
+  const chapter_id = req.query.chapter;
+
+  console.log('\n\nChapter ',chapter_id,'\n\n');
+
+  
+
+  // console.log(modelname);
+  // console.log(uuid);
+  if(!cache.has(uuid)){
+    db.getVideoFromUuid(uuid, true)
+      .then((video) => {
+        if (!video) throw new Error('no video in the DB');
+
+        var chapter = []
+
+        var talk_sub = [];
+        let no_caption = Object.keys(video['jsonSub']).length;
+
+        chapter.push(video['jsonSub']['0']['caption']['content']);
+
+        for (let id = 1; id < no_caption - 2; id++){
+          let prev = id - 1;
+          if (video['jsonSub'][id.toString()]['caption']['startOfParagraph'] && !video['jsonSub'][prev.toString()]['caption']['startOfParagraph']){
+              talk_sub.push(chapter.join(' '));
+              chapter = [];
+              chapter.push(video['jsonSub'][id.toString()]['caption']['content']);
+            }
+          else{
+              chapter.push(video['jsonSub'][id.toString()]['caption']['content']);
+            }
+        }
+        
+        chapter.push(video['jsonSub'][(no_caption - 2).toString()]['caption']['content']);
+        talk_sub.push(chapter.join(' '));
+
+
+        console.log("SUBS NOT FOUND IN CACHE.");
+        cache.set(uuid, talk_sub, 500);
+
+          return topic(talk_sub[chapter_id-1], modelname)
+            .then((words) => {
+              console.log(words);
+              res.json({result: words});
+              return;
+            }).catch((message) => {
+              console.log(message);
+              res.status(400).json({ error: 'Error in topic modeling.' });
+            })
+
+        // Promise.mapSeries(talk_sub, function(text, index, arrayLength) {
+        //     // The iteration will be performed sequentially, awaiting for any
+        //     // promises in the process.
+        //     // console.log(text);
+        //     return topic(text, modelname)
+        //     .then((words) => {
+        //       // console.log('\n\n\n')
+        //       console.log("Chapter ",index)
+        //       // console.log(words);
+        //       // console.log('\n\n\n');
+        //       return words;
+        //     }).catch((message) => {
+        //       console.log(message)
+        //       return [];
+        //     });
+        // }).then(function(result) {
+        //     // This will run after the last step is done
+        //     // console.log("Done!")
+        //     // console.log(result);
+        //     res.json({result: result});
+        // }).catch(function(rejection) {
+        //     console.log("Catch: " + rejection);
+        // });;
+          
+  //         res.json({result: [
+  //   [ 'human', 'feel', 'love', 'story', 'experience' ],
+  //   [ 'war', 'government', 'political', 'country', 'law' ],
+  //   [ 'money', 'billion', 'dollar', 'market', 'company' ],
+  //   [ 'sense', 'something', 'feel', 'understand', 'life' ],
+  //   [ 'work', 'need', 'technology', 'idea', 'can' ],
+  //   [ 'brain', 'system', 'sound', 'can', 'device' ],
+  //   [ 'war', 'government', 'political', 'country', 'law' ],
+  //   [ 'book', 'god', 'something', 'great', 'word' ],
+  //   [ 'money', 'billion', 'dollar', 'market', 'company' ],
+  //   [ 'work', 'need', 'technology', 'idea', 'can' ],
+  //   [ 'work', 'need', 'technology', 'idea', 'can' ],
+  //   [ 'work', 'need', 'technology', 'idea', 'can' ],
+  //   [ 'war', 'government', 'political', 'country', 'law' ],
+  //   [ 'sense', 'something', 'feel', 'understand', 'life' ],
+  //   [ 'war', 'government', 'political', 'country', 'law' ],
+  //   [ 'something', 'different', 'say', 'number', 'change' ],
+  //   [ 'percent', 'country', 'africa', 'million', 'population' ],
+  //   [ 'money', 'billion', 'dollar', 'market', 'company' ],
+  //   [ 'money', 'billion', 'dollar', 'market', 'company' ],
+  //   [ 'money', 'billion', 'dollar', 'market', 'company' ],
+  //   [ 'look', 'made', 'good', 'show', 'picture' ],
+  //   [ 'money', 'billion', 'dollar', 'market', 'company' ],
+  //   [ 'book', 'god', 'something', 'great', 'word' ]
+  // ]});
+
+      }).catch((e) => {
+        console.error(e);
+        res.status(400).json({ error: 'Error in topic modeling.' });
+      });
+    }else{
+      console.log("SUBS FOUND IN CACHE.");
+      let talk_sub = cache.get(uuid);
+      return topic(talk_sub[chapter_id-1], modelname)
+            .then((words) => {
+              console.log(words);
+              res.json({result: words});
+              return;
+            }).catch((message) => {
+              console.log(message);
+              res.status(400).json({ error: 'Error in topic modeling.' });
+            })
+
+    }
+}
+
 export default {
   view,
   search,
@@ -1173,4 +1302,5 @@ export default {
   runHotspot,
   getSuggestedCourses,
   topicSearch,
+  topicModel,
 };

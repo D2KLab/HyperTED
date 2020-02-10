@@ -1,4 +1,5 @@
 {
  "mongo" : "hyperted_mongo:27017/hyperted",
- "elastic" : "http://hyperted_elasticsearch:9200"
+ "elastic" : "http://hyperted_elasticsearch:9200",
+ "topicmodel" : "http://hyperted_topicmodel:5000/api/"
 }

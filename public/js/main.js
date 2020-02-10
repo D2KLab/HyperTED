@@ -750,3 +750,118 @@ function saveInLocalStorage(key, value) {
     }
   }
 }
+
+function displayTopics(chapterTopics, chapter) {
+    $('.subChapGroup[data-chapter='+chapter.toString()+'] > .chap-title').text('chapter'+ chapter.toString());
+    if (chapterTopics['result'][4])
+      $('.subChapGroup[data-chapter='+chapter.toString()+'] > .chap-title').prepend("<span class='entity ' style='font-size:15px'>" + chapterTopics['result'][4] + "</span> | ").hide().fadeIn('slow');
+    if (chapterTopics['result'][3])
+      $('.subChapGroup[data-chapter='+chapter.toString()+'] > .chap-title').prepend("<span class='entity person' style='font-size:15px'>" + chapterTopics['result'][3] + "</span> | ").hide().fadeIn('slow');
+    if (chapterTopics['result'][2])
+      $('.subChapGroup[data-chapter='+chapter.toString()+'] > .chap-title').prepend("<span class='entity organization' style='font-size:15px'>" + chapterTopics['result'][2] + "</span> | ").hide().fadeIn('slow');
+    if (chapterTopics['result'][1])
+      $('.subChapGroup[data-chapter='+chapter.toString()+'] > .chap-title').prepend("<span class='entity location' style='font-size:15px'>" + chapterTopics['result'][1] + "</span> | ").hide().fadeIn('slow');
+    if (chapterTopics['result'][0])
+    $('.subChapGroup[data-chapter='+chapter.toString()+'] > .chap-title').prepend("<span class='entity thing' style='font-size:15px'>" + chapterTopics['result'][0] + "</span> | ").hide().fadeIn('slow');
+
+}
+
+// Nerdify form become an ajax form
+  const $topicModelForm = $('form.topicModel');
+  const ajaxAction = $topicModelForm.data('action');
+
+  $topicModelForm.attr('action', ajaxAction).submit((evt) => {
+    evt.preventDefault();
+    const $submitButton = $('button[type="submit"]', $topicModelForm);
+    $submitButton.width($submitButton.width()).prop('disabled', true).html('<img src="/HyperTED/img/ajax-loader-greyRed.gif"><img src="/HyperTED/img/ajax-loader-greyRed.gif"><img src="/HyperTED/img/ajax-loader-greyRed.gif">');
+
+    const modelName = $('.topicModelSelect select', $topicModelForm).val();
+
+    // if entities are in LocalStorage, get them and go on
+    // const entitiesLS = getFromLocalStorage(videokey + extractor);
+    // if (entitiesLS) {
+    //   $submitButton.prop('disabled', false).html('Nerdify');
+    //   setLocation('enriched', extractor);
+    //   onEntitiesToShow(entitiesLS);
+    //   showTEDSuggestedChaps();
+    //   return false;
+    // }
+
+    // var xmlHttp = new XMLHttpRequest();
+    // xmlHttp.onreadystatechange = function() { 
+    //   if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+    //     alert(xmlHttp.responseText);
+    //   }
+    // xmlHttp.open("GET", 'http://tedtm:5000/api/' + modelName + '/topics', true); // true for asynchronous 
+    // xmlHttp.send(null);
+
+    const numChapters = parseInt($('.subChapGroup').last().attr('data-chapter'));
+    const uuid = $('.topicModel input[name="uuid"]').val();
+
+    function makeCall(chapter) {
+       // we're done - don't return a chained promise
+       if (chapter > numChapters){
+          $submitButton.prop('disabled', false).html('Extract Topics');
+         return;
+       }
+
+       return $.ajax({
+            url: '/HyperTED/topicmodel',
+            type: "get",
+            data: { 
+              uuid: uuid, 
+              modelname: modelName, 
+              chapter: chapter
+            },
+            success: function(response) {
+              if(!response.error){
+                displayTopics(response, chapter);
+                return;
+              }else{
+                $submitButton.prop('disabled', false).html('Extract Topics');
+                const alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
+                alert.appendTo($topicModelForm).alert();
+                console.log(response);
+                return;
+                }
+              
+            },
+            error: function(xhr) {
+              console.error(xhr);
+              $submitButton.prop('disabled', false).html('Extract Topics');
+              const alert = $('<div class="alert alert-danger fade in">').text('Something went wrong. Try again later');
+              alert.appendTo($topicModelForm).alert();
+              return
+            }
+          }).then(function () {
+          // return the next promise, or not if done
+          return makeCall(chapter + 1);
+       }).catch( function(){
+          return;
+       });
+     }
+
+    var promiseResolvedAtEnd = makeCall(1);
+
+
+    // $topicModelForm.ajaxSubmit({
+    //   success(data) {
+    //     try {
+    //       if (data.error) {
+    //         console.log(data);
+    //         return;
+    //       }
+    //     } catch (e) {
+    //       console.error(e);
+    //       // DO NOTHING
+    //     }
+
+    //     console.log(data);
+    //     displayTopics(data);
+    //     $submitButton.prop('disabled', false).html('Extract Topics');
+    //   },
+    //   error(e) {
+    //     console.error(e);
+    //   },
+    // });
+  });

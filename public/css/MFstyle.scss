@@ -1196,6 +1196,38 @@ p {
   }
 }
 
+.topicModelFormContent {
+  width: 100%;
+  padding-top: 10px;
+  p {
+    text-align: left;
+  }
+  .topicModelForm {
+    float: left;
+    &.topicModelSelect {
+      width: 100%;
+      margin-left: 1%;
+      .topicModelLabel {
+        font-weight: 200;
+      }
+      @media(min-width: 400px) {
+        width: 25%;
+      }
+    }
+    &.topicModelBtn {
+
+      padding-top: 5px;
+      width: 100%;
+      @media(min-width: 400px) {
+        width: 55%;
+        padding-left: 5%;
+        padding-top: 0;
+
+      }
+    }
+  }
+}
+
 .errorcode {
   font: {
     family: Arial Black, Arial, Verdana, sans-serif;

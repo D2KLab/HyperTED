@@ -67,6 +67,14 @@ services:
       - elasticsearch
       - mongo
 
+  topicmodel:
+    build:
+      context: ~/TEDTopicExtraction/
+      dockerfile: app/deployment/prod/Dockerfile
+    ports:
+      - "5000:5000"
+    restart: always
+
 networks:
   default:
       driver: bridge
