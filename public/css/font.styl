@@ -1,0 +1,16 @@
+// main: MFstyle.styl
+
+font-face(name, file, weight = normal, style = normal)
+  $filepath = "fonts/" + name + "/" + file;
+  @font-face
+    font-family name
+    src url($filepath + ".eot");
+    src url($filepath + ".eot?#iefix") format('embedded-opentype'), url($filepath + ".woff") format('woff'), url($filepath + ".ttf") format('truetype'), url($filepath + ".svg#" + $style-name + "") format('svg');
+    font-weight weight
+    font-style style
+
+
+font-face(CaviarDreams, CaviarDreams-webfont);
+font-face(CaviarDreams, Caviar_Dreams_Bold-webfont, bold);
+font-face(CaviarDreams, CaviarDreams_Italic-webfont, normal, italic);
+font-face(CaviarDreams, CaviarDreams_BoldItalic-webfont, bold, italic);

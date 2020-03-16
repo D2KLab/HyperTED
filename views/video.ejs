@@ -17,11 +17,6 @@
 <section id="player-sect">
     <div id="player-container" class="clearfix">
         <div id="video"></div>
-        <% if (locals.timedtext) { %>
-        <div id="hotspots-cont">
-            <% include partials/hotspots.ejs %>
-        </div>
-        <% } %>
     </div>
 
     <% if (locals.metadata && metadata.title) { %>
@@ -134,8 +129,7 @@
                                         "wikimeta": "Wikimeta",
                                         "yahoo": "Yahoo!",
                                         "zemanta": "Zemanta",
-                                        "combined": "NERD",
-                                        "topicmodel": "Topic Model"
+                                        "combined": "NERD"
                                     }
 
                                     for (var k in exts){
@@ -200,9 +194,6 @@
 
             <% if(locals.subtitles) { %>
             <div class="col-md-5 col-lg-5">
-                <a id="recommend" class="btn btn-danger btn-block recommend_btn">
-                    <h4>RECOMMEND RELATED </br>FRAGMENTS AND COURSES</h4></a>
-
                 <div class="see-also">
                     <div class="container-fluid">
                         <div class="row">
@@ -237,7 +228,7 @@
 
 
                 </div>
-                <div id="suggested-courses"></div>
+                <!-- <div id="suggested-courses"></div> -->
             </div>
             <% } %>
         </div>

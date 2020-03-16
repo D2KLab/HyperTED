@@ -24,7 +24,7 @@ app.get(`${basepath}metadata/:uuid`, video.ajaxGetMetadata);
 app.get(`${basepath}suggestmf/:uuid`, video.ajaxSuggestMF);
 app.get(`${basepath}builddb`, video.buildDb);
 app.get(`${basepath}topicsearch`, video.topicSearch);
-app.get(`${basepath}topicmodel`, video.topicModel)
+app.get(`${basepath}topicmodel`, video.topicModel);
 
 app.get('/mediafragmentplayer', (_req, res) => {
   res.render('welcome.ejs');
@@ -36,7 +36,7 @@ app.get(`${basepath}*`, (_req, res) => {
   res.render('error.ejs', errorMsg(404));
 });
 
-app.use((err, _req, res) => {
+app.use((err, _req, res, next) => { // eslint-disable-line no-unused-vars
   console.error('ERROR', err);
   res.status(err.status || 500);
   res.render('error.ejs', errorMsg(500));

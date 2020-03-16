@@ -1,0 +1,837 @@
+// out: MFstyle.css, sourcemap: true, compress: false, libs: nib
+@import "nib";
+
+@import "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"
+@import 'font'
+@import 'video_player'
+@import 'jquery.qtip.min.css'
+/* colors */
+
+$light_gray = #f4f4f4
+$medium_gray = #aaaaaa
+$dark_gray = #5d5d5d
+$ted_red = #fe2a05
+$dark_red = #b11200
+
+.clearfix
+  &:before,
+  &:after
+    content: ""
+    display: table
+  &:after
+    clear: both
+h1, h2, h3, h4, h5, h6, .navbar-brand
+  font-family CaviarDreams, Helvetica, sans-serif
+ul
+  padding: 0
+  list-style: none
+html, body
+  background: $light_gray
+  height: 100%
+  margin: 0
+  padding: 0
+.home_header
+  background: white
+  box-shadow 0 1px 8px -2px $dark_gray
+  margin: 0 0 30px
+  height: 300px
+  max-height: 35%
+  min-height: 120px
+  width: 100%
+  @media screen and (max-width: 767px)
+    max-height: 150px
+  position: relative
+  .HTlogo
+    @media (min-width: 768px)
+      position: absolute
+    bottom: 0
+    text-align: center
+    padding-bottom: 30px
+    display: block
+    width: 100%
+    .top-brand
+      margin: auto
+      display: inline-block
+  .logos
+    text-align: center
+    .inner
+      padding: 10px
+      margin-bottom: 10px
+    p
+      font-family: CaviarDreams, Helvetica, sans-serif
+      text-align: center
+      display: inline-block
+      margin: 0 20px 0 0
+    a
+      display: inline-block
+      max-height: 30px
+      margin: 0 10px
+      img
+        max-height: 100%
+    a, p
+      vertical-align: middle
+    @media screen and (min-width: 767px)
+      text-align: right
+      .inner
+        display: inline-block
+        border-bottom: 2px solid $dark_red
+        margin-bottom: 20 pxsss
+      a
+        max-height: 50px
+.home_footer, .video_footer
+  width: 100%
+  .foo
+    text-align: center
+    hr
+      margin: -6px 0 0 0
+    .eurecomLogo, .mediamixerLogo, .linkedtvLogo
+      display: inline-block
+      img
+        //        max-height: 74%;
+        //        width: auto;
+        padding-right: 20px
+    .logos
+      //      float: left;
+      img
+        padding: 4px 20px 4px 0
+        height: 55px
+        width: auto
+.example_link
+  &:hover
+    text-decoration: underline
+    color: $dark_red
+.page_cont
+  //  min-height: 100%;
+  position: relative
+.form-switch-cont
+  text-align: center
+  margin-bottom: 40px
+.home_cont
+  font-size: 0.9em
+  padding-bottom: 20px
+  margin: auto
+  form label
+    color: $medium_gray
+    font-weight: 100
+    font-size: 1.2em
+  .input-lg
+    font-size: 1em
+  .suggesting
+    font-size: 0.8em
+  > div
+    border-right: 1px dotted $medium_gray
+    @media screen and (max-width: 991px)
+      border-right: none
+      border-bottom: 1px dotted $medium_gray
+      padding-bottom: 30px
+    &:last-child
+      border: none
+  h3
+    text-align: center
+    margin-bottom: 20px
+#basic-form
+  max-width: 100%
+  button
+    margin-top: 1.3em
+  > *
+    display: block
+.video_footer
+  margin-top: 50px
+  .eurecomLogo, .mediamixerLogo, .linkedtvLogo
+    img
+      padding: 4px 0
+      height: 55px
+      width: auto
+$brandMarkPadding = 10px
+$navbarTransitionTime = 100ms
+.navbar
+  background: #fff
+  margin-bottom: 0
+  position: fixed
+  z-index: 105
+  width: 100%
+  box-shadow 0 1px 8px -2px $dark_gray
+  border-radius 0
+  transition height $navbarTransitionTime
+  @media (min-width: 768px)
+    height: 96px
+    .navbar-brand
+      position: relative
+      height: 96px
+      -webkit-box-sizing: border-box
+      -moz-box-sizing: border-box
+      box-sizing: border-box
+      .top-brand
+        img
+          @media (min-width: 320px)
+            padding-bottom: 8px
+            height: auto
+            width: auto
+    .form-group
+      padding-top: 23px
+      max-width: 300px
+      transition padding $navbarTransitionTime
+  .navbar-brand
+    top: -7px
+    height: 40px
+  .top-brand
+    img
+      height: 30px
+    .logo-text
+      width: 54px
+    .left-mark, .right-mark
+      width: 31px
+  .form-group
+    padding-top: 0
+  &.compact
+    @media (min-width: 768px)
+      height: 40px
+    .navbar-brand
+      top: -7px
+      height: 40px
+    .top-brand
+      img
+        height: auto
+      .logo-text
+        width: 54px
+      .left-mark, .right-mark
+        width: 31px
+    .form-group
+      padding-top: 0
+  &.navbar-placeholder
+    height: 96px
+    position: static
+    background: #000000
+.top-brand
+  img
+    height: 66px
+    display: inline-block
+    transition all $navbarTransitionTime
+  .logo-text
+    width: 119px
+  &.long
+    .logo-text
+      width: auto
+  .left-mark, .right-mark
+    width: 56px
+    transition padding, 100ms
+  .left-mark
+    padding-left: $brandMarkPadding
+  .right-mark
+    padding-right: $brandMarkPadding
+  &:hover
+    .left-mark
+      padding-left: 0
+      padding-right: $brandMarkPadding
+    .right-mark
+      padding-left: $brandMarkPadding
+      padding-right: 0
+.nerdificable
+  box-shadow 0 1px 8px -2px $dark_gray
+  background: #fff
+  max-width: 1200px
+  margin: 80px auto auto auto
+  padding-top: 50px
+  padding-bottom: 50px
+  #playlist-sect
+    margin: 10px
+  .playlist-holder
+    padding: 10px
+    .topic_sugg
+      margin-left: 20px
+  #entity-sect
+    margin: 10px
+    display: none
+    .entity-content
+      line-height: 200%
+      padding: 0 10px
+      h3.title
+        display: block
+      div
+        margin-top: 1.5em
+        &:first-of-type
+          margin-top: 2em
+        .entityType
+          .entTypeText
+            margin: 0
+            color: $dark_red
+            @media (max-width: 768px)
+              text-align: center
+        .entityList
+          border-left: 1px $dark_red solid
+          @media (max-width: 768px)
+            border-left: 0
+          .displayEntity
+            @extend .clearfix
+            text-align: center
+            li
+              display: inline-block
+.see-also
+  .loading, .no_ent
+    font-style: italic
+    text-align: center
+  .no_ent
+    display: none
+    color: $dark_red
+.invite
+  font-style: italic
+  font-size: 17px
+  text-align: center
+  display: none
+#suggested-courses
+  margin-top: 30px
+  display: none
+  .loading
+    font-style: italic
+    text-align: center
+  .course
+    img
+      max-width: 70px
+      max-height: auto
+    h4
+      width: 100%
+      margin: 10px 0
+      a.name
+        color: $dark_red
+        width: 80%
+        display: inline-block
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+.red_rule
+  background-color: $dark_red
+  height: 5px
+  margin-left: 0
+  text-align: left
+h1.title
+  @media (max-width: 320px)
+    font-size: 200%
+    margin: 0
+  @media (max-width: 240px)
+    font-size: 150%
+    margin: 0
+#player-sect
+  background: #000000
+  width: 100%
+  position: relative
+  .info-on-player
+    width: 100%
+    position: absolute
+    left: 0
+    top: 0
+    overflow: visible
+    .info-sx, .info-dx
+      position: relative
+      float: left
+      z-index: 2
+    .info-sx
+      width: 48%
+      .title
+        margin: 30px
+        color: #fff
+        font-weight: bold
+        @media (max-width: 767px)
+          display: none
+    .info-dx
+      idth: 8%
+      height: 100%
+      margin-top: 14%
+      margin-left: 36%
+    .stat
+      margin-left: 30px
+      width: 100%
+      overflow: visible
+      label.key
+        color: $ted_red
+      .value
+        color: $light_gray
+      .value, label.key
+        display: inline-block
+      @media (max-width: 767px)
+        display: none
+  #player-container
+    min-height: 20%
+    overflow: hidden
+    #video
+      width: 100%
+      min-height: 360px
+      .mejs-inner
+        cursor: pointer
+      @media (min-width: 768px)
+        .mejs-container
+          position: static
+          margin: auto
+          width: 100%
+          height: auto
+    #hotspots-cont
+      padding-bottom: 15px
+      form, .hsProgress
+        text-align: center
+        .btn-hotspot
+          text-align: center
+          background: #000000
+          border: 1px solid $light_gray
+          color: $light_gray
+          outline: 0
+          opacity: 1
+          height: 34px
+          border-radius 10px
+          transition width, 500ms
+          &:hover, &:active
+            background: $dark_red
+          p
+            display: inline-block
+            opacity: 0
+            transition all, 500ms
+      .hscont
+        margin-left: 65px
+        margin-right: 65px
+        @media (max-width: 768px)
+          width: 508px
+          margin-right: 0
+        .pin
+          border-radius: 0 0 10px 10px;
+          text-align: center
+          cursor: pointer
+          float: left
+          display: none
+          border-bottom: 1px solid $light_gray
+          position: relative
+          top: -10px
+          z-index: 101
+          min-height: 26px
+          img
+            position: absolute
+            left: -10px
+.qtipEnt, .qtipTitle
+  display: none
+.qtip-light
+  padding-bottom: 15px
+  .qtip-titlebar
+    margin-bottom: 15px
+    padding: 8px 15px
+    background: $dark_red
+    color: $light_gray
+    text-align: center
+    .glyphicon
+      color: $light_gray
+      font-size: 0.9em
+  .qtip-content
+    text-align: center
+    max-width: 250px
+.topic-cont
+  .topic
+    font-weight: 700
+    display: block
+    a
+      color: $darker_gray
+.btn-danger
+  background: $dark_red
+  border-radius 10px
+.chap-label
+  margin-bottom: 10px
+  color: $medium_gray
+  min-height: 20px
+  text-align: center
+  span
+    display: inline-block
+    margin: 0 3px
+    &:not(.glyphicon)
+      font-family: CaviarDreams, Helvetica, sans-serif
+      font-size: 2.6em
+  .intro
+    display: none
+  @media (max-width: 768px)
+    text-align: center
+    min-height: 10px
+.chap-line
+  min-height: 35px
+  margin: 20px 50px 20px 50px
+  text-align: center
+  @media (max-width: 768px)
+    width: 508px
+    margin-right: 0
+  .chap-link
+    transition background-color 300ms
+    transition width 300ms
+    position: relative
+    height: 15px
+    background-color: $dark_red
+    border-left: 2px solid $light_gray
+    &:nth-child(odd)
+      background-color: $ted_red
+    float: left
+    text-align: center
+    .chapNum-cont
+      overflow: hidden
+      .chap-num
+        border-radius 10px
+        background-color: #ffffff
+        display: none
+        padding: 4px
+        color: $dark_red
+        font-weight: 700
+        @media (max-width: 768px)
+          display: none
+    .chap-timing
+      position: absolute
+      min-height: 32px
+      height: 100%
+      bottom: 0
+      width: 0
+      margin-left: 50%
+      background-color: #f4f4f4
+      opacity: 0.8
+      color: #f4f4f4
+      overflow: hidden
+      -webkit-transition: width 200ms, margin 200ms, color 1s
+      -moz-transition: width 200ms, margin 200ms, color 1s
+      -ms-transition: width 200ms, margin 200ms, color 1s
+      transition: width 200ms, margin 200ms, color 1s
+      h5
+        visibility: hidden
+        .glyphicon-chevron-left, .glyphicon-chevron-right
+          font-size: 1em
+    &.selected-chap
+      .chap-timing
+        z-index: 1
+    &:hover
+      .chap-timing
+        z-index: 2
+        box-shadow 0 2px 8px 0 $dark_gray
+    &:hover, &.selected-chap
+      background-color: rgba(223, 175, 170, 0.82)
+      .chap-num
+        opacity: 0.1
+      .chap-timing
+        cursor: pointer
+        width: 100%
+        color: $dark_red
+        margin-left: 0
+        min-width: 175px
+        h5
+          visibility: visible
+        @media (max-width: 767px)
+          bottom: 30px
+          width: 175px
+          opacity: 1
+      @media (max-width: 767px)
+        background-color: #dfafaa
+.title, .noCont
+  color: $medium_gray
+  z-index: 5
+  position: relative
+.title
+  padding-bottom: 0
+  margin: 0px 6px 15px -10px
+  display: inline-block
+.noCont
+  padding-bottom: 200px
+  .glyphicon-chevron-left, .glyphicon-chevron-right
+    font-size: 1em
+.glyphicon-chevron-left, .glyphicon-chevron-right
+  color: $darker_gray
+  display: inline-block
+  font-size: 2em
+#video
+  position: relative
+  z-index: 2
+div.chapterscontent
+  display: none
+  opacity: 0
+  transition opacity 200ms
+  &.visible
+    opacity: 1
+.video-list
+  list-style: none
+  background: #fff
+  padding: 0 10px
+  .video-link
+    padding: 10px
+    border-top: 1px solid $medium_gray
+    min-height: 135px
+    &:first-child
+      border-top: none
+    &.suggTopic
+      max-width: 290px
+      border-top: none
+      border-left: 1px
+      display: inline-block
+      float: left
+    h4.playlist_title
+      white-space: nowrap
+      overflow: hidden
+      text-overflow: ellipsis
+      &.topic_title
+        max-width: 260px
+      a
+        color: $darker_gray
+        font-style: italic
+    .loader
+      height: 16px
+      width: 16px
+      margin: 30px auto
+      display: block
+    .thumb
+      height: 70px
+      width: 93px
+      float: left
+      margin-right: 12px
+    .content
+      transition opacity 200ms
+      &.visible
+        opacity: 1
+    ul.frag-list
+      li.frag-link
+        a:before
+          content: "\e072"
+          font-family: 'Glyphicons Halflings'
+          font-size: 0.6em
+          padding: 0 3px
+          -webkit-font-smoothing: antialiased
+          -moz-osx-font-smoothing: grayscale
+        a
+          color: $dark_red
+span.wiki
+  a
+    color: #fff
+#video-info-chapters
+  box-shadow 0 1px 8px -2px $dark_gray
+  display: none
+  background: #fff
+  width: 100%
+  //max-height: 265px;
+  overflow: hidden
+  text-overflow: ellipsis
+  @media (max-width: 860px)
+    max-height: 350px
+  .play-video-info
+    padding: 20px
+    margin-top: 0
+    border-top: 1px solid $light_gray
+    .left
+      float: left
+      width: 48%
+      display: inline-block
+      h3
+        font-weight: 700
+      @media (max-width: 860px)
+        width: 100%
+        text-align: center
+    .right
+      max-height: 130px
+      float: right
+      display: inline-block
+      width: 50%
+      border-left: 1px solid $dark_red
+      padding-left: 2%
+      overflow-y: auto
+      @media (max-width: 860px)
+        width: 100%
+        max-height: 90px
+        border-top: 1px solid $dark_red
+        border-left: 0
+.rdf-link
+  float: left
+  margin-right: 5px
+div.descr-cont
+  line-height: 200%
+  .descr
+    margin-top: 10px
+    margin-bottom: 20px
+    max-height: 13em
+    overflow: hidden
+    padding-bottom: 10px
+    border-bottom: 1px solid $light_gray
+    box-sizing: content-box
+    white-space: pre-wrap
+    transition max-height 1000ms
+    box-shadow 0 7px 9px -5px $medium_gray
+    &.full
+      max-height: 100em
+p
+  span.entity.nesting
+    &:not(:hover)
+      color: #000000
+      background: linear-gradient(white, #cccccc)
+      border: solid 1px black
+      .entity
+        color: #000000
+        background-color: transparent
+    span
+      display: inline-block
+      transition transform 0.5s
+    &:hover span
+      box-shadow 0, 1px, 8px, -2px, $dark_gray
+.extractor, .topic_sugg
+  font-weight: 700
+.entity
+  border-radius 5px
+  box-sizing: border-box;
+  cursor: pointer
+  padding: 3px
+  color: #ffffff
+  &.list
+    margin-left: 24px
+  &.pinEnt
+    display: inline-block
+    max-width: 80%
+    white-space: nowrap
+    overflow: hidden !important
+    text-overflow: ellipsis
+  &.hotspotEnt
+    line-height: 2em
+    margin-top: 0.5em
+    padding-top: 0
+    padding-bottom: 0
+    display: inline-block
+  a
+    color: #ffffff
+  background-color: #000000
+  &.thing
+    background-color: #15417B
+  &.amount
+    color: #000000
+    a
+      color: #000000
+    background-color: #1EDC3A
+  &.animal
+    background-color: #DD1B4B
+  &.event
+    background-color: #b200ff
+  &.function
+    background-color: #F12606
+  &.location
+    background-color: #F1A02A
+  &.organization
+    color: #000000
+    a
+      color: #000000
+    background-color: #54B9DD
+  &.person
+    color: #000000
+    a
+      color: #000000
+    background-color: #EDF10B
+  &.product
+    background-color: #5B007B
+  &.time
+    color: #000000
+    a
+      color: #000000
+    background-color: #D0F181
+.button-cont
+  text-align: right
+  clear: both
+  margin-bottom: 15px
+#sub-cont
+  clear: both
+.sub-text
+  border: 1px solid $light_gray
+  background-color: $light_gray
+  margin: 5px 0
+  height: 750px
+  position: relative
+  overflow: auto
+  resize: vertical
+  font-weight: 400
+  @media (max-height: 568px)
+    height: 275px
+  p
+    font-size: 0.9em
+    line-height: 1.8em
+    margin: 0
+    padding: 0 10px
+    transition font-weight 100ms
+    cursor: pointer
+    &:hover
+      font-weight: 700
+    &:before
+      content: ""
+      width: 8px
+      display: inline-block
+    &.selected-frag
+      background-color: #ffffff
+    &.now-playing
+      font-style: italic
+      &:before
+        content: '\2022'
+        font-family: "Helvetica Neue", Arial, Helvetica, sans-serif
+        font-size: larger
+        font-weight: 700
+        line-height: 1em
+        color: $dark_red
+  .subChapGroup
+    border-bottom: 1px solid $medium_gray
+    margin-bottom: 5px
+    &:hover
+      font-weight: 700
+    .chap-title
+      text-align: right
+      font-weight: 700
+.nerdFormContent
+  width: 100%
+  padding-top: 10px
+  p
+    text-align: left
+  .nerdForm
+    float: left
+    &.nerdSelect
+      width: 100%
+      margin-left: 1%
+      .nerdLabel
+        font-weight: 200
+      @media (min-width: 400px)
+        width: 25%
+    &.nerdBtn
+      padding-top: 5px
+      width: 100%
+      @media (min-width: 400px)
+        width: 55%
+        padding-left: 5%
+        padding-top: 0
+.topicModelFormContent
+  width: 100%
+  padding-top: 10px
+  p
+    text-align: left
+  .topicModelForm
+    float: left
+    &.topicModelSelect
+      width: 100%
+      margin-left: 1%
+      .topicModelLabel
+        font-weight: 200
+      @media (min-width: 400px)
+        width: 25%
+    &.topicModelBtn
+      padding-top: 5px
+      width: 100%
+      @media (min-width: 400px)
+        width: 55%
+        padding-left: 5%
+        padding-top: 0
+.errorcode
+  font-family: Arial Black, Arial, Verdana, sans-serif
+  font-weight: bold
+  font-size: 5em
+  color: $ted_red
+  vertical-align: middle
+.error_header
+  text-align: center
+.recommend_btn
+  margin: 60px auto
+  width: 50%
+  height: 80px
+  h4
+    margin-top: 15px
+    font-size: 15px
+    @media (min-width: 530px) and (max-width: 990px)
+      font-size: 18px
+
+.topic
+  color #eee
+  background #555
+  display inline-block
+  border-radius 2px
+  padding 0 0.3em

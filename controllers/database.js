@@ -6,21 +6,21 @@ import config from '../config.json';
 const db = monk(config.mongo);
 
 const videos = db.get('videos');
-videos.index('uuid', { unique: true });
-videos.index('locator', { unique: true });
-videos.index('vendor vendor_id', { unique: true });
+videos.createIndex('uuid', { unique: true });
+videos.createIndex('locator', { unique: true });
+videos.createIndex('vendor vendor_id', { unique: true });
 
 const ents = db.get('entities');
-ents.index('uuid');
-ents.index('extractor');
+ents.createIndex('uuid');
+ents.createIndex('extractor');
 
 const hots = db.get('hotspots');
-hots.index('uuid');
-hots.index('uuid startNPT', { unique: true });
+hots.createIndex('uuid');
+hots.createIndex('uuid startNPT', { unique: true });
 
 const chaps = db.get('chapters');
-chaps.index('uuid');
-chaps.index('uuid chapNum', { unique: true });
+chaps.createIndex('uuid');
+chaps.createIndex('uuid chapNum', { unique: true });
 
 function addChapters(uuid, chapters) {
   return Promise.mapSeries(chapters, (c) => {
