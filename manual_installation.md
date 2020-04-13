@@ -5,32 +5,33 @@ Instruction for installing WITHOUT `docker-compose`.
 
 - Start mongo
 
-      docker run -d -p 27019:27017 --restart=unless-stopped  -v /var/docker/HyperTED/database:/database --name hyperted_mongo mongo:3.4 --replSet rs --dbpath /database --httpinterface --rest
+      docker run -d -p 27027:27017 --restart=unless-stopped  -v /home/semantic/hyperted/HyperTED/database:/database --user $(id -u):$(id -g) --name hyperted_mongo mongo:3.4 --replSet rs --dbpath /database --httpinterface --rest
 
       <!-- --configExpand rest -->
 
 
       docker exec -it  hyperted_mongo mongo
 
-        var cfg = {
-              "_id": "rs",
-              "version": 1,
-              "members": [
-                  {
-                      "_id": 0,
-                      "host": "10.0.0.14:27017",
-                      "priority": 1
-                  }
-              ]
-          };
-          rs.initiate(cfg, { force: true });
-          rs.reconfig(cfg, { force: true });
-          db.getMongo().setReadPref('nearest');
-
+```js
+var cfg = {
+      "_id": "rs",
+      "version": 1,
+      "members": [
+          {
+              "_id": 0,
+              "host": "10.0.0.14:27017",
+              "priority": 1
+          }
+      ]
+};
+rs.initiate(cfg, { force: true });
+rs.reconfig(cfg, { force: true });
+db.getMongo().setReadPref('nearest');
+```
 
 - Start elasticsearch
 
-      docker run -d -p 9200:9200 --restart=unless-stopped  -v /var/docker/HyperTED/elasticsearch:/usr/share/elasticsearch/data --name hyperted_elastic elasticsearch:1.7
+      docker run -d -p 9200:9200 --restart=unless-stopped  -v /home/semantic/hyperted/HyperTED/elasticsearch:/usr/share/elasticsearch/data --name hyperted_elastic elasticsearch:1.7
 
 
 - Start mongoconnector
@@ -61,6 +62,7 @@ Instruction for installing WITHOUT `docker-compose`.
       docker network disconnect hyperted hyperted_web
 
 ## Uninstall
+
       docker stop hyperted_web
       docker rm hyperted_web
       docker rmi hyperted/web
@@ -74,5 +76,3 @@ Instruction for installing WITHOUT `docker-compose`.
 
       docker stop hyperted_mongo
       docker rm hyperted_mongo
-
-      docker network remove hyperted

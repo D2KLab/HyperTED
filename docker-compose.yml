@@ -15,8 +15,8 @@ services:
     environment:
       - TZ=Europe/Paris
     expose:
-      - "27017"
-      - "28017"
+      - "27017:27027"
+      - "28017:28027"
     restart: always
     # entrypoint: [ "/usr/bin/mongod", "--dbpath", "/database", "--replSet", "rs", "--httpinterface", "--rest" ]
     volumes:

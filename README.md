@@ -12,6 +12,11 @@ Searching and browsing through fragments of TED Talks.
 
       docker-compose up --build
 
+#### Manual installation
+
+See [dedicated guide](./manual_installation.md)
+
+
 #### Dev Mode
 
 For better developing the web part of the application.

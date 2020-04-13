@@ -15,7 +15,8 @@ services:
     environment:
       - TZ=Europe/Paris
     ports:
-      - "27017:27017"
+      - "27017:27027"
+      - "28017:28027"
     expose:
       - "27017"
       - "28017"
