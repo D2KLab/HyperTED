@@ -1,10 +1,9 @@
 import express from 'express';
 import path from 'path';
-import logger from 'morgan';
+import * as logger from 'morgan';
 import video from './controllers/video';
 import errorMsg from './controllers/error_msg';
 
-const basepath = '/HyperTED/';
 const app = express();
 const DEBUG = false;
 app.set('view options', { layout: false });
@@ -13,26 +12,31 @@ app.set('view engine', 'ejs');
 
 if (DEBUG) app.use(logger('dev'));
 
-app.use(basepath, express.static(path.join(__dirname, 'public')));
+app.use('/', express.static(path.join(__dirname, 'public')));
 
-app.get(`${basepath}nerdify`, video.runNerdify);
-app.get(`${basepath}runhotspot`, video.runHotspot);
-app.get(`${basepath}video/:uuid`, video.view);
-app.get(`${basepath}video?`, video.search);
-app.get(`${basepath}courses?`, video.getSuggestedCourses);
-app.get(`${basepath}metadata/:uuid`, video.ajaxGetMetadata);
-app.get(`${basepath}suggestmf/:uuid`, video.ajaxSuggestMF);
-app.get(`${basepath}builddb`, video.buildDb);
-app.get(`${basepath}topicsearch`, video.topicSearch);
-app.get(`${basepath}topicmodel`, video.topicModel);
+app.get('/nerdify', video.runNerdify);
+app.get('/runhotspot', video.runHotspot);
+app.get('/video/:uuid', video.view);
+app.get('/video?', video.search);
+app.get('/courses?', video.getSuggestedCourses);
+app.get('/metadata/:uuid', video.ajaxGetMetadata);
+app.get('/suggestmf/:uuid', video.ajaxSuggestMF);
+app.get('/builddb', video.buildDb);
+app.get('/topicsearch', video.topicSearch);
+app.get('/topicmodel', (req, res) => {
+  const { uuid, modelname, chapter } = req.query;
+  video.getTopics(uuid, modelname, chapter).then((words) => {
+    res.json({ result: words });
+  }).catch((message) => {
+    console.error(message);
+    res.status(400).json({ error: 'Error in topic modeling.' });
+  });
+});
 
-app.get('/mediafragmentplayer', (_req, res) => {
-  res.render('welcome.ejs');
+app.get('/', (_req, res) => {
+  res.render('index.ejs');
 });
-app.get(basepath, (_req, res) => {
-  res.render('welcome.ejs');
-});
-app.get(`${basepath}*`, (_req, res) => {
+app.get('/*', (_req, res) => {
   res.render('error.ejs', errorMsg(404));
 });
 

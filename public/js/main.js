@@ -35,7 +35,7 @@ function labelTime(time) {
 }
 
 
-function displayEntitiesSub(entityList) {
+function displayEntitiesSub(entityList = []) {
   const $newSubCont = $plainSubCont.clone();
   const $subList = $newSubCont.find('p');
 
@@ -140,7 +140,7 @@ function showTEDSuggestedChaps() {
     const timeFrag = $player.getMFJson().hash.t;
 
     $.ajax({
-      url: `/HyperTED/suggestmf/${video.uuid}`,
+      url: `/suggestmf/${video.uuid}`,
       data: {
         extractor,
         startMF: (timeFrag && timeFrag[0].startNormalized) || 0,
@@ -169,7 +169,7 @@ function showTEDSuggestedChaps() {
           { append: true });
 
         const thisVid = $(`.video-link[data-uuid=${uuid}]`, $suggestedVideoList);
-        const frags = suggVideo.chaps;
+        const frags = suggVideo.chaps || [];
         for (const frag of frags) {
           $('.frag-list', thisVid).loadTemplate($('#fragLi'),
             {
@@ -354,7 +354,7 @@ function displayPins() {
     $('.loading', $suggCourses).show();
 
     $.ajax({
-      url: '/HyperTED/courses',
+      url: '/courses',
       data: {
         uuid: video.uuid,
       },
@@ -453,11 +453,11 @@ function highlightSubLine(time) {
 
 function init() {
   // resize navbar on scroll
-  const $navbar = $('.navbar').not('.navbar-placeholder');
-  const navHeight = $navbar.height();
-  $(window).scroll(() => {
-    $navbar.toggleClass('compact', $(window).scrollTop() > navHeight);
-  });
+  // const $navbar = $('.navbar').not('.navbar-placeholder');
+  // const navHeight = $navbar.height();
+  // $(window).scroll(() => {
+  //   $navbar.toggleClass('compact', $(window).scrollTop() > navHeight);
+  // });
 
   const $subCont = $('#sub-cont');
   const hasVideoSub = $subCont.exists();
@@ -521,7 +521,7 @@ function init() {
   $nerdifyForm.attr('action', ajaxAction).submit((evt) => {
     evt.preventDefault();
     const $submitButton = $('button[type="submit"]', $nerdifyForm);
-    $submitButton.width($submitButton.width()).prop('disabled', true).html('<img src="/HyperTED/img/ajax-loader-greyRed.gif"><img src="/HyperTED/img/ajax-loader-greyRed.gif"><img src="/HyperTED/img/ajax-loader-greyRed.gif">');
+    $submitButton.width($submitButton.width()).prop('disabled', true).html('<img src="/img/ajax-loader-greyRed.gif"><img src="/img/ajax-loader-greyRed.gif"><img src="/img/ajax-loader-greyRed.gif">');
 
     const extractor = $('.nerdSelect select', $nerdifyForm).val();
 
@@ -580,7 +580,7 @@ function init() {
     const errText = 'We can not generate hotspots for this video. This functionality is only available for TED Talks';
     const $form = $(this);
     const $button = $('button', $form);
-    $button.width($button.width()).prop('disabled', true).html('<img src="/HyperTED/img/ajax-loader-white.gif"><img src="/HyperTED/img/ajax-loader-white.gif"><img src="/HyperTED/img/ajax-loader-white.gif">');
+    $button.width($button.width()).prop('disabled', true).html('<img src="/img/ajax-loader-white.gif"><img src="/img/ajax-loader-white.gif"><img src="/img/ajax-loader-white.gif">');
     $(this).ajaxSubmit({
       success(data) {
         let text;
@@ -774,7 +774,7 @@ function extractTopicFor(chapter, uuid, modelname, numChapters) {
   }
 
   $.ajax({
-    url: '/HyperTED/topicmodel',
+    url: '/topicmodel',
     type: 'get',
     data: {
       uuid,
@@ -800,13 +800,12 @@ function extractTopicFor(chapter, uuid, modelname, numChapters) {
 $topicModelForm.attr('action', ajaxAction).submit((evt) => {
   evt.preventDefault();
   const $submitButton = $('button[type="submit"]', $topicModelForm);
-  $submitButton.width($submitButton.width()).prop('disabled', true).html('<img src="/HyperTED/img/ajax-loader-greyRed.gif"><img src="/HyperTED/img/ajax-loader-greyRed.gif"><img src="/HyperTED/img/ajax-loader-greyRed.gif">');
+  $submitButton.width($submitButton.width()).prop('disabled', true).html('<img src="/img/ajax-loader-greyRed.gif"><img src="/img/ajax-loader-greyRed.gif"><img src="/img/ajax-loader-greyRed.gif">');
 
-  const modelName = $('.topicModelSelect select', $topicModelForm).val();
+  const modelName = $('select', $topicModelForm).val();
 
   const numChapters = parseInt($('.subChapGroup').last().attr('data-chapter'));
-  const uuid = $('.topicModel input[name="uuid"]').val();
-
+  const uuid = $('input[name="uuid"]', $topicModelForm).val();
 
   extractTopicFor(1, uuid, modelName, numChapters);
 });

@@ -1,17 +1,19 @@
-// out: MFstyle.css, sourcemap: true, compress: false, libs: nib
+// out: style.css, sourcemap: true, compress: false, libs: nib rupture
 @import "nib";
-
-@import "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"
-@import 'font'
-@import 'video_player'
-@import 'jquery.qtip.min.css'
-/* colors */
 
 $light_gray = #f4f4f4
 $medium_gray = #aaaaaa
 $dark_gray = #5d5d5d
 $ted_red = #fe2a05
 $dark_red = #b11200
+
+@import "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"
+@import 'font'
+@import 'video_player'
+@import 'header'
+@import 'jquery.qtip.min.css'
+/* colors */
+
 
 .clearfix
   &:before,
@@ -20,6 +22,7 @@ $dark_red = #b11200
     display: table
   &:after
     clear: both
+
 h1, h2, h3, h4, h5, h6, .navbar-brand
   font-family CaviarDreams, Helvetica, sans-serif
 ul
@@ -30,6 +33,7 @@ html, body
   height: 100%
   margin: 0
   padding: 0
+
 .home_header
   background: white
   box-shadow 0 1px 8px -2px $dark_gray
@@ -38,15 +42,15 @@ html, body
   max-height: 35%
   min-height: 120px
   width: 100%
-  @media screen and (max-width: 767px)
+  +below(767px)
     max-height: 150px
   position: relative
   .HTlogo
-    @media (min-width: 768px)
+    +above(768px)
       position: absolute
     bottom: 0
     text-align: center
-    padding-bottom: 30px
+    padding: 30px 0
     display: block
     width: 100%
     .top-brand
@@ -70,7 +74,7 @@ html, body
         max-height: 100%
     a, p
       vertical-align: middle
-    @media screen and (min-width: 767px)
+    +above(767px)
       text-align: right
       .inner
         display: inline-block
@@ -78,28 +82,32 @@ html, body
         margin-bottom: 20 pxsss
       a
         max-height: 50px
-.home_footer, .video_footer
+
+
+
+footer
+  margin-top: 1em
   width: 100%
-  .foo
-    text-align: center
-    hr
-      margin: -6px 0 0 0
-    .eurecomLogo, .mediamixerLogo, .linkedtvLogo
-      display: inline-block
-      img
-        //        max-height: 74%;
-        //        width: auto;
-        padding-right: 20px
-    .logos
-      //      float: left;
-      img
-        padding: 4px 20px 4px 0
-        height: 55px
-        width: auto
+  text-align: center
+  border-top: solid 5px $dark_red
+  .logo
+    display: inline-block
+    margin 0.4em
+    padding: .2em
+    img
+      max-height: 55px
+      max-width: 95px
+      width: auto
+
+
 .example_link
+  color inherit
+  cursor pointer
+  font-weight 700
   &:hover
     text-decoration: underline
     color: $dark_red
+
 .page_cont
   //  min-height: 100%;
   position: relative
@@ -120,7 +128,7 @@ html, body
     font-size: 0.8em
   > div
     border-right: 1px dotted $medium_gray
-    @media screen and (max-width: 991px)
+    +below(991px)
       border-right: none
       border-bottom: 1px dotted $medium_gray
       padding-bottom: 30px
@@ -135,73 +143,8 @@ html, body
     margin-top: 1.3em
   > *
     display: block
-.video_footer
-  margin-top: 50px
-  .eurecomLogo, .mediamixerLogo, .linkedtvLogo
-    img
-      padding: 4px 0
-      height: 55px
-      width: auto
 $brandMarkPadding = 10px
-$navbarTransitionTime = 100ms
-.navbar
-  background: #fff
-  margin-bottom: 0
-  position: fixed
-  z-index: 105
-  width: 100%
-  box-shadow 0 1px 8px -2px $dark_gray
-  border-radius 0
-  transition height $navbarTransitionTime
-  @media (min-width: 768px)
-    height: 96px
-    .navbar-brand
-      position: relative
-      height: 96px
-      -webkit-box-sizing: border-box
-      -moz-box-sizing: border-box
-      box-sizing: border-box
-      .top-brand
-        img
-          @media (min-width: 320px)
-            padding-bottom: 8px
-            height: auto
-            width: auto
-    .form-group
-      padding-top: 23px
-      max-width: 300px
-      transition padding $navbarTransitionTime
-  .navbar-brand
-    top: -7px
-    height: 40px
-  .top-brand
-    img
-      height: 30px
-    .logo-text
-      width: 54px
-    .left-mark, .right-mark
-      width: 31px
-  .form-group
-    padding-top: 0
-  &.compact
-    @media (min-width: 768px)
-      height: 40px
-    .navbar-brand
-      top: -7px
-      height: 40px
-    .top-brand
-      img
-        height: auto
-      .logo-text
-        width: 54px
-      .left-mark, .right-mark
-        width: 31px
-    .form-group
-      padding-top: 0
-  &.navbar-placeholder
-    height: 96px
-    position: static
-    background: #000000
+
 .top-brand
   img
     height: 66px
@@ -255,11 +198,11 @@ $navbarTransitionTime = 100ms
           .entTypeText
             margin: 0
             color: $dark_red
-            @media (max-width: 768px)
+            +below(768px)
               text-align: center
         .entityList
           border-left: 1px $dark_red solid
-          @media (max-width: 768px)
+          +below(768px)
             border-left: 0
           .displayEntity
             @extend .clearfix
@@ -304,10 +247,10 @@ $navbarTransitionTime = 100ms
   margin-left: 0
   text-align: left
 h1.title
-  @media (max-width: 320px)
+  +below(320px)
     font-size: 200%
     margin: 0
-  @media (max-width: 240px)
+  +below(240px)
     font-size: 150%
     margin: 0
 #player-sect
@@ -330,7 +273,7 @@ h1.title
         margin: 30px
         color: #fff
         font-weight: bold
-        @media (max-width: 767px)
+        +below(767px)
           display: none
     .info-dx
       idth: 8%
@@ -347,7 +290,7 @@ h1.title
         color: $light_gray
       .value, label.key
         display: inline-block
-      @media (max-width: 767px)
+      +below(767px)
         display: none
   #player-container
     min-height: 20%
@@ -357,7 +300,7 @@ h1.title
       min-height: 360px
       .mejs-inner
         cursor: pointer
-      @media (min-width: 768px)
+      +above(768px)
         .mejs-container
           position: static
           margin: auto
@@ -386,7 +329,7 @@ h1.title
       .hscont
         margin-left: 65px
         margin-right: 65px
-        @media (max-width: 768px)
+        +below(768px)
           width: 508px
           margin-right: 0
         .pin
@@ -441,14 +384,14 @@ h1.title
       font-size: 2.6em
   .intro
     display: none
-  @media (max-width: 768px)
+  +below(768px)
     text-align: center
     min-height: 10px
 .chap-line
   min-height: 35px
   margin: 20px 50px 20px 50px
   text-align: center
-  @media (max-width: 768px)
+  +below(768px)
     width: 508px
     margin-right: 0
   .chap-link
@@ -471,7 +414,7 @@ h1.title
         padding: 4px
         color: $dark_red
         font-weight: 700
-        @media (max-width: 768px)
+        +below(768px)
           display: none
     .chap-timing
       position: absolute
@@ -511,11 +454,11 @@ h1.title
         min-width: 175px
         h5
           visibility: visible
-        @media (max-width: 767px)
+        +below(767px)
           bottom: 30px
           width: 175px
           opacity: 1
-      @media (max-width: 767px)
+      +below(767px)
         background-color: #dfafaa
 .title, .noCont
   color: $medium_gray
@@ -603,7 +546,7 @@ span.wiki
   //max-height: 265px;
   overflow: hidden
   text-overflow: ellipsis
-  @media (max-width: 860px)
+  +below(860px)
     max-height: 350px
   .play-video-info
     padding: 20px
@@ -615,7 +558,7 @@ span.wiki
       display: inline-block
       h3
         font-weight: 700
-      @media (max-width: 860px)
+      +below(860px)
         width: 100%
         text-align: center
     .right
@@ -626,7 +569,7 @@ span.wiki
       border-left: 1px solid $dark_red
       padding-left: 2%
       overflow-y: auto
-      @media (max-width: 860px)
+      +below(860px)
         width: 100%
         max-height: 90px
         border-top: 1px solid $dark_red
@@ -781,12 +724,12 @@ p
       margin-left: 1%
       .nerdLabel
         font-weight: 200
-      @media (min-width: 400px)
+      +above(400px)
         width: 25%
     &.nerdBtn
       padding-top: 5px
       width: 100%
-      @media (min-width: 400px)
+      +above(400px)
         width: 55%
         padding-left: 5%
         padding-top: 0
@@ -802,12 +745,12 @@ p
       margin-left: 1%
       .topicModelLabel
         font-weight: 200
-      @media (min-width: 400px)
+      +above(400px)
         width: 25%
     &.topicModelBtn
       padding-top: 5px
       width: 100%
-      @media (min-width: 400px)
+      +above(400px)
         width: 55%
         padding-left: 5%
         padding-top: 0
@@ -826,7 +769,7 @@ p
   h4
     margin-top: 15px
     font-size: 15px
-    @media (min-width: 530px) and (max-width: 990px)
+    +between(530px,990px)
       font-size: 18px
 
 .topic

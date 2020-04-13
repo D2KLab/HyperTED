@@ -11,10 +11,9 @@ import nerdify from './nerdify';
 import db from './database';
 import ts from './linkedTVconnection';
 import courseSuggestion from './course_suggestion';
+import topic from './topic';
 import errorMsg from './error_msg';
 import config from '../config.json';
-
-import topic from './topic';
 
 const NodeCache = require('node-cache');
 
@@ -812,16 +811,18 @@ function getTedChapters(json, totDuration) {
   const subOffset = json._meta.preroll_offset;
 
   let oldkey = 0;
+  let content = '';
   for (const [key, value] of Object.entries(json)) {
     if (key === '_meta') continue;
     cursub = value.caption;
-
     const isStartOfChap = cursub.startOfParagraph;
     if (isStartOfChap) {
       const subStartTime = cursub.startTime;
       const thisChapStart = (subOffset + subStartTime) / 1000;
       curChap.endNPT = thisChapStart;
+      curChap.content = content;
       chapters.push(curChap);
+      content = '';
 
       if (parseInt(key) === parseInt(oldkey) + 1) {
         chapters.pop();
@@ -835,9 +836,11 @@ function getTedChapters(json, totDuration) {
       }
       oldkey = key;
     }
+    content += ` ${cursub.content}`;
   }
   const lasSubEnd = (subOffset + cursub.startTime + cursub.duration) / 1000;
   curChap.endNPT = totDuration || lasSubEnd;
+  curChap.content = content;
   chapters.push(curChap);
   return chapters;
 }
@@ -1171,51 +1174,20 @@ function topicSearch(req, res) {
     });
 }
 
-function topicModel(req, res) {
-  const { uuid } = req.query;
-  const { modelname } = req.query;
-  const chapterId = req.query.chapter;
 
-  let getSubs;
+async function getTopics(uuid, modelname, chapter) {
+  let subtitles;
   if (cache.has(uuid)) {
-    const data = cache.get(uuid);
-    getSubs = Promise.resolve(data);
+    subtitles = cache.get(uuid);
   } else {
-    getSubs = db.getVideoFromUuid(uuid, true)
-      .then((video) => {
-        if (!video) throw new Error('no video in the DB');
-        let chapter = [];
-        const talkSub = [];
-
-        let prevsub = video.jsonSub['0'];
-        chapter.push(prevsub.caption.content);
-        for (const cursub of Object.values(video.jsonSub)) {
-          if (!cursub.caption) continue;
-          if (cursub.caption.startOfParagraph && !prevsub.caption.startOfParagraph) {
-            // start a new chapter block
-            talkSub.push(chapter.join(' '));
-            chapter = [];
-          }
-
-          chapter.push(cursub.caption.content);
-          prevsub = cursub;
-        }
-        talkSub.push(chapter.join(' '));
-
-        cache.set(uuid, talkSub, 500);
-        return talkSub;
-      });
+    const video = await db.getVideoFromUuid(uuid, true);
+    if (!video) throw new Error('no video in the DB');
+    subtitles = getTedChapters(video.jsonSub);
+    cache.set(uuid, subtitles, 500);
   }
-
-  getSubs
-    .then((talkSub) => topic(talkSub[chapterId - 1], modelname))
-    .then((words) => {
-      res.json({ result: words });
-    }).catch((message) => {
-      console.error(message);
-      res.status(400).json({ error: 'Error in topic modeling.' });
-    });
+  return topic(subtitles[chapter].content, modelname);
 }
+
 
 export default {
   view,
@@ -1227,5 +1199,6 @@ export default {
   runHotspot,
   getSuggestedCourses,
   topicSearch,
-  topicModel,
+  getTopics,
+  getTedChapters,
 };

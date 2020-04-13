@@ -5,17 +5,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>HyperTED</title>
-    <link rel="icon" type="image/png" href="/HyperTED/img/favicons/favicon_48.png">
+    <link rel="icon" type="image/png" href="/img/favicons/favicon_48.png">
 
-    <link rel="stylesheet" href="/HyperTED/css/MFstyle.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
 </head>
 <body>
 <header class="error_header">
     <div>
         <div class="top-brand">
-            <img class="left-mark" src="/HyperTED/img/logos/left_mark.png">
+            <img class="left-mark" src="/img/logos/left_mark.png">
             <span class="errorcode"><%= code %></span>
-            <img class="right-mark" src="/HyperTED/img/logos/right_mark.png">
+            <img class="right-mark" src="/img/logos/right_mark.png">
         </div>
         <h1><%= message %></h1>
     </div>
@@ -26,7 +26,7 @@
         <small><em><%= invite %></em></small>
     </h1>
 
-    <form method="get" action="/HyperTED/video">
+    <form method="get" action="/video">
         <div class="input-group">
             <input name="uri" type="url" placeholder="Insert a Media Fragment URL" class="form-control input-lg"
                    required>
@@ -37,15 +37,6 @@
     </form>
 </div>
 
-<footer class="video_footer">
-    <div class="foo">
-        <div class="foo-line">
-            <hr class="red_rule">
-        </div>
-
-        <div class="eurecomLogo"><img src="/HyperTED/img/logos/eurecom_logo.png"/></div>
-        <div class="mediamixerLogo"><img src="/HyperTED/img/logos/mediamixer_logo.png"/></div>
-    </div>
-</footer>
+<% include partials/footer.ejs %>
 </body>
 </html>

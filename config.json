@@ -1,5 +1,5 @@
 {
   "mongo" : "localhost:27017/hyperted",
   "elastic" : "http://localhost:9200",
-  "topicmodel" : "http://localhost:5000/api/"
+  "topicmodel" : "http://hyperted.eurecom.fr/topic/api/"
 }

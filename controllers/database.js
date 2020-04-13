@@ -1,4 +1,4 @@
-import UUID from 'uuid/v5';
+import { v5 as UUID } from 'uuid';
 import monk from 'monk';
 import Promise from 'bluebird';
 import config from '../config.json';
@@ -14,9 +14,15 @@ const ents = db.get('entities');
 ents.createIndex('uuid');
 ents.createIndex('extractor');
 
-const hots = db.get('hotspots');
-hots.createIndex('uuid');
-hots.createIndex('uuid startNPT', { unique: true });
+// const hots = db.get('hotspots');
+// hots.createIndex('uuid');
+// hots.createIndex('uuid startNPT', { unique: true });
+
+const tops = db.get('topics');
+tops.createIndex('uuid');
+tops.createIndex('uuid model');
+tops.createIndex('uuid chap model', { unique: true });
+
 
 const chaps = db.get('chapters');
 chaps.createIndex('uuid');
@@ -65,7 +71,6 @@ function getVideoFromUuid(uuid, full) {
 
       return Promise.all([
         ents.find({ uuid: video.uuid }),
-        hots.find({ uuid: video.uuid }),
         chaps.find({ uuid: video.uuid }, { sort: { chapNum: 1 } }),
       ]).then((values) => {
         const [entities, hotspots, chapters] = values;
@@ -170,25 +175,45 @@ function updateVideoUuid(uuid, newVideo) {
     }).then(() => newVideo);
 }
 
-function setHotspotProcess(uuid, value) {
-  return videos.update({ uuid }, { $set: { hotspotStatus: value } });
-}
+// function setHotspotProcess(uuid, value) {
+//   return videos.update({ uuid }, { $set: { hotspotStatus: value } });
+// }
+//
+// async function getHotspotProcess(uuid) {
+//   const data = await videos.findOne({ uuid });
+//   return data.hotspotStatus;
+// }
 
-async function getHotspotProcess(uuid) {
-  const data = await videos.findOne({ uuid });
-  return data.hotspotStatus;
-}
-
-function addHotspots(uuid, hotspots) {
-  return Promise.map(hotspots, (h) => {
-    h.uuid = uuid;
-    return hots.insert(h);
-  });
-}
+// function addHotspots(uuid, hotspots) {
+//   return Promise.map(hotspots, (h) => {
+//     h.uuid = uuid;
+//     return hots.insert(h);
+//   });
+// }
 
 async function hasEntities(uuid) {
   const data = await ents.findOne({ uuid });
   return !!data;
+}
+
+function getAllVideos(vendor = 'ted') {
+  return videos.find({ vendor });
+}
+
+function getTopics(uuid, chap = 'all', model = 'lda') {
+  const query = { uuid, model };
+  if (chap !== undefined && chap !== 'all') query.chap = chap;
+  return tops.find(query);
+}
+
+function saveTopics(topic, uuid, chap, model) {
+  const obj = {
+    uuid,
+    chap,
+    model,
+    topic,
+  };
+  return tops.insert(obj);
 }
 
 export default {
@@ -204,7 +229,10 @@ export default {
   },
   addEntities,
   hasEntities,
-  setHotspotProcess,
-  getHotspotProcess,
-  addHotspots,
+  // setHotspotProcess,
+  // getHotspotProcess,
+  // addHotspots,
+  getAllVideos,
+  saveTopics,
+  getTopics,
 };

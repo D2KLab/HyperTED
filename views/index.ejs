@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HyperTED</title>
+  <link rel="icon" type="image/png" href="/img/favicons/favicon_48.png">
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+
+
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
+</head>
+<body>
+  <div class="page_cont">
+    <header class="home_header">
+
+      <div class="HTlogo">
+        <div class="top-brand long">
+          <img class="left-mark" src="/img/logos/left_mark.png">
+          <img class="logo-text hidden-xs" src="/img/logos/hTedLogo_long_text.png">
+          <img class="logo-text hidden-sm hidden-lg hidden-md" src="/img/logos/hTedLogo_big_text.png">
+          <img class="right-mark" src="/img/logos/right_mark.png">
+        </div>
+      </div>
+    </header>
+
+    <div class="container home_cont row">
+      <div class="col-md-8">
+        <h3>Start by searching for a video fragment...</h3>
+
+        <div class="form-switch-cont">
+          <div class="btn-group btn-goup-lg" id="form-switch" data-toggle="buttons">
+            <label class="btn btn-danger active">
+              <input type="radio" name="options" id="basic" checked>Basic
+            </label>
+            <label class="btn btn-danger">
+              <input type="radio" name="options" id="advanced">Advanced
+            </label>
+          </div>
+        </div>
+        <form id="basic-form" class="row" method="get" action="/video">
+          <label class="col-lg-7 col-md-12">
+            Insert the a video URL
+            <input name="uri" type="url"
+            placeholder="e.g. https://www.ted.com/talks/will_potter_the_shocking_move_to_criminalize_non_violent_protest"
+            class="form-control input-lg" required>
+            <label class="suggesting">or try with
+              <a class="example_link">https://www.ted.com/talks/2018</a>
+              or
+              <a class="example_link">https://www.ted.com/talks/sarah_lewis_embrace_the_near_win</a>
+            </label>
+
+          </label>
+
+          <div class="timeFrag col-lg-4 col-md-12">
+            <div class="row">
+              <label class="col-sm-6 col-xs-6">from
+                <small><em>(opz)</em></small>
+                <input name="start" type="time" class="form-control input-lg" step="1"
+                placeholder="hh:mm:ss" pattern="0?[0-6](:[0-5][0-9]){2}">
+              </label>
+
+              <label class="col-sm-6 col-xs-6">
+                to
+                <small><em>(opz)</em></small>
+                <input name="end" type="time" class="form-control input-lg" step="1"
+                placeholder="hh:mm:ss" pattern="0?[0-6](:[0-5][0-9]){2}">
+              </label>
+            </div>
+          </div>
+          <button class="btn btn-danger btn-lg col-lg-1 col-md-12 col-xs-12" type="submit">Go!</button>
+        </form>
+
+        <form id="advanced-form" class="hidden" method="get" action="/video">
+          <label>Insert a Media Fragment URL</label>
+
+          <div class="input-group">
+            <input name="uri" type="url"
+            placeholder="e.g. https://www.ted.com/talks/will_potter_the_shocking_move_to_criminalize_non_violent_protest#t=0:00:18,0:00:57"
+            class="form-control input-lg" required>
+            <span class="input-group-btn">
+              <button class="btn btn-danger btn-lg" type="submit">Go!</button>
+            </span>
+          </div>
+          <label>or try with
+            <a class="example_link">https://www.ted.com/talks/2018#t=0:00:18,0:00:57</a>
+            or
+            <a class="example_link">https://www.ted.com/talks/sarah_lewis_embrace_the_near_win#t=0:00:18,0:00:57</a>
+          </label>
+
+        </form>
+      </div>
+      <div class="col-md-4">
+        <h3>...or search by topic</h3>
+
+        <form id="topic-form" method="get" action="/topicsearch">
+          <label>Search a topic</label>
+
+          <div class="input-group">
+            <input name="topic" type="text" placeholder="e.g. Democracy, United States, Wikipedia"
+            class="form-control input-lg" required>
+            <span class="input-group-btn">
+              <button class="btn btn-danger btn-lg" type="submit">Go!</button>
+            </span>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+  <% include partials/footer.ejs %>
+  <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
+
+  <script>
+  $(document).ready(function () {
+    var $formSwitch = $('#form-switch');
+    var $advancedForm = $('#advanced-form');
+    var $basicForm = $('#basic-form');
+
+    $('input', $formSwitch).change(function () {
+      $advancedForm.add($basicForm).toggleClass('hidden');
+    });
+
+    $(".example_link").click(function () {
+      $("input[name=uri]:visible").val($(this).text());
+    });
+
+    $basicForm.submit(function () {
+      var $form = $(this);
+      var $timefrag = $('.timeFrag', $form);
+      var $start = $('[name="start"]', $timefrag);
+      var $end = $('[name="end"]', $timefrag);
+
+      if ($start.val() || $end.val()) {
+        var $uriInput = $('input[name="uri"]', $form);
+        var startVal = $start.val();
+        var endVal = $end.val() ? ',' + $end.val() : '';
+        var uriInputOldVal = $uriInput.val();
+        var uriHashIndex = uriInputOldVal.indexOf('#')
+        if (uriHashIndex != -1) {
+          uriInputOldVal = uriInputOldVal.substring(0, uriHashIndex);
+        }
+        $uriInput.val(uriInputOldVal + '#t=' + startVal + endVal);
+      }
+      $start.add($end).prop('disabled', true);
+      return true;
+    });
+
+
+    $('input[name="start"]').on('change', function () {
+      var minInputEnd = $(this).val();
+      var realInputEnd = $('input[name="end"]').val();
+
+      $('input[name="end"]').attr("min", minInputEnd);
+    });
+
+  });
+</script>
+
+</body>
+</html>

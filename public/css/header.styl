@@ -1,0 +1,29 @@
+// main: main.styl
+
+.navbar, .navbar-placeholder
+  margin-bottom: 0
+
+.navbar
+  position: fixed;
+  background: #fff
+  z-index: 105
+  width: 100%
+  box-shadow 0 1px 8px -2px $dark_gray
+  border-radius 0
+
+  .navbar-brand
+    padding 9px 15px
+  .top-brand
+    img
+      height: auto
+    .logo-text
+      width: 54px
+    .left-mark, .right-mark
+      width: 31px
+
++above(768px)
+  #topic-form
+    max-width 20em
+
+.navbar-placeholder
+  position: static;
