@@ -24,7 +24,7 @@ var cfg = {
           }
       ]
 };
-// rs.initiate(cfg, { force: true });
+rs.initiate(cfg, { force: true });
 rs.reconfig(cfg, { force: true });
 db.getMongo().setReadPref('nearest');
 ```
@@ -34,18 +34,16 @@ db.getMongo().setReadPref('nearest');
       docker run -d -p 9200:9200 --restart=unless-stopped  -v /home/semantic/hyperted/HyperTED/elasticsearch:/usr/share/elasticsearch/data --name hyperted_elastic elasticsearch:1.7
 
 
-- Start mongoconnector
-
-      docker build -t hyperted/mongoconnector ./db_config/mongoconnect0
-
-      docker run --name hyperted_mongoconnect hyperted/mongoconnector
-
-
 - Start web
 
       docker build -t hyperted/web .
       docker run -d -p 8011:8011 --restart=unless-stopped --name hyperted_web hyperted/web
 
+
+- Start mongoconnector
+
+      docker build -t hyperted/mongoconnector ./db_config/mongoconnect0
+      docker run --name hyperted_mongoconnect hyperted/mongoconnector
 
 - Set up network
 

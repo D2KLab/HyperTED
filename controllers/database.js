@@ -73,9 +73,8 @@ function getVideoFromUuid(uuid, full) {
         ents.find({ uuid: video.uuid }),
         chaps.find({ uuid: video.uuid }, { sort: { chapNum: 1 } }),
       ]).then((values) => {
-        const [entities, hotspots, chapters] = values;
+        const [entities, chapters] = values;
         video.entities = entities;
-        video.hotspots = hotspots;
         video.chapters = chapters;
 
         return video;

@@ -372,17 +372,7 @@ function view(req, res) {
         .then(() => db.updateVideoUuid(uuid, video))
         .catch((err) => console.error(err))
         .finally(() => {
-          if (video.hotspotStatus === hStatusValue.IN_PROGRESS) {
-            // checkHotspotResults(video.uuid, (err, data) => {
-            //   if (data) {
-            //     video.hotspotStatus = hStatusValue.DONE;
-            //     video.hotspots = data;
-            //   }
-            viewVideo(req, res, video);
-            // });
-          } else {
-            viewVideo(req, res, video);
-          }
+          viewVideo(req, res, video);
         });
     })
     .catch((err) => {
