@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mongo="${MONGO:-hyperted_mongo}"
-mongoport="${MONGOPORT:-27027}"
+mongoport="${MONGOPORT:-27017}"
 elasticsearch="${ELASTICSEARCH:-hyperted_elasticsearch}"
 elasticport="${ELASTICPORT:-9200}"
 

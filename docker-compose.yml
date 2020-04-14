@@ -14,9 +14,12 @@ services:
     # mem_limit: 1024m
     environment:
       - TZ=Europe/Paris
-    expose:
+    ports:
       - "27017:27027"
       - "28017:28027"
+    expose:
+      - "27017"
+      - "28017"
     restart: always
     # entrypoint: [ "/usr/bin/mongod", "--dbpath", "/database", "--replSet", "rs", "--httpinterface", "--rest" ]
     volumes:

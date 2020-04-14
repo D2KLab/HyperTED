@@ -38,7 +38,7 @@ db.getMongo().setReadPref('nearest');
 
       docker build -t hyperted/mongoconnector ./db_config/mongoconnect0
 
-      docker run -d --restart=unless-stopped --name hyperted_mongoconnect hyperted/mongoconnector
+      docker run --name hyperted_mongoconnect hyperted/mongoconnector
 
 
 - Start web

@@ -25,7 +25,7 @@ async function run() {
   Promise.each(videos,
     (v, i, length) => db.getTopics(v.uuid)
       .then((topics) => {
-        if (!topics.length) return processVideo(v, i, length);
+        if (!topics.length && v.jsonSub) return processVideo(v, i, length);
         return Promise.resolve(true);
       }));
 }
