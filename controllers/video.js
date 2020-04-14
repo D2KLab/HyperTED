@@ -364,7 +364,7 @@ function view(req, res) {
         console.log(`updating metadata for video ${uuid}`);
         video.timestamp = Date.now();
         updateFun = collectMetadata;
-      } else if (video.vendor) {
+      } else if (video.vendor && video.vendor !== 'ted') {
         updateFun = getFickleMetadata;
       }
 

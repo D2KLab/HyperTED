@@ -21,12 +21,12 @@ services:
       - "27017"
       - "28017"
     restart: always
-    # entrypoint: [ "/usr/bin/mongod", "--dbpath", "/database", "--replSet", "rs", "--httpinterface", "--rest" ]
+    entrypoint: [ "/usr/bin/mongod", "--dbpath", "/database", "--replSet", "rs", "--httpinterface", "--rest" ]
     volumes:
       - ./database:/database
 
   mongosetup:
-    build: ./db_config/mongosetup
+    image: yeasy/mongosetup
     # mem_limit: 1024m
     links:
       - mongo:mongo

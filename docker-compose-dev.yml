@@ -5,18 +5,17 @@
 # mongosetup will init mongo as the master node
 # elasticsearch will server as the index search db
 # mongo-connector will pipeline mongodb content to the elasticsearch
-version: "2.4"
+version: "3"
 
 services:
   mongo:
     image: mongo:3.4
     hostname: mongo
-    mem_limit: 1024m
     environment:
       - TZ=Europe/Paris
     ports:
-      - "27017:27027"
-      - "28017:28027"
+      - "27017:27017"
+      - "28017:28017"
     expose:
       - "27017"
       - "28017"
@@ -27,13 +26,11 @@ services:
 
   mongosetup:
     image: yeasy/mongosetup
-    mem_limit: 1024m
     links:
       - mongo:mongo
 
   elasticsearch:
     image: elasticsearch:1.7
-    mem_limit: 1024m
     environment:
       - TZ=Europe/Paris
     volumes:

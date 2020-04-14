@@ -1,6 +1,5 @@
 {
   "namespaces":{
-    "hyperted.entities":true,
-    "hyperted.hotspots":true
+    "hyperted.entities":true
   }
  }

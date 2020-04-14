@@ -19,12 +19,12 @@ var cfg = {
       "members": [
           {
               "_id": 0,
-              "host": "10.0.0.14:27017",
+              "host": "172.17.0.5:27017",
               "priority": 1
           }
       ]
 };
-rs.initiate(cfg, { force: true });
+// rs.initiate(cfg, { force: true });
 rs.reconfig(cfg, { force: true });
 db.getMongo().setReadPref('nearest');
 ```
@@ -76,3 +76,5 @@ db.getMongo().setReadPref('nearest');
 
       docker stop hyperted_mongo
       docker rm hyperted_mongo
+
+      docker network rm hyperted
