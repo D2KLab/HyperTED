@@ -22,8 +22,7 @@ async function topic2labels(id, modelName) {
 export default async function (text, modelName) {
   const api = `${API_INSTANCE}${modelName}/predict`;
 
-  const headers = { 'Content-Type': 'text/plain' };
-  const inf = await axios.get(api, text, { headers });
+  const inf = await axios.get(api, { params: { text } });
   const items = inf.data.results;
 
   if (!items.length) return [];
