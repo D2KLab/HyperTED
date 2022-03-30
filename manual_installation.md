@@ -36,8 +36,8 @@ db.getMongo().setReadPref('nearest');
 
 - Start web
 
-      docker build -t hyperted/web .
-      docker run -d -p 8011:8011 --restart=unless-stopped --name hyperted_web hyperted/web
+docker build -t hyperted/web .
+docker run -d -p 8011:8011 --restart=unless-stopped --name hyperted_web hyperted/web
 
 
 - Start mongoconnector
