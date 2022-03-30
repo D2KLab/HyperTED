@@ -38,10 +38,10 @@
         <div class="form-switch-cont">
           <div class="btn-group btn-goup-lg" id="form-switch" data-toggle="buttons">
             <label class="btn btn-danger active">
-              <input type="radio" name="options" id="basic" checked>Basic
+              <input type="radio" name="options" id="basic" checked/>Basic
             </label>
             <label class="btn btn-danger">
-              <input type="radio" name="options" id="advanced">Advanced
+              <input type="radio" name="options" id="advanced"/>Advanced
             </label>
           </div>
         </div>
@@ -121,20 +121,21 @@
 
   <script>
   $(document).ready(function () {
-    var $formSwitch = $('#form-switch');
-    var $advancedForm = $('#advanced-form');
-    var $basicForm = $('#basic-form');
 
-    $('input', $formSwitch).change(function () {
-      $advancedForm.add($basicForm).toggleClass('hidden');
+    var $advancedForm = document.querySelector('#advanced-form');
+    var $basicForm = document.querySelector('#basic-form');
+
+    $('#form-switch input').on('change', ()=>{
+      $advancedForm.classList.toggle('hidden');
+      $basicForm.classList.toggle('hidden');
     });
 
-    $(".example_link").click(function () {
-      $("input[name=uri]:visible").val($(this).text());
+    $(".example_link").on('click', (event) => {
+      $("input[name=uri]:visible").val(event.currentTarget.innerText);
     });
 
-    $basicForm.submit(function () {
-      var $form = $(this);
+    $basicForm.addEventListener('submit', function () {
+      var $form = $basicForm;
       var $timefrag = $('.timeFrag', $form);
       var $start = $('[name="start"]', $timefrag);
       var $end = $('[name="end"]', $timefrag);
