@@ -8,6 +8,7 @@ const storageKey = 'fragmentenricher.';
 const videokey = `${storageKey + video.uuid}.`;
 let $plainSubCont; // Container for subs with no entities
 let $player;
+let currentExtractor = 'No';
 
 const baseUri = '/Hyperted';
 
@@ -132,6 +133,7 @@ function showTEDSuggestedChaps() {
   const $playlistSect = $('.see-also #playlist-sect');
 
   const extractor = (new URLSearchParams(window.location.search)).get('enriched');
+  currentExtractor = extractor;
   $('.invite', $playlistSect).toggle(!extractor);
   $('.no_ent', $playlistSect).hide();
 
@@ -683,8 +685,9 @@ function init() {
 
     // nerdification
     const extractor = search.get('enriched');
-    if (extractor) {
+    if (extractor !== currentExtractor) {
       console.info(`popstate! new extractor: ${extractor}`);
+      currentExtractor = extractor;
       $('.nerdSelect select').val(extractor).change();
       const ents = getFromLocalStorage(videokey + extractor);
 

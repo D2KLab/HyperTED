@@ -26,12 +26,10 @@ export default async function (text, modelName) {
   const items = inf.data.results;
 
   if (!items.length) return [];
-  if (modelName === 'tfidf') return items;
 
   // the best topic is the first in the list
-  const [topic] = items;
-  const [id] = Object.keys(topic);
-  if (topic[id] < 0.2) return [];
+  const [id, conf] = items[0];
+  if (conf < 0.2) return [];
 
   return topic2labels(id, modelName);
 }
