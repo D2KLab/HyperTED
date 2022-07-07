@@ -28,7 +28,7 @@
         "esm": "^3.2.25",
         "express": "^4.17.1",
         "mediafragment": "git+https://github.com/pasqLisena/node-mediafragment",
-        "moment": "^2.24.0",
+        "moment": "^2.29.4",
         "mongodb": "^3.5.5",
         "monk": "^7.1.2",
         "morgan": "^1.10.0",
