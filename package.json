@@ -26,7 +26,7 @@
         "bluebird": "^3.7.2",
         "ejs": "^2.7.1",
         "esm": "^3.2.25",
-        "express": "^4.17.1",
+        "express": "^4.17.3",
         "mediafragment": "git+https://github.com/pasqLisena/node-mediafragment",
         "moment": "^2.24.0",
         "mongodb": "^3.5.5",
